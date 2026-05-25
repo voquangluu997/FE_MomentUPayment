@@ -29,7 +29,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
       // 🔥 BƯỚC 2: Cầm đường dẫn ảnh từ server (nếu có) gửi cùng data giao dịch
       await _repository.createTransaction(
         amount: amount,
-        category: category,
+        category: category, 
         note: note,
         imageUrl:
             serverImageUrl, // Đã được đồng bộ hóa thành chuỗi text lưu vào DB

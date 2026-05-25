@@ -30,5 +30,13 @@
   "catFood": "Ăn uống 🍰",
   "catShopping": "Mua sắm 🛍️",
   "catTransport": "Di chuyển 🚗",
-  "catEntertainment": "Giải trí 🎮"
+  "catEntertainment": "Giải trí 🎮",
+  "categoryOther": "Chưa phân loại",
+  "emptyTransactionNote": "Khoảnh khắc chi tiêu không tên...",
+  "homeGreetingDeveloper": "Xin chào, Developer! 👋",
+  "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
+  "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
+  "budgetThisMonthLabel": "Hạn mức chi tiêu tháng này",
+  "budgetRemainingStatus": "Còn lại 600.000 ₫ của 1.000.000 ₫",
+  "budgetHealthyFeedback": "🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng."
 }

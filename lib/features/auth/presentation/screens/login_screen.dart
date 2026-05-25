@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/transaction/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../transaction/presentation/screens/add_transaction_screen.dart';
@@ -59,7 +60,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ref.read(authProvider.notifier).resetState();
 
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (next == AuthState.loginError) {
         ScaffoldMessenger.of(context).showSnackBar(

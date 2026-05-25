@@ -99,4 +99,29 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get catEntertainment => 'Giải trí 🎮';
+
+  @override
+  String get categoryOther => 'Chưa phân loại';
+
+  @override
+  String get emptyTransactionNote => 'Khoảnh khắc chi tiêu không tên...';
+
+  @override
+  String get homeGreetingDeveloper => 'Xin chào, Developer! 👋';
+
+  @override
+  String get homeSubGreeting => 'Hôm nay tình hình chi tiêu thế nào?';
+
+  @override
+  String get spendingMomentsTitle => 'Khoảnh khắc chi tiêu của bạn';
+
+  @override
+  String get budgetThisMonthLabel => 'Hạn mức chi tiêu tháng này';
+
+  @override
+  String get budgetRemainingStatus => 'Còn lại 600.000 ₫ của 1.000.000 ₫';
+
+  @override
+  String get budgetHealthyFeedback =>
+      '🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.';
 }

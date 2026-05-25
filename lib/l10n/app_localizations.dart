@@ -277,6 +277,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Entertainment 🎮'**
   String get catEntertainment;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorized'**
+  String get categoryOther;
+
+  /// No description provided for @emptyTransactionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nameless spending moment...'**
+  String get emptyTransactionNote;
+
+  /// No description provided for @homeGreetingDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, Developer! 👋'**
+  String get homeGreetingDeveloper;
+
+  /// No description provided for @homeSubGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'How is your spending status today?'**
+  String get homeSubGreeting;
+
+  /// No description provided for @spendingMomentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Spending Moments'**
+  String get spendingMomentsTitle;
+
+  /// No description provided for @budgetThisMonthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget This Month'**
+  String get budgetThisMonthLabel;
+
+  /// No description provided for @budgetRemainingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining 600.000 ₫ of 1.000.000 ₫'**
+  String get budgetRemainingStatus;
+
+  /// No description provided for @budgetHealthyFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Awesome! You are managing your budget safely.'**
+  String get budgetHealthyFeedback;
 }
 
 class _AppLocalizationsDelegate

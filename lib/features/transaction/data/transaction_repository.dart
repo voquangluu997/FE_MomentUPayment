@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
   final Dio _dio;
@@ -12,7 +13,8 @@ class TransactionRepository {
           dio ??
           Dio(
             BaseOptions(
-              baseUrl: dotenv.env['API_BASE_URL'] ?? 'http://192.168.13.125:8001/',
+              baseUrl:
+                  dotenv.env['API_BASE_URL'] ?? 'http://192.168.13.125:8001/',
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 10),
             ),
@@ -40,14 +42,9 @@ class TransactionRepository {
 
       // 4. Bắn Request kèm Header Authorization
       final response = await _dio.post(
-        '/transactions/upload', // Endpoint xử lý upload file trên NestJS
+        '/upload', // Endpoint xử lý upload file trên NestJS
         data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'multipart/form-data',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       // Nhận về chuỗi URL ảnh từ server sau khi upload thành công
@@ -57,9 +54,7 @@ class TransactionRepository {
         throw Exception("Upload thất bại với status: ${response.statusCode}");
       }
     } on DioException catch (e) {
-      print(
-        '❌ Lỗi tệ hại tại uploadInvoiceImage: ${e.response?.data ?? e.message}',
-      );
+      AppLogger.e('TransactionRepo.upload', e, e.stackTrace);
       rethrow;
     }
   }
@@ -102,9 +97,7 @@ class TransactionRepository {
         throw Exception("Không thể tạo transaction");
       }
     } on DioException catch (e) {
-      print(
-        '❌ Lỗi tệ hại tại createTransaction: ${e.response?.data ?? e.message}',
-      );
+      AppLogger.e('TransactionRepo.create', e, e.stackTrace);
       rethrow;
     }
   }

@@ -100,4 +100,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catEntertainment => 'Entertainment 🎮';
+
+  @override
+  String get categoryOther => 'Uncategorized';
+
+  @override
+  String get emptyTransactionNote => 'Nameless spending moment...';
+
+  @override
+  String get homeGreetingDeveloper => 'Hello, Developer! 👋';
+
+  @override
+  String get homeSubGreeting => 'How is your spending status today?';
+
+  @override
+  String get spendingMomentsTitle => 'Your Spending Moments';
+
+  @override
+  String get budgetThisMonthLabel => 'Budget This Month';
+
+  @override
+  String get budgetRemainingStatus => 'Remaining 600.000 ₫ of 1.000.000 ₫';
+
+  @override
+  String get budgetHealthyFeedback =>
+      '🎉 Awesome! You are managing your budget safely.';
 }

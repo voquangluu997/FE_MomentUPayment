@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/transaction/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
@@ -53,7 +54,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           ),
         );
         ref.read(transactionProvider.notifier).resetState();
-        Navigator.of(context).pop();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ), // 👈 Sửa thành màn hình chính của bạn
+        );
       } else if (next == TransactionState.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -78,7 +83,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          ),
         ),
       ),
       body: SafeArea(

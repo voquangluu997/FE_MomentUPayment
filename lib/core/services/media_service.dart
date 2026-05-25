@@ -1,10 +1,21 @@
 import 'package:image_picker/image_picker.dart';
+import '../utils/app_logger.dart';
 
 class MediaService {
   final ImagePicker _picker = ImagePicker();
+  bool _isPicking = false;
 
   /// ✨ Hàm mở Camera để chụp ảnh trực tiếp
   Future<XFile?> takePhoto() async {
+    if (_isPicking) {
+      AppLogger.w(
+        'MediaService',
+        'Camera request skipped: another request is in progress',
+      );
+      return null;
+    }
+
+    _isPicking = true;
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
@@ -13,14 +24,25 @@ class MediaService {
         imageQuality: 85, // Nén chất lượng ảnh xuống 85% giúp mượt mà hơn
       );
       return photo;
-    } catch (e) {
-      print('Lỗi khi mở camera rùi: $e');
+    } catch (e, st) {
+      AppLogger.e('MediaService', e, st as StackTrace);
       return null;
+    } finally {
+      _isPicking = false;
     }
   }
 
   /// ✨ Hàm mở Album/Thư viện ảnh để chọn ảnh có sẵn
   Future<XFile?> pickImageFromGallery() async {
+    if (_isPicking) {
+      AppLogger.w(
+        'MediaService',
+        'Gallery request skipped: another request is in progress',
+      );
+      return null;
+    }
+
+    _isPicking = true;
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -29,9 +51,11 @@ class MediaService {
         imageQuality: 85,
       );
       return image;
-    } catch (e) {
-      print('Lỗi khi mở thư viện ảnh rùi: $e');
+    } catch (e, st) {
+      AppLogger.e('MediaService', e, st as StackTrace);
       return null;
+    } finally {
+      _isPicking = false;
     }
   }
 }

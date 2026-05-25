@@ -11,4 +11,5 @@ class AppColors {
   static const Color success = Color(0xFFCCD5AE);         // Xanh Sage tươi mát (Thành công)
   static const Color error = Color(0xFFFFCAD4);           // Hồng dâu dịu nhẹ (Thất bại / Lỗi)
   static const Color errorAccent = Color(0xFFFF9B9B);     // Hồng đỏ đậm cho các lỗi nổi bật
+  
 }

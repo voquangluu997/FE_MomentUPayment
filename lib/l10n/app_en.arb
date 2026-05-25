@@ -30,5 +30,13 @@
   "catFood": "Food 🍰",
   "catShopping": "Shopping 🛍️",
   "catTransport": "Transport 🚗",
-  "catEntertainment": "Entertainment 🎮"
+  "catEntertainment": "Entertainment 🎮",
+  "categoryOther": "Uncategorized",
+  "emptyTransactionNote": "Nameless spending moment...",
+  "homeGreetingDeveloper": "Hello, Developer! 👋",
+  "homeSubGreeting": "How is your spending status today?",
+  "spendingMomentsTitle": "Your Spending Moments",
+  "budgetThisMonthLabel": "Budget This Month",
+  "budgetRemainingStatus": "Remaining 600.000 ₫ of 1.000.000 ₫",
+  "budgetHealthyFeedback": "🎉 Awesome! You are managing your budget safely."
 }
