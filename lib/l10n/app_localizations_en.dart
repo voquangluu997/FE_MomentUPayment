@@ -138,4 +138,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get emptyTransactionList =>
       'No spending moments this month. Tap + to add one! 🌸';
+
+  @override
+  String get deleteDialogTitle => 'Delete this transaction?';
+
+  @override
+  String get deleteDialogContent =>
+      'This action will permanently delete your spending history and the attached receipt stored on Cloudinary.';
+
+  @override
+  String get deleteDialogCancel => 'Cancel';
+
+  @override
+  String get deleteDialogConfirm => 'Delete';
+
+  @override
+  String get deleteSuccessSnackbar =>
+      'Transaction and receipt image have been successfully cleaned up! ✨';
+
+  @override
+  String get deleteErrorSnackbar =>
+      'Failed to delete. Please check your network connection!';
 }

@@ -43,5 +43,12 @@
   "loadingData": "Đang tải danh sách chi tiêu...",
   "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
   "retryButton": "Thử lại",
-  "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸"
+  "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸",
+
+  "deleteDialogTitle": "Xóa giao dịch này?",
+  "deleteDialogContent": "Hành động này sẽ xóa vĩnh viễn lịch sử chi tiêu và ảnh chứng từ lưu trữ trên Cloudinary.",
+  "deleteDialogCancel": "Hủy",
+  "deleteDialogConfirm": "Xóa sạch",
+  "deleteSuccessSnackbar": "Đã dọn dẹp sạch sẽ giao dịch và ảnh hóa đơn! ✨",
+  "deleteErrorSnackbar": "Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!"
 }

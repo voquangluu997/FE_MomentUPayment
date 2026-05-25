@@ -43,5 +43,12 @@
   "loadingData": "Loading spending moments...",
   "errorLoadData": "Failed to load data. Please try again!",
   "retryButton": "Retry",
-  "emptyTransactionList": "No spending moments this month. Tap + to add one! 🌸"
+  "emptyTransactionList": "No spending moments this month. Tap + to add one! 🌸",
+
+  "deleteDialogTitle": "Delete this transaction?",
+  "deleteDialogContent": "This action will permanently delete your spending history and the attached receipt stored on Cloudinary.",
+  "deleteDialogCancel": "Cancel",
+  "deleteDialogConfirm": "Delete",
+  "deleteSuccessSnackbar": "Transaction and receipt image have been successfully cleaned up! ✨",
+  "deleteErrorSnackbar": "Failed to delete. Please check your network connection!"
 }

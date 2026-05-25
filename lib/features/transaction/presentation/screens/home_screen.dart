@@ -13,9 +13,10 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 🌍 Khởi tạo đối tượng đa ngôn ngữ hệ thống
     final l10n = AppLocalizations.of(context)!;
 
-    // Lắng nghe trạng thái động từ AsyncNotifierProvider
+    // 🔄 Lắng nghe trạng thái luồng dữ liệu dòng thời gian từ Riverpod Controller
     final timelineState = ref.watch(transactionTimelineProvider);
 
     return Scaffold(
@@ -63,7 +64,6 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      // Luồng kéo để tải lại dữ liệu (Pull to Refresh)
       body: RefreshIndicator(
         color: AppColors.primary,
         backgroundColor: AppColors.cardBackground,
@@ -71,11 +71,13 @@ class HomeScreen extends ConsumerWidget {
             ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(), // Hiệu ứng kéo mượt chuẩn iOS
+            parent:
+                BouncingScrollPhysics(), // Hiệu ứng cuộn đàn hồi mượt mà chuẩn iOS
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 📊 Thẻ tiến độ hạn mức ngân sách tháng hiện tại
               _buildBudgetProgressCard(context, l10n),
 
               Padding(
@@ -93,7 +95,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Quản lý Render UI dựa theo trạng thái AsyncValue của Riverpod
+              // 🚀 Phân nhánh giao diện dựa theo trạng thái AsyncValue của AsyncNotifier
               timelineState.when(
                 loading: () => const SizedBox(
                   height: 200,
@@ -143,7 +145,7 @@ class HomeScreen extends ConsumerWidget {
                     );
                   }
 
-                  // 🧠 Sạch sẽ gọn gàng: Sử dụng Util để gom nhóm và sắp xếp dữ liệu
+                  // 🧠 Xử lý phân nhóm và sắp xếp danh sách phẳng qua tầng Util
                   final groupedTransactions =
                       DateTimeHelper.groupTransactionsByDate(transactions);
 
@@ -158,7 +160,7 @@ class HomeScreen extends ConsumerWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 🗓️ Nhãn hiển thị nhóm thời gian (HÔM NAY, HÔM QUA, dd/MM/yyyy)
+                          // 🗓️ Tiêu đề nhóm ngày thân thiện (HÔM NAY, HÔM QUA, dd/MM/yyyy)
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 20,
@@ -175,18 +177,131 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          // Danh sách card chi tiêu thuộc ngày đó
-                          ...txList.map(
-                            (tx) => TransactionCard(
-                              transaction: tx,
-                              onTap: () => _showFullSizeImageDialog(
-                                context,
-                                l10n,
-                                tx['imageUrl'] ?? '',
-                                tx['note'] ?? '',
+
+                          // 🔀 Duyệt danh sách các khoản chi tiêu thuộc ngày hiện tại
+                          ...txList.map((tx) {
+                            final String txId = tx['id'].toString();
+
+                            return Dismissible(
+                              key: Key(txId),
+                              direction: DismissDirection
+                                  .endToStart, // Chỉ cho phép vuốt từ phải sang trái
+                              // 🎨 Nền đỏ pastel ẩn phía sau thẻ khi vuốt
+                              background: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 6,
+                                ),
+                                padding: const EdgeInsets.only(right: 24),
+                                alignment: Alignment.centerRight,
+                                decoration: BoxDecoration(
+                                  color: AppColors.errorAccent.withOpacity(
+                                    0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.delete_sweep_rounded,
+                                  color: AppColors.errorAccent,
+                                  size: 28,
+                                ),
                               ),
-                            ),
-                          ),
+
+                              // ❓ Hộp thoại xác nhận đa ngôn ngữ trước khi tiến hành xóa vĩnh viễn
+                              confirmDismiss: (direction) async {
+                                return await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppColors.cardBackground,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    title: Text(
+                                      l10n.deleteDialogTitle,
+                                      style: const TextStyle(
+                                        color: AppColors.primaryDark,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    content: Text(
+                                      l10n.deleteDialogContent,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text(
+                                          l10n.deleteDialogCancel,
+                                          style: TextStyle(
+                                            color: AppColors.primaryDark
+                                                .withOpacity(0.5),
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text(
+                                          l10n.deleteDialogConfirm,
+                                          style: const TextStyle(
+                                            color: AppColors.errorAccent,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+
+                              // 🚀 Kích hoạt luồng xóa bất đồng bộ khi người dùng đồng ý
+                              onDismissed: (direction) async {
+                                try {
+                                  await ref
+                                      .read(
+                                        transactionTimelineProvider.notifier,
+                                      )
+                                      .deleteTransaction(txId);
+
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: AppColors.success,
+                                        content: Text(
+                                          l10n.deleteSuccessSnackbar,
+                                        ),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: AppColors.errorAccent,
+                                        content: Text(l10n.deleteErrorSnackbar),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+
+                              // Thẻ hiển thị thông tin chi tiết giao dịch gốc
+                              child: TransactionCard(
+                                transaction: tx,
+                                onTap: () => _showFullSizeImageDialog(
+                                  context,
+                                  l10n,
+                                  tx['imageUrl'] ?? '',
+                                  tx['note'] ?? '',
+                                ),
+                              ),
+                            );
+                          }),
                         ],
                       );
                     },
@@ -214,6 +329,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// 📊 Thống kê hạn mức chi tiêu hàng tháng
   Widget _buildBudgetProgressCard(BuildContext context, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -273,6 +389,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// 🖼️ Hộp thoại xem ảnh hóa đơn phóng to chuẩn tỉ lệ tối ưu hóa bởi Cloudinary
   void _showFullSizeImageDialog(
     BuildContext context,
     AppLocalizations l10n,

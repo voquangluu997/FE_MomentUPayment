@@ -349,6 +349,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No spending moments this month. Tap + to add one! 🌸'**
   String get emptyTransactionList;
+
+  /// No description provided for @deleteDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this transaction?'**
+  String get deleteDialogTitle;
+
+  /// No description provided for @deleteDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This action will permanently delete your spending history and the attached receipt stored on Cloudinary.'**
+  String get deleteDialogContent;
+
+  /// No description provided for @deleteDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get deleteDialogCancel;
+
+  /// No description provided for @deleteDialogConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteDialogConfirm;
+
+  /// No description provided for @deleteSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction and receipt image have been successfully cleaned up! ✨'**
+  String get deleteSuccessSnackbar;
+
+  /// No description provided for @deleteErrorSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete. Please check your network connection!'**
+  String get deleteErrorSnackbar;
 }
 
 class _AppLocalizationsDelegate

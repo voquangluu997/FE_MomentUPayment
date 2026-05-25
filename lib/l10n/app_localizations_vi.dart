@@ -137,4 +137,25 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get emptyTransactionList =>
       'Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸';
+
+  @override
+  String get deleteDialogTitle => 'Xóa giao dịch này?';
+
+  @override
+  String get deleteDialogContent =>
+      'Hành động này sẽ xóa vĩnh viễn lịch sử chi tiêu và ảnh chứng từ lưu trữ trên Cloudinary.';
+
+  @override
+  String get deleteDialogCancel => 'Hủy';
+
+  @override
+  String get deleteDialogConfirm => 'Xóa sạch';
+
+  @override
+  String get deleteSuccessSnackbar =>
+      'Đã dọn dẹp sạch sẽ giao dịch và ảnh hóa đơn! ✨';
+
+  @override
+  String get deleteErrorSnackbar =>
+      'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 }

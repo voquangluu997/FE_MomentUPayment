@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/utils/app_logger.dart';
 import '../../data/transaction_repository.dart';
 
 class TransactionTimelineController
@@ -12,22 +13,44 @@ class TransactionTimelineController
     return _fetchTimelineData();
   }
 
-  /// Hàm nội bộ gọi xuống Repository lấy dữ liệu thật từ Postgres
   Future<List<Map<String, dynamic>>> _fetchTimelineData() async {
     return await _repository.getTransactions();
   }
 
-  /// Hàm public phục vụ cho tính năng "Kéo để làm mới" (Pull to Refresh) hoặc tự động reload sau khi thêm mới thành công
   Future<void> refreshTimeline() async {
-    state =
-        const AsyncLoading(); // Chuyển giao diện sang trạng thái đợi loading
-    state = await AsyncValue.guard(
-      () => _fetchTimelineData(),
-    ); // Bọc an toàn dữ liệu hoặc lỗi
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => _fetchTimelineData());
+  }
+
+  /// 🔥 HÀM XỬ LÝ SỰ KIỆN XÓA GIAO DỊCH (Optimistic UI)
+  Future<void> deleteTransaction(String id) async {
+    // 1. Lưu lại trạng thái danh sách hiện tại phòng trường hợp lỗi mạng thì khôi phục
+    final previousState = state;
+    if (!state.hasValue) return;
+
+    final currentList = state.value!;
+
+    // 2. Cập nhật UI ngay lập tức bằng cách lọc bỏ phần tử vừa xóa
+    state = AsyncValue.data(
+      currentList.where((tx) => tx['id'].toString() != id).toList(),
+    );
+
+    try {
+      // 3. Bắn lệnh DELETE lên Server NestJS
+      await _repository.deleteTransaction(id);
+    } catch (error, stackTrace) {
+      // 4. Nếu lỗi (Token hết hạn, mất mạng...), log lỗi và khôi phục lại danh sách cũ
+      AppLogger.e(
+        'TransactionTimelineController.deleteTransaction',
+        error,
+        stackTrace,
+      );
+      state = previousState;
+      rethrow; // Bắn lỗi ra ngoài để UI hiển thị SnackBar thông báo
+    }
   }
 }
 
-/// Provider toàn cục dùng chung cho toàn App để lắng nghe danh sách dòng thời gian
 final transactionTimelineProvider =
     AsyncNotifierProvider<
       TransactionTimelineController,

@@ -135,6 +135,30 @@ class TransactionRepository {
       rethrow;
     }
   }
+
+  Future<void> deleteTransaction(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('access_token');
+
+      if (token == null || token.isEmpty) {
+        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
+      }
+
+      // Gửi request DELETE tới endpoint /transactions/:id
+      final response = await _dio.delete(
+        '/transactions/$id',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception("Xóa giao dịch thất bại từ phía Server");
+      }
+    } on DioException catch (e) {
+      AppLogger.e('TransactionRepo.deleteTransaction', e, e.stackTrace);
+      rethrow;
+    }
+  }
 }
 
 // ✨ THÊM KHAI BÁO PROVIDER TOÀN CỤC CHO REPOSITORY:
