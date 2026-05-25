@@ -159,6 +159,39 @@ class TransactionRepository {
       rethrow;
     }
   }
+
+  /// 📊 Lấy dữ liệu thống kê chi tiêu theo danh mục của tháng hiện tại
+  Future<List<Map<String, dynamic>>> getTransactionAnalytics() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('access_token');
+
+      if (token == null || token.isEmpty) {
+        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
+      }
+
+      // Gửi request GET tới endpoint thống kê /transactions/analytics
+      final response = await _dio.get(
+        '/transactions/analytics',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        // Chuyển đổi list động sang cấu trúc List<Map<String, dynamic>> chuẩn chỉ
+        return data.map((item) => Map<String, dynamic>.from(item)).toList();
+      } else {
+        throw Exception("Không thể lấy dữ liệu phân tích từ Server");
+      }
+    } on DioException catch (e) {
+      AppLogger.e(
+        'TransactionRepository.getTransactionAnalytics',
+        e,
+        e.stackTrace,
+      );
+      rethrow;
+    }
+  }
 }
 
 // ✨ THÊM KHAI BÁO PROVIDER TOÀN CỤC CHO REPOSITORY:

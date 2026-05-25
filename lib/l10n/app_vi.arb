@@ -50,5 +50,9 @@
   "deleteDialogCancel": "Hủy",
   "deleteDialogConfirm": "Xóa sạch",
   "deleteSuccessSnackbar": "Đã dọn dẹp sạch sẽ giao dịch và ảnh hóa đơn! ✨",
-  "deleteErrorSnackbar": "Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!"
+  "deleteErrorSnackbar": "Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!",
+
+  "analyticsTitle": "Thống kê chi tiêu",
+  "emptyAnalyticsData": "Chưa có dữ liệu chi tiêu trong tháng này! 📝",
+  "totalLabel": "Tổng chi"
 }

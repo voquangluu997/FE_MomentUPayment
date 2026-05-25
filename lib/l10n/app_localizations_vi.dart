@@ -158,4 +158,14 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get deleteErrorSnackbar =>
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
+
+  @override
+  String get analyticsTitle => 'Thống kê chi tiêu';
+
+  @override
+  String get emptyAnalyticsData =>
+      'Chưa có dữ liệu chi tiêu trong tháng này! 📝';
+
+  @override
+  String get totalLabel => 'Tổng chi';
 }

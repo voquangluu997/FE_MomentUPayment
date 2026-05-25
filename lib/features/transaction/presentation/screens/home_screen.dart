@@ -7,16 +7,14 @@ import '../../../../l10n/app_localizations.dart';
 import '../controllers/transaction_timeline_controller.dart';
 import '../widgets/transaction_card.dart';
 import 'add_transaction_screen.dart';
+import 'analytics_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 🌍 Khởi tạo đối tượng đa ngôn ngữ hệ thống
     final l10n = AppLocalizations.of(context)!;
-
-    // 🔄 Lắng nghe trạng thái luồng dữ liệu dòng thời gian từ Riverpod Controller
     final timelineState = ref.watch(transactionTimelineProvider);
 
     return Scaffold(
@@ -54,15 +52,6 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
-              color: AppColors.primaryDark,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: RefreshIndicator(
         color: AppColors.primary,
@@ -71,15 +60,12 @@ class HomeScreen extends ConsumerWidget {
             ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(
-            parent:
-                BouncingScrollPhysics(), // Hiệu ứng cuộn đàn hồi mượt mà chuẩn iOS
+            parent: BouncingScrollPhysics(),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 📊 Thẻ tiến độ hạn mức ngân sách tháng hiện tại
               _buildBudgetProgressCard(context, l10n),
-
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -94,8 +80,6 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-
-              // 🚀 Phân nhánh giao diện dựa theo trạng thái AsyncValue của AsyncNotifier
               timelineState.when(
                 loading: () => const SizedBox(
                   height: 200,
@@ -103,64 +87,41 @@ class HomeScreen extends ConsumerWidget {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 ),
-                error: (error, stackTrace) => SizedBox(
+                error: (error, stack) => SizedBox(
                   height: 200,
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('⚠️', style: TextStyle(fontSize: 32)),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.errorLoadData,
-                          style: const TextStyle(color: AppColors.errorAccent),
-                        ),
-                        TextButton(
-                          onPressed: () => ref
-                              .read(transactionTimelineProvider.notifier)
-                              .refreshTimeline(),
-                          child: Text(
-                            l10n.retryButton,
-                            style: const TextStyle(color: AppColors.primary),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      l10n.errorLoadData,
+                      style: const TextStyle(color: AppColors.errorAccent),
                     ),
                   ),
                 ),
                 data: (transactions) {
-                  if (transactions.isEmpty) {
+                  if (transactions.isEmpty)
                     return Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(32),
                       child: Center(
                         child: Text(
                           l10n.emptyTransactionList,
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColors.primaryDark.withOpacity(0.5),
-                            fontSize: 14,
                           ),
                         ),
                       ),
                     );
-                  }
-
-                  // 🧠 Xử lý phân nhóm và sắp xếp danh sách phẳng qua tầng Util
-                  final groupedTransactions =
-                      DateTimeHelper.groupTransactionsByDate(transactions);
-
+                  final grouped = DateTimeHelper.groupTransactionsByDate(
+                    transactions,
+                  );
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: groupedTransactions.keys.length,
+                    itemCount: grouped.keys.length,
                     itemBuilder: (context, index) {
-                      final dateKey = groupedTransactions.keys.elementAt(index);
-                      final txList = groupedTransactions[dateKey]!;
-
+                      final dateKey = grouped.keys.elementAt(index);
+                      final txList = grouped[dateKey]!;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 🗓️ Tiêu đề nhóm ngày thân thiện (HÔM NAY, HÔM QUA, dd/MM/yyyy)
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 20,
@@ -173,135 +134,13 @@ class HomeScreen extends ConsumerWidget {
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryDark.withOpacity(0.45),
-                                letterSpacing: 0.5,
                               ),
                             ),
                           ),
-
-                          // 🔀 Duyệt danh sách các khoản chi tiêu thuộc ngày hiện tại
-                          ...txList.map((tx) {
-                            final String txId = tx['id'].toString();
-
-                            return Dismissible(
-                              key: Key(txId),
-                              direction: DismissDirection
-                                  .endToStart, // Chỉ cho phép vuốt từ phải sang trái
-                              // 🎨 Nền đỏ pastel ẩn phía sau thẻ khi vuốt
-                              background: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 6,
-                                ),
-                                padding: const EdgeInsets.only(right: 24),
-                                alignment: Alignment.centerRight,
-                                decoration: BoxDecoration(
-                                  color: AppColors.errorAccent.withOpacity(
-                                    0.12,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: const Icon(
-                                  Icons.delete_sweep_rounded,
-                                  color: AppColors.errorAccent,
-                                  size: 28,
-                                ),
-                              ),
-
-                              // ❓ Hộp thoại xác nhận đa ngôn ngữ trước khi tiến hành xóa vĩnh viễn
-                              confirmDismiss: (direction) async {
-                                return await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    backgroundColor: AppColors.cardBackground,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    title: Text(
-                                      l10n.deleteDialogTitle,
-                                      style: const TextStyle(
-                                        color: AppColors.primaryDark,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    content: Text(
-                                      l10n.deleteDialogContent,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: Text(
-                                          l10n.deleteDialogCancel,
-                                          style: TextStyle(
-                                            color: AppColors.primaryDark
-                                                .withOpacity(0.5),
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: Text(
-                                          l10n.deleteDialogConfirm,
-                                          style: const TextStyle(
-                                            color: AppColors.errorAccent,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-
-                              // 🚀 Kích hoạt luồng xóa bất đồng bộ khi người dùng đồng ý
-                              onDismissed: (direction) async {
-                                try {
-                                  await ref
-                                      .read(
-                                        transactionTimelineProvider.notifier,
-                                      )
-                                      .deleteTransaction(txId);
-
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: AppColors.success,
-                                        content: Text(
-                                          l10n.deleteSuccessSnackbar,
-                                        ),
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: AppColors.errorAccent,
-                                        content: Text(l10n.deleteErrorSnackbar),
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-
-                              // Thẻ hiển thị thông tin chi tiết giao dịch gốc
-                              child: TransactionCard(
-                                transaction: tx,
-                                onTap: () => _showFullSizeImageDialog(
-                                  context,
-                                  l10n,
-                                  tx['imageUrl'] ?? '',
-                                  tx['note'] ?? '',
-                                ),
-                              ),
-                            );
-                          }),
+                          ...txList.map(
+                            (tx) =>
+                                _buildDismissibleCard(context, ref, tx, l10n),
+                          ),
                         ],
                       );
                     },
@@ -315,81 +154,160 @@ class HomeScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddTransactionScreen(),
-            ),
-          );
-        },
+        onPressed: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const AddTransactionScreen())),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  /// 📊 Thống kê hạn mức chi tiêu hàng tháng
   Widget _buildBudgetProgressCard(BuildContext context, AppLocalizations l10n) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+      elevation: 0,
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.primary.withOpacity(0.06)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryDark.withOpacity(0.02),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const AnalyticsScreen())),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.primary.withOpacity(0.06)),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.budgetThisMonthLabel,
-            style: TextStyle(
-              color: AppColors.primaryDark.withOpacity(0.5),
-              fontSize: 13,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.budgetThisMonthLabel,
+                style: TextStyle(
+                  color: AppColors.primaryDark.withOpacity(0.5),
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                l10n.budgetRemainingStatus,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: 14),
+              const LinearProgressIndicator(
+                value: 0.4,
+                minHeight: 8,
+                backgroundColor: AppColors.background,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+              const SizedBox(height: 14),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.budgetHealthyFeedback,
+                    style: const TextStyle(
+                      color: AppColors.success,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${l10n.analyticsTitle ?? 'Details'} ➡️',
+                      style: TextStyle(
+                        color: AppColors.primary.withOpacity(0.9),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.budgetRemainingStatus,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
-            ),
-          ),
-          const SizedBox(height: 14),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: const LinearProgressIndicator(
-              value: 0.4,
-              minHeight: 8,
-              backgroundColor: AppColors.background,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            l10n.budgetHealthyFeedback,
-            style: const TextStyle(
-              color: AppColors.success,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  /// 🖼️ Hộp thoại xem ảnh hóa đơn phóng to chuẩn tỉ lệ tối ưu hóa bởi Cloudinary
+  Widget _buildDismissibleCard(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, dynamic> tx,
+    AppLocalizations l10n,
+  ) {
+    return Dismissible(
+      key: Key(tx['id'].toString()),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppColors.cardBackground,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              l10n.deleteDialogTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text(l10n.deleteDialogContent),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.deleteDialogCancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  l10n.deleteDialogConfirm,
+                  style: const TextStyle(color: AppColors.errorAccent),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      onDismissed: (_) async {
+        try {
+          await ref
+              .read(transactionTimelineProvider.notifier)
+              .deleteTransaction(tx['id'].toString());
+        } catch (e) {
+          ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+        }
+      },
+      background: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.errorAccent.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete_sweep, color: AppColors.errorAccent),
+      ),
+      child: TransactionCard(
+        transaction: tx,
+        onTap: () => _showFullSizeImageDialog(
+          context,
+          l10n,
+          tx['imageUrl'] ?? '',
+          tx['note'] ?? '',
+        ),
+      ),
+    );
+  }
+
   void _showFullSizeImageDialog(
     BuildContext context,
     AppLocalizations l10n,
@@ -397,8 +315,6 @@ class HomeScreen extends ConsumerWidget {
     String note,
   ) {
     if (imageUrl.isEmpty) return;
-    final optimizedUrl = CloudinaryHelper.getOptimizedOriginalUrl(imageUrl);
-
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -412,30 +328,13 @@ class HomeScreen extends ConsumerWidget {
                 top: Radius.circular(24),
               ),
               child: Image.network(
-                optimizedUrl,
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const SizedBox(
-                    height: 220,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  );
-                },
+                CloudinaryHelper.getOptimizedOriginalUrl(imageUrl),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Text(
                 note.isNotEmpty ? note : l10n.emptyTransactionNote,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.primaryDark,
-                  fontWeight: FontWeight.w500,
-                ),
                 textAlign: TextAlign.center,
               ),
             ),

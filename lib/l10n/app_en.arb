@@ -50,5 +50,9 @@
   "deleteDialogCancel": "Cancel",
   "deleteDialogConfirm": "Delete",
   "deleteSuccessSnackbar": "Transaction and receipt image have been successfully cleaned up! ✨",
-  "deleteErrorSnackbar": "Failed to delete. Please check your network connection!"
+  "deleteErrorSnackbar": "Failed to delete. Please check your network connection!",
+
+  "analyticsTitle": "Spending Analytics",
+  "emptyAnalyticsData": "No spending history found for this month! 📝",
+  "totalLabel": "Total"
 }

@@ -159,4 +159,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteErrorSnackbar =>
       'Failed to delete. Please check your network connection!';
+
+  @override
+  String get analyticsTitle => 'Spending Analytics';
+
+  @override
+  String get emptyAnalyticsData =>
+      'No spending history found for this month! 📝';
+
+  @override
+  String get totalLabel => 'Total';
 }

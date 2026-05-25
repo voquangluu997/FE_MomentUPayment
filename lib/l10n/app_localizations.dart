@@ -385,6 +385,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete. Please check your network connection!'**
   String get deleteErrorSnackbar;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Analytics'**
+  String get analyticsTitle;
+
+  /// No description provided for @emptyAnalyticsData.
+  ///
+  /// In en, this message translates to:
+  /// **'No spending history found for this month! 📝'**
+  String get emptyAnalyticsData;
+
+  /// No description provided for @totalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalLabel;
 }
 
 class _AppLocalizationsDelegate
