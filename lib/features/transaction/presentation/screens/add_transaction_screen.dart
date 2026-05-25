@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
 import '../transaction_provider.dart';
+import '../controllers/transaction_timeline_controller.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -53,7 +54,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        ref.read(transactionProvider.notifier).resetState();
+        ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => HomeScreen(),

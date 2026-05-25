@@ -125,4 +125,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get budgetHealthyFeedback =>
       '🎉 Awesome! You are managing your budget safely.';
+
+  @override
+  String get loadingData => 'Loading spending moments...';
+
+  @override
+  String get errorLoadData => 'Failed to load data. Please try again!';
+
+  @override
+  String get retryButton => 'Retry';
+
+  @override
+  String get emptyTransactionList =>
+      'No spending moments this month. Tap + to add one! 🌸';
 }

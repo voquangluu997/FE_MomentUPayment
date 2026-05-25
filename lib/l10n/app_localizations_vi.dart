@@ -124,4 +124,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get budgetHealthyFeedback =>
       '🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.';
+
+  @override
+  String get loadingData => 'Đang tải danh sách chi tiêu...';
+
+  @override
+  String get errorLoadData => 'Không thể tải dữ liệu. Vui lòng thử lại!';
+
+  @override
+  String get retryButton => 'Thử lại';
+
+  @override
+  String get emptyTransactionList =>
+      'Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸';
 }

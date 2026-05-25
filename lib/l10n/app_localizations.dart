@@ -325,6 +325,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'🎉 Awesome! You are managing your budget safely.'**
   String get budgetHealthyFeedback;
+
+  /// No description provided for @loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading spending moments...'**
+  String get loadingData;
+
+  /// No description provided for @errorLoadData.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load data. Please try again!'**
+  String get errorLoadData;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryButton;
+
+  /// No description provided for @emptyTransactionList.
+  ///
+  /// In en, this message translates to:
+  /// **'No spending moments this month. Tap + to add one! 🌸'**
+  String get emptyTransactionList;
 }
 
 class _AppLocalizationsDelegate

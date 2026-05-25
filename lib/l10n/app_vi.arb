@@ -38,5 +38,10 @@
   "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
   "budgetThisMonthLabel": "Hạn mức chi tiêu tháng này",
   "budgetRemainingStatus": "Còn lại 600.000 ₫ của 1.000.000 ₫",
-  "budgetHealthyFeedback": "🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng."
+  "budgetHealthyFeedback": "🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.",
+
+  "loadingData": "Đang tải danh sách chi tiêu...",
+  "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
+  "retryButton": "Thử lại",
+  "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸"
 }

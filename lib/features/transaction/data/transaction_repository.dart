@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✨ THÊM: Thư viện phục vụ Provider toàn cục
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
@@ -101,4 +102,42 @@ class TransactionRepository {
       rethrow;
     }
   }
+
+  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động (Đồng bộ Token & Logging)
+  Future<List<Map<String, dynamic>>> getTransactions() async {
+    try {
+      // 1. Lấy token để xác thực người dùng hiện tại
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('access_token');
+
+      if (token == null || token.isEmpty) {
+        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
+      }
+
+      // 2. Gửi request GET kèm token bảo mật lên endpoint NestJS
+      final response = await _dio.get(
+        '/transactions',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      // 3. Ép kiểu dữ liệu trả về từ Backend thành List<Map<String, dynamic>>
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        throw Exception(
+          'Failed to load transactions with status: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      // Ghi nhận lỗi mạng hoặc lỗi API đồng bộ qua AppLogger để dễ debug log
+      AppLogger.e('TransactionRepo.getTransactions', e, e.stackTrace);
+      rethrow;
+    }
+  }
 }
+
+// ✨ THÊM KHAI BÁO PROVIDER TOÀN CỤC CHO REPOSITORY:
+final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
+  return TransactionRepository();
+});

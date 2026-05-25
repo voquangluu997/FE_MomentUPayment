@@ -3,48 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../controllers/transaction_timeline_controller.dart';
 import '../widgets/transaction_card.dart';
-import 'add_transaction_screen.dart'; //
+import 'add_transaction_screen.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // Dữ liệu mẫu mô phỏng cấu trúc trả về từ API NestJS & Postgres
-  final List<Map<String, dynamic>> _dummyTransactions = [
-    {
-      'id': '1',
-      'amount': 45000,
-      'category': 'Food',
-      'note': 'Ăn tối bún đậu mắm tôm cùng team dev',
-      'emoji': '🍔',
-      'imageUrl':
-          'https://res.cloudinary.com/demo/image/upload/v123456/moment_u_payment/sample1.jpg',
-      'spentAt': '2026-05-25 19:15:00',
-    },
-    {
-      'id': '2',
-      'amount': 35000,
-      'category': 'Coffee',
-      'note': 'Ly Latte đá cho ngày làm việc tỉnh táo',
-      'emoji': '☕',
-      'imageUrl':
-          'https://res.cloudinary.com/demo/image/upload/v123456/moment_u_payment/sample2.jpg',
-      'spentAt': '2026-05-25 08:30:00',
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    // Khởi tạo đối tượng đa ngôn ngữ hệ thống
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
+    // 💡 Lắng nghe trạng thái động từ AsyncNotifierProvider
+    final timelineState = ref.watch(transactionTimelineProvider);
+
     return Scaffold(
-      backgroundColor: AppColors.background, // Nền kem sữa Pastel ngọt ngào
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.cardBackground,
         elevation: 0,
@@ -88,58 +62,131 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 📊 1. Tiến độ hạn mức chi tiêu (Thanh màu Trà sữa, feedback màu Xanh Sage)
-            _buildBudgetProgressCard(context, l10n),
+      // 🔄 Tích hợp RefreshIndicator hỗ trợ kéo từ trên xuống để re-fetch dữ liệu
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        backgroundColor: AppColors.cardBackground,
+        onRefresh: () =>
+            ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(), // Đạt chuẩn hiệu ứng mượt mà iOS
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBudgetProgressCard(context, l10n),
 
-            // 📅 2. Tiêu đề danh sách dòng thời gian chi tiêu
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                l10n.spendingMomentsTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Text(
+                  l10n.spendingMomentsTitle,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryDark,
+                  ),
                 ),
               ),
-            ),
 
-            // ☕ 3. Danh sách dòng thời gian Timeline chi tiết
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _dummyTransactions.length,
-              itemBuilder: (context, index) {
-                final tx = _dummyTransactions[index];
-                return TransactionCard(
-                  transaction: tx,
-                  onTap: () => _showFullSizeImageDialog(
-                    context,
-                    l10n,
-                    tx['imageUrl'] ?? '',
-                    tx['note'] ?? '',
+              // 🎛️ Xử lý render UI tương ứng theo 3 trạng thái: Loading, Error, và Data Động
+              timelineState.when(
+                loading: () => SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.loadingData,
+                          style: const TextStyle(
+                            color: AppColors.primaryDark,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: 100), // Khoảng đệm an toàn tránh đè nút FAB
-          ],
+                ),
+                error: (error, stackTrace) => SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('⚠️', style: TextStyle(fontSize: 32)),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.errorLoadData,
+                          style: const TextStyle(color: AppColors.errorAccent),
+                        ),
+                        TextButton(
+                          onPressed: () => ref
+                              .read(transactionTimelineProvider.notifier)
+                              .refreshTimeline(),
+                          child: Text(
+                            l10n.retryButton,
+                            style: const TextStyle(color: AppColors.primary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                data: (transactions) {
+                  if (transactions.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Center(
+                        child: Text(
+                          l10n.emptyTransactionList,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppColors.primaryDark.withOpacity(0.5),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final tx = transactions[index];
+                      return TransactionCard(
+                        transaction: tx,
+                        onTap: () => _showFullSizeImageDialog(
+                          context,
+                          l10n,
+                          tx['imageUrl'] ?? '',
+                          tx['note'] ?? '',
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
-
-      // ➕ NÚT BẤM NỔI FAB: Điều hướng chuẩn gốc xếp chồng màn hình
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary, // Màu nâu trà sữa chủ đạo
+        backgroundColor: AppColors.primary,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
         onPressed: () {
-          // Thực hiện push màn hình AddTransaction lên trên Stack
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const AddTransactionScreen(),
@@ -150,7 +197,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Khung hiển thị tiến độ Hạn mức chi tiêu
   Widget _buildBudgetProgressCard(BuildContext context, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -190,7 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: const LinearProgressIndicator(
-              value: 0.4, // Giả lập đã chi tiêu 40%
+              value: 0.4,
               minHeight: 8,
               backgroundColor: AppColors.background,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -200,7 +246,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             l10n.budgetHealthyFeedback,
             style: const TextStyle(
-              color: AppColors.success, // Xanh Sage chữa lành
+              color: AppColors.success,
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),
@@ -210,7 +256,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Pop-up hiển thị ảnh hóa đơn đầy đủ ở chất lượng tối ưu hóa
   void _showFullSizeImageDialog(
     BuildContext context,
     AppLocalizations l10n,
@@ -218,8 +263,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String note,
   ) {
     if (imageUrl.isEmpty) return;
-
-    // Tự động chèn tham số f_auto,q_auto nén nhẹ ảnh gốc từ Cloudinary CDN
     final optimizedUrl = CloudinaryHelper.getOptimizedOriginalUrl(imageUrl);
 
     showDialog(
