@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
+import '../../../../core/utils/datetime_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../controllers/transaction_timeline_controller.dart';
 import '../widgets/transaction_card.dart';
@@ -14,7 +15,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
-    // 💡 Lắng nghe trạng thái động từ AsyncNotifierProvider
+    // Lắng nghe trạng thái động từ AsyncNotifierProvider
     final timelineState = ref.watch(transactionTimelineProvider);
 
     return Scaffold(
@@ -62,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      // 🔄 Tích hợp RefreshIndicator hỗ trợ kéo từ trên xuống để re-fetch dữ liệu
+      // Luồng kéo để tải lại dữ liệu (Pull to Refresh)
       body: RefreshIndicator(
         color: AppColors.primary,
         backgroundColor: AppColors.cardBackground,
@@ -70,7 +71,7 @@ class HomeScreen extends ConsumerWidget {
             ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(), // Đạt chuẩn hiệu ứng mượt mà iOS
+            parent: BouncingScrollPhysics(), // Hiệu ứng kéo mượt chuẩn iOS
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,27 +93,12 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              // 🎛️ Xử lý render UI tương ứng theo 3 trạng thái: Loading, Error, và Data Động
+              // Quản lý Render UI dựa theo trạng thái AsyncValue của Riverpod
               timelineState.when(
-                loading: () => SizedBox(
+                loading: () => const SizedBox(
                   height: 200,
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircularProgressIndicator(
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          l10n.loadingData,
-                          style: const TextStyle(
-                            color: AppColors.primaryDark,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 ),
                 error: (error, stackTrace) => SizedBox(
@@ -157,20 +143,51 @@ class HomeScreen extends ConsumerWidget {
                     );
                   }
 
+                  // 🧠 Sạch sẽ gọn gàng: Sử dụng Util để gom nhóm và sắp xếp dữ liệu
+                  final groupedTransactions =
+                      DateTimeHelper.groupTransactionsByDate(transactions);
+
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: transactions.length,
+                    itemCount: groupedTransactions.keys.length,
                     itemBuilder: (context, index) {
-                      final tx = transactions[index];
-                      return TransactionCard(
-                        transaction: tx,
-                        onTap: () => _showFullSizeImageDialog(
-                          context,
-                          l10n,
-                          tx['imageUrl'] ?? '',
-                          tx['note'] ?? '',
-                        ),
+                      final dateKey = groupedTransactions.keys.elementAt(index);
+                      final txList = groupedTransactions[dateKey]!;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🗓️ Nhãn hiển thị nhóm thời gian (HÔM NAY, HÔM QUA, dd/MM/yyyy)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              top: 14,
+                              bottom: 6,
+                            ),
+                            child: Text(
+                              DateTimeHelper.getFriendlyDateLabel(dateKey),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryDark.withOpacity(0.45),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          // Danh sách card chi tiêu thuộc ngày đó
+                          ...txList.map(
+                            (tx) => TransactionCard(
+                              transaction: tx,
+                              onTap: () => _showFullSizeImageDialog(
+                                context,
+                                l10n,
+                                tx['imageUrl'] ?? '',
+                                tx['note'] ?? '',
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/constants/app_colors.dart';
-import '../../../../../core/utils/cloudinary_helper.dart';
-import '../../../../../l10n/app_localizations.dart'; // 💡 Đã sửa chuẩn theo dự án của bạn
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/cloudinary_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class TransactionCard extends StatelessWidget {
   final Map<String, dynamic> transaction;
@@ -15,7 +15,6 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Gọi trực tiếp AppLocalizations chuẩn của Flutter
     final l10n = AppLocalizations.of(context)!;
 
     final String imageUrl = transaction['imageUrl'] ?? '';
@@ -24,13 +23,30 @@ class TransactionCard extends StatelessWidget {
     final String category = transaction['category'] ?? l10n.categoryOther;
     final String note = transaction['note'] ?? '';
     final String emoji = transaction['emoji'] ?? '📝';
-    
-    final String time = transaction['spentAt'] != null 
-        ? transaction['spentAt'].toString().substring(11, 16)
-        : '00:00';
+
+    // 📅 XỬ LÝ ĐỊNH DẠNG ĐẦY ĐỦ VÀ ĐỒNG BỘ MÚI GIỜ LOCAL THIẾT BỊ
+    String formattedDateTime = '--:-- - --/--/----';
+    if (transaction['spentAt'] != null) {
+      try {
+        // 🔥 CHỐT HẠ: Parse và ép về múi giờ Local hệ thống tự động (.toLocal())
+        final DateTime parsedDate = DateTime.parse(
+          transaction['spentAt'].toString(),
+        ).toLocal();
+
+        final String hour = parsedDate.hour.toString().padLeft(2, '0');
+        final String minute = parsedDate.minute.toString().padLeft(2, '0');
+        final String day = parsedDate.day.toString().padLeft(2, '0');
+        final String month = parsedDate.month.toString().padLeft(2, '0');
+        final String year = parsedDate.year.toString();
+
+        formattedDateTime = '$hour:$minute - $day/$month/$year';
+      } catch (e) {
+        formattedDateTime = transaction['spentAt'].toString();
+      }
+    }
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
       color: AppColors.cardBackground,
       shape: RoundedRectangleBorder(
@@ -44,6 +60,7 @@ class TransactionCard extends StatelessWidget {
           padding: const EdgeInsets.all(14.0),
           child: Row(
             children: [
+              // 🖼️ Thumbnail ảnh hóa đơn / Icon Emoji đại diện
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: imageUrl.isNotEmpty
@@ -58,6 +75,8 @@ class TransactionCard extends StatelessWidget {
                     : _buildFallbackIcon(emoji),
               ),
               const SizedBox(width: 16),
+
+              // 📝 Nội dung chi tiết khoản chi tiêu
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,27 +95,32 @@ class TransactionCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.primaryDark.withOpacity(0.68), 
+                        color: AppColors.primaryDark.withOpacity(0.68),
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
+
+                    // 🕒 Hiển thị thời gian local chuẩn xác của user
                     Text(
-                      time,
+                      formattedDateTime,
                       style: TextStyle(
-                        color: AppColors.primaryDark.withOpacity(0.4), 
+                        color: AppColors.primaryDark.withOpacity(0.45),
                         fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
+
+              // 💰 Số tiền chi tiêu âm
               Text(
                 '-₫${amount.toStringAsFixed(0)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
-                  color: AppColors.errorAccent, 
+                  color: AppColors.errorAccent,
                 ),
               ),
             ],
