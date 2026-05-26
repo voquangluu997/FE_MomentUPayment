@@ -26,7 +26,7 @@
   "noteHint": "Ghi chú ngắn gọn... ✨",
   "saveMomentButton": "Lưu Moment Chi Tiêu ✨",
   "txSuccessMessage": "Đã ghi chép khoảnh khắc chi tiêu này rùi! 🌸",
-  "txErrorMessage": "Không lưu được giao dịch rồi bạn ơi! 😢",
+  "txErrorMessage": "Không lưu được khoảnh khắc này rồi bạn ơi! 😢",
   "catFood": "Ăn uống 🍰",
   "catShopping": "Mua sắm 🛍️",
   "catTransport": "Di chuyển 🚗",
@@ -40,19 +40,24 @@
   "budgetRemainingStatus": "Còn lại 600.000 ₫ của 1.000.000 ₫",
   "budgetHealthyFeedback": "🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.",
 
-  "loadingData": "Đang tải danh sách chi tiêu...",
+  "loadingData": "Đang tải danh sách khoảnh khắc...",
   "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
   "retryButton": "Thử lại",
   "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸",
 
-  "deleteDialogTitle": "Xóa giao dịch này?",
-  "deleteDialogContent": "Hành động này sẽ xóa vĩnh viễn lịch sử chi tiêu và ảnh chứng từ lưu trữ trên Cloudinary.",
+  "deleteDialogTitle": "Xóa khoảnh khắc này?",
+  "deleteDialogContent": "Hành động này sẽ xóa vĩnh viễn lịch sử khoảnh khắc này và ảnh chứng từ lưu trữ trên Cloudinary.",
   "deleteDialogCancel": "Hủy",
   "deleteDialogConfirm": "Xóa sạch",
-  "deleteSuccessSnackbar": "Đã dọn dẹp sạch sẽ giao dịch và ảnh hóa đơn! ✨",
+  "deleteSuccessSnackbar": "Đã dọn dẹp sạch sẽ khoảnh khắc và ảnh hóa đơn đi kèm rùi! ✨",
   "deleteErrorSnackbar": "Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!",
 
-  "analyticsTitle": "Thống kê chi tiêu",
-  "emptyAnalyticsData": "Chưa có dữ liệu chi tiêu trong tháng này! 📝",
-  "totalLabel": "Tổng chi"
+  "analyticsTitle": "Thống kê khoảnh khắc chi tiêu",
+  "emptyAnalyticsData": "Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝",
+  "totalLabel": "Tổng chi",
+  "loginErrorNotification": "Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢",
+  "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
+  "loginButtonText": "Đi vào thuiiii ✨",
+  "loginGGButtonText": "Vào bằng google nè 🚀",
+  "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑"
 }

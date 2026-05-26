@@ -51,8 +51,6 @@ class TransactionTimelineController
   }
 }
 
-final transactionTimelineProvider =
-    AsyncNotifierProvider<
-      TransactionTimelineController,
-      List<Map<String, dynamic>>
-    >(() => TransactionTimelineController());
+final transactionTimelineProvider = AsyncNotifierProvider(() {
+  return TransactionTimelineController();
+});

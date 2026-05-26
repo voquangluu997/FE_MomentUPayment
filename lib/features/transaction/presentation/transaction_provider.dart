@@ -1,44 +1,48 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/transaction_repository.dart';
+import 'controllers/transaction_timeline_controller.dart';
 
 enum TransactionState { idle, loading, success, error }
 
 class TransactionNotifier extends StateNotifier<TransactionState> {
   final TransactionRepository _repository;
+  final Ref
+  ref; // ✨ THÊM: Giữ biến ref để có thể clear/invalidate chéo giữa các provider
   String? errorMessage;
 
-  TransactionNotifier(this._repository) : super(TransactionState.idle);
+  TransactionNotifier(this._repository, this.ref)
+    : super(TransactionState.idle);
 
-  /// ✨ Hàm cốt lõi thực hiện luồng tuần tự 2 bước
   Future<void> addTransaction({
     required double amount,
     required String category,
     String? note,
-    String? localImagePath, // Đường dẫn file ảnh tạm thời trên máy thật iOS
+    String? localImagePath,
     String? emoji,
   }) async {
     state = TransactionState.loading;
     try {
       String? serverImageUrl;
 
-      // 🔥 BƯỚC 1: Nếu người dùng có chụp ảnh, tiến hành upload lên server trước
       if (localImagePath != null && localImagePath.isNotEmpty) {
         serverImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
-      // 🔥 BƯỚC 2: Cầm đường dẫn ảnh từ server (nếu có) gửi cùng data giao dịch
+
       await _repository.createTransaction(
         amount: amount,
-        category: category, 
+        category: category,
         note: note,
-        imageUrl:
-            serverImageUrl, // Đã được đồng bộ hóa thành chuỗi text lưu vào DB
+        imageUrl: serverImageUrl,
         emoji: emoji,
       );
 
+      // ✨ ĐÃ SỬA: Tự động xóa bộ đệm cũ, bắt buộc app phải nạp lại danh sách giao dịch mới tinh của chính user này
+      ref.invalidate(transactionTimelineProvider);
+
       errorMessage = null;
       state = TransactionState.success;
-      HapticFeedback.mediumImpact(); // Rung phản hồi vừa phải báo hiệu tạo thành công trên iPhone cực đã
+      HapticFeedback.mediumImpact();
     } catch (e) {
       errorMessage = e.toString().contains('401')
           ? 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại bạn ơi! 🔑'
@@ -52,13 +56,8 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
   }
 }
 
-// Khai báo các Provider
-final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
-  return TransactionRepository();
-});
-
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, TransactionState>((ref) {
       final repo = ref.watch(transactionRepositoryProvider);
-      return TransactionNotifier(repo);
+      return TransactionNotifier(repo, ref); // Truyền thêm ref vào đây
     });

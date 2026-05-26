@@ -87,7 +87,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get txErrorMessage =>
-      'Could not save your transaction, please try again! 😢';
+      'Could not save your moment, please try again! 😢';
 
   @override
   String get catFood => 'Food 🍰';
@@ -140,11 +140,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No spending moments this month. Tap + to add one! 🌸';
 
   @override
-  String get deleteDialogTitle => 'Delete this transaction?';
+  String get deleteDialogTitle => 'Delete this moment?';
 
   @override
   String get deleteDialogContent =>
-      'This action will permanently delete your spending history and the attached receipt stored on Cloudinary.';
+      'This action will permanently delete your spending moment and the attached receipt stored on Cloudinary.';
 
   @override
   String get deleteDialogCancel => 'Cancel';
@@ -154,19 +154,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteSuccessSnackbar =>
-      'Transaction and receipt image have been successfully cleaned up! ✨';
+      'Your moment and receipt image have been successfully cleaned up! ✨';
 
   @override
   String get deleteErrorSnackbar =>
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get analyticsTitle => 'Spending Analytics';
+  String get analyticsTitle => 'Spending Moments Analytics';
 
   @override
   String get emptyAnalyticsData =>
-      'No spending history found for this month! 📝';
+      'No spending moments found for this month! 📝';
 
   @override
   String get totalLabel => 'Total';
+
+  @override
+  String get loginErrorNotification =>
+      'Incorrect email or password, please try again! 😢';
+
+  @override
+  String get googleLoginErrorNotification =>
+      'Google sign-in failed! Please try again 🌸';
+
+  @override
+  String get loginButtonText => 'Let\'s Go inside ✨';
+
+  @override
+  String get loginGGButtonText => 'Let\'s Go By Google 🚀';
+
+  @override
+  String emailNotVerifiedAlert(Object email) {
+    return 'Email $email is not verified yet! 🔑';
+  }
 }

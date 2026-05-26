@@ -251,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @txErrorMessage.
   ///
   /// In en, this message translates to:
-  /// **'Could not save your transaction, please try again! 😢'**
+  /// **'Could not save your moment, please try again! 😢'**
   String get txErrorMessage;
 
   /// No description provided for @catFood.
@@ -353,13 +353,13 @@ abstract class AppLocalizations {
   /// No description provided for @deleteDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete this transaction?'**
+  /// **'Delete this moment?'**
   String get deleteDialogTitle;
 
   /// No description provided for @deleteDialogContent.
   ///
   /// In en, this message translates to:
-  /// **'This action will permanently delete your spending history and the attached receipt stored on Cloudinary.'**
+  /// **'This action will permanently delete your spending moment and the attached receipt stored on Cloudinary.'**
   String get deleteDialogContent;
 
   /// No description provided for @deleteDialogCancel.
@@ -377,7 +377,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteSuccessSnackbar.
   ///
   /// In en, this message translates to:
-  /// **'Transaction and receipt image have been successfully cleaned up! ✨'**
+  /// **'Your moment and receipt image have been successfully cleaned up! ✨'**
   String get deleteSuccessSnackbar;
 
   /// No description provided for @deleteErrorSnackbar.
@@ -389,13 +389,13 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Spending Analytics'**
+  /// **'Spending Moments Analytics'**
   String get analyticsTitle;
 
   /// No description provided for @emptyAnalyticsData.
   ///
   /// In en, this message translates to:
-  /// **'No spending history found for this month! 📝'**
+  /// **'No spending moments found for this month! 📝'**
   String get emptyAnalyticsData;
 
   /// No description provided for @totalLabel.
@@ -403,6 +403,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total'**
   String get totalLabel;
+
+  /// No description provided for @loginErrorNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password, please try again! 😢'**
+  String get loginErrorNotification;
+
+  /// No description provided for @googleLoginErrorNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed! Please try again 🌸'**
+  String get googleLoginErrorNotification;
+
+  /// No description provided for @loginButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go inside ✨'**
+  String get loginButtonText;
+
+  /// No description provided for @loginGGButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go By Google 🚀'**
+  String get loginGGButtonText;
+
+  /// No description provided for @emailNotVerifiedAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Email {email} is not verified yet! 🔑'**
+  String emailNotVerifiedAlert(Object email);
 }
 
 class _AppLocalizationsDelegate

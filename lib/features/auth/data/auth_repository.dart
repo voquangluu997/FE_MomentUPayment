@@ -9,12 +9,8 @@ class AuthRepository {
   Future<Response> register(String email, String password, String name) async {
     try {
       return await _dio.post(
-        'auth/register', 
-        data: {
-          'email': email,
-          'password': password,
-          'name': name,
-        },
+        '/auth/register',
+        data: {'email': email, 'password': password, 'name': name},
       );
     } catch (e) {
       rethrow;
@@ -25,11 +21,8 @@ class AuthRepository {
   Future<Response> login(String email, String password) async {
     try {
       return await _dio.post(
-        'auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        '/auth/login',
+        data: {'email': email, 'password': password},
       );
     } catch (e) {
       rethrow;

@@ -8,6 +8,7 @@ import '../controllers/transaction_timeline_controller.dart';
 import '../widgets/transaction_card.dart';
 import 'add_transaction_screen.dart';
 import 'analytics_screen.dart';
+import 'package:frontend/features/auth/presentation/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -52,6 +53,20 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: AppColors.primaryDark),
+            onPressed: () async {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              await ref.read(authProvider.notifier).logout();
+              if (!context.mounted) return;
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil('/login', (route) => false);
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: RefreshIndicator(
         color: AppColors.primary,
@@ -97,7 +112,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 data: (transactions) {
-                  if (transactions.isEmpty)
+                  if (transactions.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.all(32),
                       child: Center(
@@ -109,6 +124,7 @@ class HomeScreen extends ConsumerWidget {
                         ),
                       ),
                     );
+                  }
                   final grouped = DateTimeHelper.groupTransactionsByDate(
                     transactions,
                   );

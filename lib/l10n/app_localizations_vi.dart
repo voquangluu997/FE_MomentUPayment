@@ -86,7 +86,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get txSuccessMessage => 'Đã ghi chép khoảnh khắc chi tiêu này rùi! 🌸';
 
   @override
-  String get txErrorMessage => 'Không lưu được giao dịch rồi bạn ơi! 😢';
+  String get txErrorMessage => 'Không lưu được khoảnh khắc này rồi bạn ơi! 😢';
 
   @override
   String get catFood => 'Ăn uống 🍰';
@@ -126,7 +126,7 @@ class AppLocalizationsVi extends AppLocalizations {
       '🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.';
 
   @override
-  String get loadingData => 'Đang tải danh sách chi tiêu...';
+  String get loadingData => 'Đang tải danh sách khoảnh khắc...';
 
   @override
   String get errorLoadData => 'Không thể tải dữ liệu. Vui lòng thử lại!';
@@ -139,11 +139,11 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸';
 
   @override
-  String get deleteDialogTitle => 'Xóa giao dịch này?';
+  String get deleteDialogTitle => 'Xóa khoảnh khắc này?';
 
   @override
   String get deleteDialogContent =>
-      'Hành động này sẽ xóa vĩnh viễn lịch sử chi tiêu và ảnh chứng từ lưu trữ trên Cloudinary.';
+      'Hành động này sẽ xóa vĩnh viễn lịch sử khoảnh khắc này và ảnh chứng từ lưu trữ trên Cloudinary.';
 
   @override
   String get deleteDialogCancel => 'Hủy';
@@ -153,19 +153,38 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get deleteSuccessSnackbar =>
-      'Đã dọn dẹp sạch sẽ giao dịch và ảnh hóa đơn! ✨';
+      'Đã dọn dẹp sạch sẽ khoảnh khắc và ảnh hóa đơn đi kèm rùi! ✨';
 
   @override
   String get deleteErrorSnackbar =>
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 
   @override
-  String get analyticsTitle => 'Thống kê chi tiêu';
+  String get analyticsTitle => 'Thống kê khoảnh khắc chi tiêu';
 
   @override
   String get emptyAnalyticsData =>
-      'Chưa có dữ liệu chi tiêu trong tháng này! 📝';
+      'Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝';
 
   @override
   String get totalLabel => 'Tổng chi';
+
+  @override
+  String get loginErrorNotification =>
+      'Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢';
+
+  @override
+  String get googleLoginErrorNotification =>
+      'Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸';
+
+  @override
+  String get loginButtonText => 'Đi vào thuiiii ✨';
+
+  @override
+  String get loginGGButtonText => 'Vào bằng google nè 🚀';
+
+  @override
+  String emailNotVerifiedAlert(Object email) {
+    return 'Nhớ xác thực email $email bạn nhé! 🔑';
+  }
 }

@@ -76,5 +76,19 @@
         <key>NSAllowsArbitraryLoads</key>
         <true/>
     </dict>
+    <key>GIDClientID</key>
+	<string>154765717336-nsvvjge5fh6ullhj4bubbr49uhlt0nnc.apps.googleusercontent.com</string>
+
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.154765717336-nsvvjge5fh6ullhj4bubbr49uhlt0nnc</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

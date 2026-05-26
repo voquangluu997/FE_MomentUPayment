@@ -26,7 +26,7 @@
   "noteHint": "Short note... ✨",
   "saveMomentButton": "Save Expense Moment ✨",
   "txSuccessMessage": "Recorded this cute expense moment! 🌸",
-  "txErrorMessage": "Could not save your transaction, please try again! 😢",
+  "txErrorMessage": "Could not save your moment, please try again! 😢",
   "catFood": "Food 🍰",
   "catShopping": "Shopping 🛍️",
   "catTransport": "Transport 🚗",
@@ -45,14 +45,19 @@
   "retryButton": "Retry",
   "emptyTransactionList": "No spending moments this month. Tap + to add one! 🌸",
 
-  "deleteDialogTitle": "Delete this transaction?",
-  "deleteDialogContent": "This action will permanently delete your spending history and the attached receipt stored on Cloudinary.",
+  "deleteDialogTitle": "Delete this moment?",
+  "deleteDialogContent": "This action will permanently delete your spending moment and the attached receipt stored on Cloudinary.",
   "deleteDialogCancel": "Cancel",
   "deleteDialogConfirm": "Delete",
-  "deleteSuccessSnackbar": "Transaction and receipt image have been successfully cleaned up! ✨",
+  "deleteSuccessSnackbar": "Your moment and receipt image have been successfully cleaned up! ✨",
   "deleteErrorSnackbar": "Failed to delete. Please check your network connection!",
 
-  "analyticsTitle": "Spending Analytics",
-  "emptyAnalyticsData": "No spending history found for this month! 📝",
-  "totalLabel": "Total"
+  "analyticsTitle": "Spending Moments Analytics",
+  "emptyAnalyticsData": "No spending moments found for this month! 📝",
+  "totalLabel": "Total",
+  "loginErrorNotification": "Incorrect email or password, please try again! 😢",
+  "googleLoginErrorNotification": "Google sign-in failed! Please try again 🌸",
+  "loginButtonText": "Let's Go inside ✨",
+  "loginGGButtonText": "Let's Go By Google 🚀",
+  "emailNotVerifiedAlert": "Email {email} is not verified yet! 🔑"
 }

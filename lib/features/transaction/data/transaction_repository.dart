@@ -1,54 +1,53 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // ✨ ĐÃ SỬA: Dùng Secure Storage đồng bộ với Auth
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✨ THÊM: Thư viện phục vụ Provider toàn cục
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
   final Dio _dio;
+  final _secureStorage =
+      const FlutterSecureStorage(); // ✨ ĐÃ SỬA: Tạo instance bộ nhớ bảo mật
 
-  // Khởi tạo và nạp tự động Base URL từ khóa cấu hình nội bộ API_BASE_URL trong file .env
   TransactionRepository({Dio? dio})
     : _dio =
           dio ??
           Dio(
             BaseOptions(
               baseUrl:
-                  dotenv.env['API_BASE_URL'] ?? 'http://192.168.13.125:8001/',
+                  dotenv.env['API_BASE_URL'] ?? 'http://192.168.13.125:8001',
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 10),
             ),
           );
 
+  /// Hàm tiện ích nội bộ để lấy Token đồng bộ, tránh trùng lặp code
+  Future<String?> _getAuthToken() async {
+    return await _secureStorage.read(key: 'access_token');
+  }
+
   /// 🔥 BƯỚC 1: Hàm upload ảnh hóa đơn / chứng từ lên Server
   Future<String> uploadInvoiceImage(String localImagePath) async {
     try {
-      // 1. Lấy Access Token đã lưu từ SharedPreferences để chứng minh danh tính
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('access_token');
-
+      final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc mất token rồi!");
       }
 
-      // 2. Chuẩn bị file từ đường dẫn local trên iPhone
       File file = File(localImagePath);
       String fileName = localImagePath.split('/').last;
 
-      // 3. Đóng gói dữ liệu dạng FormData
       FormData formData = FormData.fromMap({
         'file': await MultipartFile.fromFile(file.path, filename: fileName),
       });
 
-      // 4. Bắn Request kèm Header Authorization
       final response = await _dio.post(
-        '/upload', // Endpoint xử lý upload file trên NestJS
+        '/upload',
         data: formData,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      // Nhận về chuỗi URL ảnh từ server sau khi upload thành công
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data['url'] as String;
       } else {
@@ -69,21 +68,18 @@ class TransactionRepository {
     String? emoji,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('access_token');
-
+      final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc mất token quyền truy cập!");
       }
 
-      // Gửi toàn bộ thông tin văn bản + URL ảnh đã có từ Bước 1 lên DB
       final response = await _dio.post(
         '/transactions',
         data: {
           'amount': amount,
           'category': category,
           'note': note,
-          'imageUrl': imageUrl, // Chuỗi string text, không phải file nữa
+          'imageUrl': imageUrl,
           'emoji': emoji,
         },
         options: Options(
@@ -103,24 +99,19 @@ class TransactionRepository {
     }
   }
 
-  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động (Đồng bộ Token & Logging)
+  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động
   Future<List<Map<String, dynamic>>> getTransactions() async {
     try {
-      // 1. Lấy token để xác thực người dùng hiện tại
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('access_token');
-
+      final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
       }
 
-      // 2. Gửi request GET kèm token bảo mật lên endpoint NestJS
       final response = await _dio.get(
         '/transactions',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      // 3. Ép kiểu dữ liệu trả về từ Backend thành List<Map<String, dynamic>>
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data.map((e) => e as Map<String, dynamic>).toList();
@@ -130,7 +121,6 @@ class TransactionRepository {
         );
       }
     } on DioException catch (e) {
-      // Ghi nhận lỗi mạng hoặc lỗi API đồng bộ qua AppLogger để dễ debug log
       AppLogger.e('TransactionRepo.getTransactions', e, e.stackTrace);
       rethrow;
     }
@@ -138,14 +128,11 @@ class TransactionRepository {
 
   Future<void> deleteTransaction(String id) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('access_token');
-
+      final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
       }
 
-      // Gửi request DELETE tới endpoint /transactions/:id
       final response = await _dio.delete(
         '/transactions/$id',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
@@ -160,17 +147,14 @@ class TransactionRepository {
     }
   }
 
-  /// 📊 Lấy dữ liệu thống kê chi tiêu theo danh mục của tháng hiện tại
+  /// 📊 Lấy dữ liệu thống kê chi tiêu theo danh mục
   Future<List<Map<String, dynamic>>> getTransactionAnalytics() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('access_token');
-
+      final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
       }
 
-      // Gửi request GET tới endpoint thống kê /transactions/analytics
       final response = await _dio.get(
         '/transactions/analytics',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
@@ -178,7 +162,6 @@ class TransactionRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        // Chuyển đổi list động sang cấu trúc List<Map<String, dynamic>> chuẩn chỉ
         return data.map((item) => Map<String, dynamic>.from(item)).toList();
       } else {
         throw Exception("Không thể lấy dữ liệu phân tích từ Server");
@@ -194,7 +177,6 @@ class TransactionRepository {
   }
 }
 
-// ✨ THÊM KHAI BÁO PROVIDER TOÀN CỤC CHO REPOSITORY:
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return TransactionRepository();
 });
