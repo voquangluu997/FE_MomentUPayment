@@ -1,38 +1,19 @@
+// features/transaction/data/transaction_repository.dart
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/api_client.dart'; // 🔑 Import dioClient toàn cục đã tích hợp Interceptor
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
   final Dio _dio;
-  final _secureStorage = const FlutterSecureStorage();
 
-  TransactionRepository({Dio? dio})
-    : _dio =
-          dio ??
-          Dio(
-            BaseOptions(
-              baseUrl:
-                  dotenv.env['API_BASE_URL'] ?? 'http://192.168.13.125:8001',
-              connectTimeout: const Duration(seconds: 10),
-              receiveTimeout: const Duration(seconds: 10),
-            ),
-          );
-
-  Future<String?> _getAuthToken() async {
-    return await _secureStorage.read(key: 'access_token');
-  }
+  // Constructor tinh gọn: Mặc định xài luôn dioClient có interceptor của hệ thống
+  TransactionRepository({Dio? dio}) : _dio = dio ?? dioClient;
 
   /// 🔥 BƯỚC 1: Hàm upload ảnh hóa đơn / chứng từ lên Server
   Future<String> uploadInvoiceImage(String localImagePath) async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc mất token rồi!");
-      }
-
       File file = File(localImagePath);
       String fileName = localImagePath.split('/').last;
 
@@ -40,11 +21,8 @@ class TransactionRepository {
         'file': await MultipartFile.fromFile(file.path, filename: fileName),
       });
 
-      final response = await _dio.post(
-        '/upload',
-        data: formData,
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      // 🚀 Interceptor tự động chèn Token Bearer vào đây
+      final response = await _dio.post('/upload', data: formData);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data['url'] as String;
@@ -66,11 +44,6 @@ class TransactionRepository {
     String? emoji,
   }) async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc mất token quyền truy cập!");
-      }
-
       final response = await _dio.post(
         '/transactions',
         data: {
@@ -80,12 +53,6 @@ class TransactionRepository {
           'imageUrl': imageUrl,
           'emoji': emoji,
         },
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -107,29 +74,15 @@ class TransactionRepository {
     String? emoji,
   }) async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
-      }
-
-      // Gửi request PUT lên route /transactions/:id của NestJS
       final response = await _dio.put(
         '/transactions/$id',
         data: {
           'amount': amount,
           'category': category,
           'note': note,
-          if (imageUrl != null)
-            'imageUrl':
-                imageUrl, // Chỉ đè link ảnh nếu có upload ảnh mới thành công
+          if (imageUrl != null) 'imageUrl': imageUrl,
           'emoji': emoji,
         },
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -147,15 +100,9 @@ class TransactionRepository {
     required int limit,
   }) async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
-      }
-
       final response = await _dio.get(
         '/transactions',
         queryParameters: {'page': page, 'limit': limit},
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       if (response.statusCode == 200) {
@@ -175,15 +122,7 @@ class TransactionRepository {
   /// 🔥 BƯỚC 5: Xóa giao dịch
   Future<void> deleteTransaction(String id) async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
-      }
-
-      final response = await _dio.delete(
-        '/transactions/$id',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      final response = await _dio.delete('/transactions/$id');
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception("Xóa giao dịch thất bại từ phía Server");
@@ -197,15 +136,7 @@ class TransactionRepository {
   /// 📊 BƯỚC 6: Lấy dữ liệu thống kê chi tiêu theo danh mục
   Future<List<Map<String, dynamic>>> getTransactionAnalytics() async {
     try {
-      final String? token = await _getAuthToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
-      }
-
-      final response = await _dio.get(
-        '/transactions/analytics',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      final response = await _dio.get('/transactions/analytics');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -224,6 +155,7 @@ class TransactionRepository {
   }
 }
 
+// Cung cấp instance của Repository thông qua Riverpod Provider
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return TransactionRepository();
 });

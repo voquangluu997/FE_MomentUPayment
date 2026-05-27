@@ -6,7 +6,7 @@
   "email": "Địa chỉ Email",
   "password": "Mật khẩu",
   "name": "Họ và tên",
-  "welcomeBack": "Welcome Back!",
+  "welcomeBack": "Welcome Back! ✨",
   "subTitle": "Moment u Payment - Nhật ký chi tiêu ngọt ngào",
   "emailHint": "Email của bạn... ✨",
   "passwordHint": "Mật khẩu bí mật... 🔑",
@@ -18,6 +18,16 @@
   "loginSuccess": "Đăng nhập thành công rùi nè! ✨",
   "loginCreateAccountTitle": "Create Account 🌸",
   "loginCreateAccountSub": "Tham gia vào thế giới quản lý chi tiêu đáng yêu",
+  "loginErrorNotification": "Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢",
+  "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
+  "loginButtonText": "Đi vào thuiiii ✨",
+  "loginGGButtonText": "Vào bằng google nè 🚀",
+  "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑",
+  "@emailNotVerifiedAlert": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
 
   "newMomentTitle": "Khoảnh khắc mới 📸",
   "amountHint": "0.00 🪙",
@@ -27,23 +37,22 @@
   "saveMomentButton": "Lưu Moment Chi Tiêu ✨",
   "txSuccessMessage": "Đã ghi chép khoảnh khắc chi tiêu này rùi! 🌸",
   "txErrorMessage": "Không lưu được khoảnh khắc này rồi bạn ơi! 😢",
+  "emptyTransactionNote": "Khoảnh khắc chi tiêu không tên...",
+  "homeGreetingDeveloper": "Xin chào, Developer! 👋",
+  "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
+  "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
+  "loadingData": "Đang tải danh sách khoảnh khắc...",
+  "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
+  "retryButton": "Thử lại",
+  "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸",
+
   "catFood": "Ăn uống 🍰",
   "catShopping": "Mua sắm 🛍️",
   "catTransport": "Di chuyển 🚗",
   "catEntertainment": "Giải trí 🎮",
   "categoryOther": "Chưa phân loại",
-  "emptyTransactionNote": "Khoảnh khắc chi tiêu không tên...",
-  "homeGreetingDeveloper": "Xin chào, Developer! 👋",
-  "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
-  "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
-  "budgetThisMonthLabel": "Hạn mức chi tiêu tháng này",
-  "budgetRemainingStatus": "Còn lại 600.000 ₫ của 1.000.000 ₫",
-  "budgetHealthyFeedback": "🎉 Tuyệt vời! Bạn đang quản lý tài chính rất an toàn, không có nguy cơ vượt ngưỡng.",
-
-  "loadingData": "Đang tải danh sách khoảnh khắc...",
-  "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
-  "retryButton": "Thử lại",
-  "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸",
+  "catCustom": "Khác nè... 📝",
+  "customCategoryHint": "Đặt tên cho danh mục bí mật của bạn nha... ✨",
 
   "deleteDialogTitle": "Xóa khoảnh khắc này?",
   "deleteDialogContent": "Hành động này sẽ xóa vĩnh viễn lịch sử khoảnh khắc này và ảnh chứng từ lưu trữ trên Cloudinary.",
@@ -52,26 +61,72 @@
   "deleteSuccessSnackbar": "Đã dọn dẹp sạch sẽ khoảnh khắc và ảnh hóa đơn đi kèm rùi! ✨",
   "deleteErrorSnackbar": "Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!",
 
-  "analyticsTitle": "Thống kê khoảnh khắc chi tiêu",
+  "analyticsTitle": "Chi tiết đây nèe!!",
   "emptyAnalyticsData": "Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝",
   "totalLabel": "Tổng chi",
-  "loginErrorNotification": "Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢",
-  "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
-  "loginButtonText": "Đi vào thuiiii ✨",
-  "loginGGButtonText": "Vào bằng google nè 🚀",
-  "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑",
   "today": "Hôm nay",
   "yesterday": "Hôm qua",
-  "monthLabel": "Tháng {month}/{year}",
   "thisMonth": "Tháng này",
   "unknownMonth": "Tháng không xác định",
   "noMomentsAvailable": "Không có khoảnh khắc nào",
-  "emptyTransactionNote": "Không có ghi chú",
   "cameraTapInstruction": "Nhấn nhẹ vào đây để chụp choẹt hóa đơn nhen! 📸",
   "galleryPickAction": "Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨",
   "galleryChangeAction": "Đổi ảnh khác từ bộ sưu tập nha 🌸",
-  "catCustom": "Khác nè... 📝",
-  "customCategoryHint": "Đặt tên cho danh mục bí mật của bạn nha... ✨",
   "amountSectionTitle": "TỔNG THIỆT HẠI ĐỢT NÀY 💰",
-  "noteSectionTitle": "TÂM SỰ MỎNG VỀ KHOẢNH KHẮC 💬"
+  "noteSectionTitle": "TÂM SỰ MỎNG VỀ KHOẢNH KHẮC 💬",
+  "monthLabel": "Tháng {month}/{year}",
+  "@monthLabel": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "year": { "type": "String" }
+    }
+  },
+
+  "budgetTitle": "Ví Ngoan Đặt Mục Tiêu 🎯",
+  "budgetSectionTitle": "HẠN MỨC CHI TIÊU THÁNG NÀY 🌟",
+  "budgetHint": "Ví dụ: 5.000.000",
+  "budgetSaveButton": "Chốt Ngưỡng Chi Tiêu Thôi! 🚀",
+  "budgetSuccessMessage": "Đã ghi nhận hạn mức mới, cùng chi tiêu thông thái nha! 🥰",
+  "budgetErrorMessage": "Hệ thống nấc cụt rồi, không lưu được ngưỡng đâu khóc mất thôi! 😿",
+  "monthBudget": "Ngân sách tháng này",
+  "changeLimit": "Sửa hạn mức",
+  "budgetMenuTitle": "Thiết lập hạn mức chi tiêu 🎯",
+  "budgetThisMonthLabel": "Ngân sách tháng này",
+  "budgetNotSetStatus": "Chưa thiết lập mục tiêu chi tiêu",
+  "budgetNotSetFeedback": "Bạn chưa cài đặt ngân sách nè, đặt ngay thôi! 🎯✨",
+  "budgetHealthyFeedback": "Ví đang rủng rỉnh nha! 💖",
+  "budgetHalfSpentFeedback": "Tiêu hết hơn nửa rồi đó nghen, khéo léo một chút nào! ⏳✨",
+  "budgetWarningFeedback": "Úi úi, ví sắp gầy trơ xương rồi, tém tém lại xíu nhen! 🥺💸",
+  "budgetOverBudgetFeedback": "Toang rồi ông giáo ạ, vung tay quá trán lố mất tiêu rồi! 🚨😭",
+  "budgetStatusGood": "Tình hình chi tiêu tháng này rất hợp lý luôn! 👍",
+  "budgetStatusWarning": "Ví của bạn còn chưa tới 15%. Thắt lưng buộc bụng thôi nào! 💸",
+  "budgetStatusOver": "Ôi không! Bạn đã tiêu vượt quá hạn mức rồi! 🚨",
+  "budgetStatusHalf": "Bạn đã tiêu hết hơn nửa số tiền rồi, cẩn thận chút nha! ⏳",
+  
+  "remainingAmount": "Còn lại: {amount}đ",
+  "@remainingAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "dailySuggestion": "💡 Gợi ý: Hôm nay bạn chỉ nên chi tiêu tối đa {money}đ để giữ an toàn nha.",
+  "@dailySuggestion": {
+    "placeholders": {
+      "money": { "type": "String" }
+    }
+  },
+  "budgetOverspentStatus": "Vượt hạn mức {overspent} (Hạn mức {limit}). 🥺💸",
+  "@budgetOverspentStatus": {
+    "placeholders": {
+      "overspent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  },
+  "budgetSpentStatus": "Đã tiêu {spent} trong tổng số {limit}",
+  "@budgetSpentStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  }
 }

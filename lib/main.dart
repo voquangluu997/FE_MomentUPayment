@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/features/auth/auth_checker.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/features/auth/auth_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_colors.dart';
 import 'core/providers/locale_provider.dart';
-import 'package:frontend/core/providers/currency_provider.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'l10n/app_localizations.dart';
 

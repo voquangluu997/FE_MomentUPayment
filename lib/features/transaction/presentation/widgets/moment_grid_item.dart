@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';

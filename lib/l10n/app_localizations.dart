@@ -206,6 +206,36 @@ abstract class AppLocalizations {
   /// **'Join the lovely expense management world'**
   String get loginCreateAccountSub;
 
+  /// No description provided for @loginErrorNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password, please try again! 😢'**
+  String get loginErrorNotification;
+
+  /// No description provided for @googleLoginErrorNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed! Please try again 🌸'**
+  String get googleLoginErrorNotification;
+
+  /// No description provided for @loginButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go inside ✨'**
+  String get loginButtonText;
+
+  /// No description provided for @loginGGButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go By Google 🚀'**
+  String get loginGGButtonText;
+
+  /// No description provided for @emailNotVerifiedAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Email {email} is not verified yet! 🔑'**
+  String emailNotVerifiedAlert(String email);
+
   /// No description provided for @newMomentTitle.
   ///
   /// In en, this message translates to:
@@ -254,6 +284,54 @@ abstract class AppLocalizations {
   /// **'Could not save your moment, please try again! 😢'**
   String get txErrorMessage;
 
+  /// No description provided for @emptyTransactionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nameless payment moment...'**
+  String get emptyTransactionNote;
+
+  /// No description provided for @homeGreetingDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, Developer! 👋'**
+  String get homeGreetingDeveloper;
+
+  /// No description provided for @homeSubGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'How is your payment status today?'**
+  String get homeSubGreeting;
+
+  /// No description provided for @spendingMomentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Payment Moments'**
+  String get spendingMomentsTitle;
+
+  /// No description provided for @loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading payment moments...'**
+  String get loadingData;
+
+  /// No description provided for @errorLoadData.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load data. Please try again!'**
+  String get errorLoadData;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryButton;
+
+  /// No description provided for @emptyTransactionList.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment moments this month. Tap + to add one! 🌸'**
+  String get emptyTransactionList;
+
   /// No description provided for @catFood.
   ///
   /// In en, this message translates to:
@@ -284,71 +362,17 @@ abstract class AppLocalizations {
   /// **'Uncategorized'**
   String get categoryOther;
 
-  /// No description provided for @emptyTransactionNote.
+  /// No description provided for @catCustom.
   ///
   /// In en, this message translates to:
-  /// **'No note'**
-  String get emptyTransactionNote;
+  /// **'Custom... 📝'**
+  String get catCustom;
 
-  /// No description provided for @homeGreetingDeveloper.
+  /// No description provided for @customCategoryHint.
   ///
   /// In en, this message translates to:
-  /// **'Hello, Developer! 👋'**
-  String get homeGreetingDeveloper;
-
-  /// No description provided for @homeSubGreeting.
-  ///
-  /// In en, this message translates to:
-  /// **'How is your payment status today?'**
-  String get homeSubGreeting;
-
-  /// No description provided for @spendingMomentsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Payment Moments'**
-  String get spendingMomentsTitle;
-
-  /// No description provided for @budgetThisMonthLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Budget This Month'**
-  String get budgetThisMonthLabel;
-
-  /// No description provided for @budgetRemainingStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Remaining 600.000 ₫ of 1.000.000 ₫'**
-  String get budgetRemainingStatus;
-
-  /// No description provided for @budgetHealthyFeedback.
-  ///
-  /// In en, this message translates to:
-  /// **'🎉 Awesome! You are managing your budget safely.'**
-  String get budgetHealthyFeedback;
-
-  /// No description provided for @loadingData.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading payment moments...'**
-  String get loadingData;
-
-  /// No description provided for @errorLoadData.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load data. Please try again!'**
-  String get errorLoadData;
-
-  /// No description provided for @retryButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retryButton;
-
-  /// No description provided for @emptyTransactionList.
-  ///
-  /// In en, this message translates to:
-  /// **'No payment moments this month. Tap + to add one! 🌸'**
-  String get emptyTransactionList;
+  /// **'Name your secret category... ✨'**
+  String get customCategoryHint;
 
   /// No description provided for @deleteDialogTitle.
   ///
@@ -389,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Payment Moments Analytics'**
+  /// **'Details here!!'**
   String get analyticsTitle;
 
   /// No description provided for @emptyAnalyticsData.
@@ -404,36 +428,6 @@ abstract class AppLocalizations {
   /// **'Total'**
   String get totalLabel;
 
-  /// No description provided for @loginErrorNotification.
-  ///
-  /// In en, this message translates to:
-  /// **'Incorrect email or password, please try again! 😢'**
-  String get loginErrorNotification;
-
-  /// No description provided for @googleLoginErrorNotification.
-  ///
-  /// In en, this message translates to:
-  /// **'Google sign-in failed! Please try again 🌸'**
-  String get googleLoginErrorNotification;
-
-  /// No description provided for @loginButtonText.
-  ///
-  /// In en, this message translates to:
-  /// **'Let\'s Go inside ✨'**
-  String get loginButtonText;
-
-  /// No description provided for @loginGGButtonText.
-  ///
-  /// In en, this message translates to:
-  /// **'Let\'s Go By Google 🚀'**
-  String get loginGGButtonText;
-
-  /// No description provided for @emailNotVerifiedAlert.
-  ///
-  /// In en, this message translates to:
-  /// **'Email {email} is not verified yet! 🔑'**
-  String emailNotVerifiedAlert(Object email);
-
   /// No description provided for @today.
   ///
   /// In en, this message translates to:
@@ -445,12 +439,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get yesterday;
-
-  /// No description provided for @monthLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{month}/{year}'**
-  String monthLabel(Object month, Object year);
 
   /// No description provided for @thisMonth.
   ///
@@ -488,18 +476,6 @@ abstract class AppLocalizations {
   /// **'Change photo from your collection 🌸'**
   String get galleryChangeAction;
 
-  /// No description provided for @catCustom.
-  ///
-  /// In en, this message translates to:
-  /// **'Custom... 📝'**
-  String get catCustom;
-
-  /// No description provided for @customCategoryHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Name your secret category... ✨'**
-  String get customCategoryHint;
-
   /// No description provided for @amountSectionTitle.
   ///
   /// In en, this message translates to:
@@ -511,6 +487,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A LITTLE CHITCHAT ABOUT THIS 💬'**
   String get noteSectionTitle;
+
+  /// No description provided for @monthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}/{year}'**
+  String monthLabel(String month, String year);
+
+  /// No description provided for @budgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Wallet Goals 🎯'**
+  String get budgetTitle;
+
+  /// No description provided for @budgetSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'THIS MONTH BUDGET LIMIT 🌟'**
+  String get budgetSectionTitle;
+
+  /// No description provided for @budgetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 5.000.000'**
+  String get budgetHint;
+
+  /// No description provided for @budgetSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock This Budget! 🚀'**
+  String get budgetSaveButton;
+
+  /// No description provided for @budgetSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'New limit saved! Let\'s spend wisely together! 🥰'**
+  String get budgetSuccessMessage;
+
+  /// No description provided for @budgetErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops, something went wrong. Couldn\'t save your budget! 😿'**
+  String get budgetErrorMessage;
+
+  /// No description provided for @monthBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month\'s Budget'**
+  String get monthBudget;
+
+  /// No description provided for @changeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Limit'**
+  String get changeLimit;
+
+  /// No description provided for @budgetMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Budget Limit 🎯'**
+  String get budgetMenuTitle;
+
+  /// No description provided for @budgetThisMonthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This month\'s budget'**
+  String get budgetThisMonthLabel;
+
+  /// No description provided for @budgetNotSetStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'No spending limit set yet'**
+  String get budgetNotSetStatus;
+
+  /// No description provided for @budgetNotSetFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t set a budget yet, let\'s set one! 🎯✨'**
+  String get budgetNotSetFeedback;
+
+  /// No description provided for @budgetHealthyFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wallet is in good shape! 💖'**
+  String get budgetHealthyFeedback;
+
+  /// No description provided for @budgetHalfSpentFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve spent more than half, be a bit more careful! ⏳✨'**
+  String get budgetHalfSpentFeedback;
+
+  /// No description provided for @budgetWarningFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops, your wallet is getting thin, slow down a bit! 🥺💸'**
+  String get budgetWarningFeedback;
+
+  /// No description provided for @budgetOverBudgetFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Oh no! You have exceeded your budget limit! 🚨😭'**
+  String get budgetOverBudgetFeedback;
+
+  /// No description provided for @budgetStatusGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Your spending this month is very reasonable! 👍'**
+  String get budgetStatusGood;
+
+  /// No description provided for @budgetStatusWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wallet has less than 15% left. Time to tighten your belt! 💸'**
+  String get budgetStatusWarning;
+
+  /// No description provided for @budgetStatusOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Oh no! You have exceeded your budget limit! 🚨'**
+  String get budgetStatusOver;
+
+  /// No description provided for @budgetStatusHalf.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve spent more than half, be a bit more careful! ⏳'**
+  String get budgetStatusHalf;
+
+  /// No description provided for @remainingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining: {amount}đ'**
+  String remainingAmount(String amount);
+
+  /// No description provided for @dailySuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Suggestion: You should spend a maximum of {money}đ today to stay safe.'**
+  String dailySuggestion(String money);
+
+  /// No description provided for @budgetOverspentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget by {overspent} (Limit: {limit}). 🥺💸'**
+  String budgetOverspentStatus(String overspent, String limit);
+
+  /// No description provided for @budgetSpentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent {spent} out of {limit}'**
+  String budgetSpentStatus(String spent, String limit);
 }
 
 class _AppLocalizationsDelegate

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/core/constants/app_colors.dart';
-import 'package:frontend/core/providers/currency_provider.dart';
-import 'package:frontend/core/utils/datetime_helper.dart';
-import 'package:frontend/features/features/home/presentation/widgets/budget_progress_card.dart';
-import 'package:frontend/features/features/home/presentation/widgets/home_app_bar.dart';
-import 'package:frontend/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
-import 'package:frontend/features/transaction/presentation/screens/add_transaction_screen.dart';
-import 'package:frontend/features/transaction/presentation/widgets/moment_details_dialog.dart';
-import 'package:frontend/features/transaction/presentation/widgets/moment_grid_item.dart';
-import 'package:frontend/features/transaction/presentation/widgets/transaction_card.dart';
-import 'package:frontend/l10n/app_localizations.dart';
+import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
+import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
+import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
+import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 final isGridViewProvider = StateProvider<bool>((ref) => false);
 
@@ -42,7 +43,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // 🔑 CẬP NHẬT: Hàm mở Dialog chờ tín hiệu reload từ Dialog trả về
-  Future<void> _openMomentDetails(Map<String, dynamic> moment, AppLocalizations l10n) async {
+  Future<void> _openMomentDetails(
+    Map<String, dynamic> moment,
+    AppLocalizations l10n,
+  ) async {
     final bool? isUpdated = await showDialog<bool>(
       context: context,
       builder: (context) => MomentDetailsDialog(moment: moment, l10n: l10n),
@@ -52,6 +56,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isUpdated == true && mounted) {
       ref.read(transactionTimelineProvider.notifier).refreshTimeline();
     }
+  }
+
+  // 🔑 CẬP NHẬT MỚI: Bọc BudgetProgressCard và thêm nút điều hướng 🎯 vào góc trên bên phải
+  Widget _buildBudgetCardWithNavigation(AppLocalizations l10n) {
+    return Stack(
+      children: [
+        const HomeBudgetCard(),
+        // Positioned(
+        //   top: 12,
+        //   right:
+        //       24, // Căn chỉnh để nằm gọn gàng bên trong lề của thẻ BudgetProgressCard
+        //   child: Tooltip(
+        //     message: l10n.budgetMenuTitle, // Chuỗi ký tự từ file ngôn ngữ
+        //     child: Material(
+        //       color: AppColors.primary.withOpacity(0.08),
+        //       shape: const CircleBorder(),
+        //       child: InkWell(
+        //         customBorder: const CircleBorder(),
+        //         onTap: () {
+        //           Navigator.of(context).push(
+        //             MaterialPageRoute(
+        //               builder: (context) => const SetBudgetScreen(),
+        //             ),
+        //           );
+        //         },
+        //         child: const Padding(
+        //           padding: EdgeInsets.all(8.0),
+        //           child: Icon(
+        //             Icons
+        //                 .track_changes_rounded, // Icon mục tiêu / tâm ngắm rất hợp với vibe "Budget"
+        //             size: 18,
+        //             color: AppColors.primary,
+        //           ),
+        //         ),
+        //       ),
+        // ),
+        // ),
+        // ),
+      ],
+    );
   }
 
   @override
@@ -101,7 +145,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   parent: BouncingScrollPhysics(),
                 ),
                 children: [
-                  const BudgetProgressCard(),
+                  _buildBudgetCardWithNavigation(
+                    l10n,
+                  ), // 🔑 CẬP NHẬT: Thay thế BudgetProgressCard cũ
                   _buildHeaderSection(
                     context,
                     ref,
@@ -131,7 +177,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               itemCount: 2 + keys.length + (isLoadingMore && hasMore ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == 0) return const BudgetProgressCard();
+                if (index == 0)
+                  return _buildBudgetCardWithNavigation(
+                    l10n,
+                  ); // 🔑 CẬP NHẬT: Thay thế BudgetProgressCard cũ
 
                 if (index == 1) {
                   return _buildHeaderSection(
@@ -320,7 +369,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               l10n: l10n,
               onLongPress: () =>
                   _showDeleteConfirmDialog(context, ref, txList[gridIdx], l10n),
-              onTap: () => _openMomentDetails(txList[gridIdx], l10n), // 🔑 Cập nhật gọi hàm mới
+              onTap: () => _openMomentDetails(
+                txList[gridIdx],
+                l10n,
+              ), // 🔑 Cập nhật gọi hàm mới
             ),
           ),
         ),
@@ -396,7 +448,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await ref
             .read(transactionTimelineProvider.notifier)
             .deleteTransaction(tx['id'].toString());
-        ref.read(transactionTimelineProvider.notifier).refreshTimeline(); // Refresh sau khi xóa
+        ref
+            .read(transactionTimelineProvider.notifier)
+            .refreshTimeline(); // Refresh sau khi xóa
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
       }

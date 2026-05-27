@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/auth/presentation/auth_provider.dart';
-import 'package:frontend/features/auth/presentation/screens/login_screen.dart';
-import 'package:frontend/features/features/home/presentation/screens/home_screen.dart';
+import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
+import 'package:moment_u_payment/features/auth/presentation/screens/login_screen.dart';
+import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 // 📝 LƯU Ý: Thay thế bằng đường dẫn import chuẩn tới LoginScreen thực tế của bạn
 
 class AuthChecker extends ConsumerWidget {

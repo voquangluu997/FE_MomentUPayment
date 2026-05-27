@@ -18,6 +18,16 @@
   "loginSuccess": "Logged in successfully! ✨",
   "loginCreateAccountTitle": "Create Account 🌸",
   "loginCreateAccountSub": "Join the lovely expense management world",
+  "loginErrorNotification": "Incorrect email or password, please try again! 😢",
+  "googleLoginErrorNotification": "Google sign-in failed! Please try again 🌸",
+  "loginButtonText": "Let's Go inside ✨",
+  "loginGGButtonText": "Let's Go By Google 🚀",
+  "emailNotVerifiedAlert": "Email {email} is not verified yet! 🔑",
+  "@emailNotVerifiedAlert": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
 
   "newMomentTitle": "New Moment 📸",
   "amountHint": "0.00 🪙",
@@ -27,23 +37,22 @@
   "saveMomentButton": "Save Expense Moment ✨",
   "txSuccessMessage": "Recorded this cute expense moment! 🌸",
   "txErrorMessage": "Could not save your moment, please try again! 😢",
+  "emptyTransactionNote": "Nameless payment moment...",
+  "homeGreetingDeveloper": "Hello, Developer! 👋",
+  "homeSubGreeting": "How is your payment status today?",
+  "spendingMomentsTitle": "Your Payment Moments",
+  "loadingData": "Loading payment moments...",
+  "errorLoadData": "Failed to load data. Please try again!",
+  "retryButton": "Retry",
+  "emptyTransactionList": "No payment moments this month. Tap + to add one! 🌸",
+
   "catFood": "Food 🍰",
   "catShopping": "Shopping 🛍️",
   "catTransport": "Transport 🚗",
   "catEntertainment": "Entertainment 🎮",
   "categoryOther": "Uncategorized",
-  "emptyTransactionNote": "Nameless payment moment...",
-  "homeGreetingDeveloper": "Hello, Developer! 👋",
-  "homeSubGreeting": "How is your payment status today?",
-  "spendingMomentsTitle": "Your Payment Moments",
-  "budgetThisMonthLabel": "Budget This Month",
-  "budgetRemainingStatus": "Remaining 600.000 ₫ of 1.000.000 ₫",
-  "budgetHealthyFeedback": "🎉 Awesome! You are managing your budget safely.",
-
-  "loadingData": "Loading payment moments...",
-  "errorLoadData": "Failed to load data. Please try again!",
-  "retryButton": "Retry",
-  "emptyTransactionList": "No payment moments this month. Tap + to add one! 🌸",
+  "catCustom": "Custom... 📝",
+  "customCategoryHint": "Name your secret category... ✨",
 
   "deleteDialogTitle": "Delete this moment?",
   "deleteDialogContent": "This action will permanently delete your payment moment and the attached receipt stored on Cloudinary.",
@@ -52,26 +61,72 @@
   "deleteSuccessSnackbar": "Your moment and receipt image have been successfully cleaned up! ✨",
   "deleteErrorSnackbar": "Failed to delete. Please check your network connection!",
 
-  "analyticsTitle": "Payment Moments Analytics",
+  "analyticsTitle": "Details here!!",
   "emptyAnalyticsData": "No payment moments found for this month! 📝",
   "totalLabel": "Total",
-  "loginErrorNotification": "Incorrect email or password, please try again! 😢",
-  "googleLoginErrorNotification": "Google sign-in failed! Please try again 🌸",
-  "loginButtonText": "Let's Go inside ✨",
-  "loginGGButtonText": "Let's Go By Google 🚀",
-  "emailNotVerifiedAlert": "Email {email} is not verified yet! 🔑",
   "today": "Today",
   "yesterday": "Yesterday",
-  "monthLabel": "{month}/{year}",
   "thisMonth": "This month",
   "unknownMonth": "Unknown month",
   "noMomentsAvailable": "No moments available",
-  "emptyTransactionNote": "No note",
   "cameraTapInstruction": "Tap here to snap your receipt! 📸",
   "galleryPickAction": "Or pick a cute photo from your gallery ✨",
   "galleryChangeAction": "Change photo from your collection 🌸",
-  "catCustom": "Custom... 📝",
-  "customCategoryHint": "Name your secret category... ✨",
   "amountSectionTitle": "TOTAL DAMAGE THIS TIME 💰",
-  "noteSectionTitle": "A LITTLE CHITCHAT ABOUT THIS 💬"
+  "noteSectionTitle": "A LITTLE CHITCHAT ABOUT THIS 💬",
+  "monthLabel": "{month}/{year}",
+  "@monthLabel": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "year": { "type": "String" }
+    }
+  },
+
+  "budgetTitle": "Smart Wallet Goals 🎯",
+  "budgetSectionTitle": "THIS MONTH BUDGET LIMIT 🌟",
+  "budgetHint": "e.g., 5.000.000",
+  "budgetSaveButton": "Lock This Budget! 🚀",
+  "budgetSuccessMessage": "New limit saved! Let's spend wisely together! 🥰",
+  "budgetErrorMessage": "Oops, something went wrong. Couldn't save your budget! 😿",
+  "monthBudget": "This Month's Budget",
+  "changeLimit": "Edit Limit",
+  "budgetMenuTitle": "Set Budget Limit 🎯",
+  "budgetThisMonthLabel": "This month's budget",
+  "budgetNotSetStatus": "No spending limit set yet",
+  "budgetNotSetFeedback": "You haven't set a budget yet, let's set one! 🎯✨",
+  "budgetHealthyFeedback": "Your wallet is in good shape! 💖",
+  "budgetHalfSpentFeedback": "You've spent more than half, be a bit more careful! ⏳✨",
+  "budgetWarningFeedback": "Oops, your wallet is getting thin, slow down a bit! 🥺💸",
+  "budgetOverBudgetFeedback": "Oh no! You have exceeded your budget limit! 🚨😭",
+  "budgetStatusGood": "Your spending this month is very reasonable! 👍",
+  "budgetStatusWarning": "Your wallet has less than 15% left. Time to tighten your belt! 💸",
+  "budgetStatusOver": "Oh no! You have exceeded your budget limit! 🚨",
+  "budgetStatusHalf": "You've spent more than half, be a bit more careful! ⏳",
+  
+  "remainingAmount": "Remaining: {amount}đ",
+  "@remainingAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "dailySuggestion": "💡 Suggestion: You should spend a maximum of {money}đ today to stay safe.",
+  "@dailySuggestion": {
+    "placeholders": {
+      "money": { "type": "String" }
+    }
+  },
+  "budgetOverspentStatus": "Over budget by {overspent} (Limit: {limit}). 🥺💸",
+  "@budgetOverspentStatus": {
+    "placeholders": {
+      "overspent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  },
+  "budgetSpentStatus": "Spent {spent} out of {limit}",
+  "@budgetSpentStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  }
 }

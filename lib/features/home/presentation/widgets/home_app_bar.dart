@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/core/constants/app_colors.dart';
-import 'package:frontend/features/auth/presentation/auth_provider.dart';
-import 'package:frontend/l10n/app_localizations.dart';
+import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
+import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});

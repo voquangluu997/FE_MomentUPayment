@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:frontend/features/features/home/presentation/screens/home_screen.dart';
-import 'package:frontend/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
@@ -33,7 +33,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 1), () {
       if (mounted) {
         _openCamera();
       }
