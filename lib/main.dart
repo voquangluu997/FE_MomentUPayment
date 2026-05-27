@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:frontend/features/auth/auth_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_colors.dart';
-import 'core/providers/locale_provider.dart'; // 🌸 THÊM IMPORT NÀY (Đường dẫn tới file locale_provider của bạn)
+import 'core/providers/locale_provider.dart';
+import 'package:frontend/core/providers/currency_provider.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   // Đảm bảo các dịch vụ nền của Flutter được khởi tạo hoàn chỉnh trước khi nạp file cấu hình
@@ -14,16 +17,26 @@ void main() async {
   // Nạp file cấu hình môi trường chứa IP máy Mac hoặc link Render
   await dotenv.load(fileName: ".env");
 
-  runApp(const ProviderScope(child: MyApp()));
+  // Khởi tạo SharedPreferences sớm ngay khi app bật lên
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        // Bơm thực thể SharedPreferences vào hệ thống Riverpod
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-// 🌸 ĐÃ SỬA: Chuyển từ StatelessWidget sang ConsumerWidget để dùng được 'WidgetRef ref'
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 🌸 ĐÃ SỬA: Lắng nghe trạng thái ngôn ngữ thay đổi trực tiếp từ Riverpod
+    // Lắng nghe trạng thái ngôn ngữ thay đổi trực tiếp từ Riverpod
     final currentLocale = ref.watch(localeProvider);
 
     return MaterialApp(
@@ -46,18 +59,14 @@ class MyApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
 
-      // 🌸 ĐÃ SỬA: Không gán cứng nữa mà cập nhật động theo provider khi gạt Switch
+      // Cập nhật động theo provider khi gạt Switch ngôn ngữ
       locale: currentLocale,
 
-      // Màn hình khởi chạy ban đầu mặc định là Login
-      home: const LoginScreen(),
+      // 🔑 THAY ĐỔI CHI THUẬT: Chuyển từ LoginScreen() sang AuthChecker() làm màn hình gốc ban đầu
+      home: const AuthChecker(),
 
-      // 🌸 THÊM BẢNG ĐIỀU HƯỚNG ROUTE: Giải quyết triệt để lỗi "Could not find a generator for route"
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        // Nếu sau này bạn có HomeScreen, hãy bổ sung thêm một dòng ở đây:
-        // '/home': (context) => const HomeScreen(),
-      },
+      // BẢNG ĐIỀU HƯỚNG ROUTE: Giải quyết triệt để lỗi "Could not find a generator for route"
+      routes: {'/login': (context) => const LoginScreen()},
     );
   }
 }

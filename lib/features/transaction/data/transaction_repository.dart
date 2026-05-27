@@ -99,16 +99,21 @@ class TransactionRepository {
     }
   }
 
-  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động
-  Future<List<Map<String, dynamic>>> getTransactions() async {
+  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động (Đã bổ sung Lazy Load)
+  Future<List<Map<String, dynamic>>> getTransactions({
+    required int page,
+    required int limit,
+  }) async {
     try {
       final String? token = await _getAuthToken();
       if (token == null || token.isEmpty) {
         throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
       }
 
+      // 🔑 CẬP NHẬT: Thêm queryParameters để gửi cặp key-value lên NestJS (?page=X&limit=Y)
       final response = await _dio.get(
         '/transactions',
+        queryParameters: {'page': page, 'limit': limit},
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 

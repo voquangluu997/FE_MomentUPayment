@@ -287,7 +287,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyTransactionNote.
   ///
   /// In en, this message translates to:
-  /// **'Nameless spending moment...'**
+  /// **'No note'**
   String get emptyTransactionNote;
 
   /// No description provided for @homeGreetingDeveloper.
@@ -299,13 +299,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeSubGreeting.
   ///
   /// In en, this message translates to:
-  /// **'How is your spending status today?'**
+  /// **'How is your payment status today?'**
   String get homeSubGreeting;
 
   /// No description provided for @spendingMomentsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Spending Moments'**
+  /// **'Your Payment Moments'**
   String get spendingMomentsTitle;
 
   /// No description provided for @budgetThisMonthLabel.
@@ -329,7 +329,7 @@ abstract class AppLocalizations {
   /// No description provided for @loadingData.
   ///
   /// In en, this message translates to:
-  /// **'Loading spending moments...'**
+  /// **'Loading payment moments...'**
   String get loadingData;
 
   /// No description provided for @errorLoadData.
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyTransactionList.
   ///
   /// In en, this message translates to:
-  /// **'No spending moments this month. Tap + to add one! 🌸'**
+  /// **'No payment moments this month. Tap + to add one! 🌸'**
   String get emptyTransactionList;
 
   /// No description provided for @deleteDialogTitle.
@@ -359,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteDialogContent.
   ///
   /// In en, this message translates to:
-  /// **'This action will permanently delete your spending moment and the attached receipt stored on Cloudinary.'**
+  /// **'This action will permanently delete your payment moment and the attached receipt stored on Cloudinary.'**
   String get deleteDialogContent;
 
   /// No description provided for @deleteDialogCancel.
@@ -389,13 +389,13 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Spending Moments Analytics'**
+  /// **'Payment Moments Analytics'**
   String get analyticsTitle;
 
   /// No description provided for @emptyAnalyticsData.
   ///
   /// In en, this message translates to:
-  /// **'No spending moments found for this month! 📝'**
+  /// **'No payment moments found for this month! 📝'**
   String get emptyAnalyticsData;
 
   /// No description provided for @totalLabel.
@@ -433,6 +433,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email {email} is not verified yet! 🔑'**
   String emailNotVerifiedAlert(Object email);
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @monthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}/{year}'**
+  String monthLabel(Object month, Object year);
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get thisMonth;
+
+  /// No description provided for @unknownMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown month'**
+  String get unknownMonth;
+
+  /// No description provided for @noMomentsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No moments available'**
+  String get noMomentsAvailable;
 }
 
 class _AppLocalizationsDelegate

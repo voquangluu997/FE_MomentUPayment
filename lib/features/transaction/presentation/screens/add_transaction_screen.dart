@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/transaction/presentation/screens/home_screen.dart';
+import 'package:frontend/features/features/home/presentation/screens/home_screen.dart';
+import 'package:frontend/core/providers/currency_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
@@ -19,33 +20,75 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
+  final _customCategoryController = TextEditingController();
   final _mediaService = MediaService();
 
   String _selectedCategory = 'Food';
   String _selectedEmoji = '🍰';
   String? _localImagePath;
+  bool _isCustomCategory = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔑 SỬA TẠI ĐÂY: Chờ hiệu ứng chuyển màn hình kết thúc (khoảng 400ms) rồi mới mở Camera
+    Future.delayed(const Duration(milliseconds: 200), () {
+      // Kiểm tra xem Widget có còn tồn tại trên cây giao diện không trước khi gọi setState/mở camera
+      if (mounted) {
+        _openCamera();
+      }
+    });
+  }
 
   @override
   void dispose() {
     _amountController.dispose();
     _noteController.dispose();
+    _customCategoryController.dispose();
     super.dispose();
+  }
+
+  // 🔑 Hàm gọi camera dùng chung cho cả lúc tự động mở và lúc user ấn thủ công vào khung ảnh
+  Future<void> _openCamera() async {
+    try {
+      final photo = await _mediaService.takePhoto();
+      if (photo != null) {
+        setState(() {
+          _localImagePath = photo.path;
+        });
+      }
+    } catch (e) {
+      // Handle lỗi camera nếu có (ví dụ: chưa cấp quyền)
+      debugPrint("Lỗi khi mở camera: $e");
+    }
+  }
+
+  void _appendZeros(String zeros) {
+    final text = _amountController.text.trim();
+    if (text.isEmpty || text == '0') return;
+
+    setState(() {
+      _amountController.text = text + zeros;
+      _amountController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _amountController.text.length),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final txState = ref.watch(transactionProvider);
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = ref.watch(currencyProvider);
 
-    // Danh sách danh mục đồng bộ hóa nội dung động thông qua l10n
     final List<Map<String, dynamic>> categories = [
       {'id': 'Food', 'name': l10n.catFood, 'emoji': '🍰'},
       {'id': 'Shopping', 'name': l10n.catShopping, 'emoji': '🛍️'},
       {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🚗'},
       {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🎮'},
+      {'id': 'Custom', 'name': 'Khác...', 'emoji': '📝'},
     ];
 
-    // Lắng nghe trạng thái lưu giao dịch để hiển thị thông báo SnackBar phù hợp
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
       if (next == TransactionState.success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -56,9 +99,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         );
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          ), // 👈 Sửa thành màn hình chính của bạn
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (next == TransactionState.error) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +126,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
           onPressed: () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           ),
         ),
       ),
@@ -95,44 +136,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 🪙 Ô nhập số tiền
-              TextField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-                decoration: InputDecoration(
-                  hintText: l10n.amountHint,
-                  hintStyle: TextStyle(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                  ),
-                  border: InputBorder.none,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // 📸 Khung ảnh chụp khoảnh khắc / hóa đơn
+              // 🌟 1. KHUNG ẢNH CHỤP LÊN ĐẦU TIÊN
               GestureDetector(
-                onTap: () async {
-                  final photo = await _mediaService.takePhoto();
-                  if (photo != null) {
-                    setState(() {
-                      _localImagePath = photo.path;
-                    });
-                  }
-                },
+                onTap: _openCamera, // Gọi lại hàm mở camera nếu muốn chụp lại
                 child: Container(
-                  height: 180,
+                  height: 260,
                   decoration: BoxDecoration(
                     color: AppColors.cardBackground,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      width: 2,
+                      color: AppColors.primary.withOpacity(0.12),
+                      width: 1.5,
                     ),
                   ),
                   child: _localImagePath != null
@@ -148,10 +162,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           children: [
                             const Icon(
                               Icons.camera_enhance_outlined,
-                              size: 40,
+                              size: 56,
                               color: AppColors.primary,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -162,6 +176,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 13,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
@@ -169,14 +184,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-              // 📂 Khu vực lựa chọn danh mục chi tiêu
+              // 🌟 2. DANH MỤC CHI TIÊU XUỐNG DƯỚI ẢNH
               Text(
-                l10n.categorySectionTitle,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+                l10n.categorySectionTitle.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryDark.withOpacity(0.6),
+                  letterSpacing: 0.8,
                 ),
               ),
               const SizedBox(height: 10),
@@ -186,31 +203,50 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   children: categories.map((cat) {
                     final isSelected = _selectedCategory == cat['id'];
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
+                      padding: const EdgeInsets.only(right: 5.0),
                       child: InkWell(
                         onTap: () {
                           setState(() {
                             _selectedCategory = cat['id']!;
                             _selectedEmoji = cat['emoji']!;
+                            _isCustomCategory = cat['id'] == 'Custom';
                           });
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
+                            horizontal: 10,
+                            vertical: 6,
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.primary
                                 : AppColors.cardBackground,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            cat['name'],
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.w600,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : AppColors.primary.withOpacity(0.04),
                             ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                cat['emoji'],
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                cat['name'],
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -218,9 +254,131 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   }).toList(),
                 ),
               ),
+
+              if (_isCustomCategory) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _customCategoryController,
+                  decoration: InputDecoration(
+                    hintText: 'Nhập tên danh mục tự chọn của bạn...',
+                    prefixIcon: const Icon(
+                      Icons.edit_note_rounded,
+                      color: AppColors.primary,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.cardBackground,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: AppColors.primary.withOpacity(0.1),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 24),
+
+              // 🌟 3. Ô NHẬP SỐ TIỀN THU NHỎ GỌN
+              Text(
+                "SỐ TIỀN CHI TIÊU",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryDark.withOpacity(0.6),
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.06),
+                    width: 1.2,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _amountController,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: '0',
+                              hintStyle: TextStyle(
+                                color: AppColors.primary.withOpacity(0.2),
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          currencySymbol,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      height: 10,
+                      thickness: 0.4,
+                      color: Colors.black12,
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _buildShortcutZeroButton(
+                          '.000',
+                          () => _appendZeros('000'),
+                        ),
+                        const SizedBox(width: 6),
+                        _buildShortcutZeroButton(
+                          '.000.000',
+                          () => _appendZeros('000000'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
 
               // 📝 Ô nhập ghi chú ngắn
+              Text(
+                "GHI CHÚ KHOẢNH KHẮC",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryDark.withOpacity(0.6),
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: _noteController,
                 decoration: InputDecoration(
@@ -235,12 +393,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
               const SizedBox(height: 32),
 
-              // 🚀 Nút bấm xử lý lưu giao dịch (Custom InkWell Pastel)
+              // 🚀 Nút bấm xử lý lưu giao dịch
               txState == TransactionState.loading
                   ? const Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.error,
+                          AppColors.primary,
                         ),
                       ),
                     )
@@ -249,11 +407,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         final amountText = _amountController.text.trim();
                         if (amountText.isEmpty) return;
 
+                        String finalCategory = _selectedCategory;
+                        if (_isCustomCategory) {
+                          finalCategory =
+                              _customCategoryController.text.trim().isNotEmpty
+                              ? _customCategoryController.text.trim()
+                              : 'Khác';
+                        }
+
                         ref
                             .read(transactionProvider.notifier)
                             .addTransaction(
                               amount: double.parse(amountText),
-                              category: _selectedCategory,
+                              category: finalCategory,
                               emoji: _selectedEmoji,
                               note: _noteController.text.trim(),
                               localImagePath: _localImagePath,
@@ -278,6 +444,29 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       ),
                     ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShortcutZeroButton(String label, VoidCallback onTap) {
+    return Material(
+      color: AppColors.primary.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+              letterSpacing: 0.3,
+            ),
           ),
         ),
       ),

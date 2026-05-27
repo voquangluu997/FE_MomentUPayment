@@ -59,5 +59,12 @@
   "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
   "loginButtonText": "Đi vào thuiiii ✨",
   "loginGGButtonText": "Vào bằng google nè 🚀",
-  "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑"
+  "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑",
+  "today": "Hôm nay",
+  "yesterday": "Hôm qua",
+  "monthLabel": "Tháng {month}/{year}",
+  "thisMonth": "Tháng này",
+  "unknownMonth": "Tháng không xác định",
+  "noMomentsAvailable": "Không có khoảnh khắc nào",
+  "emptyTransactionNote": "Không có ghi chú"
 }

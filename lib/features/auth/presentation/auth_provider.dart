@@ -10,6 +10,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 enum AuthState {
   initial,
   loading,
+  authenticated, // ✨ ĐÃ THÊM: Trạng thái tự động vào thẳng Home khi token hợp lệ
+  unauthenticated, // ✨ ĐÃ THÊM: Trạng thái chưa đăng nhập hoặc token hết hạn
   loginSuccess,
   loginError,
   registerSuccess,
@@ -47,13 +49,60 @@ final userInfoProvider =
 class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
   final _secureStorage = const FlutterSecureStorage();
-
-  // Đọc giá trị động từ file .env. Nếu không tìm thấy sẽ fallback về cổng 8001 làm dự phòng
   final String _baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8001';
 
-  AuthNotifier(this.ref) : super(AuthState.initial);
+  // 🔑 TỰ ĐỘNG CHẠY: Khởi chạy hàm check token ngay khi notifier được tạo ra
+  AuthNotifier(this.ref) : super(AuthState.initial) {
+    checkAuthStatus();
+  }
 
   void resetState() => state = AuthState.initial;
+
+  /// 🔑 HÀM MỚI: Thẩm định token cũ nằm trong máy xem còn hạn hay không
+  Future<void> checkAuthStatus() async {
+    state = AuthState.loading;
+    try {
+      String? token = await _secureStorage.read(key: 'access_token');
+      if (token == null) {
+        state = AuthState.unauthenticated;
+        return;
+      }
+
+      // Gọi API /auth/me để kiểm tra tính hợp lệ của token phía NestJS
+      final response = await http.get(
+        Uri.parse('$_baseUrl/auth/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Đồng bộ lại thông tin User
+        ref
+            .read(userInfoProvider.notifier)
+            .updateUserInfo(
+              data['user']['email'],
+              data['user']['isEmailVerified'] ?? false,
+            );
+
+        // Làm sạch RAM bộ nhớ đệm
+        ref.invalidate(transactionTimelineProvider);
+        ref.invalidate(transactionProvider);
+
+        state = AuthState.authenticated; // Kích hoạt vào thẳng Home
+      } else {
+        // Token hết hạn hoặc không hợp lệ -> Xóa bỏ token rác
+        await _secureStorage.delete(key: 'access_token');
+        state = AuthState.unauthenticated;
+      }
+    } catch (_) {
+      // Trường hợp lỗi kết nối hoặc server sập, giữ an toàn đẩy ra màn login
+      state = AuthState.unauthenticated;
+    }
+  }
 
   /// Luồng Login bằng Email thường
   Future<void> login(String email, String password) async {
@@ -68,14 +117,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        // Kiên quyết xóa token cũ trước khi ghi đè token mới để tránh xung đột cache bộ nhớ
         await _secureStorage.delete(key: 'access_token');
         await _secureStorage.write(
           key: 'access_token',
           value: data['backend_jwt_token'],
         );
 
-        // Đồng bộ dữ liệu sang User Info Provider
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
@@ -83,7 +130,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
               data['user']['isEmailVerified'] ?? false,
             );
 
-        // ✨ ĐÃ THÊM: Đập bỏ hoàn toàn trạng thái cũ kẹt trên RAM khi đăng nhập thành công
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
 
@@ -96,7 +142,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// 🌟 LUỒNG MỚI: Đăng nhập bằng Google tích hợp hệ thống
+  /// Luồng Đăng nhập bằng Google
   Future<void> loginWithGoogle() async {
     state = AuthState.loading;
     try {
@@ -106,7 +152,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        state = AuthState.initial; // User hủy bấm đăng nhập Google
+        state = AuthState.initial;
         return;
       }
 
@@ -119,7 +165,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      // Gửi accessToken của Google lên NestJS xác thực chéo
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/google-login'),
         headers: {'Content-Type': 'application/json'},
@@ -135,7 +180,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
           value: data['backend_jwt_token'],
         );
 
-        // Đồng bộ dữ liệu sang User Info Provider (Google mặc định verified = true)
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
@@ -143,7 +187,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
               data['user']['isEmailVerified'] ?? true,
             );
 
-        // ✨ ĐÃ THÊM: Dọn sạch bộ nhớ cache ngay khi login bằng Google thành công
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
 
@@ -156,7 +199,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Gửi lại email xác thực (Lazy Verification)
+  /// Gửi lại email xác thực
   Future<bool> resendVerificationEmail(String email) async {
     try {
       final response = await http.post(
@@ -219,10 +262,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    // 1. Xóa token bảo mật
     await _secureStorage.delete(key: 'access_token');
 
-    // 2. Ngắt kết nối Google Sign In
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
@@ -231,17 +272,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await googleSignIn.disconnect();
     } catch (_) {}
 
-    // 3. Xóa thông tin user cục bộ
     ref.read(userInfoProvider.notifier).clearUserInfo();
-    state = AuthState.initial;
 
-    // 4. ✨ ĐÃ SỬA: Invalidate triệt để tất cả các Provider lưu trữ dữ liệu giao dịch trên RAM
+    // 🔑 CẬP NHẬT: Trả về trạng thái chưa đăng nhập để AuthChecker tự bốc user ra ngoài màn Login
+    state = AuthState.unauthenticated;
+
     ref.invalidate(transactionTimelineProvider);
     ref.invalidate(transactionProvider);
   }
 }
 
-// Khai báo Provider dùng chung toàn hệ thống
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref);
 });

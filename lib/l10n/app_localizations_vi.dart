@@ -104,7 +104,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get categoryOther => 'Chưa phân loại';
 
   @override
-  String get emptyTransactionNote => 'Khoảnh khắc chi tiêu không tên...';
+  String get emptyTransactionNote => 'Không có ghi chú';
 
   @override
   String get homeGreetingDeveloper => 'Xin chào, Developer! 👋';
@@ -187,4 +187,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String emailNotVerifiedAlert(Object email) {
     return 'Nhớ xác thực email $email bạn nhé! 🔑';
   }
+
+  @override
+  String get today => 'Hôm nay';
+
+  @override
+  String get yesterday => 'Hôm qua';
+
+  @override
+  String monthLabel(Object month, Object year) {
+    return 'Tháng $month/$year';
+  }
+
+  @override
+  String get thisMonth => 'Tháng này';
+
+  @override
+  String get unknownMonth => 'Tháng không xác định';
+
+  @override
+  String get noMomentsAvailable => 'Không có khoảnh khắc nào';
 }

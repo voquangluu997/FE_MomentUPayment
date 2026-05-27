@@ -105,16 +105,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryOther => 'Uncategorized';
 
   @override
-  String get emptyTransactionNote => 'Nameless spending moment...';
+  String get emptyTransactionNote => 'No note';
 
   @override
   String get homeGreetingDeveloper => 'Hello, Developer! 👋';
 
   @override
-  String get homeSubGreeting => 'How is your spending status today?';
+  String get homeSubGreeting => 'How is your payment status today?';
 
   @override
-  String get spendingMomentsTitle => 'Your Spending Moments';
+  String get spendingMomentsTitle => 'Your Payment Moments';
 
   @override
   String get budgetThisMonthLabel => 'Budget This Month';
@@ -127,7 +127,7 @@ class AppLocalizationsEn extends AppLocalizations {
       '🎉 Awesome! You are managing your budget safely.';
 
   @override
-  String get loadingData => 'Loading spending moments...';
+  String get loadingData => 'Loading payment moments...';
 
   @override
   String get errorLoadData => 'Failed to load data. Please try again!';
@@ -137,14 +137,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyTransactionList =>
-      'No spending moments this month. Tap + to add one! 🌸';
+      'No payment moments this month. Tap + to add one! 🌸';
 
   @override
   String get deleteDialogTitle => 'Delete this moment?';
 
   @override
   String get deleteDialogContent =>
-      'This action will permanently delete your spending moment and the attached receipt stored on Cloudinary.';
+      'This action will permanently delete your payment moment and the attached receipt stored on Cloudinary.';
 
   @override
   String get deleteDialogCancel => 'Cancel';
@@ -161,11 +161,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get analyticsTitle => 'Spending Moments Analytics';
+  String get analyticsTitle => 'Payment Moments Analytics';
 
   @override
   String get emptyAnalyticsData =>
-      'No spending moments found for this month! 📝';
+      'No payment moments found for this month! 📝';
 
   @override
   String get totalLabel => 'Total';
@@ -188,4 +188,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String emailNotVerifiedAlert(Object email) {
     return 'Email $email is not verified yet! 🔑';
   }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String monthLabel(Object month, Object year) {
+    return '$month/$year';
+  }
+
+  @override
+  String get thisMonth => 'This month';
+
+  @override
+  String get unknownMonth => 'Unknown month';
+
+  @override
+  String get noMomentsAvailable => 'No moments available';
 }

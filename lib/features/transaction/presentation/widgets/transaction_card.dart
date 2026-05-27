@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/core/providers/currency_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
+import '../../../../core/utils/currency_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
-class TransactionCard extends StatelessWidget {
+class TransactionCard extends ConsumerWidget {
   final Map<String, dynamic> transaction;
   final VoidCallback onTap;
+  final AppLocalizations l10n;
 
   const TransactionCard({
     super.key,
     required this.transaction,
     required this.onTap,
+    required this.l10n,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencySymbol = ref.watch(currencyProvider);
+    final String formattedAmount =
+        '-${CurrencyHelper.formatCompactAmount(transaction['amount'])}$currencySymbol';
 
     final String imageUrl = transaction['imageUrl'] ?? '';
     final String thumbnailUrl = CloudinaryHelper.getThumbnailUrl(imageUrl);
-    final double amount = (transaction['amount'] ?? 0.0).toDouble();
     final String category = transaction['category'] ?? l10n.categoryOther;
     final String note = transaction['note'] ?? '';
     final String emoji = transaction['emoji'] ?? '📝';
 
-    // 📅 XỬ LÝ ĐỊNH DẠNG ĐẦY ĐỦ VÀ ĐỒNG BỘ MÚI GIỜ LOCAL THIẾT BỊ
     String formattedDateTime = '--:-- - --/--/----';
     if (transaction['spentAt'] != null) {
       try {
-        // 🔥 CHỐT HẠ: Parse và ép về múi giờ Local hệ thống tự động (.toLocal())
         final DateTime parsedDate = DateTime.parse(
           transaction['spentAt'].toString(),
         ).toLocal();
@@ -45,6 +49,10 @@ class TransactionCard extends StatelessWidget {
       }
     }
 
+    // 🔑 Tự động định dạng theo quy tắc: Dưới 1M hiện 150.000đ, trên 1M hiện 2.5M
+    // final String compactAmount =
+    // '-${CurrencyHelper.formatCompactAmount(amount)}';
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
@@ -60,7 +68,6 @@ class TransactionCard extends StatelessWidget {
           padding: const EdgeInsets.all(14.0),
           child: Row(
             children: [
-              // 🖼️ Thumbnail ảnh hóa đơn / Icon Emoji đại diện
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: imageUrl.isNotEmpty
@@ -75,8 +82,6 @@ class TransactionCard extends StatelessWidget {
                     : _buildFallbackIcon(emoji),
               ),
               const SizedBox(width: 16),
-
-              // 📝 Nội dung chi tiết khoản chi tiêu
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,8 +105,6 @@ class TransactionCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-
-                    // 🕒 Hiển thị thời gian local chuẩn xác của user
                     Text(
                       formattedDateTime,
                       style: TextStyle(
@@ -113,10 +116,8 @@ class TransactionCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // 💰 Số tiền chi tiêu âm
               Text(
-                '-₫${amount.toStringAsFixed(0)}',
+                formattedAmount,
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,

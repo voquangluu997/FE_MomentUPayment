@@ -1,3 +1,6 @@
+// 🔑 Thêm dòng import này (nhớ điều chỉnh đường dẫn tương đối cho khớp với cấu trúc thư mục của bạn)
+import '../../l10n/app_localizations.dart';
+
 class DateTimeHelper {
   /// 📦 Nhóm danh sách phẳng thành Map<String, List> dựa trên ngày (yyyy-MM-dd) local
   static Map<String, List<Map<String, dynamic>>> groupTransactionsByDate(
@@ -33,8 +36,9 @@ class DateTimeHelper {
     return grouped;
   }
 
-  /// 📝 Chuyển đổi key ngày thành nhãn hiển thị thân thiện
-  static String getFriendlyDateLabel(String dateKey) {
+  /// 📝 Chuyển đổi key ngày thành nhãn hiển thị thân thiện (Đã tích hợp đa ngôn ngữ)
+  static String getFriendlyDateLabel(String dateKey, AppLocalizations l10n) {
+    // 🔑 Bổ sung tham số l10n
     try {
       final List<String> parts = dateKey.split('-');
       final DateTime txDate = DateTime(
@@ -48,14 +52,54 @@ class DateTimeHelper {
       final DateTime yesterday = today.subtract(const Duration(days: 1));
 
       if (txDate == today) {
-        return "HÔM NAY";
+        // 🔑 Lấy từ l10n và viết hoa toàn bộ để giữ nguyên thiết kế gốc
+        return l10n.today.toUpperCase();
       } else if (txDate == yesterday) {
-        return "HÔM QUA";
+        return l10n.yesterday.toUpperCase();
       } else {
         return "${parts[2]}/${parts[1]}/${parts[0]}";
       }
     } catch (_) {
       return dateKey;
     }
+  }
+
+  static Map<String, List<Map<String, dynamic>>> groupMomentsByMonth(
+    List<dynamic> transactions,
+    AppLocalizations l10n,
+  ) {
+    final Map<String, List<Map<String, dynamic>>> monthlyGroups = {};
+    final now = DateTime.now();
+
+    for (var item in transactions) {
+      if (item is Map<String, dynamic>) {
+        final createdAtStr = item['spentAt'] ?? '';
+        String monthKey = '';
+
+        if (createdAtStr.isNotEmpty) {
+          try {
+            final datePart = createdAtStr.contains('T')
+                ? createdAtStr.split('T').first
+                : createdAtStr;
+            final parts = datePart.split('-');
+            if (parts.length >= 2) {
+              final String year = parts[0].trim();
+              final String month = parts[1].trim().padLeft(2, '0');
+
+              if (int.parse(year) == now.year &&
+                  int.parse(month) == now.month) {
+                monthKey = l10n.thisMonth;
+              } else {
+                monthKey = l10n.monthLabel(month, year);
+              }
+            }
+          } catch (_) {
+            monthKey = l10n.unknownMonth;
+          }
+        }
+        monthlyGroups.putIfAbsent(monthKey.toUpperCase(), () => []).add(item);
+      }
+    }
+    return monthlyGroups;
   }
 }
