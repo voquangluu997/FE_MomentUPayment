@@ -66,5 +66,12 @@
   "thisMonth": "Tháng này",
   "unknownMonth": "Tháng không xác định",
   "noMomentsAvailable": "Không có khoảnh khắc nào",
-  "emptyTransactionNote": "Không có ghi chú"
+  "emptyTransactionNote": "Không có ghi chú",
+  "cameraTapInstruction": "Nhấn nhẹ vào đây để chụp choẹt hóa đơn nhen! 📸",
+  "galleryPickAction": "Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨",
+  "galleryChangeAction": "Đổi ảnh khác từ bộ sưu tập nha 🌸",
+  "catCustom": "Khác nè... 📝",
+  "customCategoryHint": "Đặt tên cho danh mục bí mật của bạn nha... ✨",
+  "amountSectionTitle": "TỔNG THIỆT HẠI ĐỢT NÀY 💰",
+  "noteSectionTitle": "TÂM SỰ MỎNG VỀ KHOẢNH KHẮC 💬"
 }

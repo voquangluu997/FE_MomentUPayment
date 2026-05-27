@@ -66,5 +66,12 @@
   "thisMonth": "This month",
   "unknownMonth": "Unknown month",
   "noMomentsAvailable": "No moments available",
-  "emptyTransactionNote": "No note"
+  "emptyTransactionNote": "No note",
+  "cameraTapInstruction": "Tap here to snap your receipt! 📸",
+  "galleryPickAction": "Or pick a cute photo from your gallery ✨",
+  "galleryChangeAction": "Change photo from your collection 🌸",
+  "catCustom": "Custom... 📝",
+  "customCategoryHint": "Name your secret category... ✨",
+  "amountSectionTitle": "TOTAL DAMAGE THIS TIME 💰",
+  "noteSectionTitle": "A LITTLE CHITCHAT ABOUT THIS 💬"
 }

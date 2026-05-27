@@ -207,4 +207,27 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get noMomentsAvailable => 'Không có khoảnh khắc nào';
+
+  @override
+  String get cameraTapInstruction =>
+      'Nhấn nhẹ vào đây để chụp choẹt hóa đơn nhen! 📸';
+
+  @override
+  String get galleryPickAction => 'Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨';
+
+  @override
+  String get galleryChangeAction => 'Đổi ảnh khác từ bộ sưu tập nha 🌸';
+
+  @override
+  String get catCustom => 'Khác nè... 📝';
+
+  @override
+  String get customCategoryHint =>
+      'Đặt tên cho danh mục bí mật của bạn nha... ✨';
+
+  @override
+  String get amountSectionTitle => 'TỔNG THIỆT HẠI ĐỢT NÀY 💰';
+
+  @override
+  String get noteSectionTitle => 'TÂM SỰ MỎNG VỀ KHOẢNH KHẮC 💬';
 }

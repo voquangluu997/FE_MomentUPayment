@@ -469,6 +469,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No moments available'**
   String get noMomentsAvailable;
+
+  /// No description provided for @cameraTapInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to snap your receipt! 📸'**
+  String get cameraTapInstruction;
+
+  /// No description provided for @galleryPickAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Or pick a cute photo from your gallery ✨'**
+  String get galleryPickAction;
+
+  /// No description provided for @galleryChangeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo from your collection 🌸'**
+  String get galleryChangeAction;
+
+  /// No description provided for @catCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom... 📝'**
+  String get catCustom;
+
+  /// No description provided for @customCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your secret category... ✨'**
+  String get customCategoryHint;
+
+  /// No description provided for @amountSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL DAMAGE THIS TIME 💰'**
+  String get amountSectionTitle;
+
+  /// No description provided for @noteSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A LITTLE CHITCHAT ABOUT THIS 💬'**
+  String get noteSectionTitle;
 }
 
 class _AppLocalizationsDelegate

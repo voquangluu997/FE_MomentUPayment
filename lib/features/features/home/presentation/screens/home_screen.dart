@@ -31,7 +31,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 150) {
-        // Gọi hàm load trang tiếp theo từ Notifier của bạn
         ref.read(transactionTimelineProvider.notifier).loadNextPage();
       }
     });

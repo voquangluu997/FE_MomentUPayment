@@ -208,4 +208,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMomentsAvailable => 'No moments available';
+
+  @override
+  String get cameraTapInstruction => 'Tap here to snap your receipt! 📸';
+
+  @override
+  String get galleryPickAction => 'Or pick a cute photo from your gallery ✨';
+
+  @override
+  String get galleryChangeAction => 'Change photo from your collection 🌸';
+
+  @override
+  String get catCustom => 'Custom... 📝';
+
+  @override
+  String get customCategoryHint => 'Name your secret category... ✨';
+
+  @override
+  String get amountSectionTitle => 'TOTAL DAMAGE THIS TIME 💰';
+
+  @override
+  String get noteSectionTitle => 'A LITTLE CHITCHAT ABOUT THIS 💬';
 }
