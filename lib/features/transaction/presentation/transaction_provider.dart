@@ -1,63 +1,92 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/transaction_repository.dart';
 import 'controllers/transaction_timeline_controller.dart';
+import '../../../core/utils/app_logger.dart';
 
-enum TransactionState { idle, loading, success, error }
+// Định nghĩa các trạng thái
+enum TransactionState { initial, loading, success, error }
 
 class TransactionNotifier extends StateNotifier<TransactionState> {
-  final TransactionRepository _repository;
-  final Ref
-  ref; // ✨ THÊM: Giữ biến ref để có thể clear/invalidate chéo giữa các provider
-  String? errorMessage;
+  final Ref _ref;
 
-  TransactionNotifier(this._repository, this.ref)
-    : super(TransactionState.idle);
+  TransactionNotifier(this._ref) : super(TransactionState.initial);
 
+  TransactionRepository get _repository =>
+      _ref.read(transactionRepositoryProvider);
+
+  /// 🌸 HÀM 1: GHI LẠI KHOẢNH KHẮC CHI TIÊU MỚI
   Future<void> addTransaction({
     required double amount,
     required String category,
-    String? note,
+    required String emoji,
+    required String note,
     String? localImagePath,
-    String? emoji,
   }) async {
     state = TransactionState.loading;
     try {
-      String? serverImageUrl;
+      String? uploadedImageUrl;
 
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        serverImageUrl = await _repository.uploadInvoiceImage(localImagePath);
+        uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
 
       await _repository.createTransaction(
         amount: amount,
         category: category,
         note: note,
-        imageUrl: serverImageUrl,
         emoji: emoji,
+        imageUrl: uploadedImageUrl,
       );
 
-      // ✨ ĐÃ SỬA: Tự động xóa bộ đệm cũ, bắt buộc app phải nạp lại danh sách giao dịch mới tinh của chính user này
-      ref.invalidate(transactionTimelineProvider);
+      // Cập nhật lại list ở màn hình chính sau khi thêm
+      _ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
-      errorMessage = null;
       state = TransactionState.success;
-      HapticFeedback.mediumImpact();
-    } catch (e) {
-      errorMessage = e.toString().contains('401')
-          ? 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại bạn ơi! 🔑'
-          : 'Không lưu được giao dịch rồi bạn ơi! 😢';
+      state = TransactionState.initial; // Reset về ban đầu để tránh state cũ
+    } catch (error, stackTrace) {
+      AppLogger.e('TransactionNotifier.addTransaction', error, stackTrace);
       state = TransactionState.error;
     }
   }
 
-  void resetState() {
-    state = TransactionState.idle;
+  /// 🌸 HÀM 2: CẬP NHẬT KHOẢNH KHẮC CŨ
+  Future<void> updateTransaction({
+    required String id,
+    required double amount,
+    required String category,
+    required String emoji,
+    required String note,
+    String? localImagePath,
+  }) async {
+    state = TransactionState.loading;
+    try {
+      String? uploadedImageUrl;
+
+      if (localImagePath != null && localImagePath.isNotEmpty) {
+        uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
+      }
+
+      await _repository.updateTransaction(
+        id: id,
+        amount: amount,
+        category: category,
+        note: note,
+        emoji: emoji,
+        imageUrl: uploadedImageUrl,
+      );
+
+      _ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+
+      state = TransactionState.success;
+      state = TransactionState.initial;
+    } catch (error, stackTrace) {
+      AppLogger.e('TransactionNotifier.updateTransaction', error, stackTrace);
+      state = TransactionState.error;
+    }
   }
 }
 
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, TransactionState>((ref) {
-      final repo = ref.watch(transactionRepositoryProvider);
-      return TransactionNotifier(repo, ref); // Truyền thêm ref vào đây
+      return TransactionNotifier(ref);
     });

@@ -4,19 +4,20 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'moment_details_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔑 1. Thêm import Riverpod
 
 class MomentGridItem extends ConsumerWidget {
   final Map<String, dynamic> moment;
   final AppLocalizations l10n;
   final VoidCallback onLongPress;
+  final VoidCallback? onTap;
 
   const MomentGridItem({
     super.key,
     required this.moment,
     required this.l10n,
     required this.onLongPress,
+    this.onTap, // 🔑 2. Cho phép truyền onTap từ bên ngoài để linh hoạt hơn
   });
 
   IconData _getCategoryIcon(String? category) {
@@ -56,10 +57,7 @@ class MomentGridItem extends ConsumerWidget {
     final IconData categoryIcon = _getCategoryIcon(category);
 
     return InkWell(
-      onTap: () => showDialog(
-        context: context,
-        builder: (context) => MomentDetailsDialog(moment: moment, l10n: l10n),
-      ),
+      onTap: onTap,
       onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(12),
       child: Container(

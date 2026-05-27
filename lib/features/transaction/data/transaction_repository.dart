@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // ✨ ĐÃ SỬA: Dùng Secure Storage đồng bộ với Auth
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
   final Dio _dio;
-  final _secureStorage =
-      const FlutterSecureStorage(); // ✨ ĐÃ SỬA: Tạo instance bộ nhớ bảo mật
+  final _secureStorage = const FlutterSecureStorage();
 
   TransactionRepository({Dio? dio})
     : _dio =
@@ -22,7 +21,6 @@ class TransactionRepository {
             ),
           );
 
-  /// Hàm tiện ích nội bộ để lấy Token đồng bộ, tránh trùng lặp code
   Future<String?> _getAuthToken() async {
     return await _secureStorage.read(key: 'access_token');
   }
@@ -99,7 +97,51 @@ class TransactionRepository {
     }
   }
 
-  /// 🔥 BƯỚC 3: Lấy danh sách lịch sử giao dịch động (Đã bổ sung Lazy Load)
+  /// 🔥 BƯỚC 3: Cập nhật thông tin giao dịch (Sửa đổi / Update)
+  Future<void> updateTransaction({
+    required String id,
+    required double amount,
+    required String category,
+    String? note,
+    String? imageUrl,
+    String? emoji,
+  }) async {
+    try {
+      final String? token = await _getAuthToken();
+      if (token == null || token.isEmpty) {
+        throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
+      }
+
+      // Gửi request PUT lên route /transactions/:id của NestJS
+      final response = await _dio.put(
+        '/transactions/$id',
+        data: {
+          'amount': amount,
+          'category': category,
+          'note': note,
+          if (imageUrl != null)
+            'imageUrl':
+                imageUrl, // Chỉ đè link ảnh nếu có upload ảnh mới thành công
+          'emoji': emoji,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception("Cập nhật giao dịch thất bại từ phía Server!");
+      }
+    } on DioException catch (e) {
+      AppLogger.e('TransactionRepo.updateTransaction', e, e.stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 🔥 BƯỚC 4: Lấy danh sách lịch sử giao dịch động (Lazy Load)
   Future<List<Map<String, dynamic>>> getTransactions({
     required int page,
     required int limit,
@@ -110,7 +152,6 @@ class TransactionRepository {
         throw Exception("401 - Chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
       }
 
-      // 🔑 CẬP NHẬT: Thêm queryParameters để gửi cặp key-value lên NestJS (?page=X&limit=Y)
       final response = await _dio.get(
         '/transactions',
         queryParameters: {'page': page, 'limit': limit},
@@ -131,6 +172,7 @@ class TransactionRepository {
     }
   }
 
+  /// 🔥 BƯỚC 5: Xóa giao dịch
   Future<void> deleteTransaction(String id) async {
     try {
       final String? token = await _getAuthToken();
@@ -152,7 +194,7 @@ class TransactionRepository {
     }
   }
 
-  /// 📊 Lấy dữ liệu thống kê chi tiêu theo danh mục
+  /// 📊 BƯỚC 6: Lấy dữ liệu thống kê chi tiêu theo danh mục
   Future<List<Map<String, dynamic>>> getTransactionAnalytics() async {
     try {
       final String? token = await _getAuthToken();

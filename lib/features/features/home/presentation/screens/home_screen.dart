@@ -27,7 +27,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // 🔑 LẮNG NGHE SỰ KIỆN CUỘN: Khi user kéo gần xuống cuối trang (cách đáy 150px)
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 150) {
@@ -38,8 +37,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Giải phóng bộ nhớ tránh leak RAM
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  // 🔑 CẬP NHẬT: Hàm mở Dialog chờ tín hiệu reload từ Dialog trả về
+  Future<void> _openMomentDetails(Map<String, dynamic> moment, AppLocalizations l10n) async {
+    final bool? isUpdated = await showDialog<bool>(
+      context: context,
+      builder: (context) => MomentDetailsDialog(moment: moment, l10n: l10n),
+    );
+
+    // Nếu isUpdated == true (cập nhật thành công) -> Refresh dữ liệu
+    if (isUpdated == true && mounted) {
+      ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+    }
   }
 
   @override
@@ -49,7 +61,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isGridView = ref.watch(isGridViewProvider);
     final currentCurrency = ref.watch(currencyProvider);
 
-    // 🔑 Trích xuất trạng thái bổ trợ từ Notifier (Ví dụ: đang load thêm, còn dữ liệu không)
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
     final isLoadingMore = timelineNotifier.isLoadingMore;
     final hasMore = timelineNotifier.hasMore;
@@ -73,7 +84,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           data: (transactions) {
-            // Phân nhóm dữ liệu sẵn để hiển thị theo cơ chế Lazy Render
             final monthlyGrouped = DateTimeHelper.groupMomentsByMonth(
               transactions,
               l10n,
@@ -114,19 +124,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             }
 
-            // 🔑 GIẢI PHÁP LAG: Gom toàn bộ màn hình vào 1 ListView duy nhất. Không dùng shrinkWrap bên ngoài nữa.
             return ListView.builder(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              // Tổng item = 1 (Card) + 1 (Header) + Số lượng nhóm ngày/tháng + 1 (Nút xoay load more nếu có)
               itemCount: 2 + keys.length + (isLoadingMore && hasMore ? 1 : 0),
               itemBuilder: (context, index) {
-                // Vị trí 0: Thẻ hạn mức ngân sách
                 if (index == 0) return const BudgetProgressCard();
 
-                // Vị trí 1: Tiêu đề "Spending Moments" & Bộ lọc
                 if (index == 1) {
                   return _buildHeaderSection(
                     context,
@@ -137,7 +143,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }
 
-                // Vị trí cuối cùng: Hiển thị vòng xoay Loading khi đang tải trang tiếp theo dưới nền
                 if (index == 2 + keys.length) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
@@ -150,7 +155,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }
 
-                // Các vị trí ở giữa: Render các cụm danh sách giao dịch một cách tuần tự (Lazy)
                 final dataIndex = index - 2;
                 final groupKey = keys[dataIndex];
 
@@ -168,15 +172,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const AddTransactionScreen())),
+        onPressed: () async {
+          // 🔑 CẬP NHẬT: Hứng kết quả từ màn hình Add
+          final bool? isAdded = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+          );
+          if (isAdded == true && mounted) {
+            ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+          }
+        },
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  // Tách Widget Header để gọn code chính
   Widget _buildHeaderSection(
     BuildContext context,
     WidgetRef ref,
@@ -247,7 +256,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Tách cụm render List theo từng ngày độc lập
   Widget _buildListGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
@@ -274,7 +282,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Tách cụm render Grid theo từng tháng độc lập
   Widget _buildGridGroup(
     String monthKey,
     List<Map<String, dynamic>> txList,
@@ -300,8 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: GridView.builder(
             shrinkWrap: true,
-            physics:
-                const NeverScrollableScrollPhysics(), // Vẫn giữ vì cụm tháng nhỏ, ListView cha sẽ lo cuộn tổng thể
+            physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 8,
@@ -314,6 +320,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               l10n: l10n,
               onLongPress: () =>
                   _showDeleteConfirmDialog(context, ref, txList[gridIdx], l10n),
+              onTap: () => _openMomentDetails(txList[gridIdx], l10n), // 🔑 Cập nhật gọi hàm mới
             ),
           ),
         ),
@@ -346,10 +353,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: TransactionCard(
         transaction: tx,
-        onTap: () => showDialog(
-          context: context,
-          builder: (context) => MomentDetailsDialog(moment: tx, l10n: l10n),
-        ),
+        onTap: () => _openMomentDetails(tx, l10n), // 🔑 Cập nhật gọi hàm mới
         l10n: l10n,
       ),
     );
@@ -392,6 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await ref
             .read(transactionTimelineProvider.notifier)
             .deleteTransaction(tx['id'].toString());
+        ref.read(transactionTimelineProvider.notifier).refreshTimeline(); // Refresh sau khi xóa
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
       }

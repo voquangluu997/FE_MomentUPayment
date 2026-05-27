@@ -9,7 +9,6 @@ import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
-import '../controllers/transaction_timeline_controller.dart';
 
 class MomentDetailsDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
@@ -177,8 +176,11 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
       {'id': 'Custom', 'name': widget.l10n.catCustom, 'emoji': '📝'},
     ];
 
+    // ✨ ĐÃ SỬA: Lấy số tiền real-time từ Controller thay vì lấy dữ liệu tĩnh cũ
+    final double currentAmount =
+        double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
     final String compactAmount =
-        '-${CurrencyHelper.formatCompactAmount(widget.moment['amount'])}$currencySymbol';
+        '-${CurrencyHelper.formatCompactAmount(currentAmount)}$currencySymbol';
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -232,7 +234,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                     ),
                   ),
 
-                  // 🔑 SỬA LỖI TRÀN 1: Thay đổi Row thành Wrap để nút tự rớt dòng nếu màn hình nhỏ
                   if (_isEditing)
                     Center(
                       child: Padding(
@@ -347,7 +348,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                               color: Colors.white,
                               size: 16,
                             ),
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: () => Navigator.of(context).pop(false),
                           ),
                         ),
                       ],
@@ -372,7 +373,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
   }
 
-  // KHUNG XEM (VIEW MODE) - Đã tối ưu Flexible để chống tràn chữ danh mục dài
   Widget _buildViewMode(String compactAmount) {
     return Column(
       key: const ValueKey('ViewMode'),
@@ -449,7 +449,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
   }
 
-  // KHUNG FORM SỬA (EDIT MODE) - Đã sửa lỗi sọc vàng đen
   Widget _buildEditMode(
     List<Map<String, dynamic>> categories,
     String currencySymbol,
@@ -550,15 +549,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         ],
         const SizedBox(height: 16),
 
-        // 🔑 SỬA LỖI TRÀN 2: Bọc tiêu đề chữ trong Expanded và gom cụm nút số 0 gọn gàng
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Text(
                 widget.l10n.amountSectionTitle,
-                overflow: TextOverflow
-                    .ellipsis, // Nếu chữ đa ngôn ngữ dài quá tự động tạo dấu 3 chấm chứ không tràn viền
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -652,8 +649,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
         txState == TransactionState.loading
             ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
+                  ),
                 ),
               )
             : ElevatedButton(
@@ -666,7 +668,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {
+                onPressed: () async {
                   final amountText = _amountController.text
                       .replaceAll('.', '')
                       .trim();
@@ -680,17 +682,57 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                         : 'Khác';
                   }
 
-                  ref
-                      .read(transactionProvider.notifier)
-                      .addTransaction(
-                        amount: double.parse(amountText),
-                        category: finalCategory,
-                        emoji: _selectedEmoji,
-                        note: _noteController.text.trim(),
-                        localImagePath: _localImagePath,
-                      );
+                  // 🔑 ĐÃ SỬA: Ép kiểu an toàn .toString() chống lỗi _TypeError int/String
+                  final String momentId =
+                      widget.moment['id']?.toString() ??
+                      widget.moment['_id']?.toString() ??
+                      '';
 
-                  setState(() => _isEditing = false);
+                  if (momentId.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Không tìm thấy ID của khoảnh khắc để cập nhật!',
+                        ),
+                        backgroundColor: AppColors.errorAccent,
+                      ),
+                    );
+                    return;
+                  }
+
+                  try {
+                    // 🔥 BẮN API NGAY TẠI ĐÂY VÀ ĐỢI KẾT QUẢ
+                    await ref
+                        .read(transactionProvider.notifier)
+                        .updateTransaction(
+                          id: momentId,
+                          amount: double.parse(amountText),
+                          category: finalCategory,
+                          emoji: _selectedEmoji,
+                          note: _noteController.text.trim(),
+                          localImagePath: _localImagePath,
+                        );
+
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Cập nhật khoảnh khắc thành công! 🎉'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                      // 🎯 TỰ ĐỘNG ĐÓNG DIALOG, trả về true báo hiệu cho Timeline reload dữ liệu
+                      Navigator.of(context).pop(true);
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Cập nhật thất bại: $e'),
+                          backgroundColor: AppColors.errorAccent,
+                        ),
+                      );
+                    }
+                  }
                 },
                 child: const Text(
                   "Cập nhật khoảnh khắc ✨",
