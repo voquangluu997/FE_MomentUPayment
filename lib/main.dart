@@ -1,9 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
+import 'package:moment_u_payment/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_colors.dart';
 import 'core/providers/locale_provider.dart';
@@ -13,6 +16,9 @@ import 'l10n/app_localizations.dart';
 void main() async {
   // Đảm bảo các dịch vụ nền của Flutter được khởi tạo hoàn chỉnh trước khi nạp file cấu hình
   WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp(); // Khởi tạo Firebase trước
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.initNotifications();
 
   // Nạp file cấu hình môi trường chứa IP máy Mac hoặc link Render
   await dotenv.load(fileName: ".env");

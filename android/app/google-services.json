@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215109118632",
+    "project_id": "momentupayment-9abfd",
+    "storage_bucket": "momentupayment-9abfd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215109118632:android:a61568e3118ef39268f09d",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy7tzFsl0UZmZzMJN8Uuo-ZbTdRe4gEKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
