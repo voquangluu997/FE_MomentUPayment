@@ -128,5 +128,49 @@
       "spent": { "type": "String" },
       "limit": { "type": "String" }
     }
+  },
+
+  "budgetDetailedStatus": "Đã vung tay {spent} 💸 • Còn {remaining} để sinh tồn {days} ngày 🏕️",
+  "@budgetDetailedStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "remaining": { "type": "String" },
+      "days": { "type": "String" }
+    }
+  },
+  "budgetDetailedStatusToday": "Đã vung tay {spent} 💸 • Gồng nốt hôm nay với {remaining} thui! 🥺",
+  "@budgetDetailedStatusToday": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "remaining": { "type": "String" }
+    }
+  },
+  "budgetOverspentDetailedStatus": "Bay màu {spent} 💸 • Âm quỹ {overspent} mà còn tới {days} ngày sinh tồn! 🚨",
+  "@budgetOverspentDetailedStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "overspent": { "type": "String" },
+      "days": { "type": "String" }
+    }
+  },
+  "budgetOverspentDetailedStatusToday": "Bay màu {spent} 💸 • Chốt sổ tháng lố mất {overspent} rùi 😭",
+  "@budgetOverspentDetailedStatusToday": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "overspent": { "type": "String" }
+    }
+  },
+  "budgetSafeDaily": "💡 Mẹo sinh tồn: Mỗi ngày tiêu cỡ {amount} là an toàn hạ cánh! 🪂",
+  "@budgetSafeDaily": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "budgetSafeToday": "💡 Mẹo sinh tồn: Nay rón rén tiêu tối đa {amount} thui nha! 🥺",
+  "@budgetSafeToday": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
   }
+
 }

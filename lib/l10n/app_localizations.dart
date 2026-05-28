@@ -637,6 +637,46 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spent {spent} out of {limit}'**
   String budgetSpentStatus(String spent, String limit);
+
+  /// No description provided for @budgetDetailedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Splurged {spent} 💸 • {remaining} left to survive {days} days 🏕️'**
+  String budgetDetailedStatus(String spent, String remaining, String days);
+
+  /// No description provided for @budgetDetailedStatusToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Splurged {spent} 💸 • Survive today with {remaining} left! 🥺'**
+  String budgetDetailedStatusToday(String spent, String remaining);
+
+  /// No description provided for @budgetOverspentDetailedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Burnt {spent} 💸 • In the red {overspent} with {days} days to survive! 🚨'**
+  String budgetOverspentDetailedStatus(
+    String spent,
+    String overspent,
+    String days,
+  );
+
+  /// No description provided for @budgetOverspentDetailedStatusToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Burnt {spent} 💸 • Ended the month {overspent} over budget 😭'**
+  String budgetOverspentDetailedStatusToday(String spent, String overspent);
+
+  /// No description provided for @budgetSafeDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Survival tip: Spend around {amount}/day to land safely! 🪂'**
+  String budgetSafeDaily(String amount);
+
+  /// No description provided for @budgetSafeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Survival tip: Keep it under {amount} for today! 🥺'**
+  String budgetSafeToday(String amount);
 }
 
 class _AppLocalizationsDelegate

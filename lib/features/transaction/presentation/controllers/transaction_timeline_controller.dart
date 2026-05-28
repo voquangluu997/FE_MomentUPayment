@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import '../../../../core/utils/app_logger.dart';
 import '../../data/transaction_repository.dart';
 
@@ -45,6 +46,19 @@ class TransactionTimelineController
     state = await AsyncValue.guard(
       () => _fetchTimelineData(page: _page, limit: _limit),
     );
+  }
+
+  void removeMomentLocally(String id) {
+    if (state.hasValue) {
+      final currentList = state.value!;
+      // Lọc bỏ moment có ID vừa xóa
+      final updatedList = currentList
+          .where((moment) => moment['id'] != id)
+          .toList();
+
+      // Gán thẳng data mới vào state, UI sẽ tự vẽ lại êm ru
+      state = AsyncValue.data(updatedList);
+    }
   }
 
   /// 🔑 HÀM MỚI: Tải trang kế tiếp khi người dùng kéo xuống gần chạm đáy màn hình
@@ -107,6 +121,7 @@ class TransactionTimelineController
 
     try {
       await _repository.deleteTransaction(id);
+      ref.invalidate(homeBudgetProvider);
     } catch (error, stackTrace) {
       AppLogger.e(
         'TransactionTimelineController.deleteTransaction',

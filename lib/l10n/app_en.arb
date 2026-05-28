@@ -128,5 +128,48 @@
       "spent": { "type": "String" },
       "limit": { "type": "String" }
     }
+  },
+
+  "budgetDetailedStatus": "Splurged {spent} 💸 • {remaining} left to survive {days} days 🏕️",
+  "@budgetDetailedStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "remaining": { "type": "String" },
+      "days": { "type": "String" }
+    }
+  },
+  "budgetDetailedStatusToday": "Splurged {spent} 💸 • Survive today with {remaining} left! 🥺",
+  "@budgetDetailedStatusToday": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "remaining": { "type": "String" }
+    }
+  },
+  "budgetOverspentDetailedStatus": "Burnt {spent} 💸 • In the red {overspent} with {days} days to survive! 🚨",
+  "@budgetOverspentDetailedStatus": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "overspent": { "type": "String" },
+      "days": { "type": "String" }
+    }
+  },
+  "budgetOverspentDetailedStatusToday": "Burnt {spent} 💸 • Ended the month {overspent} over budget 😭",
+  "@budgetOverspentDetailedStatusToday": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "overspent": { "type": "String" }
+    }
+  },
+  "budgetSafeDaily": "💡 Survival tip: Spend around {amount}/day to land safely! 🪂",
+  "@budgetSafeDaily": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "budgetSafeToday": "💡 Survival tip: Keep it under {amount} for today! 🥺",
+  "@budgetSafeToday": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
   }
 }

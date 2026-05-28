@@ -310,4 +310,38 @@ class AppLocalizationsVi extends AppLocalizations {
   String budgetSpentStatus(String spent, String limit) {
     return 'Đã tiêu $spent trong tổng số $limit';
   }
+
+  @override
+  String budgetDetailedStatus(String spent, String remaining, String days) {
+    return 'Đã vung tay $spent 💸 • Còn $remaining để sinh tồn $days ngày 🏕️';
+  }
+
+  @override
+  String budgetDetailedStatusToday(String spent, String remaining) {
+    return 'Đã vung tay $spent 💸 • Gồng nốt hôm nay với $remaining thui! 🥺';
+  }
+
+  @override
+  String budgetOverspentDetailedStatus(
+    String spent,
+    String overspent,
+    String days,
+  ) {
+    return 'Bay màu $spent 💸 • Âm quỹ $overspent mà còn tới $days ngày sinh tồn! 🚨';
+  }
+
+  @override
+  String budgetOverspentDetailedStatusToday(String spent, String overspent) {
+    return 'Bay màu $spent 💸 • Chốt sổ tháng lố mất $overspent rùi 😭';
+  }
+
+  @override
+  String budgetSafeDaily(String amount) {
+    return '💡 Mẹo sinh tồn: Mỗi ngày tiêu cỡ $amount là an toàn hạ cánh! 🪂';
+  }
+
+  @override
+  String budgetSafeToday(String amount) {
+    return '💡 Mẹo sinh tồn: Nay rón rén tiêu tối đa $amount thui nha! 🥺';
+  }
 }

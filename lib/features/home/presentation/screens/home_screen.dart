@@ -60,42 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // 🔑 CẬP NHẬT MỚI: Bọc BudgetProgressCard và thêm nút điều hướng 🎯 vào góc trên bên phải
   Widget _buildBudgetCardWithNavigation(AppLocalizations l10n) {
-    return Stack(
-      children: [
-        const HomeBudgetCard(),
-        // Positioned(
-        //   top: 12,
-        //   right:
-        //       24, // Căn chỉnh để nằm gọn gàng bên trong lề của thẻ BudgetProgressCard
-        //   child: Tooltip(
-        //     message: l10n.budgetMenuTitle, // Chuỗi ký tự từ file ngôn ngữ
-        //     child: Material(
-        //       color: AppColors.primary.withOpacity(0.08),
-        //       shape: const CircleBorder(),
-        //       child: InkWell(
-        //         customBorder: const CircleBorder(),
-        //         onTap: () {
-        //           Navigator.of(context).push(
-        //             MaterialPageRoute(
-        //               builder: (context) => const SetBudgetScreen(),
-        //             ),
-        //           );
-        //         },
-        //         child: const Padding(
-        //           padding: EdgeInsets.all(8.0),
-        //           child: Icon(
-        //             Icons
-        //                 .track_changes_rounded, // Icon mục tiêu / tâm ngắm rất hợp với vibe "Budget"
-        //             size: 18,
-        //             color: AppColors.primary,
-        //           ),
-        //         ),
-        //       ),
-        // ),
-        // ),
-        // ),
-      ],
-    );
+    return Stack(children: [const HomeBudgetCard()]);
   }
 
   @override
@@ -118,6 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onRefresh: () =>
             ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
         child: timelineState.when(
+          skipLoadingOnRefresh: true,
           loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           ),
@@ -450,7 +416,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             .deleteTransaction(tx['id'].toString());
         ref
             .read(transactionTimelineProvider.notifier)
-            .refreshTimeline(); // Refresh sau khi xóa
+            .removeMomentLocally(tx['id'].toString()); // Refresh sau khi xóa
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
       }

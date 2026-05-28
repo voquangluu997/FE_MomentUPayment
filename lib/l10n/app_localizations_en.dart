@@ -309,4 +309,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String budgetSpentStatus(String spent, String limit) {
     return 'Spent $spent out of $limit';
   }
+
+  @override
+  String budgetDetailedStatus(String spent, String remaining, String days) {
+    return 'Splurged $spent 💸 • $remaining left to survive $days days 🏕️';
+  }
+
+  @override
+  String budgetDetailedStatusToday(String spent, String remaining) {
+    return 'Splurged $spent 💸 • Survive today with $remaining left! 🥺';
+  }
+
+  @override
+  String budgetOverspentDetailedStatus(
+    String spent,
+    String overspent,
+    String days,
+  ) {
+    return 'Burnt $spent 💸 • In the red $overspent with $days days to survive! 🚨';
+  }
+
+  @override
+  String budgetOverspentDetailedStatusToday(String spent, String overspent) {
+    return 'Burnt $spent 💸 • Ended the month $overspent over budget 😭';
+  }
+
+  @override
+  String budgetSafeDaily(String amount) {
+    return '💡 Survival tip: Spend around $amount/day to land safely! 🪂';
+  }
+
+  @override
+  String budgetSafeToday(String amount) {
+    return '💡 Survival tip: Keep it under $amount for today! 🥺';
+  }
 }
