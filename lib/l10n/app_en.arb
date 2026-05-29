@@ -268,6 +268,54 @@
   "cancel": "Cancel",
   "update": "Update",
   "updatePasswordSuccess": "Password updated successfully!",
-  "updatePasswordError": "Incorrect current password or connection error."
+  "updatePasswordError": "Incorrect current password or connection error.",
+
+  "forgotPasswordText": "Forgot password?",
+  "resetPasswordText": "Reset password",
+  "forgotPasswordTitle": "Recover Password",
+  "forgotPasswordSubtitle": "The system will send a verification code (OTP) or reset link to your Email.",
+  "emailAccountLabel": "Account Email",
+  "cancelButton": "Cancel",
+  "sendCodeButton": "Send Code",
+  "sendCodeSuccess": "Recovery code sent to email:",
+  "resetPasswordTitle": "Reset New Password",
+  "emailVerificationLabel": "Verification Email",
+  "otpLabel": "Verification Code (OTP / Token)",
+  "newPasswordLabel": "New Password",
+  "confirmButton": "Confirm",
+  "resetPasswordSuccess": "Your password has been changed successfully! Please log in.",
+
+  "analyticsTitle": "Spending Analytics",
+  "spendingTrend": "Trend",
+  "spendingStructure": "Structure",
+  "customDate": "Custom",
+  "totalLabel": "Total Spending",
+  "avgPerDay": "Avg/Day",
+  "timeFrame": "Days",
+  "emptyAnalyticsData": "No spending data available for this period.",
+  "errorLoadData": "Failed to load data. Please check again!",
+  "retryButton": "Retry",
+
+  "analyticsTitle": "Wallet X-Ray 🔍",
+  
+  "pastWeek": "Past Week 🌷",
+  "pastMonth": "Past Month 🌙",
+  "threeMonths": "3 Months 🍄",
+  "sixMonths": "Half a Year 🐢",
+  "pastYear": "Past Year 🌟",
+  
+  "fromDate": "From when 🐾",
+  "toDate": "To when 🌿",
+  
+  "totalLabel": "Total Damage 💸",
+  "avgPerDay": "Daily Poof 🕊️",
+  "repeatCycle": "Time Loop ⏳",
+  "days": "days",
+  
+  "spendingStructure": "Where did my money go? 🥧",
+  
+  "emptyAnalyticsData": "Nothing here! Your wallet is safely untouched 🐥",
+  "errorLoadData": "Oopsie, the data tripped and fell 🥺",
+  "retryButton": "Give it another push 🚀"
 
 }

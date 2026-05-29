@@ -163,6 +163,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   Widget build(BuildContext context) {
     final currencySymbol = ref.watch(currencyProvider);
     final txState = ref.watch(transactionProvider);
+    final appColors = ref.watch(appColorsProvider); // ✨ GỌI PROVIDER MÀU SẮC
 
     final List<Map<String, dynamic>> categories = [
       {'id': 'Food', 'name': widget.l10n.catFood, 'emoji': '🍰'},
@@ -176,7 +177,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
       {'id': 'Custom', 'name': widget.l10n.catCustom, 'emoji': '📝'},
     ];
 
-    // ✨ ĐÃ SỬA: Lấy số tiền real-time từ Controller thay vì lấy dữ liệu tĩnh cũ
     final double currentAmount =
         double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
     final String compactAmount =
@@ -184,7 +184,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      backgroundColor: AppColors.cardBackground,
+      backgroundColor: appColors.cardBackground, // Nền tự động đổi màu
       clipBehavior: Clip.antiAlias,
       child: SingleChildScrollView(
         child: Column(
@@ -206,12 +206,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                           fit: BoxFit.cover,
                         )
                       : Container(
-                          color: AppColors.primary.withOpacity(0.04),
+                          color: appColors.primary.withOpacity(0.04),
                           child: Center(
                             child: Icon(
                               _getCategoryIcon(_selectedCategory),
                               size: 64,
-                              color: AppColors.primary.withOpacity(0.15),
+                              color: appColors.primary.withOpacity(0.15),
                             ),
                           ),
                         ),
@@ -246,7 +246,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white.withOpacity(0.9),
-                                foregroundColor: AppColors.primary,
+                                foregroundColor: appColors.primary,
                                 elevation: 2,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -272,7 +272,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white.withOpacity(0.9),
-                                foregroundColor: AppColors.primary,
+                                foregroundColor: appColors.primary,
                                 elevation: 2,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -363,8 +363,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: !_isEditing
-                    ? _buildViewMode(compactAmount)
-                    : _buildEditMode(categories, currencySymbol, txState),
+                    ? _buildViewMode(compactAmount, appColors) // Truyền màu
+                    : _buildEditMode(
+                        categories,
+                        currencySymbol,
+                        txState,
+                        appColors,
+                      ), // Truyền màu
               ),
             ),
           ],
@@ -373,7 +378,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
   }
 
-  Widget _buildViewMode(String compactAmount) {
+  Widget _buildViewMode(String compactAmount, AppColorTheme appColors) {
     return Column(
       key: const ValueKey('ViewMode'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,7 +394,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: appColors.primary.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -398,7 +403,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                     Icon(
                       _getCategoryIcon(_selectedCategory),
                       size: 14,
-                      color: AppColors.primary,
+                      color: appColors.primary,
                     ),
                     const SizedBox(width: 6),
                     Flexible(
@@ -407,10 +412,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                             ? _selectedCategory
                             : widget.l10n.emptyTransactionNote,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: appColors.primary,
                         ),
                       ),
                     ),
@@ -421,10 +426,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
             const SizedBox(width: 8),
             Text(
               compactAmount,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: AppColors.errorAccent,
+                color: appColors.errorAccent, // Đổi màu
               ),
             ),
           ],
@@ -439,7 +444,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           style: TextStyle(
             fontSize: 14.5,
             fontWeight: FontWeight.bold,
-            color: AppColors.primaryDark.withOpacity(0.6),
+            color: appColors.primaryDark.withOpacity(0.6), // Đổi màu
             letterSpacing: 0.5,
             height: 1.4,
           ),
@@ -453,6 +458,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     List<Map<String, dynamic>> categories,
     String currencySymbol,
     TransactionState txState,
+    AppColorTheme appColors, // Thêm tham số
   ) {
     return Column(
       key: const ValueKey('EditMode'),
@@ -463,7 +469,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           style: TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w800,
-            color: AppColors.primaryDark.withOpacity(0.5),
+            color: appColors.primaryDark.withOpacity(0.5),
             letterSpacing: 0.8,
           ),
         ),
@@ -490,13 +496,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary
-                          : AppColors.cardBackground,
+                          ? appColors.primary
+                          : appColors.cardBackground,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : AppColors.primary.withOpacity(0.08),
+                            : appColors.primary.withOpacity(0.08),
                       ),
                     ),
                     child: Row(
@@ -509,7 +515,9 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                         Text(
                           cat['name'],
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
+                            color: isSelected
+                                ? Colors.white
+                                : appColors.primaryDark,
                             fontWeight: FontWeight.w600,
                             fontSize: 11,
                           ),
@@ -527,15 +535,19 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           const SizedBox(height: 8),
           TextField(
             controller: _customCategoryController,
+            style: TextStyle(color: appColors.primaryDark),
             decoration: InputDecoration(
               hintText: widget.l10n.customCategoryHint,
-              prefixIcon: const Icon(
+              hintStyle: TextStyle(
+                color: appColors.primaryDark.withOpacity(0.5),
+              ),
+              prefixIcon: Icon(
                 Icons.edit_note_rounded,
-                color: AppColors.primary,
+                color: appColors.primary,
                 size: 18,
               ),
               filled: true,
-              fillColor: AppColors.background,
+              fillColor: appColors.background,
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 10,
                 horizontal: 12,
@@ -559,7 +571,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                 style: TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primaryDark.withOpacity(0.5),
+                  color: appColors.primaryDark.withOpacity(0.5),
                   letterSpacing: 0.8,
                 ),
               ),
@@ -568,11 +580,16 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildShortcutZeroButton('.000', () => _appendZeros('000')),
+                _buildShortcutZeroButton(
+                  '.000',
+                  () => _appendZeros('000'),
+                  appColors,
+                ),
                 const SizedBox(width: 4),
                 _buildShortcutZeroButton(
                   '.000.000',
                   () => _appendZeros('000000'),
+                  appColors,
                 ),
               ],
             ),
@@ -582,9 +599,9 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: appColors.background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary.withOpacity(0.06)),
+            border: Border.all(color: appColors.primary.withOpacity(0.06)),
           ),
           child: Row(
             children: [
@@ -593,10 +610,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                   controller: _amountController,
                   keyboardType: TextInputType.number,
                   onChanged: _onAmountChanged,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: appColors.primary,
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -607,10 +624,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
               ),
               Text(
                 currencySymbol,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: appColors.primary,
                 ),
               ),
             ],
@@ -623,18 +640,19 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           style: TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w800,
-            color: AppColors.primaryDark.withOpacity(0.5),
+            color: appColors.primaryDark.withOpacity(0.5),
             letterSpacing: 0.8,
           ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: _noteController,
-          style: const TextStyle(fontSize: 13.5),
+          style: TextStyle(fontSize: 13.5, color: appColors.primaryDark),
           decoration: InputDecoration(
             hintText: widget.l10n.noteHint,
+            hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.5)),
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: appColors.background,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 10,
               horizontal: 12,
@@ -648,19 +666,19 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         const SizedBox(height: 20),
 
         txState == TransactionState.loading
-            ? const Center(
+            ? Center(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
+                      appColors.primary,
                     ),
                   ),
                 ),
               )
             : ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: appColors.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -682,7 +700,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                         : 'Khác';
                   }
 
-                  // 🔑 ĐÃ SỬA: Ép kiểu an toàn .toString() chống lỗi _TypeError int/String
                   final String momentId =
                       widget.moment['id']?.toString() ??
                       widget.moment['_id']?.toString() ??
@@ -690,18 +707,17 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
                   if (momentId.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
+                      SnackBar(
+                        content: const Text(
                           'Không tìm thấy ID của khoảnh khắc để cập nhật!',
                         ),
-                        backgroundColor: AppColors.errorAccent,
+                        backgroundColor: appColors.errorAccent,
                       ),
                     );
                     return;
                   }
 
                   try {
-                    // 🔥 BẮN API NGAY TẠI ĐÂY VÀ ĐỢI KẾT QUẢ
                     await ref
                         .read(transactionProvider.notifier)
                         .updateTransaction(
@@ -715,12 +731,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Cập nhật khoảnh khắc thành công! 🎉'),
-                          backgroundColor: AppColors.success,
+                        SnackBar(
+                          content: const Text(
+                            'Cập nhật khoảnh khắc thành công! 🎉',
+                          ),
+                          backgroundColor: appColors.success, // Đã có appColors
                         ),
                       );
-                      // 🎯 TỰ ĐỘNG ĐÓNG DIALOG, trả về true báo hiệu cho Timeline reload dữ liệu
                       Navigator.of(context).pop(true);
                     }
                   } catch (e) {
@@ -728,7 +745,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Cập nhật thất bại: $e'),
-                          backgroundColor: AppColors.errorAccent,
+                          backgroundColor: appColors.errorAccent,
                         ),
                       );
                     }
@@ -743,9 +760,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
   }
 
-  Widget _buildShortcutZeroButton(String label, VoidCallback onTap) {
+  Widget _buildShortcutZeroButton(
+    String label,
+    VoidCallback onTap,
+    AppColorTheme appColors,
+  ) {
     return Material(
-      color: AppColors.primary.withOpacity(0.05),
+      color: appColors.primary.withOpacity(0.05),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onTap,
@@ -754,10 +775,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: appColors.primary,
               letterSpacing: 0.3,
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/constants/app_colors.dart'; // Đảm bảo đường dẫn này chứa appColorsProvider và AppColorTheme
 import 'package:moment_u_payment/features/notification/presentation/notification_settings_provider.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
@@ -9,37 +9,37 @@ class NotificationSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ✨ Lắng nghe bộ màu dynamic từ provider thay vì dùng AppColors tĩnh
+    final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final settingsState = ref.watch(notificationSettingsProvider);
     final notifier = ref.read(notificationSettingsProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: appColors.background,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primaryDark,
+            color: appColors.primaryDark,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           l10n.notificationSettingsTitle,
-          style: const TextStyle(
-            color: AppColors.primaryDark,
+          style: TextStyle(
+            color: appColors.primaryDark,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
       body: settingsState.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
+          ? Center(child: CircularProgressIndicator(color: appColors.primary))
           : ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               physics: const BouncingScrollPhysics(),
@@ -51,6 +51,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   icon: Icons.pie_chart_rounded,
                   iconColor: Colors.orange,
                   value: settingsState.budgetAlerts,
+                  appColors: appColors,
                   onChanged: (val) => notifier.toggleSetting(budgetAlerts: val),
                 ),
                 _buildSettingCard(
@@ -60,6 +61,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   icon: Icons.layers_rounded,
                   iconColor: Colors.blue,
                   value: settingsState.sharedWalletUpdates,
+                  appColors: appColors,
                   onChanged: (val) =>
                       notifier.toggleSetting(sharedWalletUpdates: val),
                 ),
@@ -70,6 +72,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   icon: Icons.verified_user_rounded,
                   iconColor: Colors.green,
                   value: settingsState.securitySystem,
+                  appColors: appColors,
                   onChanged: (val) =>
                       notifier.toggleSetting(securitySystem: val),
                 ),
@@ -78,23 +81,24 @@ class NotificationSettingsScreen extends ConsumerWidget {
     );
   }
 
-  // Widget Tái sử dụng để vẽ từng Ô Cài Đặt (Chuẩn Soft UI)
+  // ✨ Đã thêm tham số `AppColorTheme appColors` để đồng bộ màu sắc chuẩn Soft UI theo Theme
   Widget _buildSettingCard({
     required String title,
     required String subtitle,
     required IconData icon,
     required Color iconColor,
     required bool value,
+    required AppColorTheme appColors,
     required Function(bool) onChanged,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: appColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withOpacity(0.02),
+            color: appColors.primaryDark.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -111,7 +115,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          // Icon bo tròn
+          // Icon bo tròn sử dụng opacity mờ theo đặc trưng màu của từng hạng mục
           secondary: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -122,9 +126,9 @@ class NotificationSettingsScreen extends ConsumerWidget {
           ),
           title: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
+              color: appColors.primaryDark,
               fontSize: 15,
             ),
           ),
@@ -133,7 +137,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
             child: Text(
               subtitle,
               style: TextStyle(
-                color: AppColors.primaryDark.withOpacity(0.55),
+                color: appColors.primaryDark.withOpacity(0.55),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -141,9 +145,9 @@ class NotificationSettingsScreen extends ConsumerWidget {
           ),
           value: value,
           activeColor: Colors.white,
-          activeTrackColor: AppColors.primary,
+          activeTrackColor: appColors.primary,
           inactiveThumbColor: Colors.white,
-          inactiveTrackColor: AppColors.primaryDark.withOpacity(0.15),
+          inactiveTrackColor: appColors.primaryDark.withOpacity(0.15),
           onChanged: onChanged,
         ),
       ),

@@ -1,4 +1,3 @@
-// features/budget/presentation/screens/set_budget_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
@@ -7,7 +6,6 @@ import 'package:moment_u_payment/features/home/presentation/screens/home_screen.
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../providers/budget_provider.dart';
-
 
 class SetBudgetScreen extends ConsumerStatefulWidget {
   const SetBudgetScreen({super.key});
@@ -75,6 +73,8 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✨ Lắng nghe bộ màu dynamic từ provider thay vì dùng AppColors tĩnh
+    final appColors = ref.watch(appColorsProvider);
     final budgetState = ref.watch(budgetProvider);
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
@@ -85,7 +85,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.budgetSuccessMessage),
-            backgroundColor: AppColors.success,
+            backgroundColor: appColors.success,
           ),
         );
         ref.read(homeBudgetProvider.notifier).refreshSummary();
@@ -97,26 +97,26 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.budgetErrorMessage),
-            backgroundColor: AppColors.error,
+            backgroundColor: appColors.error,
           ),
         );
       }
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
         title: Text(
           l10n.budgetTitle,
-          style: const TextStyle(
-            color: AppColors.primary,
+          style: TextStyle(
+            color: appColors.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
           onPressed: () => Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           ),
@@ -140,7 +140,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark.withOpacity(0.6),
+                      color: appColors.primaryDark.withOpacity(0.6),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -149,11 +149,13 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                       _buildShortcutZeroButton(
                         '.000',
                         () => _appendZeros('000'),
+                        appColors,
                       ),
                       const SizedBox(width: 6),
                       _buildShortcutZeroButton(
                         '.000.000',
                         () => _appendZeros('000000'),
+                        appColors,
                       ),
                     ],
                   ),
@@ -168,10 +170,10 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.cardBackground,
+                  color: appColors.cardBackground,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.08),
+                    color: appColors.primary.withOpacity(0.08),
                     width: 1.2,
                   ),
                 ),
@@ -182,15 +184,15 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                         controller: _budgetController,
                         keyboardType: TextInputType.number,
                         onChanged: _onBudgetChanged,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: appColors.primary,
                         ),
                         decoration: InputDecoration(
                           hintText: l10n.budgetHint,
                           hintStyle: TextStyle(
-                            color: AppColors.primary.withOpacity(0.25),
+                            color: appColors.primary.withOpacity(0.25),
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
@@ -200,23 +202,23 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     ),
                     Text(
                       currencySymbol,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: appColors.primary,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const Spacer(), // Đẩy nút Save xuống dưới cùng màn hình tạo cảm giác thoáng đãng
+              const Spacer(), // Đẩy nút Save xuống dưới cùng màn hình
               // 🌟 NÚT LƯU HẠN MỨC CHI TIÊU
               budgetState == BudgetState.loading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
+                          appColors.primary,
                         ),
                       ),
                     )
@@ -235,11 +237,11 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: appColors.primary,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.2),
+                              color: appColors.primary.withOpacity(0.2),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -264,9 +266,14 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     );
   }
 
-  Widget _buildShortcutZeroButton(String label, VoidCallback onTap) {
+  // ✨ Truyền thêm bộ màu appColors vào hàm tạo nút shortcut để đổi màu theo theme
+  Widget _buildShortcutZeroButton(
+    String label,
+    VoidCallback onTap,
+    AppColorTheme appColors,
+  ) {
     return Material(
-      color: AppColors.primary.withOpacity(0.06),
+      color: appColors.primary.withOpacity(0.06),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -275,10 +282,10 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: appColors.primary,
             ),
           ),
         ),

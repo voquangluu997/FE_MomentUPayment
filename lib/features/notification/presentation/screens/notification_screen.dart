@@ -9,7 +9,7 @@ import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/features/notification/models/in_app_notification.dart';
 
-// 🌸 IMPORT WIDGET DÙNG CHUNG (Bạn nhớ chỉnh lại đường dẫn nếu lúc nãy lưu file khác thư mục nhé)
+// 🌸 IMPORT WIDGET DÙNG CHUNG
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
@@ -19,7 +19,6 @@ class NotificationScreen extends ConsumerStatefulWidget {
   ConsumerState<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-// 🌸 Đã gỡ bỏ SingleTickerProviderStateMixin vì State không cần tự giữ AnimationController nữa
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   bool _showOnlyUnread = false; // Trạng thái của bộ lọc (Mặc định: Tất cả)
 
@@ -32,18 +31,18 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     });
   }
 
-  // Hàm xử lý Đa ngôn ngữ và Giao diện động (Màu sắc, Icon, Route) theo loại (type)
+  // ✨ Đã thêm tham số `AppColorTheme appColors` để sử dụng hệ màu động theo Theme
   Map<String, dynamic> _parseNotificationContent(
     InAppNotification noti,
     AppLocalizations l10n,
+    AppColorTheme appColors,
   ) {
     String title = '';
     String body = '';
     IconData icon = Icons.notifications_rounded;
-    Color color = AppColors.primary;
-    String? route; // Biến định tuyến
+    Color color = appColors.primary; // Thay thế màu mặc định dynamic
+    String? route;
 
-    // Trích xuất an toàn các tham số (arguments) từ Backend trả về
     final arg1 = noti.arguments.isNotEmpty ? noti.arguments[0] : '';
     final arg2 = noti.arguments.length > 1 ? noti.arguments[1] : '';
 
@@ -55,7 +54,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           arg2.isEmpty ? '80' : arg2,
         );
         icon = Icons.warning_rounded;
-        color = Colors.orange;
+        color = Colors.orange; // Giữ nguyên màu cam cảnh báo đặc trưng
         break;
 
       case 'budget_100':
@@ -65,7 +64,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           arg2.isEmpty ? '100' : arg2,
         );
         icon = Icons.error_rounded;
-        color = Colors.red;
+        color = Colors.red; // Giữ nguyên màu đỏ lỗi hệ thống
         break;
 
       case 'email_verified':
@@ -96,7 +95,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         body = l10n.notiFirstTxnBody;
         icon = Icons.add_circle_outline_rounded;
         color = Colors.green;
-        route = '/create_transaction'; // Key định tuyến
+        route = '/create_transaction';
         break;
 
       case 'onboarding_set_budget':
@@ -104,7 +103,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         body = l10n.notiSetBudgetBody;
         icon = Icons.security_rounded;
         color = Colors.blue;
-        route = '/budget_settings'; // Key định tuyến
+        route = '/budget_settings';
         break;
 
       default:
@@ -123,13 +122,15 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✨ Gọi bộ màu dynamic ngay tại đầu hàm build
+    final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(notificationProvider);
 
-    // 🌸 1. KIỂM TRA CHUÔNG RUNG
+    // Kiểm tra xem có thông báo nào chưa đọc hay không
     final hasUnread = state.notifications.any((noti) => !noti.isRead);
 
-    // 🌸 2. LỌC DANH SÁCH (Dùng biến này thay vì list gốc)
+    // Lọc danh sách thông báo theo bộ lọc
     final filteredNotifications = state.notifications.where((noti) {
       if (_showOnlyUnread) {
         return !noti.isRead;
@@ -138,28 +139,28 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: appColors.background,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primaryDark,
+            color: appColors
+                .primaryDark, // Tự động đổi: Nâu đậm (Light) -> Hồng phấn nhạt (Dark)
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           l10n.notificationSettingsTitle.replaceAll("Cài đặt", "Danh sách"),
-          style: const TextStyle(
-            color: AppColors.primaryDark,
+          style: TextStyle(
+            color: appColors.primaryDark,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        // 🌸 3. HIỂN THỊ CHUÔNG LẮC (Dùng Widget Reusable)
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -173,11 +174,10 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                         ? Icons.notifications_active_rounded
                         : Icons.notifications_none_rounded,
                     color: hasUnread
-                        ? AppColors.primary
-                        : AppColors.primaryDark.withOpacity(0.5),
+                        ? appColors.primary
+                        : appColors.primaryDark.withOpacity(0.5),
                     size: 26,
                   ),
-                  // Dấu chấm đỏ nhỏ xinh
                   if (hasUnread)
                     Positioned(
                       right: 2,
@@ -189,7 +189,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           color: Colors.redAccent,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.background,
+                            color: appColors
+                                .background, // Viền bao quanh dot đỏ tiệp màu nền dynamic
                             width: 2,
                           ),
                         ),
@@ -203,14 +204,14 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       ),
       body: Column(
         children: [
-          // 🌸 4. NÚT CHUYỂN ĐỔI BỘ LỌC (FILTER SWITCH)
+          // 🌸 NÚT CHUYỂN ĐỔI BỘ LỌC (FILTER SWITCH)
           if (!state.isLoading && state.notifications.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryDark.withOpacity(0.06),
+                  color: appColors.primaryDark.withOpacity(0.06),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -222,13 +223,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
                             color: !_showOnlyUnread
-                                ? AppColors.primary
+                                ? appColors.primary
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: !_showOnlyUnread
                                 ? [
                                     BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.3),
+                                      color: appColors.primary.withOpacity(0.3),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -241,7 +242,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                             style: TextStyle(
                               color: !_showOnlyUnread
                                   ? Colors.white
-                                  : AppColors.primaryDark.withOpacity(0.6),
+                                  : appColors.primaryDark.withOpacity(0.6),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -255,13 +256,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
                             color: _showOnlyUnread
-                                ? AppColors.primary
+                                ? appColors.primary
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: _showOnlyUnread
                                 ? [
                                     BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.3),
+                                      color: appColors.primary.withOpacity(0.3),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -274,7 +275,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                             style: TextStyle(
                               color: _showOnlyUnread
                                   ? Colors.white
-                                  : AppColors.primaryDark.withOpacity(0.6),
+                                  : appColors.primaryDark.withOpacity(0.6),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -286,25 +287,24 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               ),
             ),
 
-          // 🌸 5. DANH SÁCH THÔNG BÁO CHÍNH
+          // 🌸 DANH SÁCH THÔNG BÁO CHÍNH
           Expanded(
             child: state.isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                ? Center(
+                    child: CircularProgressIndicator(color: appColors.primary),
                   )
                 : state.notifications.isEmpty
-                // Case 1: Chưa từng có thông báo nào
                 ? _buildEmptyState(
                     "Hộp thư trống",
                     Icons.notifications_off_rounded,
+                    appColors,
                   )
                 : filteredNotifications.isEmpty
-                // Case 2: Đang lọc "Chưa đọc" nhưng đã đọc hết rồi
                 ? _buildEmptyState(
                     "Bạn đã đọc hết thông báo rồi! 🎉",
                     Icons.done_all_rounded,
+                    appColors,
                   )
-                // Case 3: Hiển thị danh sách
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -314,18 +314,21 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     itemCount: filteredNotifications.length,
                     itemBuilder: (context, index) {
                       final noti = filteredNotifications[index];
-                      final content = _parseNotificationContent(noti, l10n);
+                      // ✨ Truyền appColors vào bộ phân tích dữ liệu
+                      final content = _parseNotificationContent(
+                        noti,
+                        l10n,
+                        appColors,
+                      );
 
                       return GestureDetector(
                         onTap: () {
-                          // 1. Đánh dấu đã đọc khi click vào
                           if (!noti.isRead) {
                             ref
                                 .read(notificationProvider.notifier)
                                 .markAsRead(noti.id);
                           }
 
-                          // 2. Xử lý chuyển trang trực tiếp
                           final route = content['route'] as String?;
                           if (route != null) {
                             switch (route) {
@@ -353,13 +356,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: noti.isRead
-                                ? AppColors.cardBackground
-                                : AppColors.primary.withOpacity(0.04),
+                                ? appColors.cardBackground
+                                : appColors.primary.withOpacity(0.04),
                             borderRadius: BorderRadius.circular(20),
                             border: noti.isRead
                                 ? null
                                 : Border.all(
-                                    color: AppColors.primary.withOpacity(0.15),
+                                    color: appColors.primary.withOpacity(0.15),
                                     width: 1,
                                   ),
                           ),
@@ -396,7 +399,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                                   ? FontWeight.bold
                                                   : FontWeight.w900,
                                               fontSize: 14.5,
-                                              color: AppColors.primaryDark,
+                                              color: appColors.primaryDark,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -409,8 +412,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                             ),
                                             height: 8,
                                             width: 8,
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.primary,
+                                            decoration: BoxDecoration(
+                                              color: appColors.primary,
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -420,7 +423,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                     Text(
                                       content['body'] as String,
                                       style: TextStyle(
-                                        color: AppColors.primaryDark
+                                        color: appColors.primaryDark
                                             .withOpacity(
                                               noti.isRead ? 0.6 : 0.85,
                                             ),
@@ -434,7 +437,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                         'HH:mm - dd/MM/yyyy',
                                       ).format(noti.createdAt),
                                       style: TextStyle(
-                                        color: AppColors.primaryDark
+                                        color: appColors.primaryDark
                                             .withOpacity(0.4),
                                         fontSize: 11,
                                       ),
@@ -454,18 +457,18 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     );
   }
 
-  // 🌸 Hàm phụ trợ để tái sử dụng UI trạng thái trống (Empty State)
-  Widget _buildEmptyState(String text, IconData icon) {
+  // ✨ Đã thêm tham số `AppColorTheme appColors` vào hàm Empty State
+  Widget _buildEmptyState(String text, IconData icon, AppColorTheme appColors) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: AppColors.primaryDark.withOpacity(0.1)),
+          Icon(icon, size: 64, color: appColors.primaryDark.withOpacity(0.1)),
           const SizedBox(height: 16),
           Text(
             text,
             style: TextStyle(
-              color: AppColors.primaryDark.withOpacity(0.4),
+              color: appColors.primaryDark.withOpacity(0.4),
               fontSize: 16,
             ),
           ),

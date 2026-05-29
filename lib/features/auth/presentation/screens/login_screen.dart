@@ -29,17 +29,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final appColors = ref.read(appColorsProvider);
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.emptyFieldsWarning),
-          backgroundColor: AppColors.error,
+          backgroundColor: appColors.error,
         ),
       );
       return;
     }
-    // Tiến hành gọi API đăng nhập thông thường
     ref.read(authProvider.notifier).login(email, password);
   }
 
@@ -47,38 +47,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
-    final currentLocale = ref.watch(
-      localeProvider,
-    ); // Lắng nghe để cập nhật trạng thái nút Switch
+    final currentLocale = ref.watch(localeProvider);
+    final appColors = ref.watch(appColorsProvider);
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.loginSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.loginSuccess),
-            backgroundColor: AppColors.success,
+            backgroundColor: appColors.success,
           ),
         );
         ref.read(authProvider.notifier).resetState();
-
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (next == AuthState.loginError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            // ✨ ĐÃ SỬA: Đa ngôn ngữ hóa thông báo lỗi đăng nhập
             content: Text(l10n.loginErrorNotification),
-            backgroundColor: AppColors.error,
+            backgroundColor: appColors.error,
           ),
         );
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.googleLoginError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            // ✨ ĐÃ SỬA: Đa ngôn ngữ hóa thông báo lỗi Google
             content: Text(l10n.googleLoginErrorNotification),
-            backgroundColor: AppColors.error,
+            backgroundColor: appColors.error,
           ),
         );
         ref.read(authProvider.notifier).resetState();
@@ -86,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -95,22 +91,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(
-                    height: 50,
-                  ), // Tăng nhẹ khoảng cách để không đè vào nút Switch
+                  const SizedBox(height: 50),
                   Text(
                     l10n.welcomeBack,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: appColors.primary,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.subTitle,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14, color: appColors.textMuted),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
@@ -119,11 +113,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(
+                      color: appColors.text,
+                    ), // ✨ Sửa màu chữ nhập từ AppColors
                     decoration: InputDecoration(
                       labelText: l10n.email,
+                      labelStyle: TextStyle(color: appColors.textMuted),
                       hintText: l10n.emailHint,
+                      hintStyle: TextStyle(
+                        color: appColors.textMuted.withOpacity(0.6),
+                      ),
                       filled: true,
-                      fillColor: AppColors.cardBackground,
+                      fillColor: appColors.cardBackground,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -136,11 +137,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
+                    style: TextStyle(
+                      color: appColors.text,
+                    ), // ✨ Sửa màu chữ nhập từ AppColors
                     decoration: InputDecoration(
                       labelText: l10n.password,
+                      labelStyle: TextStyle(color: appColors.textMuted),
                       hintText: l10n.passwordHint,
+                      hintStyle: TextStyle(
+                        color: appColors.textMuted.withOpacity(0.6),
+                      ),
                       filled: true,
-                      fillColor: AppColors.cardBackground,
+                      fillColor: appColors.cardBackground,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -149,26 +157,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  // ✨ CẬP NHẬT MỚI: Thanh nút bấm Quên / Đặt lại mật khẩu
+                  // Thanh nút bấm Quên / Đặt lại mật khẩu (Đã đa ngôn ngữ)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
                         onPressed: () => _showForgotPasswordDialog(context),
-                        child: const Text(
-                          'Quên mật khẩu?',
+                        child: Text(
+                          l10n.forgotPasswordText,
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: appColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       TextButton(
                         onPressed: () => _showResetPasswordDialog(context),
-                        child: const Text(
-                          'Đặt lại mật khẩu',
+                        child: Text(
+                          l10n.resetPasswordText,
                           style: TextStyle(
-                            color: AppColors.primaryDark,
+                            color: appColors.primaryDark,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -179,10 +187,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   // Nút Đăng Nhập
                   authState == AuthState.loading
-                      ? const Center(
+                      ? Center(
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
+                              appColors.primary,
                             ),
                           ),
                         )
@@ -192,16 +200,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: appColors.primary,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               l10n.loginButtonText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: appColors.background,
                               ),
                             ),
                           ),
@@ -209,28 +217,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  // 🌸 THANH PHÂN CÁCH HOẶC ĐĂNG NHẬP KHÁC
-                  const Row(
+                  Row(
                     children: [
                       Expanded(
-                        child: Divider(color: Colors.grey, thickness: 0.5),
+                        child: Divider(
+                          color: appColors.textMuted.withOpacity(0.3),
+                          thickness: 0.5,
+                        ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'OR',
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          style: TextStyle(
+                            color: appColors.textMuted,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                       Expanded(
-                        child: Divider(color: Colors.grey, thickness: 0.5),
+                        child: Divider(
+                          color: appColors.textMuted.withOpacity(0.3),
+                          thickness: 0.5,
+                        ),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 24),
 
-                  // 🏅 NÚT BẤM ĐĂNG NHẬP BẰNG GOOGLE
+                  // NÚT BẤM ĐĂNG NHẬP BẰNG GOOGLE
                   InkWell(
                     onTap: authState == AuthState.loading
                         ? null
@@ -240,10 +256,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: appColors.cardBackground,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade300,
+                          color: appColors.textMuted.withOpacity(0.2),
                           width: 1,
                         ),
                       ),
@@ -256,11 +272,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            l10n.loginGGButtonText, // ✨ ĐÃ SỬA: Đa ngôn ngữ cụm này
-                            style: const TextStyle(
+                            l10n.loginGGButtonText,
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: appColors
+                                  .text, // ✨ Sử dụng AppColors đồng bộ text
                             ),
                           ),
                         ],
@@ -281,14 +298,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                     child: Text(
                       l10n.dontHaveAccount,
-                      style: const TextStyle(color: AppColors.primaryDark),
+                      style: TextStyle(color: appColors.primaryDark),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // 🌐 NÚT SWITCH NGÔN NGỮ ĐẶT GÓC TRÊN CÙNG BÊN PHẢI (MÀU VÀNG PASTEL CUTE)
+            // NÚT SWITCH NGÔN NGỮ ĐẶT GÓC TRÊN CÙNG BÊN PHẢI
             Positioned(
               top: 10,
               right: 16,
@@ -298,20 +315,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFDE7), // Màu nền vàng nhẹ cute
+                  color: appColors.cardBackground,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: const Color(0xFFFFF59D),
+                    color: appColors.textMuted.withOpacity(0.2),
                     width: 1.5,
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      '🇺🇳',
-                      style: TextStyle(fontSize: 13),
-                    ), // Icon đại diện tổng quan hoặc giữ 🇻🇳 tùy ý
+                    const Text('🇺🇳', style: TextStyle(fontSize: 13)),
                     Transform.scale(
                       scale: 0.75,
                       child: Switch(
@@ -327,10 +341,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     Text(
                       currentLocale.languageCode.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
+                        color: appColors.primaryDark,
                       ),
                     ),
                   ],
@@ -343,31 +357,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ✨ CẬP NHẬT MỚI: Dialog gửi mã yêu cầu khôi phục mật khẩu
+  // Dialog gửi mã yêu cầu khôi phục mật khẩu (Đã đa ngôn ngữ & Đồng bộ AppColors)
   void _showForgotPasswordDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final forgotEmailController = TextEditingController();
+    final appColors = ref.read(appColorsProvider);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: appColors.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Khôi phục mật khẩu',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          l10n.forgotPasswordTitle,
+          style: TextStyle(fontWeight: FontWeight.bold, color: appColors.text),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              l10n.forgotPasswordSubtitle,
+              style: TextStyle(fontSize: 13, color: appColors.textMuted),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: forgotEmailController,
               keyboardType: TextInputType.emailAddress,
+              style: TextStyle(
+                color: appColors.text,
+              ), // ✨ Đồng bộ màu text nhập
               decoration: InputDecoration(
-                labelText: 'Email tài khoản',
+                labelText: l10n.emailAccountLabel,
+                labelStyle: TextStyle(color: appColors.textMuted),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -378,11 +399,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              l10n.cancelButton,
+              style: TextStyle(color: appColors.textMuted),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: appColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -394,32 +418,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Đã gửi mã khôi phục đến email: $email'),
-                    backgroundColor: AppColors.success,
+                    content: Text('${l10n.sendCodeSuccess} $email'),
+                    backgroundColor: appColors.success,
                   ),
                 );
               }
             },
-            child: const Text('Gửi mã', style: TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.sendCodeButton,
+              style: TextStyle(color: appColors.background),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // ✨ CẬP NHẬT MỚI: Dialog nhập OTP và đặt lại mật khẩu mới
+  // Dialog nhập OTP và đặt lại mật khẩu mới (Đã đa ngôn ngữ & Đồng bộ AppColors)
   void _showResetPasswordDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final emailController = TextEditingController();
     final otpController = TextEditingController();
     final newPasswordController = TextEditingController();
+    final appColors = ref.read(appColorsProvider);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: appColors.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Đặt lại mật khẩu mới',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          l10n.resetPasswordTitle,
+          style: TextStyle(fontWeight: FontWeight.bold, color: appColors.text),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -428,21 +458,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email xác thực'),
+                style: TextStyle(
+                  color: appColors.text,
+                ), // ✨ Đồng bộ màu text nhập
+                decoration: InputDecoration(
+                  labelText: l10n.emailVerificationLabel,
+                  labelStyle: TextStyle(color: appColors.textMuted),
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: otpController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Mã xác thực (OTP / Token)',
+                style: TextStyle(
+                  color: appColors.text,
+                ), // ✨ Đồng bộ màu text nhập
+                decoration: InputDecoration(
+                  labelText: l10n.otpLabel,
+                  labelStyle: TextStyle(color: appColors.textMuted),
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: newPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Mật khẩu mới'),
+                style: TextStyle(
+                  color: appColors.text,
+                ), // ✨ Đồng bộ màu text nhập
+                decoration: InputDecoration(
+                  labelText: l10n.newPasswordLabel,
+                  labelStyle: TextStyle(color: appColors.textMuted),
+                ),
               ),
             ],
           ),
@@ -450,11 +496,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              l10n.cancelButton,
+              style: TextStyle(color: appColors.textMuted),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: appColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -470,18 +519,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     .resetPasswordWithOtp(email, otp, newPw);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.',
-                    ),
-                    backgroundColor: AppColors.success,
+                  SnackBar(
+                    content: Text(l10n.resetPasswordSuccess),
+                    backgroundColor: appColors.success,
                   ),
                 );
               }
             },
-            child: const Text(
-              'Xác nhận',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              l10n.confirmButton,
+              style: TextStyle(color: appColors.background),
             ),
           ),
         ],

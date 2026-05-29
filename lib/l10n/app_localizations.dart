@@ -311,13 +311,13 @@ abstract class AppLocalizations {
   /// No description provided for @errorLoadData.
   ///
   /// In en, this message translates to:
-  /// **'Failed to load data. Please try again!'**
+  /// **'Oopsie, the data tripped and fell 🥺'**
   String get errorLoadData;
 
   /// No description provided for @retryButton.
   ///
   /// In en, this message translates to:
-  /// **'Retry'**
+  /// **'Give it another push 🚀'**
   String get retryButton;
 
   /// No description provided for @emptyTransactionList.
@@ -407,19 +407,19 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Details here!!'**
+  /// **'Wallet X-Ray 🔍'**
   String get analyticsTitle;
 
   /// No description provided for @emptyAnalyticsData.
   ///
   /// In en, this message translates to:
-  /// **'No payment moments found for this month! 📝'**
+  /// **'Nothing here! Your wallet is safely untouched 🐥'**
   String get emptyAnalyticsData;
 
   /// No description provided for @totalLabel.
   ///
   /// In en, this message translates to:
-  /// **'Total'**
+  /// **'Total Damage 💸'**
   String get totalLabel;
 
   /// No description provided for @today.
@@ -989,6 +989,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Incorrect current password or connection error.'**
   String get updatePasswordError;
+
+  /// No description provided for @forgotPasswordText.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordText;
+
+  /// No description provided for @resetPasswordText.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get resetPasswordText;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The system will send a verification code (OTP) or reset link to your Email.'**
+  String get forgotPasswordSubtitle;
+
+  /// No description provided for @emailAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Email'**
+  String get emailAccountLabel;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
+  /// No description provided for @sendCodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get sendCodeButton;
+
+  /// No description provided for @sendCodeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code sent to email:'**
+  String get sendCodeSuccess;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset New Password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @emailVerificationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Email'**
+  String get emailVerificationLabel;
+
+  /// No description provided for @otpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code (OTP / Token)'**
+  String get otpLabel;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmButton;
+
+  /// No description provided for @resetPasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed successfully! Please log in.'**
+  String get resetPasswordSuccess;
+
+  /// No description provided for @spendingTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Trend'**
+  String get spendingTrend;
+
+  /// No description provided for @spendingStructure.
+  ///
+  /// In en, this message translates to:
+  /// **'Where did my money go? 🥧'**
+  String get spendingStructure;
+
+  /// No description provided for @customDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customDate;
+
+  /// No description provided for @avgPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Poof 🕊️'**
+  String get avgPerDay;
+
+  /// No description provided for @timeFrame.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get timeFrame;
+
+  /// No description provided for @pastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Week 🌷'**
+  String get pastWeek;
+
+  /// No description provided for @pastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Month 🌙'**
+  String get pastMonth;
+
+  /// No description provided for @threeMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'3 Months 🍄'**
+  String get threeMonths;
+
+  /// No description provided for @sixMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Half a Year 🐢'**
+  String get sixMonths;
+
+  /// No description provided for @pastYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Year 🌟'**
+  String get pastYear;
+
+  /// No description provided for @fromDate.
+  ///
+  /// In en, this message translates to:
+  /// **'From when 🐾'**
+  String get fromDate;
+
+  /// No description provided for @toDate.
+  ///
+  /// In en, this message translates to:
+  /// **'To when 🌿'**
+  String get toDate;
+
+  /// No description provided for @repeatCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Loop ⏳'**
+  String get repeatCycle;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
 }
 
 class _AppLocalizationsDelegate

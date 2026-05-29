@@ -121,10 +121,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingData => 'Loading payment moments...';
 
   @override
-  String get errorLoadData => 'Failed to load data. Please try again!';
+  String get errorLoadData => 'Oopsie, the data tripped and fell 🥺';
 
   @override
-  String get retryButton => 'Retry';
+  String get retryButton => 'Give it another push 🚀';
 
   @override
   String get emptyTransactionList =>
@@ -173,14 +173,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get analyticsTitle => 'Details here!!';
+  String get analyticsTitle => 'Wallet X-Ray 🔍';
 
   @override
   String get emptyAnalyticsData =>
-      'No payment moments found for this month! 📝';
+      'Nothing here! Your wallet is safely untouched 🐥';
 
   @override
-  String get totalLabel => 'Total';
+  String get totalLabel => 'Total Damage 💸';
 
   @override
   String get today => 'Today';
@@ -515,4 +515,90 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get updatePasswordError =>
       'Incorrect current password or connection error.';
+
+  @override
+  String get forgotPasswordText => 'Forgot password?';
+
+  @override
+  String get resetPasswordText => 'Reset password';
+
+  @override
+  String get forgotPasswordTitle => 'Recover Password';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'The system will send a verification code (OTP) or reset link to your Email.';
+
+  @override
+  String get emailAccountLabel => 'Account Email';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get sendCodeButton => 'Send Code';
+
+  @override
+  String get sendCodeSuccess => 'Recovery code sent to email:';
+
+  @override
+  String get resetPasswordTitle => 'Reset New Password';
+
+  @override
+  String get emailVerificationLabel => 'Verification Email';
+
+  @override
+  String get otpLabel => 'Verification Code (OTP / Token)';
+
+  @override
+  String get newPasswordLabel => 'New Password';
+
+  @override
+  String get confirmButton => 'Confirm';
+
+  @override
+  String get resetPasswordSuccess =>
+      'Your password has been changed successfully! Please log in.';
+
+  @override
+  String get spendingTrend => 'Trend';
+
+  @override
+  String get spendingStructure => 'Where did my money go? 🥧';
+
+  @override
+  String get customDate => 'Custom';
+
+  @override
+  String get avgPerDay => 'Daily Poof 🕊️';
+
+  @override
+  String get timeFrame => 'Days';
+
+  @override
+  String get pastWeek => 'Past Week 🌷';
+
+  @override
+  String get pastMonth => 'Past Month 🌙';
+
+  @override
+  String get threeMonths => '3 Months 🍄';
+
+  @override
+  String get sixMonths => 'Half a Year 🐢';
+
+  @override
+  String get pastYear => 'Past Year 🌟';
+
+  @override
+  String get fromDate => 'From when 🐾';
+
+  @override
+  String get toDate => 'To when 🌿';
+
+  @override
+  String get repeatCycle => 'Time Loop ⏳';
+
+  @override
+  String get days => 'days';
 }

@@ -14,25 +14,27 @@ class HomeBudgetCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetAsync = ref.watch(homeBudgetProvider);
     final l10n = AppLocalizations.of(context)!;
+    // ✨ GỌI PROVIDER MÀU SẮC HỖ TRỢ DARK MODE
+    final appColors = ref.watch(appColorsProvider);
 
     return budgetAsync.when(
       skipLoadingOnRefresh:
-          true, //Giúp giữ UI cũ, không hiện loading spinner khi làm mới
-      loading: () => const Card(
-        margin: EdgeInsets.all(16),
+          true, // Giúp giữ UI cũ, không hiện loading spinner khi làm mới
+      loading: () => Card(
+        margin: const EdgeInsets.all(16),
         elevation: 0,
         color: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+            child: CircularProgressIndicator(color: appColors.primary),
           ),
         ),
       ),
       error: (err, stack) => Card(
         margin: const EdgeInsets.all(16),
         elevation: 0,
-        color: AppColors.cardBackground,
+        color: appColors.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.all(18),
@@ -72,9 +74,9 @@ class HomeBudgetCard extends ConsumerWidget {
             ? l10n.budgetThisMonthLabel
             : '${l10n.budgetThisMonthLabel}: $limitStr';
 
-        // --- 🎨 PHÂN PHỐI MÀU SẮC & TRẠNG THÁI TEXT ---
-        Color progressColor = AppColors.primary;
-        Color feedbackColor = AppColors.success;
+        // --- 🎨 PHÂN PHỐI MÀU SẮC & TRẠNG THÁI TEXT (Dùng appColors) ---
+        Color progressColor = appColors.primary;
+        Color feedbackColor = appColors.success;
         String feedbackText = l10n.budgetHealthyFeedback;
         String budgetStatusText = '';
         String? dailySuggestionText;
@@ -83,8 +85,8 @@ class HomeBudgetCard extends ConsumerWidget {
 
         if (isNotSet) {
           // 🛑 TRƯỜNG HỢP 1: CHƯA ĐẶT NGÂN SÁCH
-          progressColor = AppColors.primary.withOpacity(0.15);
-          feedbackColor = AppColors.primaryDark.withOpacity(0.6);
+          progressColor = appColors.primary.withOpacity(0.15);
+          feedbackColor = appColors.primaryDark.withOpacity(0.6);
           feedbackText = l10n.budgetNotSetFeedback;
           budgetStatusText = l10n.budgetNotSetStatus;
         } else if (isOvertarget) {
@@ -150,9 +152,9 @@ class HomeBudgetCard extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppColors.cardBackground,
+                color: appColors.cardBackground,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.primary.withOpacity(0.06)),
+                border: Border.all(color: appColors.primary.withOpacity(0.06)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,14 +162,12 @@ class HomeBudgetCard extends ConsumerWidget {
                   // --- DÒNG HEADER: TIÊU ĐỀ + HẠN MỨC + ICON EDIT ---
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    // mainAxisAlignment mặc định là start nên các widget sẽ tự bám sát vào nhau bên trái
                     children: [
                       Flexible(
-                        // 👈 Đổi Expanded thành Flexible ở đây nè
                         child: Text(
                           headerText,
                           style: TextStyle(
-                            color: AppColors.primaryDark.withOpacity(
+                            color: appColors.primaryDark.withOpacity(
                               isNotSet ? 0.5 : 0.8,
                             ),
                             fontSize: 13,
@@ -176,13 +176,10 @@ class HomeBudgetCard extends ConsumerWidget {
                                 : FontWeight.w600,
                           ),
                           maxLines: 1,
-                          overflow: TextOverflow
-                              .ellipsis, // Vẫn giữ ellipsis để nếu số tiền quá dài sẽ hiện "..."
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(
-                        width: 6,
-                      ), // Khoảng cách nhỏ xinh giữa text và icon
+                      const SizedBox(width: 6),
                       InkWell(
                         onTap: () {
                           Navigator.of(context).push(
@@ -197,7 +194,7 @@ class HomeBudgetCard extends ConsumerWidget {
                           child: Icon(
                             Icons.edit_rounded,
                             size: 16,
-                            color: AppColors.primaryDark.withOpacity(0.5),
+                            color: appColors.primaryDark.withOpacity(0.5),
                           ),
                         ),
                       ),
@@ -208,12 +205,11 @@ class HomeBudgetCard extends ConsumerWidget {
                   // --- DÒNG STATUS: ĐÃ TIÊU • CÒN LẠI • SỐ NGÀY ---
                   Text(
                     budgetStatusText,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                      height:
-                          1.4, // Tạo khoảng cách dòng thoải mái xíu nếu text rớt dòng
+                      color: appColors.primaryDark,
+                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -224,7 +220,7 @@ class HomeBudgetCard extends ConsumerWidget {
                     child: LinearProgressIndicator(
                       value: spentPercentage > 1.0 ? 1.0 : spentPercentage,
                       minHeight: 8,
-                      backgroundColor: AppColors.background,
+                      backgroundColor: appColors.background,
                       valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                     ),
                   ),
@@ -248,10 +244,9 @@ class HomeBudgetCard extends ConsumerWidget {
                         Text(
                           dailySuggestionText!,
                           style: TextStyle(
-                            color: AppColors.primaryDark.withOpacity(0.65),
+                            color: appColors.primaryDark.withOpacity(0.65),
                             fontSize: 12,
-                            fontStyle: FontStyle
-                                .italic, // In nghiêng cho giống 1 lời thì thầm
+                            fontStyle: FontStyle.italic,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -262,7 +257,7 @@ class HomeBudgetCard extends ConsumerWidget {
                         child: Text(
                           '${l10n.analyticsTitle} ➡️',
                           style: TextStyle(
-                            color: AppColors.primary.withOpacity(0.9),
+                            color: appColors.primary.withOpacity(0.9),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,

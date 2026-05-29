@@ -4,7 +4,7 @@ import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
-import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart'; // 👈 Import Widget Mới
+import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
@@ -76,23 +76,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isLoadingMore = timelineNotifier.isLoadingMore;
     final hasMore = timelineNotifier.hasMore;
 
+    // ✨ Lấy bộ màu động (Sáng/Tối) từ Provider
+    final appColors = ref.watch(appColorsProvider);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background, // Thay đổi màu nền
       appBar: const HomeAppBar(),
       body: RefreshIndicator(
-        color: AppColors.primary,
-        backgroundColor: AppColors.cardBackground,
+        color: appColors.primary,
+        backgroundColor: appColors.cardBackground,
         onRefresh: () =>
             ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
         child: timelineState.when(
           skipLoadingOnRefresh: true,
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: appColors.primary),
           ),
           error: (error, stack) => Center(
             child: Text(
               l10n.errorLoadData,
-              style: const TextStyle(color: AppColors.errorAccent),
+              style: TextStyle(color: appColors.errorAccent), // Bỏ const
             ),
           ),
           data: (transactions) {
@@ -114,14 +117,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 children: [
                   _buildBudgetCardWithNavigation(l10n),
-                  const HomeHeaderSection(), // 👈 Dùng Widget đã tách
+                  const HomeHeaderSection(),
                   Padding(
                     padding: const EdgeInsets.all(48),
                     child: Center(
                       child: Text(
                         l10n.emptyTransactionList,
                         style: TextStyle(
-                          color: AppColors.primaryDark.withOpacity(0.5),
+                          color: appColors.primaryDark.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -139,15 +142,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               itemBuilder: (context, index) {
                 if (index == 0) return _buildBudgetCardWithNavigation(l10n);
 
-                if (index == 1)
-                  return const HomeHeaderSection(); // 👈 Dùng Widget đã tách
+                if (index == 1) return const HomeHeaderSection();
 
                 if (index == 2 + keys.length) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: appColors.primary,
                         strokeWidth: 2.5,
                       ),
                     ),
@@ -164,6 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     l10n,
                     ref,
                     context,
+                    appColors, // Truyền appColors xuống hàm
                   );
                 } else {
                   return _buildListGroup(
@@ -172,6 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     l10n,
                     ref,
                     context,
+                    appColors, // Truyền appColors xuống hàm
                   );
                 }
               },
@@ -180,7 +184,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
+        backgroundColor: appColors.primary, // Thay đổi màu nút
         onPressed: () async {
           final bool? isAdded = await Navigator.of(context).push<bool>(
             MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
@@ -200,6 +204,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     AppLocalizations l10n,
     WidgetRef ref,
     BuildContext context,
+    AppColorTheme appColors, // Nhận appColors
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,11 +216,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark.withOpacity(0.45),
+              color: appColors.primaryDark.withOpacity(0.45),
             ),
           ),
         ),
-        ...txList.map((tx) => _buildDismissibleCard(context, ref, tx, l10n)),
+        ...txList.map(
+          (tx) => _buildDismissibleCard(context, ref, tx, l10n, appColors),
+        ),
       ],
     );
   }
@@ -226,6 +233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     AppLocalizations l10n,
     WidgetRef ref,
     BuildContext context,
+    AppColorTheme appColors, // Nhận appColors
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark.withOpacity(0.45),
+              color: appColors.primaryDark.withOpacity(0.45),
             ),
           ),
         ),
@@ -256,8 +264,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             itemBuilder: (context, gridIdx) => MomentGridItem(
               moment: txList[gridIdx],
               l10n: l10n,
-              onLongPress: () =>
-                  _showDeleteConfirmDialog(context, ref, txList[gridIdx], l10n),
+              onLongPress: () => _showDeleteConfirmDialog(
+                context,
+                ref,
+                txList[gridIdx],
+                l10n,
+                appColors,
+              ),
               onTap: () => _openMomentDetails(txList[gridIdx], l10n),
             ),
           ),
@@ -271,23 +284,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetRef ref,
     Map<String, dynamic> tx,
     AppLocalizations l10n,
+    AppColorTheme appColors, // Nhận appColors
   ) {
     return Dismissible(
       key: Key(tx['id'].toString()),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
-        await _showDeleteConfirmDialog(context, ref, tx, l10n);
+        await _showDeleteConfirmDialog(context, ref, tx, l10n, appColors);
         return false;
       },
       background: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.errorAccent.withOpacity(0.12),
+          color: appColors.errorAccent.withOpacity(0.12),
           borderRadius: BorderRadius.circular(20),
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete_sweep, color: AppColors.errorAccent),
+        child: Icon(Icons.delete_sweep, color: appColors.errorAccent),
       ),
       child: TransactionCard(
         transaction: tx,
@@ -302,27 +316,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetRef ref,
     Map<String, dynamic> tx,
     AppLocalizations l10n,
+    AppColorTheme appColors, // Nhận appColors
   ) async {
     final isConfirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: appColors.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           l10n.deleteDialogTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: appColors.primaryDark,
+          ), // Đổi màu chữ title
         ),
-        content: Text(l10n.deleteDialogContent),
+        content: Text(
+          l10n.deleteDialogContent,
+          style: TextStyle(
+            color: appColors.primaryDark,
+          ), // Đổi màu chữ nội dung cho hợp Dark Mode
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.deleteDialogCancel),
+            child: Text(
+              l10n.deleteDialogCancel,
+              style: TextStyle(
+                color: appColors.primaryDark.withOpacity(0.6),
+              ), // Chữ Hủy hơi mờ
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               l10n.deleteDialogConfirm,
-              style: const TextStyle(color: AppColors.errorAccent),
+              style: TextStyle(color: appColors.errorAccent), // Bỏ const
             ),
           ),
         ],

@@ -128,6 +128,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✨ Lắng nghe bộ màu dynamic cho Dark Mode
+    final appColors = ref.watch(appColorsProvider);
     final txState = ref.watch(transactionProvider);
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
@@ -137,11 +139,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       {'id': 'Shopping', 'name': l10n.catShopping, 'emoji': '🛍️'},
       {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🚗'},
       {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🎮'},
-      {
-        'id': 'Custom',
-        'name': l10n.catCustom,
-        'emoji': '📝',
-      }, // 🔑 ĐA NGÔN NGỮ: Khác nè...
+      {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '📝'},
     ];
 
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
@@ -149,7 +147,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.txSuccessMessage),
-            backgroundColor: AppColors.success,
+            backgroundColor: appColors.success,
           ),
         );
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
@@ -160,26 +158,26 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.txErrorMessage),
-            backgroundColor: AppColors.error,
+            backgroundColor: appColors.error,
           ),
         );
       }
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
         title: Text(
           l10n.newMomentTitle,
-          style: const TextStyle(
-            color: AppColors.primary,
+          style: TextStyle(
+            color: appColors.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
           onPressed: () => Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           ),
@@ -191,17 +189,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 🌟 1. KHUNG ẢNH CAMERA CÂN ĐỐI MỀM MẠI (HẠ XUỐNG CAO 245)
+              // 🌟 1. KHUNG ẢNH CAMERA CÂN ĐỐI MỀM MẠI
               GestureDetector(
                 onTap: _openCamera,
                 child: Container(
-                  height:
-                      245, // 🔑 ĐÃ SỬA: Hạ từ 280 xuống 245 giúp UI mềm mại, không quá thô bạo mà vẫn rõ ảnh
+                  height: 245,
                   decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
+                    color: appColors.cardBackground,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.12),
+                      color: appColors.primary.withOpacity(0.12),
                       width: 1.5,
                     ),
                   ),
@@ -216,10 +213,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.camera_enhance_outlined,
                               size: 48,
-                              color: AppColors.primary,
+                              color: appColors.primary,
                             ),
                             const SizedBox(height: 10),
                             Padding(
@@ -227,10 +224,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 horizontal: 16,
                               ),
                               child: Text(
-                                l10n.cameraTapInstruction, // 🔑 ĐA NGÔN NGỮ + CUTE VIBE
+                                l10n.cameraTapInstruction,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.grey,
+                                style: TextStyle(
+                                  color: appColors
+                                      .textMuted, // Đồng bộ màu hint chữ
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -248,18 +246,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 children: [
                   TextButton.icon(
                     onPressed: _openGallery,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.photo_library_rounded,
-                      color: AppColors.primary,
+                      color: appColors.primary,
                       size: 16,
                     ),
                     label: Text(
                       _localImagePath != null
-                          ? l10n
-                                .galleryChangeAction // 🔑 ĐA NGÔN NGỮ
-                          : l10n.galleryPickAction, // 🔑 ĐA NGÔN NGỮ
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                          ? l10n.galleryChangeAction
+                          : l10n.galleryPickAction,
+                      style: TextStyle(
+                        color: appColors.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 12.5,
                       ),
@@ -275,7 +272,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primaryDark.withOpacity(0.6),
+                  color: appColors.primaryDark.withOpacity(0.6),
                   letterSpacing: 0.8,
                 ),
               ),
@@ -302,13 +299,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColors.primary
-                                : AppColors.cardBackground,
+                                ? appColors.primary
+                                : appColors.cardBackground,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: isSelected
                                   ? Colors.transparent
-                                  : AppColors.primary.withOpacity(0.04),
+                                  : appColors.primary.withOpacity(0.04),
                             ),
                           ),
                           child: Row(
@@ -324,7 +321,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
-                                      : Colors.black87,
+                                      : appColors
+                                            .text, // ✨ Sửa từ black87 sang appColors.text để tự đổi màu chữ unselected
                                   fontWeight: FontWeight.w600,
                                   fontSize: 11.5,
                                 ),
@@ -342,15 +340,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _customCategoryController,
+                  style: TextStyle(
+                    color: appColors.text,
+                  ), // ✨ Ép chữ nhập màu sáng khi ở Dark Mode
                   decoration: InputDecoration(
-                    hintText:
-                        l10n.customCategoryHint, // 🔑 ĐA NGÔN NGỮ + CUTE VIBE
-                    prefixIcon: const Icon(
+                    hintText: l10n.customCategoryHint,
+                    hintStyle: TextStyle(color: appColors.textMuted),
+                    prefixIcon: Icon(
                       Icons.edit_note_rounded,
-                      color: AppColors.primary,
+                      color: appColors.primary,
                     ),
                     filled: true,
-                    fillColor: AppColors.cardBackground,
+                    fillColor: appColors.cardBackground,
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 12,
                       horizontal: 16,
@@ -358,13 +359,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: appColors.primary.withOpacity(0.1),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
+                      borderSide: BorderSide(
+                        color: appColors.primary,
                         width: 1.5,
                       ),
                     ),
@@ -379,11 +380,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    l10n.amountSectionTitle, // 🔑 ĐA NGÔN NGỮ + CUTE VIBE (TỔNG THIỆT HẠI ĐỢT NÀY 💰)
+                    l10n.amountSectionTitle,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark.withOpacity(0.6),
+                      color: appColors.primaryDark.withOpacity(0.6),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -392,11 +393,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       _buildShortcutZeroButton(
                         '.000',
                         () => _appendZeros('000'),
+                        appColors,
                       ),
                       const SizedBox(width: 6),
                       _buildShortcutZeroButton(
                         '.000.000',
                         () => _appendZeros('000000'),
+                        appColors,
                       ),
                     ],
                   ),
@@ -410,10 +413,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.cardBackground,
+                  color: appColors.cardBackground,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.06),
+                    color: appColors.primary.withOpacity(0.06),
                     width: 1.2,
                   ),
                 ),
@@ -424,15 +427,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         controller: _amountController,
                         keyboardType: TextInputType.number,
                         onChanged: _onAmountChanged,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: appColors.primary,
                         ),
                         decoration: InputDecoration(
                           hintText: '0',
                           hintStyle: TextStyle(
-                            color: AppColors.primary.withOpacity(0.2),
+                            color: appColors.primary.withOpacity(0.2),
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
@@ -442,10 +445,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     ),
                     Text(
                       currencySymbol,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: appColors.primary,
                       ),
                     ),
                   ],
@@ -455,21 +458,25 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               // 📝 Ô NHẬP GHI CHÚ
               Text(
-                l10n.noteSectionTitle, // 🔑 ĐA NGÔN NGỮ + CUTE VIBE (TÂM SỰ MỎNG VỀ KHOẢNH KHẮC 💬)
+                l10n.noteSectionTitle,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primaryDark.withOpacity(0.6),
+                  color: appColors.primaryDark.withOpacity(0.6),
                   letterSpacing: 0.8,
                 ),
               ),
               const SizedBox(height: 6),
               TextField(
                 controller: _noteController,
+                style: TextStyle(
+                  color: appColors.text,
+                ), // ✨ Sửa lỗi gõ chữ ra màu đen trên nền tối
                 decoration: InputDecoration(
                   hintText: l10n.noteHint,
+                  hintStyle: TextStyle(color: appColors.textMuted),
                   filled: true,
-                  fillColor: AppColors.cardBackground,
+                  fillColor: appColors.cardBackground,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 12,
                     horizontal: 16,
@@ -484,10 +491,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               // 🚀 NÚT BẤM LƯU GIAO DỊCH
               txState == TransactionState.loading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
+                          appColors.primary,
                         ),
                       ),
                     )
@@ -520,7 +527,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: appColors.primary,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         alignment: Alignment.center,
@@ -541,9 +548,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  Widget _buildShortcutZeroButton(String label, VoidCallback onTap) {
+  // ✨ Đã truyền thêm bộ màu appColors vào hàm tạo nút shortcut số 0
+  Widget _buildShortcutZeroButton(
+    String label,
+    VoidCallback onTap,
+    AppColorTheme appColors,
+  ) {
     return Material(
-      color: AppColors.primary.withOpacity(0.05),
+      color: appColors.primary.withOpacity(0.05),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onTap,
@@ -552,10 +564,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: appColors.primary,
               letterSpacing: 0.3,
             ),
           ),

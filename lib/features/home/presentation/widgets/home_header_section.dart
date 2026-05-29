@@ -13,6 +13,7 @@ class HomeHeaderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isGridView = ref.watch(isGridViewProvider);
+    final appColors = ref.watch(appColorsProvider); // ✨ Lấy bộ màu động
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 16, top: 16, bottom: 8),
@@ -23,10 +24,10 @@ class HomeHeaderSection extends ConsumerWidget {
           // --- BÊN TRÁI: Tiêu đề ---
           Text(
             l10n.spendingMomentsTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
+              color: appColors.primaryDark, // Thay đổi màu
             ),
           ),
 
@@ -36,13 +37,13 @@ class HomeHeaderSection extends ConsumerWidget {
             width: 36,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary.withOpacity(0.08), // Mềm mại hóa UI
+              color: appColors.primary.withOpacity(0.08), // Mềm mại hóa UI
             ),
             child: IconButton(
               padding: EdgeInsets.zero,
               icon: Icon(
                 isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
-                color: AppColors.primary,
+                color: appColors.primary, // Thay đổi màu
                 size: 20,
               ),
               onPressed: () {

@@ -4,7 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔑 1. Thêm import Riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MomentGridItem extends ConsumerWidget {
   final Map<String, dynamic> moment;
@@ -17,7 +17,7 @@ class MomentGridItem extends ConsumerWidget {
     required this.moment,
     required this.l10n,
     required this.onLongPress,
-    this.onTap, // 🔑 2. Cho phép truyền onTap từ bên ngoài để linh hoạt hơn
+    this.onTap,
   });
 
   IconData _getCategoryIcon(String? category) {
@@ -48,9 +48,8 @@ class MomentGridItem extends ConsumerWidget {
     final bool hasImage = imageUrl.isNotEmpty;
 
     final currencySymbol = ref.watch(currencyProvider);
+    final appColors = ref.watch(appColorsProvider); // ✨ Lấy bộ màu động
 
-    // 🔑 6. Thay vì hardcode '₫', hãy truyền hoặc nối chuỗi với currencySymbol mới
-    // (Nếu hàm formatCompactAmount của bạn đang tự nối đuôi '₫', hãy xóa đuôi '₫' trong file CurrencyHelper đi nhé)
     final String compactAmount =
         '-${CurrencyHelper.formatCompactAmount(moment['amount'])}$currencySymbol';
 
@@ -62,9 +61,9 @@ class MomentGridItem extends ConsumerWidget {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: appColors.cardBackground, // Đổi nền
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.06)),
+          border: Border.all(color: appColors.primary.withOpacity(0.06)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.01),
@@ -82,9 +81,9 @@ class MomentGridItem extends ConsumerWidget {
                       CloudinaryHelper.getOptimizedOriginalUrl(imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          _buildDefaultCenterIcon(categoryIcon),
+                          _buildDefaultCenterIcon(categoryIcon, appColors),
                     )
-                  : _buildDefaultCenterIcon(categoryIcon),
+                  : _buildDefaultCenterIcon(categoryIcon, appColors),
             ),
             Positioned(
               right: 6,
@@ -110,10 +109,11 @@ class MomentGridItem extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize:
-                            10.5, // Giảm nhẹ 0.5 size để hiển thị chuỗi dài dạng "150.000₫" không bị tràn ô grid 3 cột
+                        fontSize: 10.5,
                         fontWeight: FontWeight.bold,
-                        color: hasImage ? Colors.white : AppColors.errorAccent,
+                        color: hasImage
+                            ? Colors.white
+                            : appColors.errorAccent, // Đổi màu
                       ),
                     ),
                   ),
@@ -139,7 +139,9 @@ class MomentGridItem extends ConsumerWidget {
                         fontWeight: FontWeight.w500,
                         color: hasImage
                             ? Colors.white.withOpacity(0.9)
-                            : AppColors.primaryDark.withOpacity(0.65),
+                            : appColors.primaryDark.withOpacity(
+                                0.65,
+                              ), // Đổi màu
                       ),
                     ),
                   ),
@@ -152,11 +154,12 @@ class MomentGridItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefaultCenterIcon(IconData icon) {
+  // ✨ Truyền appColors vào hàm bổ trợ
+  Widget _buildDefaultCenterIcon(IconData icon, AppColorTheme appColors) {
     return Container(
-      color: AppColors.primary.withOpacity(0.04),
+      color: appColors.primary.withOpacity(0.04),
       child: Center(
-        child: Icon(icon, size: 32, color: AppColors.primary.withOpacity(0.12)),
+        child: Icon(icon, size: 32, color: appColors.primary.withOpacity(0.12)),
       ),
     );
   }

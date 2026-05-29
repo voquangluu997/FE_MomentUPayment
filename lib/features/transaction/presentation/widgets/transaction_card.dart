@@ -21,6 +21,8 @@ class TransactionCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currencySymbol = ref.watch(currencyProvider);
+    final appColors = ref.watch(appColorsProvider); // ✨ Lấy bộ màu động
+
     final String formattedAmount =
         '-${CurrencyHelper.formatCompactAmount(transaction['amount'])}$currencySymbol';
 
@@ -49,17 +51,13 @@ class TransactionCard extends ConsumerWidget {
       }
     }
 
-    // 🔑 Tự động định dạng theo quy tắc: Dưới 1M hiện 150.000đ, trên 1M hiện 2.5M
-    // final String compactAmount =
-    // '-${CurrencyHelper.formatCompactAmount(amount)}';
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
-      color: AppColors.cardBackground,
+      color: appColors.cardBackground, // Đổi màu nền Card
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: AppColors.primary.withOpacity(0.12)),
+        side: BorderSide(color: appColors.primary.withOpacity(0.12)),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -77,9 +75,12 @@ class TransactionCard extends ConsumerWidget {
                         height: 62,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
-                            _buildFallbackIcon(emoji),
+                            _buildFallbackIcon(
+                              emoji,
+                              appColors,
+                            ), // Truyền appColors
                       )
-                    : _buildFallbackIcon(emoji),
+                    : _buildFallbackIcon(emoji, appColors),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -88,10 +89,10 @@ class TransactionCard extends ConsumerWidget {
                   children: [
                     Text(
                       category,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: AppColors.primaryDark,
+                        color: appColors.primaryDark,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -100,7 +101,7 @@ class TransactionCard extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.primaryDark.withOpacity(0.68),
+                        color: appColors.primaryDark.withOpacity(0.68),
                         fontSize: 13,
                       ),
                     ),
@@ -108,7 +109,7 @@ class TransactionCard extends ConsumerWidget {
                     Text(
                       formattedDateTime,
                       style: TextStyle(
-                        color: AppColors.primaryDark.withOpacity(0.45),
+                        color: appColors.primaryDark.withOpacity(0.45),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -118,10 +119,10 @@ class TransactionCard extends ConsumerWidget {
               ),
               Text(
                 formattedAmount,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
-                  color: AppColors.errorAccent,
+                  color: appColors.errorAccent, // Đổi màu
                 ),
               ),
             ],
@@ -131,11 +132,12 @@ class TransactionCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildFallbackIcon(String emoji) {
+  // ✨ Thêm tham số AppColorTheme
+  Widget _buildFallbackIcon(String emoji, AppColorTheme appColors) {
     return Container(
       width: 62,
       height: 62,
-      color: AppColors.background,
+      color: appColors.background,
       alignment: Alignment.center,
       child: Text(emoji, style: const TextStyle(fontSize: 26)),
     );

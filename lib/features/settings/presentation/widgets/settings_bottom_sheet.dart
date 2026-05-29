@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moment_u_payment/core/constants/app_colors.dart';
+
+import 'package:moment_u_payment/core/constants/app_colors.dart'; // Đảm bảo đường dẫn này chứa appColorsProvider và AppColorTheme
 import 'package:moment_u_payment/core/providers/locale_provider.dart';
+import 'package:moment_u_payment/core/providers/theme_provider.dart';
 import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
@@ -21,14 +23,17 @@ class SettingsBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ✨ Lắng nghe bộ màu dynamic từ provider thay vì dùng AppColors tĩnh
+    final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
     final currentCurrency = ref.watch(currencyProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: appColors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.only(top: 12, bottom: 24, left: 24, right: 24),
       constraints: BoxConstraints(
@@ -41,7 +46,7 @@ class SettingsBottomSheet extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.3),
+              color: appColors.textMuted.withOpacity(0.3),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -50,17 +55,17 @@ class SettingsBottomSheet extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                l10n.settingsAndUtilities, // "Cài đặt & Tiện ích"
-                style: const TextStyle(
+                l10n.settingsAndUtilities,
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+                  color: appColors.primaryDark,
                 ),
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.close_rounded),
-                color: AppColors.primaryDark,
+                color: appColors.primaryDark,
               ),
             ],
           ),
@@ -72,14 +77,14 @@ class SettingsBottomSheet extends ConsumerWidget {
                 children: [
                   _buildSettingItem(
                     icon: Icons.language_rounded,
-                    title: l10n.language, // "Ngôn ngữ (Language)"
+                    title: l10n.language,
                     subtitle: currentLocale.languageCode == 'en'
-                        ? l10n
-                              .english // "English"
-                        : l10n.vietnamese, // "Tiếng Việt"
+                        ? l10n.english
+                        : l10n.vietnamese,
+                    appColors: appColors,
                     trailing: Switch(
                       value: currentLocale.languageCode == 'en',
-                      activeColor: AppColors.primary,
+                      activeColor: appColors.primary,
                       onChanged: (_) =>
                           ref.read(localeProvider.notifier).toggleLocale(),
                     ),
@@ -87,16 +92,16 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                   _buildSettingItem(
                     icon: Icons.monetization_on_rounded,
-                    title: l10n.currencyUnit, // "Đơn vị tiền tệ"
-                    subtitle:
-                        '${l10n.currentlyUsing}: $currentCurrency', // "Đang dùng: $currentCurrency"
+                    title: l10n.currencyUnit,
+                    subtitle: '${l10n.currentlyUsing}: $currentCurrency',
+                    appColors: appColors,
                     trailing: PopupMenuButton<String>(
                       initialValue: currentCurrency,
                       position: PopupMenuPosition.under,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      color: AppColors.cardBackground,
+                      color: appColors.cardBackground,
                       elevation: 3,
                       onSelected: (newValue) {
                         ref
@@ -118,8 +123,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                   color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.primaryDark,
+                                      ? appColors.primary
+                                      : appColors.primaryDark,
                                 ),
                               ),
                             ),
@@ -132,7 +137,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: appColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -140,16 +145,16 @@ class SettingsBottomSheet extends ConsumerWidget {
                           children: [
                             Text(
                               currentCurrency,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color: appColors.primary,
                                 fontSize: 14,
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(
+                            Icon(
                               Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
+                              color: appColors.primary,
                               size: 18,
                             ),
                           ],
@@ -160,16 +165,28 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                   _buildSettingItem(
                     icon: Icons.dark_mode_rounded,
-                    title: l10n.darkMode, // "Chế độ tối (Dark Mode)"
-                    subtitle: l10n.lightTheme, // "Giao diện sáng"
-                    trailing: Switch(value: false, onChanged: (val) {}),
+                    title: l10n.darkMode,
+                    subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
+                    appColors: appColors,
+                    trailing: Switch(
+                      value: isDark,
+                      activeColor: appColors.primary,
+                      onChanged: (val) {
+                        // 🔥 Gọi hàm toggle ở đây
+                        ref.read(themeModeProvider.notifier).toggleTheme();
+                      },
+                    ),
+                    onTap: () {
+                      // ✨ Bấm vào nguyên cả hàng cũng sẽ tự đổi luôn
+                      ref.read(themeModeProvider.notifier).toggleTheme();
+                    },
                   ),
 
                   _buildSettingItem(
                     icon: Icons.notifications_active_rounded,
                     title: l10n.notificationSettingsTitle,
-                    subtitle: l10n
-                        .notificationSettingsSubtitle, // "Quản lý cảnh báo & chi tiêu"
+                    subtitle: l10n.notificationSettingsSubtitle,
+                    appColors: appColors,
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.of(context).push(
@@ -182,9 +199,9 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                   _buildSettingItem(
                     icon: Icons.lock_reset_rounded,
-                    title: l10n.changePassword, // "Đổi mật khẩu"
-                    subtitle: l10n
-                        .changePasswordSubtitle, // "Thay đổi mật khẩu tài khoản hiện tại"
+                    title: l10n.changePassword,
+                    subtitle: l10n.changePasswordSubtitle,
+                    appColors: appColors,
                     onTap: () {
                       Navigator.of(context).pop();
                       _showUpdatePasswordDialog(context);
@@ -193,15 +210,18 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                   _buildSettingItem(
                     icon: Icons.help_outline_rounded,
-                    title: l10n.helpCenter, // "Trung tâm trợ giúp"
-                    subtitle:
-                        l10n.helpCenterSubtitle, // "Hỏi đáp & Liên hệ hỗ trợ"
+                    title: l10n.helpCenter,
+                    subtitle: l10n.helpCenterSubtitle,
+                    appColors: appColors,
                     onTap: () {},
                   ),
 
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(thickness: 0.5),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Divider(
+                      thickness: 0.5,
+                      color: appColors.textMuted.withOpacity(0.2),
+                    ),
                   ),
 
                   ListTile(
@@ -209,7 +229,9 @@ class SettingsBottomSheet extends ConsumerWidget {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.red.shade50,
+                        color: Colors.redAccent.withOpacity(
+                          0.12,
+                        ), // Đổi từ sắc trắng hồng cố định sang mờ dynamic
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -219,7 +241,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                       ),
                     ),
                     title: Text(
-                      l10n.logout, // "Đăng xuất"
+                      l10n.logout,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.redAccent,
@@ -227,8 +249,11 @@ class SettingsBottomSheet extends ConsumerWidget {
                       ),
                     ),
                     subtitle: Text(
-                      l10n.logoutSubtitle, // "Rời khỏi phiên đăng nhập hiện tại"
-                      style: const TextStyle(fontSize: 12),
+                      l10n.logoutSubtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: appColors.textMuted,
+                      ),
                     ),
                     onTap: () async {
                       Navigator.of(context).pop();
@@ -251,10 +276,12 @@ class SettingsBottomSheet extends ConsumerWidget {
     );
   }
 
+  // ✨ Đã thêm tham số `AppColorTheme appColors` để đồng bộ màu sắc các dòng cài đặt
   Widget _buildSettingItem({
     required IconData icon,
     required String title,
     required String subtitle,
+    required AppColorTheme appColors,
     Widget? trailing,
     VoidCallback? onTap,
   }) {
@@ -263,21 +290,30 @@ class SettingsBottomSheet extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: appColors.primary.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: AppColors.primary, size: 22),
+        child: Icon(icon, color: appColors.primary, size: 22),
       ),
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+          color: appColors.primaryDark,
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        style: TextStyle(color: appColors.textMuted, fontSize: 13),
       ),
       trailing:
-          trailing ?? const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          trailing ??
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: appColors.textMuted,
+          ),
       onTap: onTap,
     );
   }
@@ -290,16 +326,21 @@ class SettingsBottomSheet extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => Consumer(
         builder: (context, ref, child) {
-          // Lấy l10n bên trong context của Dialog
           final l10n = AppLocalizations.of(context)!;
+          // ✨ Lấy bộ màu dynamic cho Dialog chống mù chữ khi ở Dark mode
+          final dialogColors = ref.watch(appColorsProvider);
 
           return AlertDialog(
+            backgroundColor: dialogColors.background,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             title: Text(
-              l10n.newPasswordTitle, // "Đổi mật khẩu mới"
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              l10n.newPasswordTitle,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: dialogColors.primaryDark,
+              ),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -307,17 +348,21 @@ class SettingsBottomSheet extends ConsumerWidget {
                 TextField(
                   controller: oldPasswordController,
                   obscureText: true,
+                  style: TextStyle(color: dialogColors.text),
                   decoration: InputDecoration(
-                    labelText: l10n.currentPassword, // "Mật khẩu hiện tại"
+                    labelText: l10n.currentPassword,
+                    labelStyle: TextStyle(color: dialogColors.textMuted),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: newPasswordController,
                   obscureText: true,
+                  style: TextStyle(color: dialogColors.text),
                   decoration: InputDecoration(
                     labelText: l10n.newPassword,
-                  ), // "Mật khẩu mới"
+                    labelStyle: TextStyle(color: dialogColors.textMuted),
+                  ),
                 ),
               ],
             ),
@@ -326,12 +371,12 @@ class SettingsBottomSheet extends ConsumerWidget {
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   l10n.cancel,
-                  style: const TextStyle(color: Colors.grey),
-                ), // "Hủy"
+                  style: TextStyle(color: dialogColors.textMuted),
+                ),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: dialogColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -352,26 +397,22 @@ class SettingsBottomSheet extends ConsumerWidget {
                     if (isSuccess) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
-                          content: Text(
-                            l10n.updatePasswordSuccess,
-                          ), // "Cập nhật mật khẩu thành công!"
-                          backgroundColor: AppColors.success,
+                          content: Text(l10n.updatePasswordSuccess),
+                          backgroundColor: dialogColors.success,
                         ),
                       );
                     } else {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
-                          content: Text(
-                            l10n.updatePasswordError,
-                          ), // "Mật khẩu hiện tại không đúng hoặc lỗi kết nối."
-                          backgroundColor: AppColors.error,
+                          content: Text(l10n.updatePasswordError),
+                          backgroundColor: dialogColors.error,
                         ),
                       );
                     }
                   }
                 },
                 child: Text(
-                  l10n.update, // "Cập nhật"
+                  l10n.update,
                   style: const TextStyle(color: Colors.white),
                 ),
               ),

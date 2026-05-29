@@ -1,7 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:moment_u_payment/core/widgets/analytics_components.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../controllers/transaction_analytics_controller.dart';
@@ -14,288 +13,232 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 }
 
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
-  int touchedIndex = -1; // Lưu vị trí danh mục người dùng đang nhấn vào biểu đồ
+  String _selectedTimeFrame = '1M';
+  late DateTime _startDate;
+  late DateTime _endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _endDate = DateTime.now();
+    _startDate = DateTime(_endDate.year, _endDate.month - 1, _endDate.day);
+  }
+
+  // Cập nhật State khi nhấn Tuần qua, Tháng qua, 3 Tháng, 6 Tháng, Năm qua
+  void _onPeriodChanged(String period) {
+    setState(() {
+      _selectedTimeFrame = period;
+      _endDate = DateTime.now();
+
+      switch (period) {
+        case '1W':
+          _startDate = _endDate.subtract(const Duration(days: 7));
+          break;
+        case '1M':
+          _startDate = DateTime(
+            _endDate.year,
+            _endDate.month - 1,
+            _endDate.day,
+          );
+          break;
+        case '3M':
+          _startDate = DateTime(
+            _endDate.year,
+            _endDate.month - 3,
+            _endDate.day,
+          );
+          break;
+        case '6M':
+          _startDate = DateTime(
+            _endDate.year,
+            _endDate.month - 6,
+            _endDate.day,
+          );
+          break;
+        case '1Y':
+          _startDate = DateTime(
+            _endDate.year - 1,
+            _endDate.month,
+            _endDate.day,
+          );
+          break;
+      }
+    });
+    _fetchData();
+  }
+
+  // Hàm Date Picker Custom: Chạm là chọn luôn & Ràng buộc logic ngày
+  Future<void> _selectSingleDate({
+    required bool isStartDate,
+    required AppColorTheme appColors,
+  }) async {
+    // Logic ràng buộc cực kỳ quan trọng:
+    // - Ngày bắt đầu (Từ ngày) không được lớn hơn Ngày kết thúc (Đến ngày)
+    // - Ngày kết thúc không được nhỏ hơn Ngày bắt đầu, không được lớn hơn hiện tại
+    final DateTime initialDate = isStartDate ? _startDate : _endDate;
+    final DateTime firstDate = isStartDate ? DateTime(2020) : _startDate;
+    final DateTime lastDate = isStartDate ? _endDate : DateTime.now();
+
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          backgroundColor: appColors.cardBackground,
+          insetPadding: const EdgeInsets.all(20),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: appColors.primary,
+                brightness: isDark ? Brightness.dark : Brightness.light,
+                surface: appColors.cardBackground,
+                onSurface: appColors.text,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CalendarDatePicker(
+                initialDate: initialDate,
+                firstDate: firstDate,
+                lastDate: lastDate,
+                onDateChanged: (DateTime date) {
+                  // ĐÓNG DIALOG VÀ TRẢ VỀ NGÀY NGAY LẬP TỨC ⚡
+                  Navigator.pop(dialogContext, date);
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedTimeFrame = 'Custom';
+        if (isStartDate) {
+          _startDate = picked;
+        } else {
+          _endDate = picked;
+        }
+      });
+      _fetchData();
+    }
+  }
+
+  void _fetchData() {
+    // Gọi API làm mới dữ liệu thông qua controller khi ngày thay đổi
+    // ref.read(transactionAnalyticsProvider.notifier).fetchByDateRange(_startDate, _endDate);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appColors = ref.watch(appColorsProvider);
     final analyticsState = ref.watch(transactionAnalyticsProvider);
-    final currencyFormatter = NumberFormat.currency(
-      locale: 'vi_VN',
-      symbol: '₫',
-      decimalDigits: 0,
-    );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
         title: Text(
-          l10n.analyticsTitle ?? 'Phân Tích Chi Tiêu',
-          style: const TextStyle(
-            color: AppColors.primaryDark,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+          l10n.analyticsTitle ?? "Thống kê",
+          style: TextStyle(
+            color: appColors.text,
+            fontWeight: FontWeight.w900,
+            fontSize: 22,
           ),
         ),
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: appColors.background,
         elevation: 0,
         centerTitle: true,
       ),
       body: RefreshIndicator(
-        color: AppColors.primary,
+        color: appColors.primary,
+        backgroundColor: appColors.cardBackground,
         onRefresh: () =>
             ref.read(transactionAnalyticsProvider.notifier).refreshAnalytics(),
-        child: analyticsState.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-          error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('⚠️', style: TextStyle(fontSize: 36)),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.errorLoadData,
-                  style: const TextStyle(color: AppColors.errorAccent),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              QuickPeriodChips(
+                selectedTimeFrame: _selectedTimeFrame,
+                onPeriodSelected: _onPeriodChanged,
+                appColors: appColors,
+                l10n: l10n, // Trỏ l10n vào để thay đổi chữ
+              ),
+              FromToDatePicker(
+                startDate: _startDate,
+                endDate: _endDate,
+                onSelectStart: () =>
+                    _selectSingleDate(isStartDate: true, appColors: appColors),
+                onSelectEnd: () =>
+                    _selectSingleDate(isStartDate: false, appColors: appColors),
+                appColors: appColors,
+                l10n: l10n,
+              ),
+
+              analyticsState.when(
+                skipLoadingOnRefresh: true,
+                loading: () => SizedBox(
+                  height: 300,
+                  child: Center(
+                    child: CircularProgressIndicator(color: appColors.primary),
+                  ),
                 ),
-                TextButton(
-                  onPressed: () => ref
+                error: (error, stack) => ErrorAnalyticsWidget(
+                  // Widget này có trong file components
+                  l10n: l10n,
+                  appColors: appColors,
+                  onRetry: () => ref
                       .read(transactionAnalyticsProvider.notifier)
                       .refreshAnalytics(),
-                  child: Text(
-                    l10n.retryButton,
-                    style: const TextStyle(color: AppColors.primary),
-                  ),
                 ),
-              ],
-            ),
+                data: (analyticsData) {
+                  if (analyticsData.isEmpty) {
+                    return EmptyAnalyticsWidget(
+                      l10n: l10n,
+                      appColors: appColors,
+                    );
+                  }
+
+                  final double totalSpending = analyticsData.fold(
+                    0.0,
+                    (sum, item) => sum + (item['totalAmount'] ?? 0.0),
+                  );
+                  final int totalDays = _endDate
+                      .difference(_startDate)
+                      .inDays
+                      .clamp(1, 365);
+
+                  return Column(
+                    children: [
+                      CuteOverviewCard(
+                        total: totalSpending,
+                        totalDays: totalDays,
+                        appColors: appColors,
+                        l10n: l10n,
+                      ),
+                      AnalyticsContentWidget(
+                        analyticsData: analyticsData,
+                        totalSpending: totalSpending,
+                        appColors: appColors,
+                        l10n: l10n,
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-          data: (analyticsData) {
-            if (analyticsData.isEmpty) {
-              return Center(
-                child: Text(
-                  l10n.emptyAnalyticsData ??
-                      'Chưa có dữ liệu chi tiêu trong tháng này! 📝',
-                  style: TextStyle(
-                    color: AppColors.primaryDark.withOpacity(0.5),
-                  ),
-                ),
-              );
-            }
-
-            // 🧠 Tính tổng chi tiêu toàn bộ để tính % tỷ trọng
-            final double totalSpending = analyticsData.fold(
-              0.0,
-              (sum, item) => sum + (item['totalAmount'] ?? 0.0),
-            );
-
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-
-                  // 🎯 Khu vực 1: Vẽ biểu đồ tròn Doughnut Chart
-                  SizedBox(
-                    height: 240,
-                    child: Stack(
-                      children: [
-                        PieChart(
-                          PieChartData(
-                            pieTouchData: PieTouchData(
-                              touchCallback:
-                                  (FlTouchEvent event, pieTouchResponse) {
-                                    setState(() {
-                                      if (!event.isInterestedForInteractions ||
-                                          pieTouchResponse == null ||
-                                          pieTouchResponse.touchedSection ==
-                                              null) {
-                                        touchedIndex = -1;
-                                        return;
-                                      }
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection!
-                                          .touchedSectionIndex;
-                                    });
-                                  },
-                            ),
-                            borderData: FlBorderData(show: false),
-                            sectionsSpace: 4, // Khoảng cách giữa các miếng bánh
-                            centerSpaceRadius:
-                                70, // Tạo lỗ rỗng ở giữa thành hình bánh Donut
-                            sections: _buildPieChartSections(
-                              analyticsData,
-                              totalSpending,
-                            ),
-                          ),
-                        ),
-                        // Hiển thị tổng tiền ngay chính giữa tâm biểu đồ
-                        Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                l10n.totalLabel ?? 'Tổng chi',
-                                style: TextStyle(
-                                  color: AppColors.primaryDark.withOpacity(0.5),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                currencyFormatter.format(totalSpending),
-                                style: const TextStyle(
-                                  color: AppColors.primaryDark,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // 🎯 Khu vực 2: Danh sách thống kê chi tiết theo hàng
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBackground,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryDark.withOpacity(0.02),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: analyticsData.length,
-                      separatorBuilder: (context, index) =>
-                          Divider(color: AppColors.background.withOpacity(0.5)),
-                      itemBuilder: (context, index) {
-                        final item = analyticsData[index];
-                        final color = AppColors.getCategoryColor(index);
-                        final double amount =
-                            (item['totalAmount'] as num?)?.toDouble() ?? 0.0;
-                        final double percentage = totalSpending > 0
-                            ? (amount / totalSpending) * 100
-                            : 0.0;
-                        final bool isSelected = touchedIndex == index;
-
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? color.withOpacity(0.08)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              // Mã màu + Emoji đại diện danh mục
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: color.withOpacity(0.15),
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  item['emoji'] ?? '📝',
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-
-                              // Tên danh mục & tỉ lệ %
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['category'] ?? '',
-                                      style: const TextStyle(
-                                        color: AppColors.primaryDark,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${percentage.toStringAsFixed(1)}%',
-                                      style: TextStyle(
-                                        color: AppColors.primaryDark
-                                            .withOpacity(0.4),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Tổng số tiền tiêu hao
-                              Text(
-                                currencyFormatter.format(amount),
-                                style: const TextStyle(
-                                  color: AppColors.primaryDark,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            );
-          },
         ),
       ),
     );
   }
-
-  /// 🧠 Hàm biến đổi danh sách dữ liệu thô sang cấu trúc PieChartSectionData của fl_chart
-  List<PieChartSectionData> _buildPieChartSections(
-    List<Map<String, dynamic>> data,
-    double total,
-  ) {
-    return List.generate(data.length, (i) {
-      final item = data[i];
-      final double amount = (item['totalAmount'] as num?)?.toDouble() ?? 0.0;
-      final isTouched = i == touchedIndex;
-
-      // Nếu người dùng đang nhấn vào miếng bánh hiện tại, tăng kích thước phóng to để tạo hiệu ứng động
-      final radius = isTouched ? 30.0 : 22.0;
-
-      return PieChartSectionData(
-        color: AppColors.getCategoryColor(i),
-        value: amount,
-        title:
-            '', // Không vẽ chữ trực tiếp đè lên biểu đồ nhìn sẽ rối, tụi mình show ở list dưới
-        radius: radius,
-      );
-    });
-  }
-
-  
 }

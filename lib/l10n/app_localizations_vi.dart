@@ -120,10 +120,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loadingData => 'Đang tải danh sách khoảnh khắc...';
 
   @override
-  String get errorLoadData => 'Không thể tải dữ liệu. Vui lòng thử lại!';
+  String get errorLoadData => 'Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺';
 
   @override
-  String get retryButton => 'Thử lại';
+  String get retryButton => 'Lấy đà thử lại nghen 🚀';
 
   @override
   String get emptyTransactionList =>
@@ -173,14 +173,14 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 
   @override
-  String get analyticsTitle => 'Chi tiết đây nèe!!';
+  String get analyticsTitle => 'Soi Ví 🔍';
 
   @override
   String get emptyAnalyticsData =>
-      'Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝';
+      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
 
   @override
-  String get totalLabel => 'Tổng chi';
+  String get totalLabel => 'Tổng thiệt hại 💸';
 
   @override
   String get today => 'Hôm nay';
@@ -517,4 +517,90 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get updatePasswordError =>
       'Mật khẩu hiện tại không đúng hoặc lỗi kết nối.';
+
+  @override
+  String get forgotPasswordText => 'Quên mật khẩu?';
+
+  @override
+  String get resetPasswordText => 'Đặt lại mật khẩu';
+
+  @override
+  String get forgotPasswordTitle => 'Khôi phục mật khẩu';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.';
+
+  @override
+  String get emailAccountLabel => 'Email tài khoản';
+
+  @override
+  String get cancelButton => 'Hủy';
+
+  @override
+  String get sendCodeButton => 'Gửi mã';
+
+  @override
+  String get sendCodeSuccess => 'Đã gửi mã khôi phục đến email:';
+
+  @override
+  String get resetPasswordTitle => 'Đặt lại mật khẩu mới';
+
+  @override
+  String get emailVerificationLabel => 'Email xác thực';
+
+  @override
+  String get otpLabel => 'Mã xác thực (OTP / Token)';
+
+  @override
+  String get newPasswordLabel => 'Mật khẩu mới';
+
+  @override
+  String get confirmButton => 'Xác nhận';
+
+  @override
+  String get resetPasswordSuccess =>
+      'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.';
+
+  @override
+  String get spendingTrend => 'Xu hướng';
+
+  @override
+  String get spendingStructure => 'Cơ cấu \'bay màu\' của ví 🥧';
+
+  @override
+  String get customDate => 'Tùy chỉnh';
+
+  @override
+  String get avgPerDay => 'Mỗi ngày \'bay\' cỡ 🕊️';
+
+  @override
+  String get timeFrame => 'Số ngày';
+
+  @override
+  String get pastWeek => 'Tuần qua 🌷';
+
+  @override
+  String get pastMonth => 'Tháng qua 🌙';
+
+  @override
+  String get threeMonths => '3 tháng 🍄';
+
+  @override
+  String get sixMonths => 'Nửa năm 🐢';
+
+  @override
+  String get pastYear => 'Năm qua 🌟';
+
+  @override
+  String get fromDate => 'Từ ngày nào 🐾';
+
+  @override
+  String get toDate => 'Đến ngày nao 🌿';
+
+  @override
+  String get repeatCycle => 'Vòng lặp ⏳';
+
+  @override
+  String get days => 'ngày';
 }

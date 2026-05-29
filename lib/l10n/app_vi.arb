@@ -268,6 +268,54 @@
   "cancel": "Hủy",
   "update": "Cập nhật",
   "updatePasswordSuccess": "Cập nhật mật khẩu thành công!",
-  "updatePasswordError": "Mật khẩu hiện tại không đúng hoặc lỗi kết nối."
+  "updatePasswordError": "Mật khẩu hiện tại không đúng hoặc lỗi kết nối.",
+
+  "forgotPasswordText": "Quên mật khẩu?",
+  "resetPasswordText": "Đặt lại mật khẩu",
+  "forgotPasswordTitle": "Khôi phục mật khẩu",
+  "forgotPasswordSubtitle": "Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.",
+  "emailAccountLabel": "Email tài khoản",
+  "cancelButton": "Hủy",
+  "sendCodeButton": "Gửi mã",
+  "sendCodeSuccess": "Đã gửi mã khôi phục đến email:",
+  "resetPasswordTitle": "Đặt lại mật khẩu mới",
+  "emailVerificationLabel": "Email xác thực",
+  "otpLabel": "Mã xác thực (OTP / Token)",
+  "newPasswordLabel": "Mật khẩu mới",
+  "confirmButton": "Xác nhận",
+  "resetPasswordSuccess": "Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.",
+
+  "analyticsTitle": "Phân tích chi tiêu",
+  "spendingTrend": "Xu hướng",
+  "spendingStructure": "Tỷ trọng",
+  "customDate": "Tùy chỉnh",
+  "totalLabel": "Tổng chi tiêu",
+  "avgPerDay": "Trung bình/Ngày",
+  "timeFrame": "Số ngày",
+  "emptyAnalyticsData": "Không có dữ liệu chi tiêu trong khoảng thời gian này.",
+  "errorLoadData": "Không thể tải dữ liệu. Vui lòng kiểm tra lại!",
+  "retryButton": "Thử lại",
+
+  "analyticsTitle": "Soi Ví 🔍",
+  
+  "pastWeek": "Tuần qua 🌷",
+  "pastMonth": "Tháng qua 🌙",
+  "threeMonths": "3 tháng 🍄",
+  "sixMonths": "Nửa năm 🐢",
+  "pastYear": "Năm qua 🌟",
+  
+  "fromDate": "Từ ngày nào 🐾",
+  "toDate": "Đến ngày nao 🌿",
+  
+  "totalLabel": "Tổng thiệt hại 💸",
+  "avgPerDay": "Mỗi ngày 'bay' cỡ 🕊️",
+  "repeatCycle": "Vòng lặp ⏳",
+  "days": "ngày",
+  
+  "spendingStructure": "Cơ cấu 'bay màu' của ví 🥧",
+  
+  "emptyAnalyticsData": "Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥",
+  "errorLoadData": "Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺",
+  "retryButton": "Lấy đà thử lại nghen 🚀"
 
 }

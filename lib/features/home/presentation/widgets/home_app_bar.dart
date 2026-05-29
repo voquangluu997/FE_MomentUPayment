@@ -19,15 +19,18 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final userInfo = ref.watch(userInfoProvider);
     final String userName = userInfo?.name ?? 'User';
 
+    // ✨ Lấy bộ màu động hiện tại (Sáng hoặc Tối)
+    final appColors = ref.watch(appColorsProvider);
+
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       elevation: 0,
       centerTitle: false,
       titleSpacing: 16,
       title: Row(
         children: [
-          const CircleAvatar(
-            backgroundColor: AppColors.cardBackground,
+          CircleAvatar(
+            backgroundColor: appColors.cardBackground,
             child: Text('👋', style: TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: 12),
@@ -37,8 +40,8 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
               children: [
                 Text(
                   '${l10n.hello} $userName👋',
-                  style: const TextStyle(
-                    color: AppColors.primaryDark,
+                  style: TextStyle(
+                    color: appColors.primaryDark,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -48,7 +51,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 Text(
                   l10n.homeSubGreeting,
                   style: TextStyle(
-                    color: AppColors.primaryDark.withOpacity(0.55),
+                    color: appColors.primaryDark.withOpacity(0.55),
                     fontSize: 12,
                   ),
                 ),
@@ -82,8 +85,8 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           ? Icons.notifications_active_rounded
                           : Icons.notifications_none_rounded,
                       color: hasUnread
-                          ? AppColors.primary
-                          : AppColors.primaryDark,
+                          ? appColors.primary
+                          : appColors.primaryDark,
                     ),
                   ),
                   if (hasUnread)
@@ -91,9 +94,9 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       right: 8,
                       top: 8,
                       child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.errorAccent,
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: appColors.errorAccent,
                           shape: BoxShape.circle,
                         ),
                         constraints: const BoxConstraints(
@@ -121,9 +124,9 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
         // 2. Nút mở Settings
         IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.more_vert_rounded,
-            color: AppColors.primaryDark,
+            color: appColors.primaryDark,
             size: 24,
           ),
           onPressed: () {

@@ -29,12 +29,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final appColors = ref.read(appColorsProvider);
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.emptyFieldsWarning),
-          backgroundColor: AppColors.error,
+          backgroundColor: appColors.error,
         ),
       );
       return;
@@ -47,35 +48,40 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
+    final appColors = ref.watch(appColorsProvider);
 
-    // ✨ CHỈ lắng nghe và phản hồi các trạng thái liên quan đến ĐĂNG KÝ
+    // ✨ SỬA LỖI: Xác định Dark Mode chính xác dựa trên màu nền của Provider
+    final isDark = appColors.background.computeLuminance() < 0.5;
+
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.registerSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: appColors.success,
           ),
         );
         ref.read(authProvider.notifier).resetState();
         Navigator.of(context).pop();
       } else if (next == AuthState.emailAlreadyExists) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email này đã được đăng ký trước đó rồi bạn ơi! 🌸'),
-            backgroundColor: AppColors.error,
+          SnackBar(
+            content: const Text(
+              'Email này đã được đăng ký trước đó rồi bạn ơi! 🌸',
+            ),
+            backgroundColor: appColors.error,
           ),
         );
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.registerError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'Đăng ký thất bại! Vui lòng kiểm tra lại kết nối BE hoặc log hệ thống 😢',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: appColors.error,
           ),
         );
         ref.read(authProvider.notifier).resetState();
@@ -83,12 +89,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: appColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -100,17 +106,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             children: [
               Text(
                 l10n.loginCreateAccountTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: appColors.primary,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 l10n.loginCreateAccountSub,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.grey,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -118,11 +127,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               // Họ tên
               TextField(
                 controller: _nameController,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   labelText: l10n.name,
+                  labelStyle: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                  ),
                   hintText: l10n.nameHint,
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  ),
                   filled: true,
-                  fillColor: AppColors.cardBackground,
+                  fillColor: appColors.cardBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -135,11 +151,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   labelText: l10n.email,
+                  labelStyle: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                  ),
                   hintText: l10n.emailHint,
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  ),
                   filled: true,
-                  fillColor: AppColors.cardBackground,
+                  fillColor: appColors.cardBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -152,11 +175,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               TextField(
                 controller: _passwordController,
                 obscureText: true,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   labelText: l10n.password,
+                  labelStyle: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                  ),
                   hintText: l10n.passwordHint,
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  ),
                   filled: true,
-                  fillColor: AppColors.cardBackground,
+                  fillColor: appColors.cardBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -165,12 +195,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Nút bấm Đăng ký xử lý trạng thái
               authState == AuthState.loading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
+                          appColors.primary,
                         ),
                       ),
                     )
@@ -180,16 +209,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: appColors.primary,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           l10n.registerButton,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDark ? Colors.black : Colors.white,
                           ),
                         ),
                       ),
