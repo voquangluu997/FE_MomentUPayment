@@ -111,9 +111,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get emptyTransactionNote => 'Khoảnh khắc chi tiêu không tên...';
 
   @override
-  String get homeGreetingDeveloper => 'Xin chào, Developer! 👋';
-
-  @override
   String get homeSubGreeting => 'Hôm nay tình hình chi tiêu thế nào?';
 
   @override
@@ -344,4 +341,73 @@ class AppLocalizationsVi extends AppLocalizations {
   String budgetSafeToday(String amount) {
     return '💡 Mẹo sinh tồn: Nay rón rén tiêu tối đa $amount thui nha! 🥺';
   }
+
+  @override
+  String get hello => 'Xin chào,';
+
+  @override
+  String get notificationSettingsTitle => 'Cài đặt thông báo';
+
+  @override
+  String get notiCategoryBudget => 'Cảnh báo ngân sách';
+
+  @override
+  String get notiCategoryReminder => 'Nhắc nhở định kỳ';
+
+  @override
+  String get notiCategorySecurity => 'Hệ thống & Bảo mật';
+
+  @override
+  String get notiCategorySharedWallet => 'Hoạt động ví nhóm';
+
+  @override
+  String get notiBudgetWarningTitle => 'Cảnh báo ngân sách! 🚨';
+
+  @override
+  String notiBudgetWarningBody(String wallet, String percent) {
+    return 'Chú ý: $wallet của bạn đã dùng hết $percent%. Hãy chi tiêu dè xẻn lại nhé!';
+  }
+
+  @override
+  String get notiBudgetExceededTitle => 'Vượt quá ngân sách! 💸';
+
+  @override
+  String notiBudgetExceededBody(String wallet, String percent) {
+    return 'Báo động đỏ: $wallet đã vượt mức an toàn ($percent%). Chuyển sang chế độ sinh tồn ngay!';
+  }
+
+  @override
+  String get notiEmailVerifiedTitle => 'Xác thực thành công! 🛡️';
+
+  @override
+  String get notiEmailVerifiedBody =>
+      'Tài khoản của bạn đã được bảo vệ an toàn. Bắt đầu quản lý chi tiêu thôi nào!';
+
+  @override
+  String notiAggregatedTxBody(String budgetName, String count) {
+    return 'Ví $budgetName có $count thay đổi giao dịch mới được gộp lại.';
+  }
+
+  @override
+  String get notiFirstLoginReminderTitle =>
+      'Xác thực một xíu, yêu nhau lâu dài! 💖';
+
+  @override
+  String notiFirstLoginReminderBody(String name) {
+    return '$name ơi, nhớ kiểm tra hòm thư và nhấn xác thực email liền nha! Sau 30 ngày nếu tụi mình chưa thấy bạn, tài khoản sẽ phải tự động \'ngủ đông\' mất tiêu á, thương lắm luôn! 🥺🌱';
+  }
+
+  @override
+  String get notiFirstTxnTitle => 'Chạm ngõ Moment đầu tiên! 🪄';
+
+  @override
+  String get notiFirstTxnBody =>
+      'Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của cậu ngay hôm nay nhé. Chạm vào đây nào! 👇💸';
+
+  @override
+  String get notiSetBudgetTitle => 'Lập khiên bảo vệ ví! 🛡️';
+
+  @override
+  String get notiSetBudgetBody =>
+      'Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ \'vung tay quá trán\' nha. Chạm để thiết lập! 🎯💖';
 }

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
-import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
-import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart'; // 👈 Import Widget Mới
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
+import 'package:moment_u_payment/features/notification/notification_provider.dart';
 
 final isGridViewProvider = StateProvider<bool>((ref) => false);
 
@@ -28,6 +28,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Tự động gọi API lấy số lượng thông báo chưa đọc khi user vừa mở App
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notificationProvider.notifier).fetchUnreadCount();
+    });
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 150) {
@@ -42,7 +48,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  // 🔑 CẬP NHẬT: Hàm mở Dialog chờ tín hiệu reload từ Dialog trả về
   Future<void> _openMomentDetails(
     Map<String, dynamic> moment,
     AppLocalizations l10n,
@@ -52,15 +57,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       builder: (context) => MomentDetailsDialog(moment: moment, l10n: l10n),
     );
 
-    // Nếu isUpdated == true (cập nhật thành công) -> Refresh dữ liệu
     if (isUpdated == true && mounted) {
       ref.read(transactionTimelineProvider.notifier).refreshTimeline();
     }
   }
 
-  // 🔑 CẬP NHẬT MỚI: Bọc BudgetProgressCard và thêm nút điều hướng 🎯 vào góc trên bên phải
   Widget _buildBudgetCardWithNavigation(AppLocalizations l10n) {
-    return Stack(children: [const HomeBudgetCard()]);
+    return const Stack(children: [HomeBudgetCard()]);
   }
 
   @override
@@ -68,7 +71,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
     final timelineState = ref.watch(transactionTimelineProvider);
     final isGridView = ref.watch(isGridViewProvider);
-    final currentCurrency = ref.watch(currencyProvider);
 
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
     final isLoadingMore = timelineNotifier.isLoadingMore;
@@ -111,16 +113,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   parent: BouncingScrollPhysics(),
                 ),
                 children: [
-                  _buildBudgetCardWithNavigation(
-                    l10n,
-                  ), // 🔑 CẬP NHẬT: Thay thế BudgetProgressCard cũ
-                  _buildHeaderSection(
-                    context,
-                    ref,
-                    l10n,
-                    currentCurrency,
-                    isGridView,
-                  ),
+                  _buildBudgetCardWithNavigation(l10n),
+                  const HomeHeaderSection(), // 👈 Dùng Widget đã tách
                   Padding(
                     padding: const EdgeInsets.all(48),
                     child: Center(
@@ -143,20 +137,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               itemCount: 2 + keys.length + (isLoadingMore && hasMore ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == 0)
-                  return _buildBudgetCardWithNavigation(
-                    l10n,
-                  ); // 🔑 CẬP NHẬT: Thay thế BudgetProgressCard cũ
+                if (index == 0) return _buildBudgetCardWithNavigation(l10n);
 
-                if (index == 1) {
-                  return _buildHeaderSection(
-                    context,
-                    ref,
-                    l10n,
-                    currentCurrency,
-                    isGridView,
-                  );
-                }
+                if (index == 1)
+                  return const HomeHeaderSection(); // 👈 Dùng Widget đã tách
 
                 if (index == 2 + keys.length) {
                   return const Padding(
@@ -174,11 +158,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 final groupKey = keys[dataIndex];
 
                 if (isGridView) {
-                  final txList = monthlyGrouped[groupKey]!;
-                  return _buildGridGroup(groupKey, txList, l10n, ref, context);
+                  return _buildGridGroup(
+                    groupKey,
+                    monthlyGrouped[groupKey]!,
+                    l10n,
+                    ref,
+                    context,
+                  );
                 } else {
-                  final txList = dailyGrouped[groupKey]!;
-                  return _buildListGroup(groupKey, txList, l10n, ref, context);
+                  return _buildListGroup(
+                    groupKey,
+                    dailyGrouped[groupKey]!,
+                    l10n,
+                    ref,
+                    context,
+                  );
                 }
               },
             );
@@ -188,7 +182,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () async {
-          // 🔑 CẬP NHẬT: Hứng kết quả từ màn hình Add
           final bool? isAdded = await Navigator.of(context).push<bool>(
             MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
           );
@@ -197,76 +190,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           }
         },
         child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildHeaderSection(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations l10n,
-    String currentCurrency,
-    bool isGridView,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            l10n.spendingMomentsTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
-            ),
-          ),
-          Row(
-            children: [
-              DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: currentCurrency,
-                  icon: const Icon(
-                    Icons.arrow_drop_down,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                  dropdownColor: AppColors.cardBackground,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                    fontSize: 15,
-                  ),
-                  items: ['₫', '\$', '€', '¥'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      ref.read(currencyProvider.notifier).setCurrency(newValue);
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: Icon(
-                  isGridView
-                      ? Icons.view_list_rounded
-                      : Icons.grid_view_rounded,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
-                onPressed: () =>
-                    ref.read(isGridViewProvider.notifier).state = !isGridView,
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -335,10 +258,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               l10n: l10n,
               onLongPress: () =>
                   _showDeleteConfirmDialog(context, ref, txList[gridIdx], l10n),
-              onTap: () => _openMomentDetails(
-                txList[gridIdx],
-                l10n,
-              ), // 🔑 Cập nhật gọi hàm mới
+              onTap: () => _openMomentDetails(txList[gridIdx], l10n),
             ),
           ),
         ),
@@ -371,7 +291,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: TransactionCard(
         transaction: tx,
-        onTap: () => _openMomentDetails(tx, l10n), // 🔑 Cập nhật gọi hàm mới
+        onTap: () => _openMomentDetails(tx, l10n),
         l10n: l10n,
       ),
     );
@@ -416,7 +336,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             .deleteTransaction(tx['id'].toString());
         ref
             .read(transactionTimelineProvider.notifier)
-            .removeMomentLocally(tx['id'].toString()); // Refresh sau khi xóa
+            .removeMomentLocally(tx['id'].toString());
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
       }

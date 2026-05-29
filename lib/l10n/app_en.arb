@@ -38,7 +38,6 @@
   "txSuccessMessage": "Recorded this cute expense moment! 🌸",
   "txErrorMessage": "Could not save your moment, please try again! 😢",
   "emptyTransactionNote": "Nameless payment moment...",
-  "homeGreetingDeveloper": "Hello, Developer! 👋",
   "homeSubGreeting": "How is your payment status today?",
   "spendingMomentsTitle": "Your Payment Moments",
   "loadingData": "Loading payment moments...",
@@ -171,5 +170,57 @@
     "placeholders": {
       "amount": { "type": "String" }
     }
-  }
+  },
+  "hello": "Hello,",
+
+  "notificationSettingsTitle": "Notification Settings",
+  "notiCategoryBudget": "Budget Alerts",
+  "notiCategoryReminder": "Recurring Reminders",
+  "notiCategorySecurity": "System & Security",
+  "notiCategorySharedWallet": "Shared Wallet Activities",
+  "notiBudgetWarningTitle": "Budget Warning! 🚨",
+  "notiBudgetWarningBody": "Heads up: Your {wallet} has reached {percent}%. Time to slow down!",
+  "@notiBudgetWarningBody": {
+    "placeholders": {
+      "wallet": { "type": "String" },
+      "percent": { "type": "String" }
+    }
+  },
+
+  "notiBudgetExceededTitle": "Budget Exceeded! 💸",
+  "notiBudgetExceededBody": "Red alert: Your {wallet} is at {percent}%. Survival mode activated!",
+  "@notiBudgetExceededBody": {
+    "placeholders": {
+      "wallet": { "type": "String" },
+      "percent": { "type": "String" }
+    }
+  },
+  "notiEmailVerifiedTitle": "Verification Successful 🎉",
+  "notiEmailVerifiedBody": "Your email has been verified. Welcome aboard!",
+
+  "notiAggregatedTxBody": "Wallet {budgetName} has {count} new transaction changes aggregated.",
+  "@notiAggregatedTxBody": {
+    "placeholders": {
+      "budgetName": { "type": "String" },
+      "count": { "type": "String" }
+    }
+  },
+ "notiFirstLoginReminderTitle": "A tiny tap to secure our bond! 💖",
+  "notiFirstLoginReminderBody": "Hey {name}, please check your inbox and verify your email! After 30 days without verification, your account will go into 'hibernation' mode, and we'd miss you so much! 🥺🌱",
+  "@notiFirstLoginReminderBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notiEmailVerifiedTitle": "Verification successful! 🛡️",
+  "notiEmailVerifiedBody": "Your account is now secure. Let's start managing your budget!",
+
+  "notiFirstTxnTitle": "Your first Moment awaits! 🪄",
+  "notiFirstTxnBody": "Your wallet is ready! Let's record your very first expense (Moment) today. Tap here! 👇💸",
+
+  "notiSetBudgetTitle": "Shield your wallet! 🛡️",
+  "notiSetBudgetBody": "Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖"
 }

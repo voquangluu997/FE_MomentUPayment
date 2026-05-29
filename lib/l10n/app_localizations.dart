@@ -290,12 +290,6 @@ abstract class AppLocalizations {
   /// **'Nameless payment moment...'**
   String get emptyTransactionNote;
 
-  /// No description provided for @homeGreetingDeveloper.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello, Developer! 👋'**
-  String get homeGreetingDeveloper;
-
   /// No description provided for @homeSubGreeting.
   ///
   /// In en, this message translates to:
@@ -677,6 +671,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'💡 Survival tip: Keep it under {amount} for today! 🥺'**
   String budgetSafeToday(String amount);
+
+  /// No description provided for @hello.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,'**
+  String get hello;
+
+  /// No description provided for @notificationSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettingsTitle;
+
+  /// No description provided for @notiCategoryBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Alerts'**
+  String get notiCategoryBudget;
+
+  /// No description provided for @notiCategoryReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Reminders'**
+  String get notiCategoryReminder;
+
+  /// No description provided for @notiCategorySecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'System & Security'**
+  String get notiCategorySecurity;
+
+  /// No description provided for @notiCategorySharedWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Wallet Activities'**
+  String get notiCategorySharedWallet;
+
+  /// No description provided for @notiBudgetWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Warning! 🚨'**
+  String get notiBudgetWarningTitle;
+
+  /// No description provided for @notiBudgetWarningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Heads up: Your {wallet} has reached {percent}%. Time to slow down!'**
+  String notiBudgetWarningBody(String wallet, String percent);
+
+  /// No description provided for @notiBudgetExceededTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Exceeded! 💸'**
+  String get notiBudgetExceededTitle;
+
+  /// No description provided for @notiBudgetExceededBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Red alert: Your {wallet} is at {percent}%. Survival mode activated!'**
+  String notiBudgetExceededBody(String wallet, String percent);
+
+  /// No description provided for @notiEmailVerifiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification successful! 🛡️'**
+  String get notiEmailVerifiedTitle;
+
+  /// No description provided for @notiEmailVerifiedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is now secure. Let\'s start managing your budget!'**
+  String get notiEmailVerifiedBody;
+
+  /// No description provided for @notiAggregatedTxBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet {budgetName} has {count} new transaction changes aggregated.'**
+  String notiAggregatedTxBody(String budgetName, String count);
+
+  /// No description provided for @notiFirstLoginReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A tiny tap to secure our bond! 💖'**
+  String get notiFirstLoginReminderTitle;
+
+  /// No description provided for @notiFirstLoginReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey {name}, please check your inbox and verify your email! After 30 days without verification, your account will go into \'hibernation\' mode, and we\'d miss you so much! 🥺🌱'**
+  String notiFirstLoginReminderBody(String name);
+
+  /// No description provided for @notiFirstTxnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first Moment awaits! 🪄'**
+  String get notiFirstTxnTitle;
+
+  /// No description provided for @notiFirstTxnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wallet is ready! Let\'s record your very first expense (Moment) today. Tap here! 👇💸'**
+  String get notiFirstTxnBody;
+
+  /// No description provided for @notiSetBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shield your wallet! 🛡️'**
+  String get notiSetBudgetTitle;
+
+  /// No description provided for @notiSetBudgetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖'**
+  String get notiSetBudgetBody;
 }
 
 class _AppLocalizationsDelegate

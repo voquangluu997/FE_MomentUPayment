@@ -112,9 +112,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyTransactionNote => 'Nameless payment moment...';
 
   @override
-  String get homeGreetingDeveloper => 'Hello, Developer! 👋';
-
-  @override
   String get homeSubGreeting => 'How is your payment status today?';
 
   @override
@@ -343,4 +340,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String budgetSafeToday(String amount) {
     return '💡 Survival tip: Keep it under $amount for today! 🥺';
   }
+
+  @override
+  String get hello => 'Hello,';
+
+  @override
+  String get notificationSettingsTitle => 'Notification Settings';
+
+  @override
+  String get notiCategoryBudget => 'Budget Alerts';
+
+  @override
+  String get notiCategoryReminder => 'Recurring Reminders';
+
+  @override
+  String get notiCategorySecurity => 'System & Security';
+
+  @override
+  String get notiCategorySharedWallet => 'Shared Wallet Activities';
+
+  @override
+  String get notiBudgetWarningTitle => 'Budget Warning! 🚨';
+
+  @override
+  String notiBudgetWarningBody(String wallet, String percent) {
+    return 'Heads up: Your $wallet has reached $percent%. Time to slow down!';
+  }
+
+  @override
+  String get notiBudgetExceededTitle => 'Budget Exceeded! 💸';
+
+  @override
+  String notiBudgetExceededBody(String wallet, String percent) {
+    return 'Red alert: Your $wallet is at $percent%. Survival mode activated!';
+  }
+
+  @override
+  String get notiEmailVerifiedTitle => 'Verification successful! 🛡️';
+
+  @override
+  String get notiEmailVerifiedBody =>
+      'Your account is now secure. Let\'s start managing your budget!';
+
+  @override
+  String notiAggregatedTxBody(String budgetName, String count) {
+    return 'Wallet $budgetName has $count new transaction changes aggregated.';
+  }
+
+  @override
+  String get notiFirstLoginReminderTitle => 'A tiny tap to secure our bond! 💖';
+
+  @override
+  String notiFirstLoginReminderBody(String name) {
+    return 'Hey $name, please check your inbox and verify your email! After 30 days without verification, your account will go into \'hibernation\' mode, and we\'d miss you so much! 🥺🌱';
+  }
+
+  @override
+  String get notiFirstTxnTitle => 'Your first Moment awaits! 🪄';
+
+  @override
+  String get notiFirstTxnBody =>
+      'Your wallet is ready! Let\'s record your very first expense (Moment) today. Tap here! 👇💸';
+
+  @override
+  String get notiSetBudgetTitle => 'Shield your wallet! 🛡️';
+
+  @override
+  String get notiSetBudgetBody =>
+      'Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖';
 }

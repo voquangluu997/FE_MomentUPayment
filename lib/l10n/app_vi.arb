@@ -38,7 +38,6 @@
   "txSuccessMessage": "Đã ghi chép khoảnh khắc chi tiêu này rùi! 🌸",
   "txErrorMessage": "Không lưu được khoảnh khắc này rồi bạn ơi! 😢",
   "emptyTransactionNote": "Khoảnh khắc chi tiêu không tên...",
-  "homeGreetingDeveloper": "Xin chào, Developer! 👋",
   "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
   "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
   "loadingData": "Đang tải danh sách khoảnh khắc...",
@@ -171,6 +170,58 @@
     "placeholders": {
       "amount": { "type": "String" }
     }
-  }
+  },
+  "hello": "Xin chào,",
+
+  "notificationSettingsTitle": "Cài đặt thông báo",
+  "notiCategoryBudget": "Cảnh báo ngân sách",
+  "notiCategoryReminder": "Nhắc nhở định kỳ",
+  "notiCategorySecurity": "Hệ thống & Bảo mật",
+  "notiCategorySharedWallet": "Hoạt động ví nhóm",
+  "notiBudgetWarningTitle": "Cảnh báo ngân sách! 🚨",
+  "notiBudgetWarningBody": "Chú ý: {wallet} của bạn đã dùng hết {percent}%. Hãy chi tiêu dè xẻn lại nhé!",
+  "@notiBudgetWarningBody": {
+    "placeholders": {
+      "wallet": { "type": "String" },
+      "percent": { "type": "String" }
+    }
+  },
+
+  "notiBudgetExceededTitle": "Vượt quá ngân sách! 💸",
+  "notiBudgetExceededBody": "Báo động đỏ: {wallet} đã vượt mức an toàn ({percent}%). Chuyển sang chế độ sinh tồn ngay!",
+  "@notiBudgetExceededBody": {
+    "placeholders": {
+      "wallet": { "type": "String" },
+      "percent": { "type": "String" }
+    }
+  },
+  "notiEmailVerifiedTitle": "Xác thực thành công 🎉",
+  "notiEmailVerifiedBody": "Email của bạn đã được xác minh. Bắt đầu trải nghiệm thôi!",
+
+  "notiAggregatedTxBody": "Ví {budgetName} có {count} thay đổi giao dịch mới được gộp lại.",
+  "@notiAggregatedTxBody": {
+    "placeholders": {
+      "budgetName": { "type": "String" },
+      "count": { "type": "String" }
+    }
+  },
+  
+  "notiEmailVerifiedTitle": "Xác thực thành công! 🛡️",
+  "notiEmailVerifiedBody": "Tài khoản của bạn đã được bảo vệ an toàn. Bắt đầu quản lý chi tiêu thôi nào!",
+
+  "notiFirstLoginReminderTitle": "Xác thực một xíu, yêu nhau lâu dài! 💖",
+  "notiFirstLoginReminderBody": "{name} ơi, nhớ kiểm tra hòm thư và nhấn xác thực email liền nha! Sau 30 ngày nếu tụi mình chưa thấy bạn, tài khoản sẽ phải tự động 'ngủ đông' mất tiêu á, thương lắm luôn! 🥺🌱",
+  "@notiFirstLoginReminderBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notiFirstTxnTitle": "Chạm ngõ Moment đầu tiên! 🪄",
+  "notiFirstTxnBody": "Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của cậu ngay hôm nay nhé. Chạm vào đây nào! 👇💸",
+
+  "notiSetBudgetTitle": "Lập khiên bảo vệ ví! 🛡️",
+  "notiSetBudgetBody": "Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ 'vung tay quá trán' nha. Chạm để thiết lập! 🎯💖"
 
 }

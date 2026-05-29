@@ -22,17 +22,27 @@ enum AuthState {
 
 // Model nhỏ để quản lý thông tin User tiện lợi hơn
 class UserInfoState {
+  final String name;
   final String email;
   final bool isEmailVerified;
-  UserInfoState({required this.email, required this.isEmailVerified});
+
+  UserInfoState({
+    required this.name,
+    required this.email,
+    required this.isEmailVerified,
+  });
 }
 
 // Provider quản lý thông tin User độc lập để HomeScreen lắng nghe Banner
 class userInformationProvider extends StateNotifier<UserInfoState?> {
   userInformationProvider() : super(null);
 
-  void updateUserInfo(String email, bool isVerified) {
-    state = UserInfoState(email: email, isEmailVerified: isVerified);
+  void updateUserInfo(String name, String email, bool isVerified) {
+    state = UserInfoState(
+      name: name,
+      email: email,
+      isEmailVerified: isVerified,
+    );
   }
 
   void clearUserInfo() {
@@ -80,11 +90,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // Đồng bộ lại thông tin User
+        final email = data['user']['email'] ?? '';
+        final name = data['user']['name'] ?? email.split('@').first;
+
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              data['user']['email'],
+              name,
+              email,
               data['user']['isEmailVerified'] ?? false,
             );
 
@@ -123,10 +136,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
           value: data['backend_jwt_token'],
         );
 
+        final userEmail = data['user']['email'] ?? email;
+        final userName = data['user']['name'] ?? userEmail.split('@').first;
+
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              data['user']['email'],
+              userName,
+              userEmail,
               data['user']['isEmailVerified'] ?? false,
             );
 
@@ -180,10 +197,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
           value: data['backend_jwt_token'],
         );
 
+        final email = data['user']['email'] ?? '';
+        final name = data['user']['name'] ?? email.split('@').first;
+
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              data['user']['email'],
+              name,
+              email,
               data['user']['isEmailVerified'] ?? true,
             );
 
@@ -229,10 +250,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final userEmail = data['user']['email'] ?? '';
+        final userName = data['user']['name'] ?? userEmail.split('@').first;
+
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              data['user']['email'],
+              userName,
+              userEmail,
               data['user']['isEmailVerified'] ?? false,
             );
       }
