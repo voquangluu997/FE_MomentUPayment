@@ -785,6 +785,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖'**
   String get notiSetBudgetBody;
+
+  /// No description provided for @forgotPasswordDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Password'**
+  String get forgotPasswordDialogTitle;
+
+  /// No description provided for @forgotPasswordDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'We will send an authentication code (OTP) or a reset link to your email.'**
+  String get forgotPasswordDialogDesc;
+
+  /// No description provided for @accountEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Email'**
+  String get accountEmail;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get sendCode;
+
+  /// No description provided for @forgotPwSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code sent to: {email}'**
+  String forgotPwSuccess(String email);
+
+  /// No description provided for @forgotPwError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send recovery code. Please try again.'**
+  String get forgotPwError;
+
+  /// No description provided for @resetPwDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset New Password'**
+  String get resetPwDialogTitle;
+
+  /// No description provided for @authEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Email'**
+  String get authEmail;
+
+  /// No description provided for @otpCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Code (OTP / Token)'**
+  String get otpCode;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @resetPwSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been successfully reset! Please login.'**
+  String get resetPwSuccess;
+
+  /// No description provided for @resetPwError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired authentication code.'**
+  String get resetPwError;
+
+  /// No description provided for @settingsAndUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings & Utilities'**
+  String get settingsAndUtilities;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @vietnamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese'**
+  String get vietnamese;
+
+  /// No description provided for @currencyUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Unit'**
+  String get currencyUnit;
+
+  /// No description provided for @currentlyUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently using'**
+  String get currentlyUsing;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Theme'**
+  String get lightTheme;
+
+  /// No description provided for @notificationSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage alerts & expenses'**
+  String get notificationSettingsSubtitle;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @changePasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change current account password'**
+  String get changePasswordSubtitle;
+
+  /// No description provided for @helpCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center'**
+  String get helpCenter;
+
+  /// No description provided for @helpCenterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ & Support Contact'**
+  String get helpCenterSubtitle;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @logoutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the current login session'**
+  String get logoutSubtitle;
+
+  /// No description provided for @newPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordTitle;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @updatePasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully!'**
+  String get updatePasswordSuccess;
+
+  /// No description provided for @updatePasswordError.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect current password or connection error.'**
+  String get updatePasswordError;
 }
 
 class _AppLocalizationsDelegate

@@ -3,13 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
-import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
+import 'package:moment_u_payment/features/settings/presentation/widgets/settings_bottom_sheet.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
-
-// 🔑 Import thêm các provider cần thiết
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/features/notification/presentation/screens/notification_screen.dart';
-import 'package:moment_u_payment/core/providers/currency_provider.dart';
 
 class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -22,13 +19,8 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final userInfo = ref.watch(userInfoProvider);
     final String userName = userInfo?.name ?? 'User';
 
-    // Lấy thông tin thông báo và tiền tệ
-    final unreadCount = ref.watch(notificationProvider).unreadCount;
-    final currentCurrency = ref.watch(currencyProvider);
-
     return AppBar(
-      backgroundColor:
-          AppColors.background, // Dùng màu nền tiệp với nền app cho liền mạch
+      backgroundColor: AppColors.background,
       elevation: 0,
       centerTitle: false,
       titleSpacing: 16,
@@ -66,84 +58,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        // 1. Nút Đổi Tiền Tệ (Đã sửa lại bằng PopupMenu mềm mại, không che nút)
-        Theme(
-          data: Theme.of(context).copyWith(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-          ),
-          child: PopupMenuButton<String>(
-            initialValue: currentCurrency,
-
-            // 🔥 THAY ĐỔI QUAN TRỌNG: Ép buộc Flutter hiển thị menu ở dưới nút
-            position: PopupMenuPosition.under,
-            constraints: const BoxConstraints(
-              maxWidth: 75, // Khoảng cách vừa đủ cho 1 ký hiệu và bo góc
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            color: AppColors.cardBackground,
-            elevation: 3,
-            onSelected: (newValue) {
-              ref.read(currencyProvider.notifier).setCurrency(newValue);
-            },
-            itemBuilder: (BuildContext context) {
-              return ['₫', '\$', '€', '¥'].map((String value) {
-                final isSelected = value == currentCurrency;
-                return PopupMenuItem<String>(
-                  value: value,
-                  height: 40,
-                  child: Center(
-                    child: Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.primaryDark,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList();
-            },
-            // Giao diện nút gốc
-            child: Container(
-              height: 36,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    currentCurrency,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: AppColors.primary,
-                    size: 18,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-
-        // 2. Nút Thông Báo (Có chuông đỏ)
+        // 1. Nút Thông Báo
         Consumer(
           builder: (context, ref, child) {
             final unreadCount = ref.watch(notificationProvider).unreadCount;
@@ -163,7 +78,6 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       );
                     },
                     icon: Icon(
-                      // Nếu có thông báo thì đổi icon và màu cho nổi bật hơn
                       hasUnread
                           ? Icons.notifications_active_rounded
                           : Icons.notifications_none_rounded,
@@ -203,104 +117,18 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
             );
           },
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 6),
 
-        // 3. Tiện ích mở rộng (Menu chức năng: Đăng xuất, Cài đặt...)
-        Theme(
-          data: Theme.of(context).copyWith(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
+        // 2. Nút mở Settings
+        IconButton(
+          icon: const Icon(
+            Icons.more_vert_rounded,
+            color: AppColors.primaryDark,
+            size: 24,
           ),
-          child: PopupMenuButton<String>(
-            offset: const Offset(0, 45), // Canh menu xổ xuống đẹp hơn
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            color: AppColors.cardBackground,
-            icon: const Icon(
-              Icons.more_vert_rounded,
-              color: AppColors.primaryDark,
-            ),
-            onSelected: (value) async {
-              if (value == 'settings') {
-                // Điều hướng mượt mà sang màn hình cài đặt thông báo nội bộ
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const NotificationSettingsScreen(),
-                  ),
-                );
-              } else if (value == 'logout') {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                await ref.read(authProvider.notifier).logout();
-                if (!context.mounted) return;
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil('/login', (route) => false);
-              }
-              // Tương lai bạn thêm case 'settings', 'profile' vào đây
-            },
-            itemBuilder: (BuildContext context) => [
-              // Mục Cài đặt thông báo mới thêm vào
-              PopupMenuItem<String>(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.tune_rounded,
-                        color: AppColors.primary,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      AppLocalizations.of(context)!.notificationSettingsTitle,
-                      style: const TextStyle(
-                        color: AppColors.primaryDark,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuDivider(height: 1),
-              // Mục Đăng xuất
-              PopupMenuItem<String>(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorAccent.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.logout_rounded,
-                        color: AppColors.errorAccent,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Đăng xuất',
-                      style: TextStyle(
-                        color: AppColors.errorAccent,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          onPressed: () {
+            SettingsBottomSheet.show(context);
+          },
         ),
         const SizedBox(width: 8),
       ],

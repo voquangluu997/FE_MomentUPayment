@@ -222,6 +222,52 @@
   "notiFirstTxnBody": "Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của cậu ngay hôm nay nhé. Chạm vào đây nào! 👇💸",
 
   "notiSetBudgetTitle": "Lập khiên bảo vệ ví! 🛡️",
-  "notiSetBudgetBody": "Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ 'vung tay quá trán' nha. Chạm để thiết lập! 🎯💖"
+  "notiSetBudgetBody": "Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ 'vung tay quá trán' nha. Chạm để thiết lập! 🎯💖",
+
+  "forgotPasswordDialogTitle": "Khôi phục mật khẩu",
+  "forgotPasswordDialogDesc": "Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.",
+  "accountEmail": "Email tài khoản",
+  "cancel": "Hủy",
+  "sendCode": "Gửi mã",
+  "forgotPwSuccess": "Đã gửi mã khôi phục đến email: {email}",
+  "@forgotPwSuccess": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "forgotPwError": "Không thể gửi mã khôi phục. Vui lòng thử lại.",
+  
+  "resetPwDialogTitle": "Đặt lại mật khẩu mới",
+  "authEmail": "Email xác thực",
+  "otpCode": "Mã xác thực (OTP / Token)",
+  "newPassword": "Mật khẩu mới",
+  "confirm": "Xác nhận",
+  "resetPwSuccess": "Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.",
+  "resetPwError": "Mã xác thực không hợp lệ hoặc đã hết hạn.",
+
+  "settingsAndUtilities": "Cài đặt & Tiện ích",
+  "language": "Ngôn ngữ (Language)",
+  "english": "English",
+  "vietnamese": "Tiếng Việt",
+  "currencyUnit": "Đơn vị tiền tệ",
+  "currentlyUsing": "Đang dùng",
+  "darkMode": "Chế độ tối (Dark Mode)",
+  "lightTheme": "Giao diện sáng",
+  "notificationSettingsSubtitle": "Quản lý cảnh báo & chi tiêu",
+  "changePassword": "Đổi mật khẩu",
+  "changePasswordSubtitle": "Thay đổi mật khẩu tài khoản hiện tại",
+  "helpCenter": "Trung tâm trợ giúp",
+  "helpCenterSubtitle": "Hỏi đáp & Liên hệ hỗ trợ",
+  "logout": "Đăng xuất",
+  "logoutSubtitle": "Rời khỏi phiên đăng nhập hiện tại",
+  "newPasswordTitle": "Đổi mật khẩu mới",
+  "currentPassword": "Mật khẩu hiện tại",
+  "newPassword": "Mật khẩu mới",
+  "cancel": "Hủy",
+  "update": "Cập nhật",
+  "updatePasswordSuccess": "Cập nhật mật khẩu thành công!",
+  "updatePasswordError": "Mật khẩu hiện tại không đúng hoặc lỗi kết nối."
 
 }

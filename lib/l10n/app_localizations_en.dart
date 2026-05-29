@@ -408,4 +408,111 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notiSetBudgetBody =>
       'Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖';
+
+  @override
+  String get forgotPasswordDialogTitle => 'Recover Password';
+
+  @override
+  String get forgotPasswordDialogDesc =>
+      'We will send an authentication code (OTP) or a reset link to your email.';
+
+  @override
+  String get accountEmail => 'Account Email';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get sendCode => 'Send Code';
+
+  @override
+  String forgotPwSuccess(String email) {
+    return 'Recovery code sent to: $email';
+  }
+
+  @override
+  String get forgotPwError => 'Failed to send recovery code. Please try again.';
+
+  @override
+  String get resetPwDialogTitle => 'Reset New Password';
+
+  @override
+  String get authEmail => 'Authentication Email';
+
+  @override
+  String get otpCode => 'Authentication Code (OTP / Token)';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get resetPwSuccess =>
+      'Your password has been successfully reset! Please login.';
+
+  @override
+  String get resetPwError => 'Invalid or expired authentication code.';
+
+  @override
+  String get settingsAndUtilities => 'Settings & Utilities';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get vietnamese => 'Vietnamese';
+
+  @override
+  String get currencyUnit => 'Currency Unit';
+
+  @override
+  String get currentlyUsing => 'Currently using';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get lightTheme => 'Light Theme';
+
+  @override
+  String get notificationSettingsSubtitle => 'Manage alerts & expenses';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get changePasswordSubtitle => 'Change current account password';
+
+  @override
+  String get helpCenter => 'Help Center';
+
+  @override
+  String get helpCenterSubtitle => 'FAQ & Support Contact';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get logoutSubtitle => 'Leave the current login session';
+
+  @override
+  String get newPasswordTitle => 'New Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get updatePasswordSuccess => 'Password updated successfully!';
+
+  @override
+  String get updatePasswordError =>
+      'Incorrect current password or connection error.';
 }

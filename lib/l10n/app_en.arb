@@ -222,5 +222,52 @@
   "notiFirstTxnBody": "Your wallet is ready! Let's record your very first expense (Moment) today. Tap here! 👇💸",
 
   "notiSetBudgetTitle": "Shield your wallet! 🛡️",
-  "notiSetBudgetBody": "Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖"
+  "notiSetBudgetBody": "Set a budget limit so I can gently warn you before overspending. Tap to set it up! 🎯💖",
+
+  "forgotPasswordDialogTitle": "Recover Password",
+  "forgotPasswordDialogDesc": "We will send an authentication code (OTP) or a reset link to your email.",
+  "accountEmail": "Account Email",
+  "cancel": "Cancel",
+  "sendCode": "Send Code",
+  "forgotPwSuccess": "Recovery code sent to: {email}",
+  "@forgotPwSuccess": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "forgotPwError": "Failed to send recovery code. Please try again.",
+  
+  "resetPwDialogTitle": "Reset New Password",
+  "authEmail": "Authentication Email",
+  "otpCode": "Authentication Code (OTP / Token)",
+  "newPassword": "New Password",
+  "confirm": "Confirm",
+  "resetPwSuccess": "Your password has been successfully reset! Please login.",
+  "resetPwError": "Invalid or expired authentication code.",
+
+  "settingsAndUtilities": "Settings & Utilities",
+  "language": "Language",
+  "english": "English",
+  "vietnamese": "Vietnamese",
+  "currencyUnit": "Currency Unit",
+  "currentlyUsing": "Currently using",
+  "darkMode": "Dark Mode",
+  "lightTheme": "Light Theme",
+  "notificationSettingsSubtitle": "Manage alerts & expenses",
+  "changePassword": "Change Password",
+  "changePasswordSubtitle": "Change current account password",
+  "helpCenter": "Help Center",
+  "helpCenterSubtitle": "FAQ & Support Contact",
+  "logout": "Logout",
+  "logoutSubtitle": "Leave the current login session",
+  "newPasswordTitle": "New Password",
+  "currentPassword": "Current Password",
+  "newPassword": "New Password",
+  "cancel": "Cancel",
+  "update": "Update",
+  "updatePasswordSuccess": "Password updated successfully!",
+  "updatePasswordError": "Incorrect current password or connection error."
+
 }

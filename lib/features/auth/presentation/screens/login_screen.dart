@@ -147,7 +147,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 8),
+
+                  // ✨ CẬP NHẬT MỚI: Thanh nút bấm Quên / Đặt lại mật khẩu
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => _showForgotPasswordDialog(context),
+                        child: const Text(
+                          'Quên mật khẩu?',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => _showResetPasswordDialog(context),
+                        child: const Text(
+                          'Đặt lại mật khẩu',
+                          style: TextStyle(
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
                   // Nút Đăng Nhập
                   authState == AuthState.loading
@@ -311,6 +339,152 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ✨ CẬP NHẬT MỚI: Dialog gửi mã yêu cầu khôi phục mật khẩu
+  void _showForgotPasswordDialog(BuildContext context) {
+    final forgotEmailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Khôi phục mật khẩu',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: forgotEmailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email tài khoản',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              final email = forgotEmailController.text.trim();
+              if (email.isNotEmpty) {
+                ref.read(authProvider.notifier).forgotPassword(email);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Đã gửi mã khôi phục đến email: $email'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
+            },
+            child: const Text('Gửi mã', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✨ CẬP NHẬT MỚI: Dialog nhập OTP và đặt lại mật khẩu mới
+  void _showResetPasswordDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    final otpController = TextEditingController();
+    final newPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Đặt lại mật khẩu mới',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'Email xác thực'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: otpController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Mã xác thực (OTP / Token)',
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Mật khẩu mới'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              final email = emailController.text.trim();
+              final otp = otpController.text.trim();
+              final newPw = newPasswordController.text.trim();
+
+              if (email.isNotEmpty && otp.isNotEmpty && newPw.isNotEmpty) {
+                ref
+                    .read(authProvider.notifier)
+                    .resetPasswordWithOtp(email, otp, newPw);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.',
+                    ),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              'Xác nhận',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

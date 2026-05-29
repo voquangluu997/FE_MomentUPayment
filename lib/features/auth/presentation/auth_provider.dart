@@ -305,6 +305,83 @@ class AuthNotifier extends StateNotifier<AuthState> {
     ref.invalidate(transactionTimelineProvider);
     ref.invalidate(transactionProvider);
   }
+
+  // ✨ THÊM MỚI: API Quên mật khẩu
+  Future<bool> forgotPassword(String email) async {
+    state = AuthState.loading;
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      state = AuthState.initial; // Reset state về ban đầu
+
+      if (response.statusCode == 200) {
+        return true; // Gửi mail thành công
+      } else {
+        return false; // Lỗi (email không tồn tại, v.v.)
+      }
+    } catch (e) {
+      state = AuthState.initial;
+      return false;
+    }
+  }
+
+  // ✨ THÊM MỚI: API Đặt lại mật khẩu
+  Future<bool> resetPasswordWithOtp(
+    String email,
+    String otp,
+    String newPassword,
+  ) async {
+    state = AuthState.loading;
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+        }),
+      );
+
+      state = AuthState.initial;
+
+      if (response.statusCode == 200) {
+        return true; // Đổi mật khẩu thành công
+      } else {
+        return false; // Lỗi OTP sai hoặc hết hạn
+      }
+    } catch (e) {
+      state = AuthState.initial;
+      return false;
+    }
+  }
+
+  Future<bool> updatePassword(String oldPassword, String newPassword) async {
+    try {
+      String? token = await _secureStorage.read(key: 'access_token');
+      if (token == null) return false;
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/update-password'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        }),
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {

@@ -410,4 +410,111 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get notiSetBudgetBody =>
       'Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ \'vung tay quá trán\' nha. Chạm để thiết lập! 🎯💖';
+
+  @override
+  String get forgotPasswordDialogTitle => 'Khôi phục mật khẩu';
+
+  @override
+  String get forgotPasswordDialogDesc =>
+      'Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.';
+
+  @override
+  String get accountEmail => 'Email tài khoản';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get sendCode => 'Gửi mã';
+
+  @override
+  String forgotPwSuccess(String email) {
+    return 'Đã gửi mã khôi phục đến email: $email';
+  }
+
+  @override
+  String get forgotPwError => 'Không thể gửi mã khôi phục. Vui lòng thử lại.';
+
+  @override
+  String get resetPwDialogTitle => 'Đặt lại mật khẩu mới';
+
+  @override
+  String get authEmail => 'Email xác thực';
+
+  @override
+  String get otpCode => 'Mã xác thực (OTP / Token)';
+
+  @override
+  String get newPassword => 'Mật khẩu mới';
+
+  @override
+  String get confirm => 'Xác nhận';
+
+  @override
+  String get resetPwSuccess =>
+      'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.';
+
+  @override
+  String get resetPwError => 'Mã xác thực không hợp lệ hoặc đã hết hạn.';
+
+  @override
+  String get settingsAndUtilities => 'Cài đặt & Tiện ích';
+
+  @override
+  String get language => 'Ngôn ngữ (Language)';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get vietnamese => 'Tiếng Việt';
+
+  @override
+  String get currencyUnit => 'Đơn vị tiền tệ';
+
+  @override
+  String get currentlyUsing => 'Đang dùng';
+
+  @override
+  String get darkMode => 'Chế độ tối (Dark Mode)';
+
+  @override
+  String get lightTheme => 'Giao diện sáng';
+
+  @override
+  String get notificationSettingsSubtitle => 'Quản lý cảnh báo & chi tiêu';
+
+  @override
+  String get changePassword => 'Đổi mật khẩu';
+
+  @override
+  String get changePasswordSubtitle => 'Thay đổi mật khẩu tài khoản hiện tại';
+
+  @override
+  String get helpCenter => 'Trung tâm trợ giúp';
+
+  @override
+  String get helpCenterSubtitle => 'Hỏi đáp & Liên hệ hỗ trợ';
+
+  @override
+  String get logout => 'Đăng xuất';
+
+  @override
+  String get logoutSubtitle => 'Rời khỏi phiên đăng nhập hiện tại';
+
+  @override
+  String get newPasswordTitle => 'Đổi mật khẩu mới';
+
+  @override
+  String get currentPassword => 'Mật khẩu hiện tại';
+
+  @override
+  String get update => 'Cập nhật';
+
+  @override
+  String get updatePasswordSuccess => 'Cập nhật mật khẩu thành công!';
+
+  @override
+  String get updatePasswordError =>
+      'Mật khẩu hiện tại không đúng hoặc lỗi kết nối.';
 }
