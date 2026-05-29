@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/utils/currency_helper.dart'; // 🔑 THÊM IMPORT CURRENCY HELPER NÈ BỒ TÈO
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 // ==========================================
@@ -177,7 +178,7 @@ class FromToDatePicker extends StatelessWidget {
 }
 
 // ==========================================
-// 3. THẺ TỔNG QUAN XINH XẮN
+// 3. THẺ TỔNG QUAN XINH XẮN (Giữ nguyên không sửa)
 // ==========================================
 class CuteOverviewCard extends StatelessWidget {
   final double total;
@@ -291,7 +292,7 @@ class CuteOverviewCard extends StatelessWidget {
 }
 
 // ==========================================
-// 4. KHỐI CHỨA BIỂU ĐỒ TRÒN & DANH SÁCH (Liên kết 100%)
+// 4. KHỐI CHỨA BIỂU ĐỒ TRÒN & DANH SÁCH
 // ==========================================
 class AnalyticsContentWidget extends StatefulWidget {
   final List<Map<String, dynamic>> analyticsData;
@@ -376,6 +377,11 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
   }
 
   Widget _buildDonutChart() {
+    // Lấy số tiền hiện tại tùy thuộc vào việc có đang nhấn vào phần nào hay không
+    final dynamic activeAmount = touchedIndex != -1
+        ? widget.analyticsData[touchedIndex]['totalAmount']
+        : widget.totalSpending;
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -429,12 +435,9 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
               ),
             ),
             const SizedBox(height: 4),
+            // 🛠️ ĐÃ FIX TRÀN VIỀN: Sử dụng cách hiển thị rút gọn (Compact) từ CurrencyHelper
             Text(
-              currencyFormatter.format(
-                touchedIndex != -1
-                    ? widget.analyticsData[touchedIndex]['totalAmount']
-                    : widget.totalSpending,
-              ),
+              '${CurrencyHelper.formatCompactAmount(activeAmount)}₫',
               style: TextStyle(
                 color: widget.appColors.text,
                 fontSize: 18,
@@ -549,7 +552,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
 }
 
 // ==========================================
-// 5. CÁC TRẠNG THÁI RỖNG / LỖI (ĐÃ BỔ SUNG ✨)
+// 5. CÁC TRẠNG THÁI RỖNG / LỖI
 // ==========================================
 class EmptyAnalyticsWidget extends StatelessWidget {
   final AppLocalizations l10n;

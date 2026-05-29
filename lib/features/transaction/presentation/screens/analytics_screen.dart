@@ -67,17 +67,26 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     _fetchData();
   }
 
-  // Hàm Date Picker Custom: Chạm là chọn luôn & Ràng buộc logic ngày
+  // Hàm Date Picker Custom: Chạm là chọn luôn & Ràng buộc logic ngày (Max 1 năm)
   Future<void> _selectSingleDate({
     required bool isStartDate,
     required AppColorTheme appColors,
   }) async {
-    // Logic ràng buộc cực kỳ quan trọng:
-    // - Ngày bắt đầu (Từ ngày) không được lớn hơn Ngày kết thúc (Đến ngày)
-    // - Ngày kết thúc không được nhỏ hơn Ngày bắt đầu, không được lớn hơn hiện tại
-    final DateTime initialDate = isStartDate ? _startDate : _endDate;
+    // 🛡️ BƯỚC 1: TÍNH TOÁN NGÀY KẾT THÚC TỐI ĐA (1 NĂM)
+    DateTime maxAllowedEndDate = _startDate.add(const Duration(days: 365));
+    if (maxAllowedEndDate.isAfter(DateTime.now())) {
+      maxAllowedEndDate = DateTime.now(); // Không cho phép chọn tương lai
+    }
+
+    // Logic ràng buộc:
+    final DateTime initialDate = isStartDate
+        ? _startDate
+        : (_endDate.isAfter(maxAllowedEndDate) ? maxAllowedEndDate : _endDate);
+
     final DateTime firstDate = isStartDate ? DateTime(2020) : _startDate;
-    final DateTime lastDate = isStartDate ? _endDate : DateTime.now();
+
+    // 🛡️ KHÓA CỨNG: Nếu là EndDate, không cho chọn vượt quá maxAllowedEndDate
+    final DateTime lastDate = isStartDate ? _endDate : maxAllowedEndDate;
 
     final DateTime? picked = await showDialog<DateTime>(
       context: context,
@@ -118,19 +127,32 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     if (picked != null) {
       setState(() {
         _selectedTimeFrame = 'Custom';
+
         if (isStartDate) {
           _startDate = picked;
+
+          // 🛡️ BƯỚC 2: TỰ ĐỘNG KÉO END DATE NẾU VƯỢT QUÁ 1 NĂM
+          if (_endDate.difference(_startDate).inDays > 365) {
+            _endDate = _startDate.add(const Duration(days: 365));
+            if (_endDate.isAfter(DateTime.now())) {
+              _endDate = DateTime.now();
+            }
+          }
         } else {
           _endDate = picked;
         }
       });
+
+      // 🚀 BƯỚC 3: KÉO DỮ LIỆU MỚI TỪ SERVER
       _fetchData();
     }
   }
 
   void _fetchData() {
-    // Gọi API làm mới dữ liệu thông qua controller khi ngày thay đổi
-    // ref.read(transactionAnalyticsProvider.notifier).fetchByDateRange(_startDate, _endDate);
+    // 🔥 MỞ KHÓA API: Gọi Controller để update ngày và fetch lại biểu đồ
+    ref
+        .read(transactionAnalyticsProvider.notifier)
+        .updateDateRange(_startDate, _endDate);
   }
 
   @override

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/transaction_repository.dart';
 import 'controllers/transaction_timeline_controller.dart';
 import '../../../core/utils/app_logger.dart';
-// 👇 THÊM IMPORT NÀY ĐỂ TRÌNH BIÊN DỊCH HIỂU HOME BUDGET PROVIDER NHA
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 
 // Định nghĩa các trạng thái
@@ -98,4 +97,58 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
 final transactionProvider =
     StateNotifierProvider<TransactionNotifier, TransactionState>((ref) {
       return TransactionNotifier(ref);
+    });
+
+// =========================================================
+// 🚀 THÊM MỚI TỪ ĐÂY: PROVIDER DÀNH RIÊNG CHO ANALYTICS
+// =========================================================
+
+class TransactionAnalyticsNotifier
+    extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
+  final Ref _ref;
+
+  // Lưu giữ khoảng thời gian đang xem để dùng cho chức năng "Kéo xuống làm mới" (Pull to refresh)
+  DateTime _currentStart = DateTime.now().subtract(const Duration(days: 30));
+  DateTime _currentEnd = DateTime.now();
+
+  TransactionAnalyticsNotifier(this._ref) : super(const AsyncValue.loading());
+
+  TransactionRepository get _repository =>
+      _ref.read(transactionRepositoryProvider);
+
+  /// 🌸 HÀM: Lấy dữ liệu biểu đồ theo ngày
+  Future<void> fetchByDateRange(DateTime start, DateTime end) async {
+    _currentStart = start;
+    _currentEnd = end;
+    state = const AsyncValue.loading();
+
+    try {
+      final data = await _repository.getTransactionAnalytics(
+        startDate: start,
+        endDate: end,
+      );
+      state = AsyncValue.data(data);
+    } catch (error, stackTrace) {
+      AppLogger.e(
+        'TransactionAnalyticsNotifier.fetchByDateRange',
+        error,
+        stackTrace,
+      );
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  /// 🌸 HÀM: Kéo xuống để làm mới dữ liệu (Refresh)
+  Future<void> refreshAnalytics() async {
+    await fetchByDateRange(_currentStart, _currentEnd);
+  }
+}
+
+// ✨ THẦN CHÚ: Provider cung cấp dữ liệu cho màn hình biểu đồ
+final transactionAnalyticsProvider =
+    StateNotifierProvider<
+      TransactionAnalyticsNotifier,
+      AsyncValue<List<Map<String, dynamic>>>
+    >((ref) {
+      return TransactionAnalyticsNotifier(ref);
     });

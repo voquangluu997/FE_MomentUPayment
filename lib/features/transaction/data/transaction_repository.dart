@@ -2,7 +2,8 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart'; // 🔑 Import dioClient toàn cục đã tích hợp Interceptor
+import 'package:intl/intl.dart'; // 🔑 THÊM IMPORT ĐỂ FORMAT ĐỊNH DẠNG NGÀY KHỚP BACKEND
+import '../../../core/network/api_client.dart'; // Import dioClient toàn cục đã tích hợp Interceptor
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
@@ -133,10 +134,21 @@ class TransactionRepository {
     }
   }
 
-  /// 📊 BƯỚC 6: Lấy dữ liệu thống kê chi tiêu theo danh mục
-  Future<List<Map<String, dynamic>>> getTransactionAnalytics() async {
+  /// 📊 BƯỚC 6: LẤY DỮ LIỆU THỐNG KÊ CHI TIÊU (ĐÃ UPDATE THEO KHOẢNG NGÀY ĐỘNG 🚀)
+  Future<List<Map<String, dynamic>>> getTransactionAnalytics({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
     try {
-      final response = await _dio.get('/transactions/analytics');
+      final DateFormat df = DateFormat('yyyy-MM-dd');
+
+      final response = await _dio.get(
+        '/transactions/analytics',
+        queryParameters: {
+          'startDate': df.format(startDate),
+          'endDate': df.format(endDate),
+        },
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
