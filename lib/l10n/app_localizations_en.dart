@@ -650,4 +650,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get budgetTip =>
       'Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟';
+
+  @override
+  String get emptyFilterTransaction => 'No transactions in this date range 🌸';
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get to => 'to';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get day => 'Day';
+
+  @override
+  String get mon => 'Mon';
+
+  @override
+  String get tue => 'Tue';
+
+  @override
+  String get wed => 'Wed';
+
+  @override
+  String get thu => 'Thu';
+
+  @override
+  String get fri => 'Fri';
+
+  @override
+  String get sat => 'Sat';
+
+  @override
+  String get sun => 'Sun';
 }

@@ -165,7 +165,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       backgroundColor: appColors.background,
       appBar: AppBar(
         title: Text(
-          l10n.analyticsTitle ?? "Thống kê",
+          l10n.analyticsTitle,
           style: TextStyle(
             color: appColors.text,
             fontWeight: FontWeight.w900,

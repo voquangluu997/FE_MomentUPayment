@@ -653,4 +653,41 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get budgetTip =>
       'Mẹo: Hãy đặt hạn mức thấp hơn thu nhập thực tế khoảng 20% để luôn có khoản tiết kiệm dự phòng nhé! 🌟';
+
+  @override
+  String get emptyFilterTransaction =>
+      'Không có giao dịch nào trong khoảng ngày này 🌸';
+
+  @override
+  String get from => 'Từ';
+
+  @override
+  String get to => 'đến';
+
+  @override
+  String get month => 'Tháng';
+
+  @override
+  String get day => 'Ngày';
+
+  @override
+  String get mon => 'T2';
+
+  @override
+  String get tue => 'T3';
+
+  @override
+  String get wed => 'T4';
+
+  @override
+  String get thu => 'T5';
+
+  @override
+  String get fri => 'T6';
+
+  @override
+  String get sat => 'T7';
+
+  @override
+  String get sun => 'CN';
 }

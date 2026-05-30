@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:intl/intl.dart'; // ✨ Dùng để hiển thị tag ngày tháng cho đẹp
+import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
@@ -12,10 +12,14 @@ import 'package:moment_u_payment/features/transaction/presentation/screens/add_t
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/photo_calendar_cell.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 
-final isGridViewProvider = StateProvider<bool>((ref) => false);
+// ✨ TẠO ENUM 3 TRẠNG THÁI VIEW
+enum ViewMode { list, grid, calendar }
+
+final viewModeProvider = StateProvider<ViewMode>((ref) => ViewMode.list);
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,12 +30,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
-  DateTimeRange? _selectedDateRange; // ✨ Lưu khoảng thời gian From - To để lọc
+  DateTimeRange? _selectedDateRange;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationProvider.notifier).fetchUnreadCount();
     });
@@ -64,76 +67,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  // ===========================================================================
-  // HÀM LỌC DANH SÁCH THEO NGÀY CHỌN
-  // ===========================================================================
   List<Map<String, dynamic>> _applyDateFilter(
     List<Map<String, dynamic>> transactions,
   ) {
     if (_selectedDateRange == null) return transactions;
 
-    // Lấy thời điểm bắt đầu ngày (00:00:00)
     final DateTime startOfDay = DateTime(
       _selectedDateRange!.start.year,
       _selectedDateRange!.start.month,
       _selectedDateRange!.start.day,
     );
 
-    // Lấy thời điểm cuối ngày kết thúc (23:59:59)
     final DateTime endOfDay = DateTime(
       _selectedDateRange!.end.year,
       _selectedDateRange!.end.month,
       _selectedDateRange!.end.day,
-    ).add(const Duration(days: 1)); // Cộng 1 ngày để bao trọn ngày end
+    ).add(const Duration(days: 1));
 
     return transactions.where((tx) {
-      // ✨ ĐỔI 'createdAt' THÀNH 'spentAt' Ở ĐÂY
       final dynamic rawDate = tx['spentAt'];
-
       if (rawDate == null) return false;
 
-      // Chuyển đổi an toàn
       final DateTime? txDate = rawDate is DateTime
           ? rawDate
           : DateTime.tryParse(rawDate.toString());
 
       if (txDate == null) return false;
 
-      // Logic: txDate >= startOfDay VÀ txDate < endOfDay
       return txDate.isAfter(startOfDay.subtract(const Duration(seconds: 1))) &&
           txDate.isBefore(endOfDay);
     }).toList();
-  }
-
-  // Hộp thoại lịch chọn khoảng ngày xinh xắn
-  Future<void> _pickDateRange(
-    BuildContext context,
-    AppColorTheme appColors,
-  ) async {
-    final DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      initialDateRange: _selectedDateRange,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: appColors.primary,
-              onPrimary: Colors.white,
-              onSurface: appColors.primaryDark,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && picked != _selectedDateRange) {
-      setState(() {
-        _selectedDateRange = picked;
-      });
-    }
   }
 
   Widget _buildBudgetCardWithNavigation(AppLocalizations l10n) {
@@ -144,7 +107,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final timelineState = ref.watch(transactionTimelineProvider);
-    final isGridView = ref.watch(isGridViewProvider);
+
+    // ✨ Lắng nghe trạng thái View hiện tại (List, Grid, Calendar)
+    final viewMode = ref.watch(viewModeProvider);
 
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
     final isLoadingMore = timelineNotifier.isLoadingMore;
@@ -171,14 +136,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           data: (allTransactions) {
-            // ✨ 1. Tiến hành lọc danh sách theo ngày trước khi nhóm dữ liệu
             final filteredTransactions = _applyDateFilter(allTransactions);
 
-            // ✨ 2. Cả 2 chế độ bây giờ đều ĐỒNG BỘ nhóm theo Ngày (Daily)
+            // 1. NHÓM DỮ LIỆU THEO NGÀY (Dùng cho List và Masonry Grid)
             final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
               filteredTransactions,
             );
-            final keys = dailyGrouped.keys.toList();
+            final dailyKeys = dailyGrouped.keys.toList();
+
+            // 2. NHÓM DỮ LIỆU THEO THÁNG (Chỉ tạo khi đang ở chế độ Calendar)
+            Map<DateTime, List<Map<String, dynamic>>> monthlyGrouped = {};
+            List<DateTime> monthlyKeys = [];
+
+            if (viewMode == ViewMode.calendar) {
+              for (var tx in filteredTransactions) {
+                final date =
+                    DateTime.tryParse(tx['spentAt']?.toString() ?? '') ??
+                    DateTime.now();
+                final monthKey = DateTime(date.year, date.month, 1);
+                monthlyGrouped.putIfAbsent(monthKey, () => []).add(tx);
+              }
+              monthlyKeys = monthlyGrouped.keys.toList()
+                ..sort((a, b) => b.compareTo(a));
+            }
 
             if (filteredTransactions.isEmpty) {
               return ListView(
@@ -187,15 +167,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 children: [
                   _buildBudgetCardWithNavigation(l10n),
-                  // Vẫn hiển thị Header chứa nút Filter để người dùng bấm hủy lọc
-                  _buildControlHeaderRow(appColors, isGridView),
-                  if (_selectedDateRange != null) _buildFilterTag(appColors),
+                  _buildControlHeaderRow(appColors, viewMode),
+                  if (_selectedDateRange != null)
+                    _buildFilterTag(appColors, l10n),
                   Padding(
                     padding: const EdgeInsets.all(48),
                     child: Center(
                       child: Text(
                         _selectedDateRange != null
-                            ? "Không có giao dịch nào trong khoảng ngày này 🌸"
+                            ? l10n.emptyFilterTransaction
                             : l10n.emptyTransactionList,
                         style: TextStyle(
                           color: appColors.primaryDark.withOpacity(0.5),
@@ -207,33 +187,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             }
 
+            final listLength = viewMode == ViewMode.calendar
+                ? monthlyKeys.length
+                : dailyKeys.length;
+
             return ListView.builder(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              // Cộng thêm 3 vì: index 0 (Budget), index 1 (Header + Filter Control Row), index 2 (Filter Tag nếu có)
-              itemCount: 3 + keys.length + (isLoadingMore && hasMore ? 1 : 0),
+              itemCount: 3 + listLength + (isLoadingMore && hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == 0) return _buildBudgetCardWithNavigation(l10n);
-
-                // ✨ index 1: Hợp nhất HomeHeaderSection và Thanh điều khiển Filter/Toggle View nằm ngang hàng
-                if (index == 1) {
-                  return _buildControlHeaderRow(appColors, isGridView);
-                }
-
-                // index 2: Hiển thị tag khoảng ngày đang chọn nếu có, nếu không có trả về khoảng trống rỗng
+                if (index == 1)
+                  return _buildControlHeaderRow(appColors, viewMode);
                 if (index == 2) {
                   return _selectedDateRange != null
                       ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: _buildFilterTag(appColors),
+                          child: _buildFilterTag(appColors, l10n),
                         )
                       : const SizedBox.shrink();
                 }
 
-                // Kiểm tra chỉ số loading cuối trang
-                if (index == 3 + keys.length) {
+                if (index == 3 + listLength) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
@@ -245,15 +222,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }
 
-                // Tính toán vị trí data thực tế (bỏ qua 3 item đầu)
                 final dataIndex = index - 3;
-                final groupKey = keys[dataIndex];
-                final txList = dailyGrouped[groupKey]!;
 
-                // ✨ Trả về Grid hoặc List đồng bộ nhóm theo Ngày
-                if (isGridView) {
-                  return _buildGridGroup(
-                    groupKey,
+                // ✨ RẼ NHÁNH GIAO DIỆN CHÍNH Ở ĐÂY
+                if (viewMode == ViewMode.calendar) {
+                  final monthKey = monthlyKeys[dataIndex];
+                  final txList = monthlyGrouped[monthKey]!;
+                  return _buildMonthlyCalendar(
+                    monthKey,
+                    txList,
+                    l10n,
+                    ref,
+                    context,
+                    appColors,
+                  );
+                } else if (viewMode == ViewMode.grid) {
+                  final dayKey = dailyKeys[dataIndex];
+                  final txList = dailyGrouped[dayKey]!;
+                  return _buildMasonryGridGroup(
+                    dayKey,
                     txList,
                     l10n,
                     ref,
@@ -261,8 +248,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     appColors,
                   );
                 } else {
+                  // ViewMode.list
+                  final dayKey = dailyKeys[dataIndex];
+                  final txList = dailyGrouped[dayKey]!;
                   return _buildListGroup(
-                    groupKey,
+                    dayKey,
                     txList,
                     l10n,
                     ref,
@@ -291,21 +281,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // ===========================================================================
-  // WIDGET ROW: CHỨA TIÊU ĐỀ HOME + CẶP NÚT FILTER & CHUYỂN VIEW NẰM NGANG HÀNG
+  // WIDGET ROW: CHỨA TIÊU ĐỀ HOME + CẶP NÚT FILTER & CHUYỂN VIEW
   // ===========================================================================
-  Widget _buildControlHeaderRow(AppColorTheme appColors, bool isGridView) {
+  Widget _buildControlHeaderRow(AppColorTheme appColors, ViewMode currentMode) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Bên trái giữ nguyên phần chữ Header của bạn
           Expanded(
             child: HomeHeaderSection(
-              isGridView: isGridView,
+              // Truyền trạng thái để icon cũ biết đang ở Grid hay List
+              isGridView: currentMode == ViewMode.grid,
               isFiltered: _selectedDateRange != null,
-              onToggleView: () =>
-                  ref.read(isGridViewProvider.notifier).state = !isGridView,
+
+              // 🔄 Logic cho nút cũ: Chỉ xoay vòng giữa List và Grid
+              onToggleView: () {
+                if (currentMode == ViewMode.grid) {
+                  ref.read(viewModeProvider.notifier).state = ViewMode.list;
+                } else {
+                  ref.read(viewModeProvider.notifier).state = ViewMode.grid;
+                }
+              },
+
               onFilterTap: () async {
                 final DateTimeRange? picked = await showDateRangePicker(
                   context: context,
@@ -314,7 +311,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       DateTimeRange(start: DateTime.now(), end: DateTime.now()),
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2030),
-                  // 🔥 Tự động đóng/áp dụng khi chọn xong 2 điểm
                   builder: (context, child) => Theme(
                     data: Theme.of(context).copyWith(
                       colorScheme: ColorScheme.light(
@@ -330,32 +326,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
             ),
           ),
+
+          const SizedBox(width: 8),
+
+          // ✨ NÚT CALENDAR ĐỘC LẬP NẰM BÊN CẠNH
+          InkWell(
+            onTap: () {
+              if (currentMode == ViewMode.calendar) {
+                // Đang mở Lịch, bấm vào sẽ tắt Lịch (trở về List mặc định)
+                ref.read(viewModeProvider.notifier).state = ViewMode.list;
+              } else {
+                // Đang ở List/Grid, bấm vào sẽ bật Lịch
+                ref.read(viewModeProvider.notifier).state = ViewMode.calendar;
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: currentMode == ViewMode.calendar
+                    ? appColors.primary
+                    : appColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.calendar_month_rounded,
+                size: 22,
+                color: currentMode == ViewMode.calendar
+                    ? Colors.white
+                    : appColors.primary,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton({
-    required IconData icon,
-    required Color iconColor,
-    required Color backgroundColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, size: 22, color: iconColor),
-      ),
-    );
-  }
-
-  Widget _buildFilterTag(AppColorTheme appColors) {
+  Widget _buildFilterTag(AppColorTheme appColors, AppLocalizations l10n) {
     final f = DateFormat('dd/MM');
     return Row(
       children: [
@@ -376,7 +384,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(width: 6),
               Text(
-                'Từ ${f.format(_selectedDateRange!.start)} đến ${f.format(_selectedDateRange!.end)}',
+                '${l10n.from} ${f.format(_selectedDateRange!.start)} ${l10n.to} ${f.format(_selectedDateRange!.end)}',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
@@ -399,6 +407,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  // ===========================================================================
+  // 1. GIAO DIỆN LIST (MẶC ĐỊNH)
+  // ===========================================================================
   Widget _buildListGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
@@ -428,8 +439,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ✨ ĐÃ UPDATE: Nhóm Grid theo Từng Ngày thay vì theo Tháng như trước
-  Widget _buildGridGroup(
+  // ===========================================================================
+  // 2. GIAO DIỆN MASONRY GRID (GIỮ LẠI CŨ)
+  // ===========================================================================
+  Widget _buildMasonryGridGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
     AppLocalizations l10n,
@@ -443,7 +456,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 20, top: 12, bottom: 6),
           child: Text(
-            // Sử dụng nhãn ngày thân thiện giống List View cho đồng bộ luôn bồ tèo nhé!
             DateTimeHelper.getFriendlyDateLabel(dateKey, l10n),
             style: TextStyle(
               fontSize: 13,
@@ -479,7 +491,213 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Giữ nguyên hàm _buildDismissibleCard và _showDeleteConfirmDialog cũ bên dưới của bạn...
+  // ===========================================================================
+  // 3. GIAO DIỆN CALENDAR (MỚI THÊM VÀO)
+  // ===========================================================================
+  Widget _buildMonthlyCalendar(
+    DateTime monthKey,
+    List<Map<String, dynamic>> monthTx,
+    AppLocalizations l10n,
+    WidgetRef ref,
+    BuildContext context,
+    AppColorTheme appColors,
+  ) {
+    Map<int, Map<String, dynamic>> dailyData = {};
+    for (var tx in monthTx) {
+      final date =
+          DateTime.tryParse(tx['spentAt']?.toString() ?? '') ?? DateTime.now();
+
+      if (!dailyData.containsKey(date.day)) {
+        dailyData[date.day] = {
+          'totalAmount': (tx['amount'] as num?)?.toDouble() ?? 0.0,
+          'imageUrl': tx['imageUrl'] ?? '',
+          'emoji': tx['emoji'] ?? '✨',
+          'transactions': [tx],
+        };
+      } else {
+        dailyData[date.day]!['totalAmount'] +=
+            (tx['amount'] as num?)?.toDouble() ?? 0.0;
+        dailyData[date.day]!['transactions'].add(tx);
+
+        if ((dailyData[date.day]!['imageUrl'] as String).isEmpty &&
+            (tx['imageUrl'] ?? '').toString().isNotEmpty) {
+          dailyData[date.day]!['imageUrl'] = tx['imageUrl'];
+        }
+      }
+    }
+
+    final daysInMonth = DateUtils.getDaysInMonth(monthKey.year, monthKey.month);
+    final firstWeekday = DateTime(monthKey.year, monthKey.month, 1).weekday;
+    final emptyDays = firstWeekday - 1;
+    final totalCells = emptyDays + daysInMonth;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, top: 24, bottom: 8),
+          child: Text(
+            '${l10n.month} ${monthKey.month}, ${monthKey.year}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: appColors.primary,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children:
+                [
+                  l10n.mon,
+                  l10n.tue,
+                  l10n.wed,
+                  l10n.thu,
+                  l10n.fri,
+                  l10n.sat,
+                  l10n.sun,
+                ].asMap().entries.map((entry) {
+                  final isWeekend =
+                      entry.key == 5 || entry.key == 6; // Thứ 7, CN
+                  final day = entry.value;
+
+                  return SizedBox(
+                    width: 30,
+                    child: Text(
+                      day,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isWeekend
+                            ? appColors.errorAccent.withOpacity(0.8)
+                            : appColors.primaryDark.withOpacity(0.5),
+                      ),
+                    ),
+                  );
+                }).toList(),
+          ),
+        ),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            childAspectRatio: 0.75,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemCount: totalCells,
+          itemBuilder: (context, index) {
+            if (index < emptyDays) return const SizedBox.shrink();
+
+            final day = index - emptyDays + 1;
+            final dayDate = DateTime(monthKey.year, monthKey.month, day);
+            final dayData = dailyData[day];
+
+            return PhotoCalendarCell(
+              date: dayDate,
+              dayData: dayData,
+              onTap: () {
+                if (dayData != null) {
+                  _showDayDetailsBottomSheet(
+                    context,
+                    dayDate,
+                    dayData,
+                    appColors,
+                    l10n,
+                  );
+                } else {
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (_) => const AddTransactionScreen(),
+                        ),
+                      )
+                      .then((isAdded) {
+                        if (isAdded == true && mounted) {
+                          ref
+                              .read(transactionTimelineProvider.notifier)
+                              .refreshTimeline();
+                        }
+                      });
+                }
+              },
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  void _showDayDetailsBottomSheet(
+    BuildContext context,
+    DateTime date,
+    Map<String, dynamic> dayData,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: appColors.cardBackground,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        final List txList = dayData['transactions'];
+        return FractionallySizedBox(
+          heightFactor: 0.6,
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  "${l10n.day} ${date.day} ${l10n.month} ${date.month}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: appColors.primaryDark,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: txList.length,
+                  itemBuilder: (context, index) {
+                    final tx = txList[index];
+                    return TransactionCard(
+                      transaction: tx,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openMomentDetails(tx, l10n);
+                      },
+                      l10n: l10n,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildDismissibleCard(
     BuildContext context,
     WidgetRef ref,

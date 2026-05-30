@@ -4,7 +4,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
-import 'package:moment_u_payment/core/providers/theme_provider.dart';
 import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
 import 'package:moment_u_payment/firebase_options.dart';

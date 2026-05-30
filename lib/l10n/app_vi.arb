@@ -334,6 +334,19 @@
 
   "dailyAllowance": "Trung bình mỗi ngày",
   "quickSuggestions": "Gợi ý nhanh",
-  "budgetTip": "Mẹo: Hãy đặt hạn mức thấp hơn thu nhập thực tế khoảng 20% để luôn có khoản tiết kiệm dự phòng nhé! 🌟"
+  "budgetTip": "Mẹo: Hãy đặt hạn mức thấp hơn thu nhập thực tế khoảng 20% để luôn có khoản tiết kiệm dự phòng nhé! 🌟",
+
+  "emptyFilterTransaction": "Không có giao dịch nào trong khoảng ngày này 🌸",
+  "from": "Từ",
+  "to": "đến",
+  "month": "Tháng",
+  "day": "Ngày",
+  "mon": "T2",
+  "tue": "T3",
+  "wed": "T4",
+  "thu": "T5",
+  "fri": "T6",
+  "sat": "T7",
+  "sun": "CN"
 
 }

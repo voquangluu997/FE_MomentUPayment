@@ -334,6 +334,19 @@
 
   "dailyAllowance": "Daily average",
   "quickSuggestions": "Quick suggestions",
-  "budgetTip": "Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟"
+  "budgetTip": "Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟",
+
+  "emptyFilterTransaction": "No transactions in this date range 🌸",
+  "from": "From",
+  "to": "to",
+  "month": "Month",
+  "day": "Day",
+  "mon": "Mon",
+  "tue": "Tue",
+  "wed": "Wed",
+  "thu": "Thu",
+  "fri": "Fri",
+  "sat": "Sat",
+  "sun": "Sun"
 
 }
