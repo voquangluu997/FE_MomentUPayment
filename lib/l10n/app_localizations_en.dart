@@ -173,7 +173,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get analyticsTitle => 'Wallet X-Ray 🔍';
+  String get analyticsTitle => 'Transaction Analytics';
 
   @override
   String get emptyAnalyticsData =>
@@ -201,10 +201,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cameraTapInstruction => 'Tap here to snap your receipt! 📸';
 
   @override
-  String get galleryPickAction => 'Or pick a cute photo from your gallery ✨';
+  String get galleryPickAction => 'Pick image';
 
   @override
-  String get galleryChangeAction => 'Change photo from your collection 🌸';
+  String get galleryChangeAction => 'Change image';
 
   @override
   String get amountSectionTitle => 'TOTAL DAMAGE THIS TIME 💰';
@@ -739,4 +739,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get incorrectPassword => 'Current password is incorrect!';
+
+  @override
+  String get maxOneYearWarning =>
+      'Moment U only supports viewing up to 1 year! 🗓️';
+
+  @override
+  String get wrongOldPassword => 'Incorrect current password.';
+
+  @override
+  String get userNotFoundError => 'User not found.';
+
+  @override
+  String get weakPasswordError => 'The new password is too weak.';
+
+  @override
+  String get noChangeWarning => 'Your information has not changed! ✨';
+
+  @override
+  String get fillPasswordFieldsError => 'Please enter all password fields.';
+
+  @override
+  String get samePasswordError =>
+      'New password cannot be the same as old password.';
 }

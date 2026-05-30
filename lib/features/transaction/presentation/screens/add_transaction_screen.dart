@@ -9,6 +9,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
 import '../transaction_provider.dart';
 import '../controllers/transaction_timeline_controller.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart'; // ✨ Import hệ thống Toast mới ở đây!
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -142,25 +143,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '📝'},
     ];
 
+    // ✨ Lắng nghe trạng thái giao dịch và hiển thị AppToast mới
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
       if (next == TransactionState.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.txSuccessMessage),
-            backgroundColor: appColors.success,
-          ),
-        );
+        AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (next == TransactionState.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.txErrorMessage),
-            backgroundColor: appColors.error,
-          ),
-        );
+        AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
     });
 
@@ -322,7 +314,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   color: isSelected
                                       ? Colors.white
                                       : appColors
-                                            .text, // ✨ Sửa từ black87 sang appColors.text để tự đổi màu chữ unselected
+                                            .text, // ✨ Tự đổi màu chữ unselected theo Theme
                                   fontWeight: FontWeight.w600,
                                   fontSize: 11.5,
                                 ),
@@ -471,7 +463,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 controller: _noteController,
                 style: TextStyle(
                   color: appColors.text,
-                ), // ✨ Sửa lỗi gõ chữ ra màu đen trên nền tối
+                ), // ✨ Gõ chữ tự đổi màu sáng tối tương thích
                 decoration: InputDecoration(
                   hintText: l10n.noteHint,
                   hintStyle: TextStyle(color: appColors.textMuted),
@@ -503,7 +495,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         final amountText = _amountController.text
                             .replaceAll('.', '')
                             .trim();
-                        if (amountText.isEmpty) return;
+                        if (amountText.isEmpty) {
+                          // ✨ Bạn có thể thêm Toast nhắc nhở nếu cần thiết
+                          AppToast.showError(
+                            context,
+                            'Vui lòng nhập số tiền hợp lệ nha! 💸',
+                            appColors,
+                          );
+                          return;
+                        }
 
                         String finalCategory = _selectedCategory;
                         if (_isCustomCategory) {

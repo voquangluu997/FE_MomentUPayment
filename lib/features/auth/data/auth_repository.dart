@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart'; // Thay đổi đường dẫn này cho đúng với dự án của bạn
+import '../../../core/network/api_client.dart'; // Giữ nguyên import của dự án bạn
 
 class AuthRepository {
   // Sử dụng trực tiếp dioClient toàn cục của bạn
@@ -30,6 +30,7 @@ class AuthRepository {
     }
   }
 
+  /// Gọi API Cập nhật hồ sơ
   Future<Response> updateProfile(String name, String? avatarUrl) async {
     try {
       return await _dio.post(

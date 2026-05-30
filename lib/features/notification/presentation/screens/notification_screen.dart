@@ -9,8 +9,9 @@ import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/features/notification/models/in_app_notification.dart';
 
-// 🌸 IMPORT WIDGET DÙNG CHUNG
+// 🌸 IMPORT WIDGET DÙNG CHUNG VÀ TOAST MỚI
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart'; // ✨ Đã tích hợp Toast cute đồng bộ hệ thống!
 
 class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
@@ -327,6 +328,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                             ref
                                 .read(notificationProvider.notifier)
                                 .markAsRead(noti.id);
+
+                            // ✨ Toast thông báo đã đọc cực đáng yêu đồng bộ toàn app!
+                            AppToast.showSuccess(
+                              context,
+                              'Đã đọc thông báo rùi nha! 💌',
+                              appColors,
+                            );
                           }
 
                           final route = content['route'] as String?;

@@ -369,5 +369,17 @@
   "nameEmptyError": "Name cannot be empty!",
   "passwordLengthError": "Password must be at least 4 characters long!",
   "systemError": "System error!",
-  "incorrectPassword": "Current password is incorrect!"
+  "incorrectPassword": "Current password is incorrect!",
+
+  "maxOneYearWarning": "Moment U only supports viewing up to 1 year! 🗓️",
+  "analyticsTitle": "Transaction Analytics",
+  "galleryPickAction": "Pick image",
+  "galleryChangeAction": "Change image",
+
+  "wrongOldPassword": "Incorrect current password.",
+  "userNotFoundError": "User not found.",
+  "weakPasswordError": "The new password is too weak.",
+  "noChangeWarning": "Your information has not changed! ✨",
+  "fillPasswordFieldsError": "Please enter all password fields.",
+  "samePasswordError": "New password cannot be the same as old password."
 }

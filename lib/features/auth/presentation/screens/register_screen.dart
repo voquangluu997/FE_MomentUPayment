@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../auth_provider.dart';
+import '../../../../core/utils/app_toast.dart'; // ✨ Thêm import Toast cute đồng bộ cho app nha!
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -32,12 +33,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final appColors = ref.read(appColorsProvider);
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.emptyFieldsWarning),
-          backgroundColor: appColors.error,
-        ),
-      );
+      // ✨ Thay thế SnackBar cảnh báo trống trường bằng AppToast.showError
+      AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
       return;
     }
 
@@ -55,34 +52,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.registerSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕',
-            ),
-            backgroundColor: appColors.success,
-          ),
+        // ✨ Toast ngôi sao lấp lánh khi đăng ký thành công tài khoản mới
+        AppToast.showSuccess(
+          context,
+          'Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕',
+          appColors,
         );
         ref.read(authProvider.notifier).resetState();
         Navigator.of(context).pop();
       } else if (next == AuthState.emailAlreadyExists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Email này đã được đăng ký trước đó rồi bạn ơi! 🌸',
-            ),
-            backgroundColor: appColors.error,
-          ),
+        // ✨ Toast trái tim tan vỡ kèm icon cute khi trùng email
+        AppToast.showError(
+          context,
+          'Email này đã được đăng ký trước đó rồi bạn ơi! 🌸',
+          appColors,
         );
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.registerError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Đăng ký thất bại! Vui lòng kiểm tra lại kết nối BE hoặc log hệ thống 😢',
-            ),
-            backgroundColor: appColors.error,
-          ),
+        // ✨ Toast trái tim vỡ báo lỗi hệ thống / lỗi kết nối BE
+        AppToast.showError(
+          context,
+          'Đăng ký thất bại! Vui lòng kiểm tra lại kết nối BE hoặc log hệ thống 😢',
+          appColors,
         );
         ref.read(authProvider.notifier).resetState();
       }

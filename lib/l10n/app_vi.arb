@@ -368,6 +368,18 @@
   "nameEmptyError": "Tên không được để trống!",
   "passwordLengthError": "Mật khẩu phải từ 4 ký tự trở lên!",
   "systemError": "Lỗi hệ thống!",
-  "incorrectPassword": "Mật khẩu hiện tại không đúng!"
+  "incorrectPassword": "Mật khẩu hiện tại không đúng!",
+
+  "maxOneYearWarning": "Moment U chỉ hỗ trợ xem tối đa 1 năm thui nè! 🗓️",
+  "analyticsTitle": "Phân tích giao dịch",
+  "galleryPickAction": "Chọn ảnh",
+  "galleryChangeAction": "Đổi ảnh",
+
+  "wrongOldPassword": "Mật khẩu cũ không chính xác.",
+  "userNotFoundError": "Không tìm thấy thông tin tài khoản.",
+  "weakPasswordError": "Mật khẩu mới quá yếu.",
+  "noChangeWarning": "Thông tin của bạn vẫn như cũ! ✨",
+  "fillPasswordFieldsError": "Vui lòng nhập đầy đủ thông tin mật khẩu.",
+  "samePasswordError": "Mật khẩu mới không được trùng mật khẩu cũ."
 
 }

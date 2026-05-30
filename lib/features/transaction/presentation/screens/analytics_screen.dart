@@ -4,6 +4,7 @@ import 'package:moment_u_payment/core/widgets/analytics_components.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../controllers/transaction_analytics_controller.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -24,7 +25,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     _startDate = DateTime(_endDate.year, _endDate.month - 1, _endDate.day);
   }
 
-  // Cập nhật State khi nhấn Tuần qua, Tháng qua, 3 Tháng, 6 Tháng, Năm qua
   void _onPeriodChanged(String period) {
     setState(() {
       _selectedTimeFrame = period;
@@ -67,25 +67,21 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     _fetchData();
   }
 
-  // Hàm Date Picker Custom: Chạm là chọn luôn & Ràng buộc logic ngày (Max 1 năm)
   Future<void> _selectSingleDate({
     required bool isStartDate,
     required AppColorTheme appColors,
+    required AppLocalizations l10n,
   }) async {
-    // 🛡️ BƯỚC 1: TÍNH TOÁN NGÀY KẾT THÚC TỐI ĐA (1 NĂM)
     DateTime maxAllowedEndDate = _startDate.add(const Duration(days: 365));
     if (maxAllowedEndDate.isAfter(DateTime.now())) {
-      maxAllowedEndDate = DateTime.now(); // Không cho phép chọn tương lai
+      maxAllowedEndDate = DateTime.now();
     }
 
-    // Logic ràng buộc:
     final DateTime initialDate = isStartDate
         ? _startDate
         : (_endDate.isAfter(maxAllowedEndDate) ? maxAllowedEndDate : _endDate);
 
     final DateTime firstDate = isStartDate ? DateTime(2020) : _startDate;
-
-    // 🛡️ KHÓA CỨNG: Nếu là EndDate, không cho chọn vượt quá maxAllowedEndDate
     final DateTime lastDate = isStartDate ? _endDate : maxAllowedEndDate;
 
     final DateTime? picked = await showDialog<DateTime>(
@@ -114,7 +110,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 firstDate: firstDate,
                 lastDate: lastDate,
                 onDateChanged: (DateTime date) {
-                  // ĐÓNG DIALOG VÀ TRẢ VỀ NGÀY NGAY LẬP TỨC ⚡
                   Navigator.pop(dialogContext, date);
                 },
               ),
@@ -125,31 +120,33 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     );
 
     if (picked != null) {
+      bool showingLimitWarning = false;
+
       setState(() {
         _selectedTimeFrame = 'Custom';
 
         if (isStartDate) {
           _startDate = picked;
-
-          // 🛡️ BƯỚC 2: TỰ ĐỘNG KÉO END DATE NẾU VƯỢT QUÁ 1 NĂM
           if (_endDate.difference(_startDate).inDays > 365) {
             _endDate = _startDate.add(const Duration(days: 365));
             if (_endDate.isAfter(DateTime.now())) {
               _endDate = DateTime.now();
             }
+            showingLimitWarning = true;
           }
         } else {
           _endDate = picked;
         }
       });
 
-      // 🚀 BƯỚC 3: KÉO DỮ LIỆU MỚI TỪ SERVER
+      if (showingLimitWarning && mounted) {
+        AppToast.showSuccess(context, l10n.maxOneYearWarning, appColors);
+      }
       _fetchData();
     }
   }
 
   void _fetchData() {
-    // 🔥 MỞ KHÓA API: Gọi Controller để update ngày và fetch lại biểu đồ
     ref
         .read(transactionAnalyticsProvider.notifier)
         .updateDateRange(_startDate, _endDate);
@@ -175,6 +172,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         backgroundColor: appColors.background,
         elevation: 0,
         centerTitle: true,
+        // --- FIX Ở ĐÂY ---
+        // Thiết lập màu icon (nút quay lại) dựa theo màu text của theme
+        iconTheme: IconThemeData(color: appColors.text),
       ),
       body: RefreshIndicator(
         color: appColors.primary,
@@ -192,19 +192,24 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 selectedTimeFrame: _selectedTimeFrame,
                 onPeriodSelected: _onPeriodChanged,
                 appColors: appColors,
-                l10n: l10n, // Trỏ l10n vào để thay đổi chữ
+                l10n: l10n,
               ),
               FromToDatePicker(
                 startDate: _startDate,
                 endDate: _endDate,
-                onSelectStart: () =>
-                    _selectSingleDate(isStartDate: true, appColors: appColors),
-                onSelectEnd: () =>
-                    _selectSingleDate(isStartDate: false, appColors: appColors),
+                onSelectStart: () => _selectSingleDate(
+                  isStartDate: true,
+                  appColors: appColors,
+                  l10n: l10n,
+                ),
+                onSelectEnd: () => _selectSingleDate(
+                  isStartDate: false,
+                  appColors: appColors,
+                  l10n: l10n,
+                ),
                 appColors: appColors,
                 l10n: l10n,
               ),
-
               analyticsState.when(
                 skipLoadingOnRefresh: true,
                 loading: () => SizedBox(
@@ -214,7 +219,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                   ),
                 ),
                 error: (error, stack) => ErrorAnalyticsWidget(
-                  // Widget này có trong file components
                   l10n: l10n,
                   appColors: appColors,
                   onRetry: () => ref

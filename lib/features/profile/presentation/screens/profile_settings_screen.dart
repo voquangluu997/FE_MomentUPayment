@@ -7,6 +7,7 @@ import 'package:moment_u_payment/features/home/presentation/screens/home_screen.
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/features/transaction/data/transaction_repository.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -63,47 +64,44 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     if (image != null) setState(() => _selectedImage = File(image.path));
   }
 
-  void _showToast(String message, {bool isError = false}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red.shade600 : Colors.green.shade600,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  String _parseErrorMessage(String error, AppLocalizations l10n) {
-    final isVi = Localizations.localeOf(context).languageCode == 'vi';
+  /// Map các lỗi API sang key l10n
+  String _getLocalizedErrorMessage(String error, AppLocalizations l10n) {
     final lowerError = error.toLowerCase();
-
     if (lowerError.contains('wrong password') ||
         lowerError.contains('incorrect password') ||
         lowerError.contains('mật khẩu không đúng')) {
-      return isVi
-          ? 'Mật khẩu cũ không chính xác.'
-          : 'Incorrect current password.';
+      return l10n.wrongOldPassword;
     }
     if (lowerError.contains('user not found') ||
         lowerError.contains('invalid user')) {
-      return isVi ? 'Không tìm thấy thông tin tài khoản.' : 'User not found.';
+      return l10n.userNotFoundError;
     }
     if (lowerError.contains('weak password')) {
-      return isVi ? 'Mật khẩu mới quá yếu.' : 'The new password is too weak.';
+      return l10n.weakPasswordError;
     }
     return error;
   }
 
   Future<void> _handleUpdateProfile(AppLocalizations l10n) async {
+    final appColors = ref.read(appColorsProvider);
+    final user = ref.read(userInfoProvider);
+
+    final hasNameChanged = _nameController.text.trim() != (user?.name ?? '');
+    final hasImageChanged = _selectedImage != null;
+
+    if (!hasNameChanged && !hasImageChanged) {
+      AppToast.showSuccess(context, l10n.noChangeWarning, appColors);
+      return;
+    }
+
     if (_nameController.text.trim().isEmpty) {
-      _showToast(l10n.nameEmptyError, isError: true);
+      AppToast.showError(context, l10n.nameEmptyError, appColors);
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      String? imageUrl;
+      String? imageUrl = user?.avatar;
       if (_selectedImage != null) {
         imageUrl = await ref
             .read(transactionRepositoryProvider)
@@ -112,46 +110,46 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
 
       final errorMessage = await ref
           .read(authProvider.notifier)
-          .updateProfile(_nameController.text, imageUrl);
+          .updateProfile(_nameController.text.trim(), imageUrl);
 
       if (errorMessage == null) {
-        _showToast(l10n.updateSuccess);
+        if (mounted) {
+          AppToast.showSuccess(context, l10n.updateSuccess, appColors);
+        }
         setState(() => _selectedImage = null);
       } else {
-        _showToast(_parseErrorMessage(errorMessage, l10n), isError: true);
+        if (mounted) {
+          AppToast.showError(
+            context,
+            _getLocalizedErrorMessage(errorMessage, l10n),
+            appColors,
+          );
+        }
       }
     } catch (e) {
-      _showToast(l10n.systemError, isError: true);
+      if (mounted) {
+        AppToast.showError(context, l10n.systemError, appColors);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _handleUpdatePassword(AppLocalizations l10n) async {
-    final isVi = Localizations.localeOf(context).languageCode == 'vi';
+    final appColors = ref.read(appColorsProvider);
 
     if (_oldPwController.text.isEmpty || _newPwController.text.isEmpty) {
-      _showToast(
-        isVi
-            ? 'Vui lòng nhập đầy đủ thông tin mật khẩu.'
-            : 'Please enter all password fields.',
-        isError: true,
-      );
+      AppToast.showError(context, l10n.fillPasswordFieldsError, appColors);
       return;
     }
 
     if (_oldPwController.text.length < 4 || _newPwController.text.length < 4) {
-      _showToast(l10n.passwordLengthError, isError: true);
+      AppToast.showError(context, l10n.passwordLengthError, appColors);
       return;
     }
 
     if (_oldPwController.text == _newPwController.text) {
-      _showToast(
-        isVi
-            ? 'Mật khẩu mới không được trùng mật khẩu cũ.'
-            : 'New password cannot be the same as old password.',
-        isError: true,
-      );
+      AppToast.showError(context, l10n.samePasswordError, appColors);
       return;
     }
 
@@ -162,14 +160,24 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           .updatePassword(_oldPwController.text, _newPwController.text);
 
       if (errorMessage == null) {
-        _showToast(l10n.updateSuccess);
+        if (mounted) {
+          AppToast.showSuccess(context, l10n.updateSuccess, appColors);
+        }
         _oldPwController.clear();
         _newPwController.clear();
       } else {
-        _showToast(_parseErrorMessage(errorMessage, l10n), isError: true);
+        if (mounted) {
+          AppToast.showError(
+            context,
+            _getLocalizedErrorMessage(errorMessage, l10n),
+            appColors,
+          );
+        }
       }
     } catch (e) {
-      _showToast(l10n.systemError, isError: true);
+      if (mounted) {
+        AppToast.showError(context, l10n.systemError, appColors);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -213,7 +221,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              // SECTION: HỒ SƠ PERSONAL
               _buildSettingsCard(
                 title: l10n.personalInfo,
                 appColors: appColors,
@@ -282,7 +289,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              // SECTION: BẢO MẬT SECURITY
               _buildSettingsCard(
                 title: l10n.security,
                 appColors: appColors,

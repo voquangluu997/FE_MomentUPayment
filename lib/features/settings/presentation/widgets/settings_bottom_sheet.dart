@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/providers/locale_provider.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
-import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
-import 'package:moment_u_payment/l10n/app_localizations.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart'; // ✨ Thêm import tiện ích Toast của bạn
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
-import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
 import 'package:moment_u_payment/features/profile/presentation/screens/profile_settings_screen.dart';
+import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class SettingsBottomSheet extends ConsumerWidget {
   const SettingsBottomSheet({super.key});
@@ -43,6 +43,7 @@ class SettingsBottomSheet extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Thanh kéo ngang nhỏ trên cùng định hướng BottomSheet
           Container(
             width: 40,
             height: 4,
@@ -52,6 +53,8 @@ class SettingsBottomSheet extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Tiêu đề BottomSheet
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -71,12 +74,16 @@ class SettingsBottomSheet extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
+
+          // Danh sách các mục cài đặt cấu hình công cụ
           Flexible(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // ✨ MỚI: TÀI KHOẢN & BẢO MẬT
+                  // =========================================================
+                  // PHÂN NHÓM 1: QUẢN LÝ CÁ NHÂN & TƯƠNG TÁC
+                  // =========================================================
                   _buildSettingItem(
                     icon: Icons.person_outline_rounded,
                     title: l10n.accountSettings,
@@ -91,7 +98,32 @@ class SettingsBottomSheet extends ConsumerWidget {
                       );
                     },
                   ),
+                  _buildSettingItem(
+                    icon: Icons.notifications_active_rounded,
+                    title: l10n.notificationSettingsTitle,
+                    subtitle: l10n.notificationSettingsSubtitle,
+                    appColors: appColors,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
 
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Divider(
+                      thickness: 0.5,
+                      color: appColors.textMuted.withOpacity(0.15),
+                    ),
+                  ),
+
+                  // =========================================================
+                  // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
+                  // =========================================================
                   _buildSettingItem(
                     icon: Icons.language_rounded,
                     title: l10n.language,
@@ -106,7 +138,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                           ref.read(localeProvider.notifier).toggleLocale(),
                     ),
                   ),
-
                   _buildSettingItem(
                     icon: Icons.monetization_on_rounded,
                     title: l10n.currencyUnit,
@@ -179,7 +210,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                       ),
                     ),
                   ),
-
                   _buildSettingItem(
                     icon: Icons.dark_mode_rounded,
                     title: l10n.darkMode,
@@ -195,21 +225,17 @@ class SettingsBottomSheet extends ConsumerWidget {
                         ref.read(themeModeProvider.notifier).toggleTheme(),
                   ),
 
-                  _buildSettingItem(
-                    icon: Icons.notifications_active_rounded,
-                    title: l10n.notificationSettingsTitle,
-                    subtitle: l10n.notificationSettingsSubtitle,
-                    appColors: appColors,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationSettingsScreen(),
-                        ),
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Divider(
+                      thickness: 0.5,
+                      color: appColors.textMuted.withOpacity(0.15),
+                    ),
                   ),
 
+                  // =========================================================
+                  // PHÂN NHÓM 3: HỖ TRỢ & ĐÓNG GÓP PHÁT TRIỂN
+                  // =========================================================
                   _buildSettingItem(
                     icon: Icons.help_outline_rounded,
                     title: l10n.helpCenter,
@@ -220,10 +246,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                       _showHelpCenterDialog(context, appColors, l10n);
                     },
                   ),
-
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _buildDonationBanner(context, appColors, l10n),
-                  const SizedBox(height: 8),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -233,6 +257,9 @@ class SettingsBottomSheet extends ConsumerWidget {
                     ),
                   ),
 
+                  // =========================================================
+                  // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (ĐĂNG XUẤT)
+                  // =========================================================
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Container(
@@ -277,6 +304,47 @@ class SettingsBottomSheet extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required AppColorTheme appColors,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: appColors.primary.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: appColors.primary, size: 22),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+          color: appColors.primaryDark,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(color: appColors.textMuted, fontSize: 13),
+      ),
+      trailing:
+          trailing ??
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: appColors.textMuted,
+          ),
+      onTap: onTap,
     );
   }
 
@@ -401,7 +469,6 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -442,9 +509,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: appColors.primary,
@@ -470,7 +535,6 @@ class SettingsBottomSheet extends ConsumerWidget {
     );
   }
 
-  // ✨ DIALOG TRUNG TÂM TRỢ GIÚP
   void _showHelpCenterDialog(
     BuildContext context,
     AppColorTheme appColors,
@@ -518,18 +582,15 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Box chứa Email hỗ trợ có thể copy
             InkWell(
               onTap: () async {
                 await Clipboard.setData(ClipboardData(text: l10n.contactEmail));
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã sao chép email: ${l10n.contactEmail}'),
-                      backgroundColor: appColors.primary,
-                      duration: const Duration(seconds: 2),
-                    ),
+                  // ✨ FIX: Thay thế SnackBar thô bằng AppToast.showSuccess đồng bộ màu sắc và style mới
+                  AppToast.showSuccess(
+                    context,
+                    'Đã sao chép email: ${l10n.contactEmail}',
+                    appColors,
                   );
                 }
               },
@@ -571,10 +632,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Phiên bản app
             Text(
               '${l10n.appVersionTitle}: ${l10n.appVersion}',
               style: TextStyle(
@@ -583,10 +641,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Nút đóng
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: appColors.primary,
@@ -608,151 +663,6 @@ class SettingsBottomSheet extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSettingItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required AppColorTheme appColors,
-    Widget? trailing,
-    VoidCallback? onTap,
-  }) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: appColors.primary.withOpacity(0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: appColors.primary, size: 22),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 15,
-          color: appColors.primaryDark,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(color: appColors.textMuted, fontSize: 13),
-      ),
-      trailing:
-          trailing ??
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 16,
-            color: appColors.textMuted,
-          ),
-      onTap: onTap,
-    );
-  }
-
-  void _showUpdatePasswordDialog(BuildContext context) {
-    final oldPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => Consumer(
-        builder: (context, ref, child) {
-          final l10n = AppLocalizations.of(context)!;
-          final dialogColors = ref.watch(appColorsProvider);
-
-          return AlertDialog(
-            backgroundColor: dialogColors.background,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Text(
-              l10n.newPasswordTitle,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: dialogColors.primaryDark,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: oldPasswordController,
-                  obscureText: true,
-                  style: TextStyle(color: dialogColors.text),
-                  decoration: InputDecoration(
-                    labelText: l10n.currentPassword,
-                    labelStyle: TextStyle(color: dialogColors.textMuted),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: newPasswordController,
-                  obscureText: true,
-                  style: TextStyle(color: dialogColors.text),
-                  decoration: InputDecoration(
-                    labelText: l10n.newPassword,
-                    labelStyle: TextStyle(color: dialogColors.textMuted),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  l10n.cancel,
-                  style: TextStyle(color: dialogColors.textMuted),
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: dialogColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () async {
-                  final oldPw = oldPasswordController.text.trim();
-                  final newPw = newPasswordController.text.trim();
-
-                  if (oldPw.isNotEmpty && newPw.isNotEmpty) {
-                    final authNotifier = ref.read(authProvider.notifier);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    Navigator.pop(context);
-
-                    final isSuccess = await authNotifier.updatePassword(
-                      oldPw,
-                      newPw,
-                    );
-                    if (isSuccess != null) {
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.updatePasswordSuccess),
-                          backgroundColor: dialogColors.success,
-                        ),
-                      );
-                    } else {
-                      scaffoldMessenger.showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.updatePasswordError),
-                          backgroundColor: dialogColors.error,
-                        ),
-                      );
-                    }
-                  }
-                },
-                child: Text(
-                  l10n.update,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          );
-        },
       ),
     );
   }

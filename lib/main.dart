@@ -76,3 +76,5 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
+
+final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();

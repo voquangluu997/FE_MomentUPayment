@@ -6,6 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../auth_provider.dart';
 import 'register_screen.dart';
 import '../../../../core/providers/locale_provider.dart';
+import '../../../../core/utils/app_toast.dart'; // ✨ Đã thêm import Toast cute của bạn ở đây nha!
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,12 +33,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final appColors = ref.read(appColorsProvider);
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.emptyFieldsWarning),
-          backgroundColor: appColors.error,
-        ),
-      );
+      // ✨ Dùng Toast lỗi nhẹ nhàng thay cho SnackBar cũ
+      AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
       return;
     }
     ref.read(authProvider.notifier).login(email, password);
@@ -52,30 +49,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.loginSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.loginSuccess),
-            backgroundColor: appColors.success,
-          ),
-        );
+        // ✨ Toast ngôi sao lấp lánh khi đăng nhập thành công
+        AppToast.showSuccess(context, l10n.loginSuccess, appColors);
+
         ref.read(authProvider.notifier).resetState();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (next == AuthState.loginError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.loginErrorNotification),
-            backgroundColor: appColors.error,
-          ),
-        );
+        // ✨ Toast trái tim vỡ khi sai mật khẩu/tài khoản
+        AppToast.showError(context, l10n.loginErrorNotification, appColors);
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.googleLoginError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.googleLoginErrorNotification),
-            backgroundColor: appColors.error,
-          ),
+        // ✨ Toast lỗi đăng nhập Google
+        AppToast.showError(
+          context,
+          l10n.googleLoginErrorNotification,
+          appColors,
         );
         ref.read(authProvider.notifier).resetState();
       }
@@ -113,9 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(
-                      color: appColors.text,
-                    ), // ✨ Sửa màu chữ nhập từ AppColors
+                    style: TextStyle(color: appColors.text),
                     decoration: InputDecoration(
                       labelText: l10n.email,
                       labelStyle: TextStyle(color: appColors.textMuted),
@@ -137,9 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    style: TextStyle(
-                      color: appColors.text,
-                    ), // ✨ Sửa màu chữ nhập từ AppColors
+                    style: TextStyle(color: appColors.text),
                     decoration: InputDecoration(
                       labelText: l10n.password,
                       labelStyle: TextStyle(color: appColors.textMuted),
@@ -157,7 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Thanh nút bấm Quên / Đặt lại mật khẩu (Đã đa ngôn ngữ)
+                  // Thanh nút bấm Quên / Đặt lại mật khẩu
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -276,8 +262,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: appColors
-                                  .text, // ✨ Sử dụng AppColors đồng bộ text
+                              color: appColors.text,
                             ),
                           ),
                         ],
@@ -357,7 +342,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // Dialog gửi mã yêu cầu khôi phục mật khẩu (Đã đa ngôn ngữ & Đồng bộ AppColors)
+  // Dialog gửi mã yêu cầu khôi phục mật khẩu
   void _showForgotPasswordDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final forgotEmailController = TextEditingController();
@@ -383,9 +368,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextField(
               controller: forgotEmailController,
               keyboardType: TextInputType.emailAddress,
-              style: TextStyle(
-                color: appColors.text,
-              ), // ✨ Đồng bộ màu text nhập
+              style: TextStyle(color: appColors.text),
               decoration: InputDecoration(
                 labelText: l10n.emailAccountLabel,
                 labelStyle: TextStyle(color: appColors.textMuted),
@@ -416,11 +399,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               if (email.isNotEmpty) {
                 ref.read(authProvider.notifier).forgotPassword(email);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${l10n.sendCodeSuccess} $email'),
-                    backgroundColor: appColors.success,
-                  ),
+
+                // ✨ Thao tác Toast thành công khi gửi code
+                AppToast.showSuccess(
+                  context,
+                  '${l10n.sendCodeSuccess} $email',
+                  appColors,
                 );
               }
             },
@@ -434,7 +418,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // Dialog nhập OTP và đặt lại mật khẩu mới (Đã đa ngôn ngữ & Đồng bộ AppColors)
+  // Dialog nhập OTP và đặt lại mật khẩu mới
   void _showResetPasswordDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final emailController = TextEditingController();
@@ -458,9 +442,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(
-                  color: appColors.text,
-                ), // ✨ Đồng bộ màu text nhập
+                style: TextStyle(color: appColors.text),
                 decoration: InputDecoration(
                   labelText: l10n.emailVerificationLabel,
                   labelStyle: TextStyle(color: appColors.textMuted),
@@ -470,9 +452,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextField(
                 controller: otpController,
                 keyboardType: TextInputType.number,
-                style: TextStyle(
-                  color: appColors.text,
-                ), // ✨ Đồng bộ màu text nhập
+                style: TextStyle(color: appColors.text),
                 decoration: InputDecoration(
                   labelText: l10n.otpLabel,
                   labelStyle: TextStyle(color: appColors.textMuted),
@@ -482,9 +462,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextField(
                 controller: newPasswordController,
                 obscureText: true,
-                style: TextStyle(
-                  color: appColors.text,
-                ), // ✨ Đồng bộ màu text nhập
+                style: TextStyle(color: appColors.text),
                 decoration: InputDecoration(
                   labelText: l10n.newPasswordLabel,
                   labelStyle: TextStyle(color: appColors.textMuted),
@@ -518,11 +496,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     .read(authProvider.notifier)
                     .resetPasswordWithOtp(email, otp, newPw);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.resetPasswordSuccess),
-                    backgroundColor: appColors.success,
-                  ),
+
+                // ✨ Toast thành công đổi mật khẩu mới ngọt ngào
+                AppToast.showSuccess(
+                  context,
+                  l10n.resetPasswordSuccess,
+                  appColors,
                 );
               }
             },

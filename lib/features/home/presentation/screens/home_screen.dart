@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
@@ -15,6 +16,8 @@ import 'package:moment_u_payment/features/transaction/presentation/widgets/trans
 import 'package:moment_u_payment/features/transaction/presentation/widgets/photo_calendar_cell.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart';
+// #1. Nhớ kiểm tra lại path import file AppCalendarSheet của bạn
 
 // ✨ TẠO ENUM 3 TRẠNG THÁI VIEW
 enum ViewMode { list, grid, calendar }
@@ -63,7 +66,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (isUpdated == true && mounted) {
+      final appColors = ref.read(appColorsProvider);
       ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+
+      AppToast.showSuccess(
+        context,
+        'Cập nhật khoảnh khắc thành công rùi nha! 🥰',
+        appColors,
+      );
     }
   }
 
@@ -107,10 +117,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final timelineState = ref.watch(transactionTimelineProvider);
-
-    // ✨ Lắng nghe trạng thái View hiện tại (List, Grid, Calendar)
     final viewMode = ref.watch(viewModeProvider);
-
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
     final isLoadingMore = timelineNotifier.isLoadingMore;
     final hasMore = timelineNotifier.hasMore;
@@ -138,13 +145,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           data: (allTransactions) {
             final filteredTransactions = _applyDateFilter(allTransactions);
 
-            // 1. NHÓM DỮ LIỆU THEO NGÀY (Dùng cho List và Masonry Grid)
             final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
               filteredTransactions,
             );
             final dailyKeys = dailyGrouped.keys.toList();
 
-            // 2. NHÓM DỮ LIỆU THEO THÁNG (Chỉ tạo khi đang ở chế độ Calendar)
             Map<DateTime, List<Map<String, dynamic>>> monthlyGrouped = {};
             List<DateTime> monthlyKeys = [];
 
@@ -224,7 +229,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                 final dataIndex = index - 3;
 
-                // ✨ RẼ NHÁNH GIAO DIỆN CHÍNH Ở ĐÂY
                 if (viewMode == ViewMode.calendar) {
                   final monthKey = monthlyKeys[dataIndex];
                   final txList = monthlyGrouped[monthKey]!;
@@ -248,7 +252,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     appColors,
                   );
                 } else {
-                  // ViewMode.list
                   final dayKey = dailyKeys[dataIndex];
                   final txList = dailyGrouped[dayKey]!;
                   return _buildListGroup(
@@ -273,6 +276,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
           if (isAdded == true && mounted) {
             ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+
+            AppToast.showSuccess(
+              context,
+              'Thêm khoảnh khắc mới thành công rùi! ✨',
+              appColors,
+            );
           }
         },
         child: const Icon(Icons.add, color: Colors.white),
@@ -280,86 +289,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ===========================================================================
-  // WIDGET ROW: CHỨA TIÊU ĐỀ HOME + CẶP NÚT FILTER & CHUYỂN VIEW
-  // ===========================================================================
   Widget _buildControlHeaderRow(AppColorTheme appColors, ViewMode currentMode) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: HomeHeaderSection(
-              // Truyền trạng thái để icon cũ biết đang ở Grid hay List
-              isGridView: currentMode == ViewMode.grid,
-              isFiltered: _selectedDateRange != null,
+    return HomeHeaderSection(
+      isGridView: currentMode == ViewMode.grid,
+      isFiltered: _selectedDateRange != null,
+      isCalendarView: currentMode == ViewMode.calendar,
 
-              // 🔄 Logic cho nút cũ: Chỉ xoay vòng giữa List và Grid
-              onToggleView: () {
-                if (currentMode == ViewMode.grid) {
-                  ref.read(viewModeProvider.notifier).state = ViewMode.list;
-                } else {
-                  ref.read(viewModeProvider.notifier).state = ViewMode.grid;
-                }
-              },
+      onToggleView: () {
+        ref.read(viewModeProvider.notifier).state = currentMode == ViewMode.grid
+            ? ViewMode.list
+            : ViewMode.grid;
+      },
 
-              onFilterTap: () async {
-                final DateTimeRange? picked = await showDateRangePicker(
-                  context: context,
-                  initialDateRange:
-                      _selectedDateRange ??
-                      DateTimeRange(start: DateTime.now(), end: DateTime.now()),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2030),
-                  builder: (context, child) => Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: ColorScheme.light(
-                        primary: appColors.primary,
-                      ),
-                    ),
-                    child: child!,
-                  ),
-                );
-                if (picked != null) {
-                  setState(() => _selectedDateRange = picked);
-                }
-              },
-            ),
-          ),
+      // --- SỬ DỤNG APP CALENDAR SHEET Ở ĐÂY ---
+      onFilterTap: () {
+        AppCalendarSheet.show(
+          context: context,
+          initialRange:
+              _selectedDateRange ??
+              DateTimeRange(start: DateTime.now(), end: DateTime.now()),
+          appColors: appColors,
+          onRangeSelected: (range) {
+            setState(() => _selectedDateRange = range);
+          },
+        );
+      },
 
-          const SizedBox(width: 8),
-
-          // ✨ NÚT CALENDAR ĐỘC LẬP NẰM BÊN CẠNH
-          InkWell(
-            onTap: () {
-              if (currentMode == ViewMode.calendar) {
-                // Đang mở Lịch, bấm vào sẽ tắt Lịch (trở về List mặc định)
-                ref.read(viewModeProvider.notifier).state = ViewMode.list;
-              } else {
-                // Đang ở List/Grid, bấm vào sẽ bật Lịch
-                ref.read(viewModeProvider.notifier).state = ViewMode.calendar;
-              }
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: currentMode == ViewMode.calendar
-                    ? appColors.primary
-                    : appColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.calendar_month_rounded,
-                size: 22,
-                color: currentMode == ViewMode.calendar
-                    ? Colors.white
-                    : appColors.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
+      onCalendarTap: () {
+        ref
+            .read(viewModeProvider.notifier)
+            .state = currentMode == ViewMode.calendar
+            ? ViewMode.list
+            : ViewMode.calendar;
+      },
     );
   }
 
@@ -407,9 +369,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ===========================================================================
-  // 1. GIAO DIỆN LIST (MẶC ĐỊNH)
-  // ===========================================================================
   Widget _buildListGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
@@ -439,9 +398,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ===========================================================================
-  // 2. GIAO DIỆN MASONRY GRID (GIỮ LẠI CŨ)
-  // ===========================================================================
   Widget _buildMasonryGridGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
@@ -491,9 +447,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ===========================================================================
-  // 3. GIAO DIỆN CALENDAR (MỚI THÊM VÀO)
-  // ===========================================================================
   Widget _buildMonthlyCalendar(
     DateTime monthKey,
     List<Map<String, dynamic>> monthTx,
@@ -612,7 +565,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 } else {
                   Navigator.of(context)
-                      .push(
+                      .push<bool>(
                         MaterialPageRoute(
                           builder: (_) => const AddTransactionScreen(),
                         ),
@@ -622,6 +575,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ref
                               .read(transactionTimelineProvider.notifier)
                               .refreshTimeline();
+
+                          AppToast.showSuccess(
+                            context,
+                            'Thêm khoảnh khắc thành công rùi nè! 🎉',
+                            appColors,
+                          );
                         }
                       });
                 }
@@ -780,8 +739,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref
             .read(transactionTimelineProvider.notifier)
             .removeMomentLocally(tx['id'].toString());
+
+        if (mounted) {
+          AppToast.showSuccess(
+            context,
+            'Đã xoá khoảnh khắc thành công rùi bạn ơi! 🌸',
+            appColors,
+          );
+        }
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+
+        if (mounted) {
+          AppToast.showError(
+            context,
+            'Có lỗi xảy ra khi xoá mất rồi, thử lại nhé! 😢',
+            appColors,
+          );
+        }
       }
     }
   }

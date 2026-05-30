@@ -95,15 +95,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final data = jsonDecode(response.body);
         final user = data['user'];
 
-        ref
-            .read(userInfoProvider.notifier)
-            .updateUserInfo(
-              user['name'] ?? '',
-              user['email'] ?? '',
-              user['isEmailVerified'] ?? false,
-              user['avatar'],
-            );
+        if (user != null) {
+          ref
+              .read(userInfoProvider.notifier)
+              .updateUserInfo(
+                user['name']?.toString() ?? '',
+                user['email']?.toString() ?? '',
+                user['isEmailVerified'] as bool? ?? false,
+                user['avatar'] as String?,
+              );
+        }
 
+        // Force reload transactions
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
 
@@ -134,14 +137,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
 
         final user = data['user'];
-        ref
-            .read(userInfoProvider.notifier)
-            .updateUserInfo(
-              user['name'] ?? '',
-              user['email'] ?? email,
-              user['isEmailVerified'] ?? false,
-              user['avatar'],
-            );
+
+        if (user != null) {
+          ref
+              .read(userInfoProvider.notifier)
+              .updateUserInfo(
+                user['name']?.toString() ?? '',
+                user['email']?.toString() ?? email,
+                user['isEmailVerified'] as bool? ?? false,
+                user['avatar'] as String?,
+              );
+        }
+
+        // --- FIX: Refresh dữ liệu giao dịch khi login thành công ---
+        ref.invalidate(transactionTimelineProvider);
+        ref.invalidate(transactionProvider);
+        // -----------------------------------------------------------
 
         state = AuthState.loginSuccess;
       } else {
@@ -188,14 +199,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
 
         final user = data['user'];
-        ref
-            .read(userInfoProvider.notifier)
-            .updateUserInfo(
-              user['name'] ?? '',
-              user['email'] ?? '',
-              user['isEmailVerified'] ?? true,
-              user['avatar'],
-            );
+
+        if (user != null) {
+          ref
+              .read(userInfoProvider.notifier)
+              .updateUserInfo(
+                user['name']?.toString() ?? '',
+                user['email']?.toString() ?? '',
+                user['isEmailVerified'] as bool? ?? true,
+                user['avatar'] as String?,
+              );
+        }
+
+        // --- FIX: Refresh dữ liệu giao dịch khi login GG thành công ---
+        ref.invalidate(transactionTimelineProvider);
+        ref.invalidate(transactionProvider);
+        // -----------------------------------------------------------
 
         state = AuthState.loginSuccess;
       } else {
@@ -205,6 +224,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState.googleLoginError;
     }
   }
+
+  // ... Các hàm khác giữ nguyên ...
 
   Future<bool> resendVerificationEmail(String email) async {
     try {
@@ -235,14 +256,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final user = data['user'];
-        ref
-            .read(userInfoProvider.notifier)
-            .updateUserInfo(
-              user['name'] ?? '',
-              user['email'] ?? '',
-              user['isEmailVerified'] ?? false,
-              user['avatar'],
-            );
+
+        if (user != null) {
+          ref
+              .read(userInfoProvider.notifier)
+              .updateUserInfo(
+                user['name']?.toString() ?? '',
+                user['email']?.toString() ?? '',
+                user['isEmailVerified'] as bool? ?? false,
+                user['avatar'] as String?,
+              );
+        }
       }
     } catch (_) {}
   }
@@ -362,8 +386,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final data = response.data;
         final userResponse = data['user'];
 
-        final String newName = userResponse['name'] ?? name;
-        final String? newAvatar = userResponse['avatar'];
+        final String newName = userResponse?['name']?.toString() ?? name;
+        final String? newAvatar = userResponse?['avatar'] as String?;
 
         final currentUser = ref.read(userInfoProvider);
         final currentEmail = currentUser?.email ?? "";

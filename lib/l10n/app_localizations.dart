@@ -407,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wallet X-Ray 🔍'**
+  /// **'Transaction Analytics'**
   String get analyticsTitle;
 
   /// No description provided for @emptyAnalyticsData.
@@ -461,13 +461,13 @@ abstract class AppLocalizations {
   /// No description provided for @galleryPickAction.
   ///
   /// In en, this message translates to:
-  /// **'Or pick a cute photo from your gallery ✨'**
+  /// **'Pick image'**
   String get galleryPickAction;
 
   /// No description provided for @galleryChangeAction.
   ///
   /// In en, this message translates to:
-  /// **'Change photo from your collection 🌸'**
+  /// **'Change image'**
   String get galleryChangeAction;
 
   /// No description provided for @amountSectionTitle.
@@ -1421,6 +1421,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current password is incorrect!'**
   String get incorrectPassword;
+
+  /// No description provided for @maxOneYearWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Moment U only supports viewing up to 1 year! 🗓️'**
+  String get maxOneYearWarning;
+
+  /// No description provided for @wrongOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect current password.'**
+  String get wrongOldPassword;
+
+  /// No description provided for @userNotFoundError.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found.'**
+  String get userNotFoundError;
+
+  /// No description provided for @weakPasswordError.
+  ///
+  /// In en, this message translates to:
+  /// **'The new password is too weak.'**
+  String get weakPasswordError;
+
+  /// No description provided for @noChangeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Your information has not changed! ✨'**
+  String get noChangeWarning;
+
+  /// No description provided for @fillPasswordFieldsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter all password fields.'**
+  String get fillPasswordFieldsError;
+
+  /// No description provided for @samePasswordError.
+  ///
+  /// In en, this message translates to:
+  /// **'New password cannot be the same as old password.'**
+  String get samePasswordError;
 }
 
 class _AppLocalizationsDelegate

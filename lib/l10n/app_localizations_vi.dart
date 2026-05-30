@@ -173,7 +173,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 
   @override
-  String get analyticsTitle => 'Soi Ví 🔍';
+  String get analyticsTitle => 'Phân tích giao dịch';
 
   @override
   String get emptyAnalyticsData =>
@@ -202,10 +202,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Nhấn nhẹ vào đây để chụp choẹt hóa đơn nhen! 📸';
 
   @override
-  String get galleryPickAction => 'Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨';
+  String get galleryPickAction => 'Chọn ảnh';
 
   @override
-  String get galleryChangeAction => 'Đổi ảnh khác từ bộ sưu tập nha 🌸';
+  String get galleryChangeAction => 'Đổi ảnh';
 
   @override
   String get amountSectionTitle => 'TỔNG THIỆT HẠI ĐỢT NÀY 💰';
@@ -742,4 +742,27 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get incorrectPassword => 'Mật khẩu hiện tại không đúng!';
+
+  @override
+  String get maxOneYearWarning =>
+      'Moment U chỉ hỗ trợ xem tối đa 1 năm thui nè! 🗓️';
+
+  @override
+  String get wrongOldPassword => 'Mật khẩu cũ không chính xác.';
+
+  @override
+  String get userNotFoundError => 'Không tìm thấy thông tin tài khoản.';
+
+  @override
+  String get weakPasswordError => 'Mật khẩu mới quá yếu.';
+
+  @override
+  String get noChangeWarning => 'Thông tin của bạn vẫn như cũ! ✨';
+
+  @override
+  String get fillPasswordFieldsError =>
+      'Vui lòng nhập đầy đủ thông tin mật khẩu.';
+
+  @override
+  String get samePasswordError => 'Mật khẩu mới không được trùng mật khẩu cũ.';
 }
