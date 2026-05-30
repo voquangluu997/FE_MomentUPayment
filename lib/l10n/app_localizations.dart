@@ -909,7 +909,7 @@ abstract class AppLocalizations {
   /// No description provided for @darkMode.
   ///
   /// In en, this message translates to:
-  /// **'Dark Mode'**
+  /// **'Night owl mode'**
   String get darkMode;
 
   /// No description provided for @lightTheme.
@@ -923,12 +923,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage alerts & expenses'**
   String get notificationSettingsSubtitle;
-
-  /// No description provided for @changePassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Change Password'**
-  String get changePassword;
 
   /// No description provided for @changePasswordSubtitle.
   ///
@@ -951,7 +945,7 @@ abstract class AppLocalizations {
   /// No description provided for @logout.
   ///
   /// In en, this message translates to:
-  /// **'Logout'**
+  /// **'Catch ya later!'**
   String get logout;
 
   /// No description provided for @logoutSubtitle.
@@ -965,12 +959,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Password'**
   String get newPasswordTitle;
-
-  /// No description provided for @currentPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Current Password'**
-  String get currentPassword;
 
   /// No description provided for @update.
   ///
@@ -1203,7 +1191,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpCenterDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Help Center 🎧'**
+  /// **'Lost? Let me help! 🎧'**
   String get helpCenterDialogTitle;
 
   /// No description provided for @helpCenterDialogMessage.
@@ -1319,6 +1307,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sun'**
   String get sun;
+
+  /// No description provided for @accountSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Little Corner ✨'**
+  String get accountSettings;
+
+  /// No description provided for @accountSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tweak your name, fresh pic & lock the safe'**
+  String get accountSettingsSubtitle;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cool name'**
+  String get fullName;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save it!'**
+  String get save;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// No description provided for @updateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Update successful!'**
+  String get updateSuccess;
+
+  /// No description provided for @updateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops, something went wrong...'**
+  String get updateError;
+
+  /// No description provided for @changeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change avatar'**
+  String get changeAvatar;
+
+  /// No description provided for @saveSettingsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated!'**
+  String get saveSettingsSuccess;
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal information'**
+  String get personalInfo;
+
+  /// No description provided for @security.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get security;
+
+  /// No description provided for @updateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Update profile'**
+  String get updateProfile;
+
+  /// No description provided for @updatePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Update password'**
+  String get updatePassword;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Update failed!'**
+  String get updateFailed;
+
+  /// No description provided for @nameEmptyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot be empty!'**
+  String get nameEmptyError;
+
+  /// No description provided for @passwordLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 4 characters long!'**
+  String get passwordLengthError;
+
+  /// No description provided for @systemError.
+  ///
+  /// In en, this message translates to:
+  /// **'System error!'**
+  String get systemError;
+
+  /// No description provided for @incorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is incorrect!'**
+  String get incorrectPassword;
 }
 
 class _AppLocalizationsDelegate

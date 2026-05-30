@@ -474,16 +474,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentlyUsing => 'Currently using';
 
   @override
-  String get darkMode => 'Dark Mode';
+  String get darkMode => 'Night owl mode';
 
   @override
   String get lightTheme => 'Light Theme';
 
   @override
   String get notificationSettingsSubtitle => 'Manage alerts & expenses';
-
-  @override
-  String get changePassword => 'Change Password';
 
   @override
   String get changePasswordSubtitle => 'Change current account password';
@@ -495,16 +492,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpCenterSubtitle => 'FAQ & Support Contact';
 
   @override
-  String get logout => 'Logout';
+  String get logout => 'Catch ya later!';
 
   @override
   String get logoutSubtitle => 'Leave the current login session';
 
   @override
   String get newPasswordTitle => 'New Password';
-
-  @override
-  String get currentPassword => 'Current Password';
 
   @override
   String get update => 'Update';
@@ -626,7 +620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buyMeACoffeeBtn => 'Or via Buy Me a Coffee ☕';
 
   @override
-  String get helpCenterDialogTitle => 'Help Center 🎧';
+  String get helpCenterDialogTitle => 'Lost? Let me help! 🎧';
 
   @override
   String get helpCenterDialogMessage =>
@@ -686,4 +680,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sun => 'Sun';
+
+  @override
+  String get accountSettings => 'Your Little Corner ✨';
+
+  @override
+  String get accountSettingsSubtitle =>
+      'Tweak your name, fresh pic & lock the safe';
+
+  @override
+  String get fullName => 'Your cool name';
+
+  @override
+  String get save => 'Save it!';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get updateSuccess => 'Update successful!';
+
+  @override
+  String get updateError => 'Oops, something went wrong...';
+
+  @override
+  String get changeAvatar => 'Change avatar';
+
+  @override
+  String get saveSettingsSuccess => 'Profile updated!';
+
+  @override
+  String get personalInfo => 'Personal information';
+
+  @override
+  String get security => 'Security';
+
+  @override
+  String get updateProfile => 'Update profile';
+
+  @override
+  String get updatePassword => 'Update password';
+
+  @override
+  String get updateFailed => 'Update failed!';
+
+  @override
+  String get nameEmptyError => 'Name cannot be empty!';
+
+  @override
+  String get passwordLengthError =>
+      'Password must be at least 4 characters long!';
+
+  @override
+  String get systemError => 'System error!';
+
+  @override
+  String get incorrectPassword => 'Current password is incorrect!';
 }

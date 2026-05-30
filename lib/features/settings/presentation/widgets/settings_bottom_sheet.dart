@@ -9,6 +9,7 @@ import 'package:moment_u_payment/features/notification/presentation/screens/noti
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/features/profile/presentation/screens/profile_settings_screen.dart';
 
 class SettingsBottomSheet extends ConsumerWidget {
   const SettingsBottomSheet({super.key});
@@ -75,6 +76,22 @@ class SettingsBottomSheet extends ConsumerWidget {
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
+                  // ✨ MỚI: TÀI KHOẢN & BẢO MẬT
+                  _buildSettingItem(
+                    icon: Icons.person_outline_rounded,
+                    title: l10n.accountSettings,
+                    subtitle: l10n.accountSettingsSubtitle,
+                    appColors: appColors,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
                   _buildSettingItem(
                     icon: Icons.language_rounded,
                     title: l10n.language,
@@ -171,13 +188,11 @@ class SettingsBottomSheet extends ConsumerWidget {
                     trailing: Switch(
                       value: isDark,
                       activeColor: appColors.primary,
-                      onChanged: (val) {
-                        ref.read(themeModeProvider.notifier).toggleTheme();
-                      },
+                      onChanged: (val) =>
+                          ref.read(themeModeProvider.notifier).toggleTheme(),
                     ),
-                    onTap: () {
-                      ref.read(themeModeProvider.notifier).toggleTheme();
-                    },
+                    onTap: () =>
+                        ref.read(themeModeProvider.notifier).toggleTheme(),
                   ),
 
                   _buildSettingItem(
@@ -196,18 +211,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                   ),
 
                   _buildSettingItem(
-                    icon: Icons.lock_reset_rounded,
-                    title: l10n.changePassword,
-                    subtitle: l10n.changePasswordSubtitle,
-                    appColors: appColors,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showUpdatePasswordDialog(context);
-                    },
-                  ),
-
-                  // ✨ CẬP NHẬT TRUNG TÂM TRỢ GIÚP
-                  _buildSettingItem(
                     icon: Icons.help_outline_rounded,
                     title: l10n.helpCenter,
                     subtitle: l10n.helpCenterSubtitle,
@@ -219,10 +222,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 16),
-
-                  // ✨ BANNER DONATE
                   _buildDonationBanner(context, appColors, l10n),
-
                   const SizedBox(height: 8),
 
                   Padding(
@@ -264,10 +264,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                     ),
                     onTap: () async {
                       Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
                       await ref.read(authProvider.notifier).logout();
-
                       if (!context.mounted) return;
                       Navigator.of(
                         context,
@@ -731,7 +728,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                       oldPw,
                       newPw,
                     );
-                    if (isSuccess) {
+                    if (isSuccess != null) {
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
                           content: Text(l10n.updatePasswordSuccess),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart'; // Thay đổi đường dẫn này cho đúng với dự án của bạn
 
 class AuthRepository {
@@ -28,4 +29,19 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  Future<Response> updateProfile(String name, String? avatarUrl) async {
+    try {
+      return await _dio.post(
+        '/auth/update-profile',
+        data: {'name': name, if (avatarUrl != null) 'avatar': avatarUrl},
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository();
+});

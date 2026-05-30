@@ -445,7 +445,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get otpCode => 'Mã xác thực (OTP / Token)';
 
   @override
-  String get newPassword => 'Mật khẩu mới';
+  String get newPassword => 'Mật khẩu mới nè';
 
   @override
   String get confirm => 'Xác nhận';
@@ -476,7 +476,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currentlyUsing => 'Đang dùng';
 
   @override
-  String get darkMode => 'Chế độ tối (Dark Mode)';
+  String get darkMode => 'Bật chế độ cú đêm';
 
   @override
   String get lightTheme => 'Giao diện sáng';
@@ -485,28 +485,22 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationSettingsSubtitle => 'Quản lý cảnh báo & chi tiêu';
 
   @override
-  String get changePassword => 'Đổi mật khẩu';
-
-  @override
   String get changePasswordSubtitle => 'Thay đổi mật khẩu tài khoản hiện tại';
 
   @override
-  String get helpCenter => 'Trung tâm trợ giúp';
+  String get helpCenter => 'Cần mình giúp gì hông? 🎧';
 
   @override
   String get helpCenterSubtitle => 'Hỏi đáp & Liên hệ hỗ trợ';
 
   @override
-  String get logout => 'Đăng xuất';
+  String get logout => 'Thôi, tớ đi đây!';
 
   @override
   String get logoutSubtitle => 'Rời khỏi phiên đăng nhập hiện tại';
 
   @override
   String get newPasswordTitle => 'Đổi mật khẩu mới';
-
-  @override
-  String get currentPassword => 'Mật khẩu hiện tại';
 
   @override
   String get update => 'Cập nhật';
@@ -690,4 +684,62 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get sun => 'CN';
+
+  @override
+  String get accountSettings => 'Góc riêng của bạn ✨';
+
+  @override
+  String get accountSettingsSubtitle =>
+      'Sửa tên, đổi ảnh xinh và khóa két cho xịn';
+
+  @override
+  String get fullName => 'Tên \'xịn\' của bạn';
+
+  @override
+  String get save => 'Lưu lẹ đi nè!';
+
+  @override
+  String get changePassword => 'Đổi mật khẩu';
+
+  @override
+  String get currentPassword => 'Mật khẩu cũ';
+
+  @override
+  String get updateSuccess => 'Cập nhật thành công!';
+
+  @override
+  String get updateError => 'Ối, có lỗi gì đó rồi...';
+
+  @override
+  String get changeAvatar => 'Thay ảnh xinh';
+
+  @override
+  String get saveSettingsSuccess => 'Cập nhật hồ sơ thành công!';
+
+  @override
+  String get personalInfo => 'Thông tin cá nhân';
+
+  @override
+  String get security => 'Bảo mật';
+
+  @override
+  String get updateProfile => 'Cập nhật hồ sơ';
+
+  @override
+  String get updatePassword => 'Đổi mật khẩu';
+
+  @override
+  String get updateFailed => 'Cập nhật thất bại!';
+
+  @override
+  String get nameEmptyError => 'Tên không được để trống!';
+
+  @override
+  String get passwordLengthError => 'Mật khẩu phải từ 4 ký tự trở lên!';
+
+  @override
+  String get systemError => 'Lỗi hệ thống!';
+
+  @override
+  String get incorrectPassword => 'Mật khẩu hiện tại không đúng!';
 }

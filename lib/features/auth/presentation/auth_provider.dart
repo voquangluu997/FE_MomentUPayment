@@ -1,17 +1,19 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moment_u_payment/features/auth/data/auth_repository.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 
 enum AuthState {
   initial,
   loading,
-  authenticated, // ✨ ĐÃ THÊM: Trạng thái tự động vào thẳng Home khi token hợp lệ
-  unauthenticated, // ✨ ĐÃ THÊM: Trạng thái chưa đăng nhập hoặc token hết hạn
+  authenticated,
+  unauthenticated,
   loginSuccess,
   loginError,
   registerSuccess,
@@ -20,28 +22,34 @@ enum AuthState {
   googleLoginError,
 }
 
-// Model nhỏ để quản lý thông tin User tiện lợi hơn
 class UserInfoState {
   final String name;
   final String email;
   final bool isEmailVerified;
+  final String? avatar;
 
   UserInfoState({
     required this.name,
     required this.email,
     required this.isEmailVerified,
+    this.avatar,
   });
 }
 
-// Provider quản lý thông tin User độc lập để HomeScreen lắng nghe Banner
-class userInformationProvider extends StateNotifier<UserInfoState?> {
-  userInformationProvider() : super(null);
+class UserInformationProvider extends StateNotifier<UserInfoState?> {
+  UserInformationProvider() : super(null);
 
-  void updateUserInfo(String name, String email, bool isVerified) {
+  void updateUserInfo(
+    String name,
+    String email,
+    bool isVerified,
+    String? avatar,
+  ) {
     state = UserInfoState(
       name: name,
       email: email,
       isEmailVerified: isVerified,
+      avatar: avatar,
     );
   }
 
@@ -51,24 +59,21 @@ class userInformationProvider extends StateNotifier<UserInfoState?> {
 }
 
 final userInfoProvider =
-    StateNotifierProvider<userInformationProvider, UserInfoState?>((ref) {
-      return userInformationProvider();
+    StateNotifierProvider<UserInformationProvider, UserInfoState?>((ref) {
+      return UserInformationProvider();
     });
 
-// AuthNotifier chính phục vụ ứng dụng Moment U Payment
 class AuthNotifier extends StateNotifier<AuthState> {
   final Ref ref;
   final _secureStorage = const FlutterSecureStorage();
   final String _baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8001';
 
-  // 🔑 TỰ ĐỘNG CHẠY: Khởi chạy hàm check token ngay khi notifier được tạo ra
   AuthNotifier(this.ref) : super(AuthState.initial) {
     checkAuthStatus();
   }
 
   void resetState() => state = AuthState.initial;
 
-  /// 🔑 HÀM MỚI: Thẩm định token cũ nằm trong máy xem còn hạn hay không
   Future<void> checkAuthStatus() async {
     state = AuthState.loading;
     try {
@@ -78,7 +83,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      // Gọi API /auth/me để kiểm tra tính hợp lệ của token phía NestJS
       final response = await http.get(
         Uri.parse('$_baseUrl/auth/me'),
         headers: {
@@ -89,35 +93,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        final email = data['user']['email'] ?? '';
-        final name = data['user']['name'] ?? email.split('@').first;
+        final user = data['user'];
 
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              name,
-              email,
-              data['user']['isEmailVerified'] ?? false,
+              user['name'] ?? '',
+              user['email'] ?? '',
+              user['isEmailVerified'] ?? false,
+              user['avatar'],
             );
 
-        // Làm sạch RAM bộ nhớ đệm
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
 
-        state = AuthState.authenticated; // Kích hoạt vào thẳng Home
+        state = AuthState.authenticated;
       } else {
-        // Token hết hạn hoặc không hợp lệ -> Xóa bỏ token rác
         await _secureStorage.delete(key: 'access_token');
         state = AuthState.unauthenticated;
       }
     } catch (_) {
-      // Trường hợp lỗi kết nối hoặc server sập, giữ an toàn đẩy ra màn login
       state = AuthState.unauthenticated;
     }
   }
 
-  /// Luồng Login bằng Email thường
   Future<void> login(String email, String password) async {
     state = AuthState.loading;
     try {
@@ -129,26 +128,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-
-        await _secureStorage.delete(key: 'access_token');
         await _secureStorage.write(
           key: 'access_token',
           value: data['backend_jwt_token'],
         );
 
-        final userEmail = data['user']['email'] ?? email;
-        final userName = data['user']['name'] ?? userEmail.split('@').first;
-
+        final user = data['user'];
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              userName,
-              userEmail,
-              data['user']['isEmailVerified'] ?? false,
+              user['name'] ?? '',
+              user['email'] ?? email,
+              user['isEmailVerified'] ?? false,
+              user['avatar'],
             );
-
-        ref.invalidate(transactionTimelineProvider);
-        ref.invalidate(transactionProvider);
 
         state = AuthState.loginSuccess;
       } else {
@@ -159,7 +152,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Luồng Đăng nhập bằng Google
   Future<void> loginWithGoogle() async {
     state = AuthState.loading;
     try {
@@ -190,26 +182,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-
-        await _secureStorage.delete(key: 'access_token');
         await _secureStorage.write(
           key: 'access_token',
           value: data['backend_jwt_token'],
         );
 
-        final email = data['user']['email'] ?? '';
-        final name = data['user']['name'] ?? email.split('@').first;
-
+        final user = data['user'];
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              name,
-              email,
-              data['user']['isEmailVerified'] ?? true,
+              user['name'] ?? '',
+              user['email'] ?? '',
+              user['isEmailVerified'] ?? true,
+              user['avatar'],
             );
-
-        ref.invalidate(transactionTimelineProvider);
-        ref.invalidate(transactionProvider);
 
         state = AuthState.loginSuccess;
       } else {
@@ -220,7 +206,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Gửi lại email xác thực
   Future<bool> resendVerificationEmail(String email) async {
     try {
       final response = await http.post(
@@ -234,7 +219,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Đồng bộ thủ công hoặc đồng bộ tự động trạng thái email từ DB
   Future<void> syncEmailVerificationStatus() async {
     try {
       String? token = await _secureStorage.read(key: 'access_token');
@@ -250,21 +234,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final userEmail = data['user']['email'] ?? '';
-        final userName = data['user']['name'] ?? userEmail.split('@').first;
-
+        final user = data['user'];
         ref
             .read(userInfoProvider.notifier)
             .updateUserInfo(
-              userName,
-              userEmail,
-              data['user']['isEmailVerified'] ?? false,
+              user['name'] ?? '',
+              user['email'] ?? '',
+              user['isEmailVerified'] ?? false,
+              user['avatar'],
             );
       }
     } catch (_) {}
   }
 
-  /// Luồng Đăng ký tài khoản thường
   Future<void> register(String name, String email, String password) async {
     state = AuthState.loading;
     try {
@@ -288,25 +270,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await _secureStorage.delete(key: 'access_token');
-
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-      );
+      final GoogleSignIn googleSignIn = GoogleSignIn();
       await googleSignIn.signOut();
-      await googleSignIn.disconnect();
     } catch (_) {}
 
     ref.read(userInfoProvider.notifier).clearUserInfo();
-
-    // 🔑 CẬP NHẬT: Trả về trạng thái chưa đăng nhập để AuthChecker tự bốc user ra ngoài màn Login
     state = AuthState.unauthenticated;
-
     ref.invalidate(transactionTimelineProvider);
     ref.invalidate(transactionProvider);
   }
 
-  // ✨ THÊM MỚI: API Quên mật khẩu
   Future<bool> forgotPassword(String email) async {
     state = AuthState.loading;
     try {
@@ -315,21 +289,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email}),
       );
-
-      state = AuthState.initial; // Reset state về ban đầu
-
-      if (response.statusCode == 200) {
-        return true; // Gửi mail thành công
-      } else {
-        return false; // Lỗi (email không tồn tại, v.v.)
-      }
+      state = AuthState.initial;
+      return response.statusCode == 200;
     } catch (e) {
       state = AuthState.initial;
       return false;
     }
   }
 
-  // ✨ THÊM MỚI: API Đặt lại mật khẩu
   Future<bool> resetPasswordWithOtp(
     String email,
     String otp,
@@ -346,24 +313,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
           'newPassword': newPassword,
         }),
       );
-
       state = AuthState.initial;
-
-      if (response.statusCode == 200) {
-        return true; // Đổi mật khẩu thành công
-      } else {
-        return false; // Lỗi OTP sai hoặc hết hạn
-      }
+      return response.statusCode == 200;
     } catch (e) {
       state = AuthState.initial;
       return false;
     }
   }
 
-  Future<bool> updatePassword(String oldPassword, String newPassword) async {
+  Future<String?> updatePassword(String oldPassword, String newPassword) async {
     try {
       String? token = await _secureStorage.read(key: 'access_token');
-      if (token == null) return false;
+      if (token == null) {
+        return "Lỗi xác thực, vui lòng đăng nhập lại";
+      }
 
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/update-password'),
@@ -377,9 +340,49 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return null;
+      } else {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? "Cập nhật thất bại. Vui lòng thử lại.";
+      }
     } catch (e) {
-      return false;
+      return "Lỗi kết nối máy chủ";
+    }
+  }
+
+  Future<String?> updateProfile(String name, String? avatarUrl) async {
+    state = AuthState.loading;
+    try {
+      final response = await ref
+          .read(authRepositoryProvider)
+          .updateProfile(name, avatarUrl);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+        final userResponse = data['user'];
+
+        final String newName = userResponse['name'] ?? name;
+        final String? newAvatar = userResponse['avatar'];
+
+        final currentUser = ref.read(userInfoProvider);
+        final currentEmail = currentUser?.email ?? "";
+        final isVerified = currentUser?.isEmailVerified ?? false;
+
+        ref
+            .read(userInfoProvider.notifier)
+            .updateUserInfo(newName, currentEmail, isVerified, newAvatar);
+
+        state = AuthState.initial;
+        return null;
+      }
+
+      state = AuthState.initial;
+      final data = response.data;
+      return data['message'] ?? "Cập nhật hồ sơ thất bại";
+    } catch (e) {
+      state = AuthState.initial;
+      return "Lỗi kết nối máy chủ";
     }
   }
 }
