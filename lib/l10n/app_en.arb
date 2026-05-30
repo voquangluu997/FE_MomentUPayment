@@ -316,6 +316,24 @@
   
   "emptyAnalyticsData": "Nothing here! Your wallet is safely untouched 🐥",
   "errorLoadData": "Oopsie, the data tripped and fell 🥺",
-  "retryButton": "Give it another push 🚀"
+  "retryButton": "Give it another push 🚀",
+
+  "buyDevCoffeeTitle": "Buy the Dev a Coffee ☕",
+  "buyDevCoffeeSubtitle": "Keep the dev awake & coding happily! 🥰",
+  "scanToSpreadLoveTitle": "Scan to spread love 💖",
+  "scanToSpreadLoveSubtitle": "Every coffee you send mercilessly destroys a bug! Thank you for being Moment U's absolute MVP! ✨",
+  "missingQrMessage": "Please add QR image to:\nassets/images/momo_qr.png",
+  "closeButton": "Close",
+  "buyMeACoffeeBtn": "Or via Buy Me a Coffee ☕",
+
+  "helpCenterDialogTitle": "Help Center 🎧",
+  "helpCenterDialogMessage": "If you encounter any bugs or have brilliant ideas to make Moment U better, drop us an email! We're all ears. 🥰",
+  "contactEmail": "momentu.support@gmail.com",
+  "appVersionTitle": "Version",
+  "appVersion": "v1.0.0",
+
+  "dailyAllowance": "Daily average",
+  "quickSuggestions": "Quick suggestions",
+  "budgetTip": "Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟"
 
 }

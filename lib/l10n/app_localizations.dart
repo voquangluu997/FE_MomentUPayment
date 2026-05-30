@@ -1157,6 +1157,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'days'**
   String get days;
+
+  /// No description provided for @buyDevCoffeeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy the Dev a Coffee ☕'**
+  String get buyDevCoffeeTitle;
+
+  /// No description provided for @buyDevCoffeeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the dev awake & coding happily! 🥰'**
+  String get buyDevCoffeeSubtitle;
+
+  /// No description provided for @scanToSpreadLoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to spread love 💖'**
+  String get scanToSpreadLoveTitle;
+
+  /// No description provided for @scanToSpreadLoveSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every coffee you send mercilessly destroys a bug! Thank you for being Moment U\'s absolute MVP! ✨'**
+  String get scanToSpreadLoveSubtitle;
+
+  /// No description provided for @missingQrMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add QR image to:\nassets/images/momo_qr.png'**
+  String get missingQrMessage;
+
+  /// No description provided for @closeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeButton;
+
+  /// No description provided for @buyMeACoffeeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Or via Buy Me a Coffee ☕'**
+  String get buyMeACoffeeBtn;
+
+  /// No description provided for @helpCenterDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center 🎧'**
+  String get helpCenterDialogTitle;
+
+  /// No description provided for @helpCenterDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If you encounter any bugs or have brilliant ideas to make Moment U better, drop us an email! We\'re all ears. 🥰'**
+  String get helpCenterDialogMessage;
+
+  /// No description provided for @contactEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'momentu.support@gmail.com'**
+  String get contactEmail;
+
+  /// No description provided for @appVersionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get appVersionTitle;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'v1.0.0'**
+  String get appVersion;
+
+  /// No description provided for @dailyAllowance.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily average'**
+  String get dailyAllowance;
+
+  /// No description provided for @quickSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick suggestions'**
+  String get quickSuggestions;
+
+  /// No description provided for @budgetTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟'**
+  String get budgetTip;
 }
 
 class _AppLocalizationsDelegate

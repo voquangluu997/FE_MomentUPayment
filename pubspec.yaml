@@ -72,6 +72,7 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/images/ # ✨ Thêm dòng này để Flutter biết rằng bạn có thư mục chứa ảnh ở đây
 
   # To add assets to your application, add an assets section, like this:
   # assets:

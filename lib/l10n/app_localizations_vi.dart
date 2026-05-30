@@ -603,4 +603,54 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get days => 'ngày';
+
+  @override
+  String get buyDevCoffeeTitle => 'Tiếp thêm cafein cho dev ☕';
+
+  @override
+  String get buyDevCoffeeSubtitle =>
+      'Ủng hộ ly cà phê để dev code không quạo nha! 🥰';
+
+  @override
+  String get scanToSpreadLoveTitle => 'Đa tạ đại hiệp búng xu! 🥰';
+
+  @override
+  String get scanToSpreadLoveSubtitle =>
+      'Mỗi ly cà phê của bạn là một chiếc bug bị tiêu diệt! Cảm ơn nhà tài trợ kim cương đã yêu thương Moment U Payment nhé! 💎✨';
+
+  @override
+  String get missingQrMessage =>
+      'Hãy thêm ảnh QR vào:\nassets/images/momo_qr.png';
+
+  @override
+  String get closeButton => 'Đóng';
+
+  @override
+  String get buyMeACoffeeBtn => 'Hoặc tặng qua Buy Me a Coffee ☕';
+
+  @override
+  String get helpCenterDialogTitle => 'Trung tâm hỗ trợ 🎧';
+
+  @override
+  String get helpCenterDialogMessage =>
+      'Nếu bạn chạm trán \'bug\' hay có bất kỳ ý tưởng nào để Moment U tuyệt vời hơn, đừng ngại email cho dev nhé! Tụi mình luôn lắng nghe bạn. 🥰';
+
+  @override
+  String get contactEmail => 'momentu.support@gmail.com';
+
+  @override
+  String get appVersionTitle => 'Phiên bản';
+
+  @override
+  String get appVersion => 'v1.0.0';
+
+  @override
+  String get dailyAllowance => 'Trung bình mỗi ngày';
+
+  @override
+  String get quickSuggestions => 'Gợi ý nhanh';
+
+  @override
+  String get budgetTip =>
+      'Mẹo: Hãy đặt hạn mức thấp hơn thu nhập thực tế khoảng 20% để luôn có khoản tiết kiệm dự phòng nhé! 🌟';
 }

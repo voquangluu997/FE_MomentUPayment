@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moment_u_payment/core/constants/app_colors.dart'; // Đảm bảo đường dẫn này chứa appColorsProvider và AppColorTheme
+import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/providers/locale_provider.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
 import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
@@ -23,7 +24,6 @@ class SettingsBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ✨ Lắng nghe bộ màu dynamic từ provider thay vì dùng AppColors tĩnh
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
@@ -37,7 +37,7 @@ class SettingsBottomSheet extends ConsumerWidget {
       ),
       padding: const EdgeInsets.only(top: 12, bottom: 24, left: 24, right: 24),
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -172,12 +172,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                       value: isDark,
                       activeColor: appColors.primary,
                       onChanged: (val) {
-                        // 🔥 Gọi hàm toggle ở đây
                         ref.read(themeModeProvider.notifier).toggleTheme();
                       },
                     ),
                     onTap: () {
-                      // ✨ Bấm vào nguyên cả hàng cũng sẽ tự đổi luôn
                       ref.read(themeModeProvider.notifier).toggleTheme();
                     },
                   ),
@@ -208,13 +206,24 @@ class SettingsBottomSheet extends ConsumerWidget {
                     },
                   ),
 
+                  // ✨ CẬP NHẬT TRUNG TÂM TRỢ GIÚP
                   _buildSettingItem(
                     icon: Icons.help_outline_rounded,
                     title: l10n.helpCenter,
                     subtitle: l10n.helpCenterSubtitle,
                     appColors: appColors,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showHelpCenterDialog(context, appColors, l10n);
+                    },
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // ✨ BANNER DONATE
+                  _buildDonationBanner(context, appColors, l10n),
+
+                  const SizedBox(height: 8),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -229,9 +238,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(
-                          0.12,
-                        ), // Đổi từ sắc trắng hồng cố định sang mờ dynamic
+                        color: Colors.redAccent.withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -276,7 +283,338 @@ class SettingsBottomSheet extends ConsumerWidget {
     );
   }
 
-  // ✨ Đã thêm tham số `AppColorTheme appColors` để đồng bộ màu sắc các dòng cài đặt
+  Widget _buildDonationBanner(
+    BuildContext context,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    return InkWell(
+      onTap: () => _showDonationDialog(context, appColors, l10n),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              appColors.primary.withOpacity(0.15),
+              appColors.primary.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: appColors.primary.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: appColors.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: appColors.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.coffee_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.buyDevCoffeeTitle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: appColors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.buyDevCoffeeSubtitle,
+                    style: TextStyle(fontSize: 12, color: appColors.textMuted),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.favorite_rounded, color: appColors.primary, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDonationDialog(
+    BuildContext context,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: appColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.all(24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFA50064).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.qr_code_2_rounded,
+                color: Color(0xFFA50064),
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.scanToSpreadLoveTitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: appColors.primaryDark,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.scanToSpreadLoveSubtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: appColors.textMuted,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: appColors.cardBackground,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/momo_qr.png',
+                  width: 180,
+                  height: 180,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 180,
+                      height: 180,
+                      color: appColors.primary.withOpacity(0.1),
+                      alignment: Alignment.center,
+                      child: Text(
+                        l10n.missingQrMessage,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: appColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: appColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                minimumSize: const Size(double.infinity, 48),
+                elevation: 0,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                l10n.closeButton,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ✨ DIALOG TRUNG TÂM TRỢ GIÚP
+  void _showHelpCenterDialog(
+    BuildContext context,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: appColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.all(24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: appColors.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.support_agent_rounded,
+                color: appColors.primary,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.helpCenterDialogTitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: appColors.primaryDark,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.helpCenterDialogMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: appColors.textMuted,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Box chứa Email hỗ trợ có thể copy
+            InkWell(
+              onTap: () async {
+                await Clipboard.setData(ClipboardData(text: l10n.contactEmail));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Đã sao chép email: ${l10n.contactEmail}'),
+                      backgroundColor: appColors.primary,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: appColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: appColors.primary.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      color: appColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        l10n.contactEmail,
+                        style: TextStyle(
+                          color: appColors.primaryDark,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.copy_rounded,
+                      color: appColors.textMuted,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Phiên bản app
+            Text(
+              '${l10n.appVersionTitle}: ${l10n.appVersion}',
+              style: TextStyle(
+                fontSize: 12,
+                color: appColors.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Nút đóng
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: appColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                minimumSize: const Size(double.infinity, 48),
+                elevation: 0,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                l10n.closeButton,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSettingItem({
     required IconData icon,
     required String title,
@@ -327,7 +665,6 @@ class SettingsBottomSheet extends ConsumerWidget {
       builder: (dialogContext) => Consumer(
         builder: (context, ref, child) {
           final l10n = AppLocalizations.of(context)!;
-          // ✨ Lấy bộ màu dynamic cho Dialog chống mù chữ khi ở Dark mode
           final dialogColors = ref.watch(appColorsProvider);
 
           return AlertDialog(

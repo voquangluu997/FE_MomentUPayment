@@ -1,11 +1,11 @@
-import 'dart:ui'; // ✨ Cần thiết để dùng ImageFilter (làm mờ kính)
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MomentGridItem extends ConsumerWidget {
   final Map<String, dynamic> moment;
@@ -38,9 +38,7 @@ class MomentGridItem extends ConsumerWidget {
     return InkWell(
       onTap: onTap,
       onLongPress: onLongPress,
-      borderRadius: BorderRadius.circular(
-        16,
-      ), // Thu nhỏ bo góc một chút cho hợp với size mới
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
           color: appColors.cardBackground,
@@ -69,7 +67,7 @@ class MomentGridItem extends ConsumerWidget {
   }
 
   // ===========================================================================
-  // 1. UI KHI CÓ ẢNH: Đã thu ngắn chiều dọc (Tỷ lệ 0.88 - Gọn gàng, thanh thoát)
+  // 1. UI KHI CÓ ẢNH: Đã tối ưu khoảng cách (Padding & Margin)
   // ===========================================================================
   Widget _buildImageContent(
     String imageUrl,
@@ -80,10 +78,10 @@ class MomentGridItem extends ConsumerWidget {
     AppColorTheme appColors,
   ) {
     return AspectRatio(
-      aspectRatio:
-          0.88, // ✨ Giảm độ dài, ảnh sẽ vừa vặn và không lo chiếm diện tích màn hình
+      aspectRatio: 0.88,
       child: Stack(
         children: [
+          // Ảnh nền
           Positioned.fill(
             child: Image.network(
               CloudinaryHelper.getOptimizedOriginalUrl(imageUrl),
@@ -92,6 +90,7 @@ class MomentGridItem extends ConsumerWidget {
                   _buildCuteMemoPad(emoji, category, appColors, compactAmount),
             ),
           ),
+
           // Lớp phủ Gradient
           Positioned.fill(
             child: Container(
@@ -108,7 +107,39 @@ class MomentGridItem extends ConsumerWidget {
               ),
             ),
           ),
-          // Khối Kính Mờ Glassmorphism (Thu nhỏ padding nhẹ để text cân đối)
+
+          // Băng keo Washi Tape (Đã đẩy xuống 8px để tránh dính sát mép trên)
+          Positioned(
+            top: 8,
+            left: 12,
+            child: Transform.rotate(
+              angle: -0.05,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: appColors.primary.withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Text(
+                  category.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 7.5,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Khối Kính Mờ (Đã tăng Padding nội bộ để chữ không bị bí)
           Positioned(
             bottom: 6,
             left: 6,
@@ -119,8 +150,8 @@ class MomentGridItem extends ConsumerWidget {
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 5,
+                    horizontal: 8,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
@@ -137,7 +168,7 @@ class MomentGridItem extends ConsumerWidget {
                       Row(
                         children: [
                           Text(emoji, style: const TextStyle(fontSize: 11)),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5), // Giãn cách emoji với text
                           Expanded(
                             child: Text(
                               note.isNotEmpty
@@ -146,7 +177,7 @@ class MomentGridItem extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 9.5,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white.withOpacity(0.95),
                               ),
@@ -154,43 +185,18 @@ class MomentGridItem extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(
+                        height: 4,
+                      ), // Giãn cách dòng giữa Note và Số tiền
                       Text(
                         compactAmount,
                         style: const TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Băng keo Washi Tape
-          Positioned(
-            top: -4,
-            left: 12,
-            child: Transform.rotate(
-              angle: -0.05,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2.5,
-                ),
-                decoration: BoxDecoration(
-                  color: appColors.primary.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: Text(
-                  category.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 7,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 0.6,
                   ),
                 ),
               ),
@@ -202,7 +208,7 @@ class MomentGridItem extends ConsumerWidget {
   }
 
   // ===========================================================================
-  // 2. UI KHÔNG CÓ ẢNH: Tờ giấy Memo Pad (Tỷ lệ 1.15 - Dẹt nằm ngang siêu gọn)
+  // 2. UI KHÔNG CÓ ẢNH: Memo Pad (Thiết kế phẳng)
   // ===========================================================================
   Widget _buildCuteMemoPad(
     String emoji,
@@ -211,8 +217,7 @@ class MomentGridItem extends ConsumerWidget {
     String compactAmount,
   ) {
     return AspectRatio(
-      aspectRatio:
-          1.15, // ✨ Thay vì vuông 1:1, ô chữ sẽ dẹt nằm ngang giúp tiết kiệm chiều dọc tối đa
+      aspectRatio: 1.15,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

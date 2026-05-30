@@ -1,4 +1,3 @@
-// 🔑 Thêm dòng import này (nhớ điều chỉnh đường dẫn tương đối cho khớp với cấu trúc thư mục của bạn)
 import '../../l10n/app_localizations.dart';
 
 class DateTimeHelper {
@@ -101,5 +100,12 @@ class DateTimeHelper {
       }
     }
     return monthlyGroups;
+  }
+
+  /// 🗓️ Lấy số lượng ngày của tháng hiện tại
+  static int getDaysInCurrentMonth() {
+    final now = DateTime.now();
+    // DateTime(year, month + 1, 0) sẽ trả về ngày cuối cùng của tháng hiện tại
+    return DateTime(now.year, now.month + 1, 0).day;
   }
 }

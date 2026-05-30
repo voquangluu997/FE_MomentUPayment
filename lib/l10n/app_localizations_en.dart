@@ -601,4 +601,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get days => 'days';
+
+  @override
+  String get buyDevCoffeeTitle => 'Buy the Dev a Coffee ☕';
+
+  @override
+  String get buyDevCoffeeSubtitle => 'Keep the dev awake & coding happily! 🥰';
+
+  @override
+  String get scanToSpreadLoveTitle => 'Scan to spread love 💖';
+
+  @override
+  String get scanToSpreadLoveSubtitle =>
+      'Every coffee you send mercilessly destroys a bug! Thank you for being Moment U\'s absolute MVP! ✨';
+
+  @override
+  String get missingQrMessage =>
+      'Please add QR image to:\nassets/images/momo_qr.png';
+
+  @override
+  String get closeButton => 'Close';
+
+  @override
+  String get buyMeACoffeeBtn => 'Or via Buy Me a Coffee ☕';
+
+  @override
+  String get helpCenterDialogTitle => 'Help Center 🎧';
+
+  @override
+  String get helpCenterDialogMessage =>
+      'If you encounter any bugs or have brilliant ideas to make Moment U better, drop us an email! We\'re all ears. 🥰';
+
+  @override
+  String get contactEmail => 'momentu.support@gmail.com';
+
+  @override
+  String get appVersionTitle => 'Version';
+
+  @override
+  String get appVersion => 'v1.0.0';
+
+  @override
+  String get dailyAllowance => 'Daily average';
+
+  @override
+  String get quickSuggestions => 'Quick suggestions';
+
+  @override
+  String get budgetTip =>
+      'Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟';
 }
