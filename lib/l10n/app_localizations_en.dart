@@ -127,7 +127,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryButton => 'Give it another push 🚀';
 
   @override
-  String get emptyTransactionList => 'No transactions yet';
+  String get emptyTransactionList => 'No moments yet';
 
   @override
   String get catFood => 'Food 🍰';
@@ -172,13 +172,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get analyticsTitle => 'Transaction Analytics';
-
-  @override
-  String get emptyAnalyticsData =>
-      'Nothing here! Your wallet is safely untouched 🐥';
-
-  @override
   String get totalLabel => 'Total Damage 💸';
 
   @override
@@ -200,10 +193,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cameraTapInstruction => 'Tap here to snap your receipt! 📸';
 
   @override
-  String get galleryPickAction => 'Pick image';
+  String get galleryPickAction => 'Or pick a cute photo from your gallery ✨';
 
   @override
-  String get galleryChangeAction => 'Change image';
+  String get cameraPickActionShort => 'Pick a photo';
+
+  @override
+  String get galleryChangeAction => 'Change photo from your collection 🌸';
+
+  @override
+  String get galleryChangeActionShort => 'Change photo';
 
   @override
   String get amountSectionTitle => 'TOTAL DAMAGE THIS TIME 💰';
@@ -383,7 +382,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String notiAggregatedTxBody(String budgetName, String count) {
-    return 'Wallet $budgetName has $count new transaction changes aggregated.';
+    return 'Wallet $budgetName has $count new moment changes aggregated.';
   }
 
   @override
@@ -554,6 +553,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your password has been changed successfully! Please log in.';
 
   @override
+  String get analyticsTitle => 'Wallet X-Ray 🔍';
+
+  @override
   String get spendingTrend => 'Trend';
 
   @override
@@ -596,6 +598,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get days => 'days';
 
   @override
+  String get emptyAnalyticsData =>
+      'Nothing here! Your wallet is safely untouched 🐥';
+
+  @override
   String get buyDevCoffeeTitle => 'Buy the Dev a Coffee ☕';
 
   @override
@@ -626,7 +632,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'If you encounter any bugs or have brilliant ideas to make Moment U better, drop us an email! We\'re all ears. 🥰';
 
   @override
-  String get contactEmail => 'momentu.support@gmail.com';
+  String get contactEmail => 'momentupayment.support@gmail.com';
 
   @override
   String get appVersionTitle => 'Version';
@@ -645,7 +651,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟';
 
   @override
-  String get emptyFilterTransaction => 'No transactions found for this period';
+  String get emptyFilterTransaction => 'No moments found for this period';
 
   @override
   String get from => 'From';
@@ -771,11 +777,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateSuccessMessage => 'Updated successfully! ✨';
 
   @override
-  String get futureDateError => 'You cannot add transactions for future dates!';
+  String get futureDateError => 'You cannot add moments for future dates!';
 
   @override
   String get deleteSuccessMessage => 'Deleted successfully!';
 
   @override
   String get deleteErrorMessage => 'An error occurred while deleting';
+
+  @override
+  String get premiumGroupMomentsTitle => 'Group Moments 👑';
+
+  @override
+  String get premiumGroupMomentsSubtitle =>
+      'Group wallet feature is temporarily locked in beta.';
 }

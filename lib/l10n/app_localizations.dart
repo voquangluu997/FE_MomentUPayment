@@ -323,7 +323,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyTransactionList.
   ///
   /// In en, this message translates to:
-  /// **'No transactions yet'**
+  /// **'No moments yet'**
   String get emptyTransactionList;
 
   /// No description provided for @catFood.
@@ -404,18 +404,6 @@ abstract class AppLocalizations {
   /// **'Failed to delete. Please check your network connection!'**
   String get deleteErrorSnackbar;
 
-  /// No description provided for @analyticsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Transaction Analytics'**
-  String get analyticsTitle;
-
-  /// No description provided for @emptyAnalyticsData.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing here! Your wallet is safely untouched 🐥'**
-  String get emptyAnalyticsData;
-
   /// No description provided for @totalLabel.
   ///
   /// In en, this message translates to:
@@ -461,14 +449,26 @@ abstract class AppLocalizations {
   /// No description provided for @galleryPickAction.
   ///
   /// In en, this message translates to:
-  /// **'Pick image'**
+  /// **'Or pick a cute photo from your gallery ✨'**
   String get galleryPickAction;
+
+  /// No description provided for @cameraPickActionShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a photo'**
+  String get cameraPickActionShort;
 
   /// No description provided for @galleryChangeAction.
   ///
   /// In en, this message translates to:
-  /// **'Change image'**
+  /// **'Change photo from your collection 🌸'**
   String get galleryChangeAction;
+
+  /// No description provided for @galleryChangeActionShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get galleryChangeActionShort;
 
   /// No description provided for @amountSectionTitle.
   ///
@@ -747,7 +747,7 @@ abstract class AppLocalizations {
   /// No description provided for @notiAggregatedTxBody.
   ///
   /// In en, this message translates to:
-  /// **'Wallet {budgetName} has {count} new transaction changes aggregated.'**
+  /// **'Wallet {budgetName} has {count} new moment changes aggregated.'**
   String notiAggregatedTxBody(String budgetName, String count);
 
   /// No description provided for @notiFirstLoginReminderTitle.
@@ -1062,6 +1062,12 @@ abstract class AppLocalizations {
   /// **'Your password has been changed successfully! Please log in.'**
   String get resetPasswordSuccess;
 
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet X-Ray 🔍'**
+  String get analyticsTitle;
+
   /// No description provided for @spendingTrend.
   ///
   /// In en, this message translates to:
@@ -1146,6 +1152,12 @@ abstract class AppLocalizations {
   /// **'days'**
   String get days;
 
+  /// No description provided for @emptyAnalyticsData.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here! Your wallet is safely untouched 🐥'**
+  String get emptyAnalyticsData;
+
   /// No description provided for @buyDevCoffeeTitle.
   ///
   /// In en, this message translates to:
@@ -1203,7 +1215,7 @@ abstract class AppLocalizations {
   /// No description provided for @contactEmail.
   ///
   /// In en, this message translates to:
-  /// **'momentu.support@gmail.com'**
+  /// **'momentupayment.support@gmail.com'**
   String get contactEmail;
 
   /// No description provided for @appVersionTitle.
@@ -1239,7 +1251,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyFilterTransaction.
   ///
   /// In en, this message translates to:
-  /// **'No transactions found for this period'**
+  /// **'No moments found for this period'**
   String get emptyFilterTransaction;
 
   /// No description provided for @from.
@@ -1479,7 +1491,7 @@ abstract class AppLocalizations {
   /// No description provided for @futureDateError.
   ///
   /// In en, this message translates to:
-  /// **'You cannot add transactions for future dates!'**
+  /// **'You cannot add moments for future dates!'**
   String get futureDateError;
 
   /// No description provided for @deleteSuccessMessage.
@@ -1493,6 +1505,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An error occurred while deleting'**
   String get deleteErrorMessage;
+
+  /// No description provided for @premiumGroupMomentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Moments 👑'**
+  String get premiumGroupMomentsTitle;
+
+  /// No description provided for @premiumGroupMomentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Group wallet feature is temporarily locked in beta.'**
+  String get premiumGroupMomentsSubtitle;
 }
 
 class _AppLocalizationsDelegate

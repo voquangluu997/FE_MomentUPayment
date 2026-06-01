@@ -5,11 +5,13 @@ import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
@@ -168,9 +170,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 children: [
                   _buildBudgetCardWithNavigation(l10n),
-                  _buildControlHeaderRow(appColors, viewMode),
-                  if (_selectedDateRange != null)
-                    _buildFilterTag(appColors, l10n),
+                  _buildControlHeaderRow(
+                    appColors,
+                    viewMode,
+                    filteredTransactions,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(48),
                     child: Center(
@@ -188,6 +192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             }
 
+            // Đã lược bớt 1 dòng chỉ số index cũ của filterTag cũ
             final listLength = viewMode == ViewMode.calendar
                 ? monthlyKeys.length
                 : dailyKeys.length;
@@ -197,21 +202,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              itemCount: 3 + listLength + (isLoadingMore && hasMore ? 1 : 0),
+              itemCount: 2 + listLength + (isLoadingMore && hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == 0) return _buildBudgetCardWithNavigation(l10n);
                 if (index == 1)
-                  return _buildControlHeaderRow(appColors, viewMode);
-                if (index == 2) {
-                  return _selectedDateRange != null
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: _buildFilterTag(appColors, l10n),
-                        )
-                      : const SizedBox.shrink();
-                }
+                  return _buildControlHeaderRow(
+                    appColors,
+                    viewMode,
+                    filteredTransactions,
+                  );
 
-                if (index == 3 + listLength) {
+                if (index == 2 + listLength) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
@@ -223,7 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }
 
-                final dataIndex = index - 3;
+                final dataIndex = index - 2;
 
                 if (viewMode == ViewMode.calendar) {
                   final monthKey = monthlyKeys[dataIndex];
@@ -281,11 +282,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildControlHeaderRow(AppColorTheme appColors, ViewMode currentMode) {
+  Widget _buildControlHeaderRow(
+    AppColorTheme appColors,
+    ViewMode currentMode,
+    List<Map<String, dynamic>> currentTransactions,
+  ) {
     return HomeHeaderSection(
       isGridView: currentMode == ViewMode.grid,
       isFiltered: _selectedDateRange != null,
       isCalendarView: currentMode == ViewMode.calendar,
+      selectedDateRange: _selectedDateRange, // Truyền range dữ liệu sang Header
+      onClearFilter: () {
+        setState(() => _selectedDateRange = null);
+      },
       onToggleView: () {
         ref.read(viewModeProvider.notifier).state = currentMode == ViewMode.grid
             ? ViewMode.list
@@ -310,50 +319,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ? ViewMode.list
             : ViewMode.calendar;
       },
-    );
-  }
-
-  Widget _buildFilterTag(AppColorTheme appColors, AppLocalizations l10n) {
-    final f = DateFormat('dd/MM');
-    return Row(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: appColors.primary.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.date_range_rounded,
-                size: 12,
-                color: appColors.primary,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${l10n.from} ${f.format(_selectedDateRange!.start)} ${l10n.to} ${f.format(_selectedDateRange!.end)}',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: appColors.primary,
-                ),
-              ),
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: () => setState(() => _selectedDateRange = null),
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 14,
-                  color: appColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

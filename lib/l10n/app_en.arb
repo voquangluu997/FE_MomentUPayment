@@ -60,8 +60,6 @@
   "deleteSuccessSnackbar": "Your moment and receipt image have been successfully cleaned up! ✨",
   "deleteErrorSnackbar": "Failed to delete. Please check your network connection!",
 
-  "analyticsTitle": "Details here!!",
-  "emptyAnalyticsData": "No payment moments found for this month! 📝",
   "totalLabel": "Total",
   "today": "Today",
   "yesterday": "Yesterday",
@@ -70,7 +68,9 @@
   "noMomentsAvailable": "No moments available",
   "cameraTapInstruction": "Tap here to snap your receipt! 📸",
   "galleryPickAction": "Or pick a cute photo from your gallery ✨",
+  "cameraPickActionShort": "Pick a photo",
   "galleryChangeAction": "Change photo from your collection 🌸",
+  "galleryChangeActionShort": "Change photo",
   "amountSectionTitle": "TOTAL DAMAGE THIS TIME 💰",
   "noteSectionTitle": "A LITTLE CHITCHAT ABOUT THIS 💬",
   "monthLabel": "{month}/{year}",
@@ -198,7 +198,7 @@
   "notiEmailVerifiedTitle": "Verification Successful 🎉",
   "notiEmailVerifiedBody": "Your email has been verified. Welcome aboard!",
 
-  "notiAggregatedTxBody": "Wallet {budgetName} has {count} new transaction changes aggregated.",
+  "notiAggregatedTxBody": "Wallet {budgetName} has {count} new moment changes aggregated.",
   "@notiAggregatedTxBody": {
     "placeholders": {
       "budgetName": { "type": "String" },
@@ -289,7 +289,6 @@
   "totalLabel": "Total Spending",
   "avgPerDay": "Avg/Day",
   "timeFrame": "Days",
-  "emptyAnalyticsData": "No spending data available for this period.",
   "errorLoadData": "Failed to load data. Please check again!",
   "retryButton": "Retry",
 
@@ -325,7 +324,7 @@
 
   "helpCenterDialogTitle": "Lost? Let me help! 🎧",
   "helpCenterDialogMessage": "If you encounter any bugs or have brilliant ideas to make Moment U better, drop us an email! We're all ears. 🥰",
-  "contactEmail": "momentu.support@gmail.com",
+  "contactEmail": "momentupayment.support@gmail.com",
   "appVersionTitle": "Version",
   "appVersion": "v1.0.0",
 
@@ -333,7 +332,7 @@
   "quickSuggestions": "Quick suggestions",
   "budgetTip": "Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟",
 
-  "emptyFilterTransaction": "No transactions in this date range 🌸",
+  "emptyFilterTransaction": "No moments in this date range 🌸",
   "from": "From",
   "to": "to",
   "month": "Month",
@@ -372,9 +371,6 @@
   "incorrectPassword": "Current password is incorrect!",
 
   "maxOneYearWarning": "Moment U only supports viewing up to 1 year! 🗓️",
-  "analyticsTitle": "Transaction Analytics",
-  "galleryPickAction": "Pick image",
-  "galleryChangeAction": "Change image",
 
   "wrongOldPassword": "Incorrect current password.",
   "userNotFoundError": "User not found.",
@@ -384,12 +380,14 @@
   "samePasswordError": "New password cannot be the same as old password.",
 
   "errorLoadData": "Error loading data",
-  "emptyFilterTransaction": "No transactions found for this period",
-  "emptyTransactionList": "No transactions yet",
+  "emptyFilterTransaction": "No moments found for this period",
+  "emptyTransactionList": "No moments yet",
   "addSuccessMessage": "Added successfully! ✨",
   "updateSuccessMessage": "Updated successfully! ✨",
-  "futureDateError": "You cannot add transactions for future dates!",
+  "futureDateError": "You cannot add moments for future dates!",
   "deleteSuccessMessage": "Deleted successfully!",
-  "deleteErrorMessage": "An error occurred while deleting"
+  "deleteErrorMessage": "An error occurred while deleting",
+  "premiumGroupMomentsTitle": "Group Moments 👑",
+  "premiumGroupMomentsSubtitle": "Group wallet feature is temporarily locked in beta."
   
 }

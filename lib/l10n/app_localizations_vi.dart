@@ -126,7 +126,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get retryButton => 'Lấy đà thử lại nghen 🚀';
 
   @override
-  String get emptyTransactionList => 'Chưa có giao dịch nào được ghi lại';
+  String get emptyTransactionList => 'Chưa có khoảnh khắc nào được ghi lại';
 
   @override
   String get catFood => 'Ăn uống 🍰';
@@ -172,13 +172,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 
   @override
-  String get analyticsTitle => 'Phân tích giao dịch';
-
-  @override
-  String get emptyAnalyticsData =>
-      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
-
-  @override
   String get totalLabel => 'Tổng thiệt hại 💸';
 
   @override
@@ -201,10 +194,16 @@ class AppLocalizationsVi extends AppLocalizations {
       'Nhấn nhẹ vào đây để chụp choẹt hóa đơn nhen! 📸';
 
   @override
-  String get galleryPickAction => 'Chọn ảnh';
+  String get galleryPickAction => 'Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨';
 
   @override
-  String get galleryChangeAction => 'Đổi ảnh';
+  String get cameraPickActionShort => 'Chọn ảnh';
+
+  @override
+  String get galleryChangeAction => 'Đổi ảnh khác từ bộ sưu tập nha 🌸';
+
+  @override
+  String get galleryChangeActionShort => 'Đổi ảnh';
 
   @override
   String get amountSectionTitle => 'TỔNG THIỆT HẠI ĐỢT NÀY 💰';
@@ -384,7 +383,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String notiAggregatedTxBody(String budgetName, String count) {
-    return 'Ví $budgetName có $count thay đổi giao dịch mới được gộp lại.';
+    return 'Ví $budgetName có $count thay đổi khoảnh khắc mới được gộp lại.';
   }
 
   @override
@@ -556,6 +555,9 @@ class AppLocalizationsVi extends AppLocalizations {
       'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.';
 
   @override
+  String get analyticsTitle => 'Thống kê chi tiêu';
+
+  @override
   String get spendingTrend => 'Xu hướng';
 
   @override
@@ -598,6 +600,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get days => 'ngày';
 
   @override
+  String get emptyAnalyticsData =>
+      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
+
+  @override
   String get buyDevCoffeeTitle => 'Tiếp thêm cafein cho dev ☕';
 
   @override
@@ -629,7 +635,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Nếu bạn chạm trán \'bug\' hay có bất kỳ ý tưởng nào để Moment U tuyệt vời hơn, đừng ngại email cho dev nhé! Tụi mình luôn lắng nghe bạn. 🥰';
 
   @override
-  String get contactEmail => 'momentu.support@gmail.com';
+  String get contactEmail => 'momentupayment.support@gmail.com';
 
   @override
   String get appVersionTitle => 'Phiên bản';
@@ -649,7 +655,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get emptyFilterTransaction =>
-      'Không có giao dịch nào trong khoảng thời gian này';
+      'Không có khoảnh khắc nào trong khoảng thời gian này';
 
   @override
   String get from => 'Từ';
@@ -785,4 +791,11 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get deleteErrorMessage =>
       'Có lỗi xảy ra khi xoá mất rồi, thử lại nhé! 😢';
+
+  @override
+  String get premiumGroupMomentsTitle => 'Group Moments 👑';
+
+  @override
+  String get premiumGroupMomentsSubtitle =>
+      'Tính năng ví nhóm đang tạm khóa ở bản thử nghiệm.';
 }

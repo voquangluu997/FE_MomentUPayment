@@ -7,14 +7,14 @@ final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
 });
 
 class LocaleNotifier extends StateNotifier<Locale> {
-  LocaleNotifier() : super(const Locale('vi')) {
+  LocaleNotifier() : super(const Locale('en')) {
     _loadSavedLocale();
   }
 
   // Tự động tải ngôn ngữ đã lưu từ máy lên
   Future<void> _loadSavedLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final langCode = prefs.getString('language_code') ?? 'vi';
+    final langCode = prefs.getString('language_code') ?? 'en';
     state = Locale(langCode);
   }
 

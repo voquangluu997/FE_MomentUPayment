@@ -198,7 +198,7 @@
   "notiEmailVerifiedTitle": "Xác thực thành công 🎉",
   "notiEmailVerifiedBody": "Email của bạn đã được xác minh. Bắt đầu trải nghiệm thôi!",
 
-  "notiAggregatedTxBody": "Ví {budgetName} có {count} thay đổi giao dịch mới được gộp lại.",
+  "notiAggregatedTxBody": "Ví {budgetName} có {count} thay đổi khoảnh khắc mới được gộp lại.",
   "@notiAggregatedTxBody": {
     "placeholders": {
       "budgetName": { "type": "String" },
@@ -325,7 +325,7 @@
 
   "helpCenterDialogTitle": "Trung tâm hỗ trợ 🎧",
   "helpCenterDialogMessage": "Nếu bạn chạm trán 'bug' hay có bất kỳ ý tưởng nào để Moment U tuyệt vời hơn, đừng ngại email cho dev nhé! Tụi mình luôn lắng nghe bạn. 🥰",
-  "contactEmail": "momentu.support@gmail.com",
+  "contactEmail": "momentupayment.support@gmail.com",
   "appVersionTitle": "Phiên bản",
   "appVersion": "v1.0.0",
 
@@ -333,7 +333,7 @@
   "quickSuggestions": "Gợi ý nhanh",
   "budgetTip": "Mẹo: Hãy đặt hạn mức thấp hơn thu nhập thực tế khoảng 20% để luôn có khoản tiết kiệm dự phòng nhé! 🌟",
 
-  "emptyFilterTransaction": "Không có giao dịch nào trong khoảng ngày này 🌸",
+  "emptyFilterTransaction": "Không có khoảnh khắc nào trong khoảng ngày này 🌸",
   "from": "Từ",
   "to": "đến",
   "month": "Tháng",
@@ -371,9 +371,9 @@
   "incorrectPassword": "Mật khẩu hiện tại không đúng!",
 
   "maxOneYearWarning": "Moment U chỉ hỗ trợ xem tối đa 1 năm thui nè! 🗓️",
-  "analyticsTitle": "Phân tích giao dịch",
-  "galleryPickAction": "Chọn ảnh",
-  "galleryChangeAction": "Đổi ảnh",
+  "analyticsTitle": "Thống kê chi tiêu",
+  "cameraPickActionShort": "Chọn ảnh",
+  "galleryChangeActionShort": "Đổi ảnh",
 
   "wrongOldPassword": "Mật khẩu cũ không chính xác.",
   "userNotFoundError": "Không tìm thấy thông tin tài khoản.",
@@ -383,8 +383,8 @@
   "samePasswordError": "Mật khẩu mới không được trùng mật khẩu cũ.",
 
   "errorLoadData": "Lỗi khi tải dữ liệu",
-  "emptyFilterTransaction": "Không có giao dịch nào trong khoảng thời gian này",
-  "emptyTransactionList": "Chưa có giao dịch nào được ghi lại",
+  "emptyFilterTransaction": "Không có khoảnh khắc nào trong khoảng thời gian này",
+  "emptyTransactionList": "Chưa có khoảnh khắc nào được ghi lại",
   "addSuccessMessage": "Thêm khoảnh khắc mới thành công rùi! ✨",
   "updateSuccessMessage": "Cập nhật khoảnh khắc thành công rùi nha! 🥰",
   "futureDateError": "Bạn không thể thêm khoảnh khắc cho ngày tương lai! 🫣",
@@ -397,6 +397,9 @@
   "errorFutureDate": "Không thể chọn ngày tương lai!",
   "updateSuccess": "Cập nhật thành công!",
   "updateFailed": "Cập nhật thất bại: {error}",
-  "detailsTitle": "Chi tiết khoảnh khắc"
+  "detailsTitle": "Chi tiết khoảnh khắc",
+
+  "premiumGroupMomentsTitle": "Group Moments 👑",
+  "premiumGroupMomentsSubtitle": "Tính năng ví nhóm đang tạm khóa ở bản thử nghiệm."
 
 }

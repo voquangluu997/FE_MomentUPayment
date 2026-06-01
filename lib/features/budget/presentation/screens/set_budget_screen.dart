@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+import 'package:moment_u_payment/core/utils/currency_helper.dart'; // Đừng quên import helper này nếu có
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -18,6 +19,17 @@ class SetBudgetScreen extends ConsumerStatefulWidget {
 class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   final _budgetController = TextEditingController();
   double _currentAmount = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 🚀 LẤY NGÂN SÁCH HIỆN TẠI VÀ GÁN VÀO CONTROLLER KHI MỞ MÀN HÌNH
+    final currentSummary = ref.read(homeBudgetProvider).valueOrNull;
+    if (currentSummary != null && currentSummary.budgetLimit > 0) {
+      _currentAmount = currentSummary.budgetLimit;
+      _budgetController.text = _formatNumber(_currentAmount.toStringAsFixed(0));
+    }
+  }
 
   @override
   void dispose() {
@@ -86,6 +98,12 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
 
+    // Lấy thông tin chi tiêu hiện tại để làm tính năng Cảnh báo
+    final budgetSummary = ref.watch(homeBudgetProvider).valueOrNull;
+    final double totalSpent = budgetSummary?.totalSpent ?? 0.0;
+    final bool isBudgetTooLow =
+        _currentAmount > 0 && _currentAmount < totalSpent;
+
     ref.listen<BudgetState>(budgetProvider, (previous, next) {
       if (next == BudgetState.success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -150,7 +168,6 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // TIÊU ĐỀ NẰM NGANG VỚI PHÍM TẮT SỐ 0 (Cuộn ngang nếu tràn)
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
@@ -214,8 +231,10 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                       ),
                     ],
                     border: Border.all(
-                      color: appColors.primary.withOpacity(0.1),
-                      width: 1,
+                      color: isBudgetTooLow
+                          ? Colors.orange.withOpacity(0.5)
+                          : appColors.primary.withOpacity(0.1),
+                      width: isBudgetTooLow ? 1.5 : 1,
                     ),
                   ),
                   child: Row(
@@ -224,6 +243,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                       Expanded(
                         child: TextField(
                           controller: _budgetController,
+                          autofocus: true, // 💡 TỰ ĐỘNG BẬT BÀN PHÍM LÊN
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
                           onSubmitted: (_) => FocusScope.of(context).unfocus(),
@@ -231,7 +251,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
-                            color: appColors.primary,
+                            color: isBudgetTooLow
+                                ? Colors.orange.shade700
+                                : appColors.primary,
                           ),
                           decoration: InputDecoration(
                             hintText: '0',
@@ -241,6 +263,22 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
+                            // 💡 NÚT XÓA NHANH KHI ĐÃ NHẬP SỐ
+                            suffixIcon: _budgetController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: Icon(
+                                      Icons.cancel_rounded,
+                                      color: appColors.textMuted.withOpacity(
+                                        0.4,
+                                      ),
+                                      size: 24,
+                                    ),
+                                    onPressed: () {
+                                      _budgetController.clear();
+                                      _onBudgetChanged('');
+                                    },
+                                  )
+                                : null,
                           ),
                         ),
                       ),
@@ -315,6 +353,38 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                 ),
 
                 const SizedBox(height: 16),
+
+                // 💡 HIỂN THỊ CẢNH BÁO NẾU NGÂN SÁCH MỚI < SỐ TIỀN ĐÃ TIÊU
+                if (isBudgetTooLow)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.orange,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Ngân sách này thấp hơn số tiền bạn đã tiêu trong tháng (${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol).',
+                            style: TextStyle(
+                              color: Colors.orange.shade800,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                 if (_currentAmount > 0)
                   AnimatedContainer(

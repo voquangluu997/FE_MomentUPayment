@@ -11,7 +11,7 @@ import 'package:moment_u_payment/features/notification/models/in_app_notificatio
 
 // 🌸 IMPORT WIDGET DÙNG CHUNG VÀ TOAST MỚI
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
-import 'package:moment_u_payment/core/utils/app_toast.dart'; // ✨ Đã tích hợp Toast cute đồng bộ hệ thống!
+import 'package:moment_u_payment/core/utils/app_toast.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
@@ -32,7 +32,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     });
   }
 
-  // ✨ Đã thêm tham số `AppColorTheme appColors` để sử dụng hệ màu động theo Theme
+  // ✨ PARSER XỬ LÝ THÔNG BÁO TÍCH HỢP ĐA NGÔN NGỮ ĐỘNG
   Map<String, dynamic> _parseNotificationContent(
     InAppNotification noti,
     AppLocalizations l10n,
@@ -44,28 +44,40 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     Color color = appColors.primary; // Thay thế màu mặc định dynamic
     String? route;
 
-    final arg1 = noti.arguments.isNotEmpty ? noti.arguments[0] : '';
-    final arg2 = noti.arguments.length > 1 ? noti.arguments[1] : '';
+    // 🌟 MAGIC L10N: Hàm con tự động dịch các argument từ Backend
+    String translateArg(String arg) {
+      if (arg == 'monthBudget') return l10n.monthBudget;
+      // Bạn có thể thêm các key khác ở đây sau này
+      return arg;
+    }
+
+    // Lấy và dịch argument
+    final arg1 = noti.arguments.isNotEmpty
+        ? translateArg(noti.arguments[0])
+        : '';
+    final arg2 = noti.arguments.length > 1
+        ? translateArg(noti.arguments[1])
+        : '';
 
     switch (noti.type) {
       case 'budget_80':
         title = l10n.notiBudgetWarningTitle;
         body = l10n.notiBudgetWarningBody(
-          arg1.isEmpty ? 'Ví' : arg1,
+          arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
           arg2.isEmpty ? '80' : arg2,
         );
         icon = Icons.warning_rounded;
-        color = Colors.orange; // Giữ nguyên màu cam cảnh báo đặc trưng
+        color = Colors.orange;
         break;
 
       case 'budget_100':
         title = l10n.notiBudgetExceededTitle;
         body = l10n.notiBudgetExceededBody(
-          arg1.isEmpty ? 'Ví' : arg1,
+          arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
           arg2.isEmpty ? '100' : arg2,
         );
         icon = Icons.error_rounded;
-        color = Colors.red; // Giữ nguyên màu đỏ lỗi hệ thống
+        color = Colors.red;
         break;
 
       case 'email_verified':
@@ -84,6 +96,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
 
       case 'first_login_reminder':
         title = l10n.notiFirstLoginReminderTitle;
+        // Tạm dùng 'bạn hiền' cho lém lỉnh, hoặc truyền tên user từ DB vào arg1
         body = l10n.notiFirstLoginReminderBody(
           arg1.isEmpty ? 'bạn hiền' : arg1,
         );
@@ -108,8 +121,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         break;
 
       default:
-        title = "Thông báo hệ thống";
-        body = noti.bodyKey;
+        title = l10n.notificationSettingsTitle; // Tạm dùng key title thông báo
+        body = noti.bodyKey; // Nếu không khớp type, hiển thị nguyên raw data
     }
 
     return {
@@ -148,14 +161,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: appColors
-                .primaryDark, // Tự động đổi: Nâu đậm (Light) -> Hồng phấn nhạt (Dark)
+            color: appColors.primaryDark,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          l10n.notificationSettingsTitle.replaceAll("Cài đặt", "Danh sách"),
+          l10n.notificationSettingsTitle.replaceAll(
+            "Cài đặt",
+            "Danh sách",
+          ), // Trick nhỏ để đổi tên
           style: TextStyle(
             color: appColors.primaryDark,
             fontSize: 18,
@@ -190,8 +205,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           color: Colors.redAccent,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: appColors
-                                .background, // Viền bao quanh dot đỏ tiệp màu nền dynamic
+                            color: appColors.background,
                             width: 2,
                           ),
                         ),
@@ -239,7 +253,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            "Tất cả",
+                            "Tất cả", // Bạn có thể chuyển text này vào l10n
                             style: TextStyle(
                               color: !_showOnlyUnread
                                   ? Colors.white
@@ -272,7 +286,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            "Chưa đọc",
+                            "Chưa đọc", // Bạn có thể chuyển text này vào l10n
                             style: TextStyle(
                               color: _showOnlyUnread
                                   ? Colors.white
@@ -315,7 +329,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     itemCount: filteredNotifications.length,
                     itemBuilder: (context, index) {
                       final noti = filteredNotifications[index];
-                      // ✨ Truyền appColors vào bộ phân tích dữ liệu
+                      // ✨ L10n và AppColors đã được bơm vào đây!
                       final content = _parseNotificationContent(
                         noti,
                         l10n,
@@ -329,7 +343,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                 .read(notificationProvider.notifier)
                                 .markAsRead(noti.id);
 
-                            // ✨ Toast thông báo đã đọc cực đáng yêu đồng bộ toàn app!
+                            // ✨ Toast thông báo siêu đáng yêu
                             AppToast.showSuccess(
                               context,
                               'Đã đọc thông báo rùi nha! 💌',
@@ -465,7 +479,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     );
   }
 
-  // ✨ Đã thêm tham số `AppColorTheme appColors` vào hàm Empty State
+  // ✨ UI Empty State
   Widget _buildEmptyState(String text, IconData icon, AppColorTheme appColors) {
     return Center(
       child: Column(

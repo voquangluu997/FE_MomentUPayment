@@ -5,7 +5,7 @@ import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/providers/locale_provider.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
-import 'package:moment_u_payment/core/utils/app_toast.dart'; // ✨ Thêm import tiện ích Toast của bạn
+import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/features/notification/presentation/screens/notification_settings_screen.dart';
 import 'package:moment_u_payment/features/profile/presentation/screens/profile_settings_screen.dart';
@@ -35,11 +35,10 @@ class SettingsBottomSheet extends ConsumerWidget {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      // 🚀 GIẢI PHÁP: Sử dụng Material làm background thay vì BoxDecoration
       child: Material(
         color: appColors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        clipBehavior: Clip.antiAlias, // Cắt gợn sóng mượt mà theo góc bo
+        clipBehavior: Clip.antiAlias,
         child: Padding(
           padding: const EdgeInsets.only(
             top: 12,
@@ -50,7 +49,7 @@ class SettingsBottomSheet extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Thanh kéo ngang nhỏ trên cùng định hướng BottomSheet
+              // THANH KÉO (HANDLE)
               Container(
                 width: 40,
                 height: 4,
@@ -61,7 +60,7 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
 
-              // Tiêu đề BottomSheet
+              // TIÊU ĐỀ & NÚT ĐÓNG
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -82,15 +81,13 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
 
-              // Danh sách các mục cài đặt cấu hình công cụ
+              // PHẦN NỘI DUNG CUỘN ĐƯỢC
               Flexible(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      // =========================================================
                       // PHÂN NHÓM 1: QUẢN LÝ CÁ NHÂN & TƯƠNG TÁC
-                      // =========================================================
                       _buildSettingItem(
                         icon: Icons.person_outline_rounded,
                         title: l10n.accountSettings,
@@ -129,9 +126,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         ),
                       ),
 
-                      // =========================================================
                       // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
-                      // =========================================================
                       _buildSettingItem(
                         icon: Icons.language_rounded,
                         title: l10n.language,
@@ -242,9 +237,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         ),
                       ),
 
-                      // =========================================================
-                      // PHÂN NHÓM 3: HỖ TRỢ & ĐÓNG GÓP PHÁT TRIỂN
-                      // =========================================================
+                      // PHÂN NHÓM 3: HỖ TRỢ
                       _buildSettingItem(
                         icon: Icons.help_outline_rounded,
                         title: l10n.helpCenter,
@@ -255,20 +248,16 @@ class SettingsBottomSheet extends ConsumerWidget {
                           _showHelpCenterDialog(context, appColors, l10n);
                         },
                       ),
-                      const SizedBox(height: 12),
-                      _buildDonationBanner(context, appColors, l10n),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Divider(
                           thickness: 0.5,
                           color: appColors.textMuted.withOpacity(0.2),
                         ),
                       ),
 
-                      // =========================================================
-                      // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (ĐĂNG XUẤT)
-                      // =========================================================
+                      // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
@@ -309,6 +298,20 @@ class SettingsBottomSheet extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+
+              // ==========================================
+              // PHẦN CỐ ĐỊNH Ở ĐÁY (KHÔNG CUỘN)
+              // ==========================================
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildDonationBanner(context, appColors, l10n),
+                    _buildPremiumBanner(context, appColors, l10n),
+                  ],
                 ),
               ),
             ],
@@ -429,6 +432,93 @@ class SettingsBottomSheet extends ConsumerWidget {
             Icon(Icons.favorite_rounded, color: appColors.primary, size: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumBanner(
+    BuildContext context,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFB800).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFFFB800).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFB800),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFFB800).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.workspace_premium_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      l10n.premiumGroupMomentsTitle,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: appColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFB800).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.lock_rounded,
+                        size: 12,
+                        color: Color(0xFFD99B00),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.premiumGroupMomentsSubtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: appColors.primaryDark.withOpacity(0.6),
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -624,15 +714,21 @@ class SettingsBottomSheet extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        l10n.contactEmail,
-                        style: TextStyle(
-                          color: appColors.primaryDark,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Text(
+                          l10n.contactEmail,
+                          style: TextStyle(
+                            color: appColors.primaryDark,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
                         ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Icon(
                       Icons.copy_rounded,
                       color: appColors.textMuted,
