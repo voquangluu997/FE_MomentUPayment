@@ -9,7 +9,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appName => 'Moment u Payment';
+  String get appName => 'Moments U Payment';
 
   @override
   String get login => 'Đăng nhập';
@@ -30,7 +30,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get welcomeBack => 'Welcome Back! ✨';
 
   @override
-  String get subTitle => 'Moment u Payment - Nhật ký chi tiêu ngọt ngào';
+  String get subTitle => 'Moments u Payment - Nhật ký chi tiêu ngọt ngào';
 
   @override
   String get emailHint => 'Email của bạn... ✨';
@@ -96,7 +96,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get categorySectionTitle => 'Danh mục chi tiêu';
 
   @override
-  String get noteHint => 'Ghi chú ngắn gọn... ✨';
+  String get noteHint => 'Ghi chú...';
 
   @override
   String get saveMomentButton => 'Lưu Moment Chi Tiêu ✨';
@@ -114,20 +114,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeSubGreeting => 'Hôm nay tình hình chi tiêu thế nào?';
 
   @override
-  String get spendingMomentsTitle => 'Khoảnh khắc chi tiêu của bạn';
+  String get spendingMomentsTitle => 'Khoảnh khắc chi tiêu nè';
 
   @override
   String get loadingData => 'Đang tải danh sách khoảnh khắc...';
 
   @override
-  String get errorLoadData => 'Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺';
+  String get errorLoadData => 'Lỗi khi tải dữ liệu';
 
   @override
   String get retryButton => 'Lấy đà thử lại nghen 🚀';
 
   @override
-  String get emptyTransactionList =>
-      'Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸';
+  String get emptyTransactionList => 'Chưa có giao dịch nào được ghi lại';
 
   @override
   String get catFood => 'Ăn uống 🍰';
@@ -610,7 +609,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get scanToSpreadLoveSubtitle =>
-      'Mỗi ly cà phê của bạn là một chiếc bug bị tiêu diệt! Cảm ơn nhà tài trợ kim cương đã yêu thương Moment U Payment nhé! 💎✨';
+      'Mỗi ly cà phê của bạn là một chiếc bug bị tiêu diệt! Cảm ơn nhà tài trợ kim cương đã yêu thương Moments U Payment nhé! 💎✨';
 
   @override
   String get missingQrMessage =>
@@ -650,7 +649,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get emptyFilterTransaction =>
-      'Không có giao dịch nào trong khoảng ngày này 🌸';
+      'Không có giao dịch nào trong khoảng thời gian này';
 
   @override
   String get from => 'Từ';
@@ -729,7 +728,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updatePassword => 'Đổi mật khẩu';
 
   @override
-  String get updateFailed => 'Cập nhật thất bại!';
+  String updateFailed(Object error) {
+    return 'Cập nhật thất bại: $error';
+  }
 
   @override
   String get nameEmptyError => 'Tên không được để trống!';
@@ -765,4 +766,23 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get samePasswordError => 'Mật khẩu mới không được trùng mật khẩu cũ.';
+
+  @override
+  String get addSuccessMessage => 'Thêm khoảnh khắc mới thành công rùi! ✨';
+
+  @override
+  String get updateSuccessMessage =>
+      'Cập nhật khoảnh khắc thành công rùi nha! 🥰';
+
+  @override
+  String get futureDateError =>
+      'Bạn không thể thêm khoảnh khắc cho ngày tương lai! 🫣';
+
+  @override
+  String get deleteSuccessMessage =>
+      'Đã xoá khoảnh khắc thành công rùi bạn ơi! 🌸';
+
+  @override
+  String get deleteErrorMessage =>
+      'Có lỗi xảy ra khi xoá mất rồi, thử lại nhé! 😢';
 }

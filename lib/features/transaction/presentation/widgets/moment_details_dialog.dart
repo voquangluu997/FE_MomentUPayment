@@ -31,6 +31,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   late TextEditingController _amountController;
   late TextEditingController _noteController;
   late TextEditingController _customCategoryController;
+  DateTime _selectedDate = DateTime.now();
 
   final _mediaService = MediaService();
   final ImagePicker _picker = ImagePicker();
@@ -40,6 +41,34 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   String? _localImagePath;
   late String _currentImageUrl;
   bool _isCustomCategory = false;
+
+  Future<void> _pickDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        final appColors = ref.read(appColorsProvider);
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: appColors.primary,
+              onPrimary: Colors.white,
+              surface: appColors.cardBackground,
+              onSurface: appColors.primaryDark,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -54,6 +83,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     _noteController = TextEditingController(text: widget.moment['note'] ?? '');
     _customCategoryController = TextEditingController();
+
+    if (widget.moment['spentAt'] != null) {
+      _selectedDate =
+          DateTime.tryParse(widget.moment['spentAt'].toString())?.toLocal() ??
+          DateTime.now();
+    }
   }
 
   @override
@@ -163,7 +198,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   Widget build(BuildContext context) {
     final currencySymbol = ref.watch(currencyProvider);
     final txState = ref.watch(transactionProvider);
-    final appColors = ref.watch(appColorsProvider); // ✨ GỌI PROVIDER MÀU SẮC
+    final appColors = ref.watch(appColorsProvider);
 
     final List<Map<String, dynamic>> categories = [
       {'id': 'Food', 'name': widget.l10n.catFood, 'emoji': '🍰'},
@@ -184,7 +219,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      backgroundColor: appColors.cardBackground, // Nền tự động đổi màu
+      backgroundColor: appColors.cardBackground,
       clipBehavior: Clip.antiAlias,
       child: SingleChildScrollView(
         child: Column(
@@ -332,6 +367,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                                   );
                                   _noteController.text =
                                       widget.moment['note'] ?? '';
+                                  if (widget.moment['spentAt'] != null) {
+                                    _selectedDate =
+                                        DateTime.tryParse(
+                                          widget.moment['spentAt'].toString(),
+                                        )?.toLocal() ??
+                                        DateTime.now();
+                                  }
                                 }
                                 _isEditing = !_isEditing;
                               });
@@ -363,13 +405,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: !_isEditing
-                    ? _buildViewMode(compactAmount, appColors) // Truyền màu
+                    ? _buildViewMode(compactAmount, appColors)
                     : _buildEditMode(
                         categories,
                         currencySymbol,
                         txState,
                         appColors,
-                      ), // Truyền màu
+                      ),
               ),
             ),
           ],
@@ -379,6 +421,9 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   }
 
   Widget _buildViewMode(String compactAmount, AppColorTheme appColors) {
+    final formattedDate =
+        "${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}";
+
     return Column(
       key: const ValueKey('ViewMode'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,39 +433,78 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: appColors.primary.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _getCategoryIcon(_selectedCategory),
-                      size: 14,
-                      color: appColors.primary,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
                     ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        _selectedCategory.isNotEmpty
-                            ? _selectedCategory
-                            : widget.l10n.emptyTransactionNote,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                    decoration: BoxDecoration(
+                      color: appColors.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getCategoryIcon(_selectedCategory),
+                          size: 14,
                           color: appColors.primary,
                         ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            _selectedCategory.isNotEmpty
+                                ? _selectedCategory
+                                : widget.l10n.emptyTransactionNote,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: appColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: appColors.background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: appColors.primary.withOpacity(0.1),
                       ),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 12,
+                          color: appColors.textMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          formattedDate,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 8),
@@ -429,7 +513,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: appColors.errorAccent, // Đổi màu
+                color: appColors.errorAccent,
               ),
             ),
           ],
@@ -444,7 +528,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           style: TextStyle(
             fontSize: 14.5,
             fontWeight: FontWeight.bold,
-            color: appColors.primaryDark.withOpacity(0.6), // Đổi màu
+            color: appColors.primaryDark.withOpacity(0.6),
             letterSpacing: 0.5,
             height: 1.4,
           ),
@@ -458,7 +542,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     List<Map<String, dynamic>> categories,
     String currencySymbol,
     TransactionState txState,
-    AppColorTheme appColors, // Thêm tham số
+    AppColorTheme appColors,
   ) {
     return Column(
       key: const ValueKey('EditMode'),
@@ -636,6 +720,57 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         const SizedBox(height: 16),
 
         Text(
+          "THỜI GIAN GIAO DỊCH",
+          style: TextStyle(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w800,
+            color: appColors.primaryDark.withOpacity(0.5),
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _pickDate,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: appColors.background,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: appColors.primary.withOpacity(0.06)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    size: 20,
+                    color: appColors.primary,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    "${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}",
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: appColors.primaryDark,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.edit_calendar_rounded,
+                    size: 16,
+                    color: appColors.textMuted,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        Text(
           widget.l10n.noteSectionTitle,
           style: TextStyle(
             fontSize: 10.5,
@@ -718,6 +853,17 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                   }
 
                   try {
+                    // 🌟 XỬ LÝ GỘP THỜI GIAN: Ngày (từ Date Picker) + Giờ hiện tại (từ DateTime.now())
+                    final now = DateTime.now();
+                    final spentAtWithCurrentTime = DateTime(
+                      _selectedDate.year,
+                      _selectedDate.month,
+                      _selectedDate.day,
+                      now.hour,
+                      now.minute,
+                      now.second,
+                    );
+
                     await ref
                         .read(transactionProvider.notifier)
                         .updateTransaction(
@@ -727,6 +873,8 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                           emoji: _selectedEmoji,
                           note: _noteController.text.trim(),
                           localImagePath: _localImagePath,
+                          // Gửi chuỗi ISO đã gộp ngày chọn và giờ hiện tại
+                          spentAt: spentAtWithCurrentTime,
                         );
 
                     if (mounted) {
@@ -735,7 +883,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                           content: const Text(
                             'Cập nhật khoảnh khắc thành công! 🎉',
                           ),
-                          backgroundColor: appColors.success, // Đã có appColors
+                          backgroundColor: appColors.success,
                         ),
                       );
                       Navigator.of(context).pop(true);

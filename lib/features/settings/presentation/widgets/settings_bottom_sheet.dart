@@ -32,277 +32,288 @@ class SettingsBottomSheet extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      decoration: BoxDecoration(
-        color: appColors.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.only(top: 12, bottom: 24, left: 24, right: 24),
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Thanh kéo ngang nhỏ trên cùng định hướng BottomSheet
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: appColors.textMuted.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(10),
-            ),
+      // 🚀 GIẢI PHÁP: Sử dụng Material làm background thay vì BoxDecoration
+      child: Material(
+        color: appColors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        clipBehavior: Clip.antiAlias, // Cắt gợn sóng mượt mà theo góc bo
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 12,
+            bottom: 24,
+            left: 24,
+            right: 24,
           ),
-          const SizedBox(height: 20),
-
-          // Tiêu đề BottomSheet
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.settingsAndUtilities,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: appColors.primaryDark,
+              // Thanh kéo ngang nhỏ trên cùng định hướng BottomSheet
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: appColors.textMuted.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close_rounded),
-                color: appColors.primaryDark,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
-          // Danh sách các mục cài đặt cấu hình công cụ
-          Flexible(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
+              // Tiêu đề BottomSheet
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // =========================================================
-                  // PHÂN NHÓM 1: QUẢN LÝ CÁ NHÂN & TƯƠNG TÁC
-                  // =========================================================
-                  _buildSettingItem(
-                    icon: Icons.person_outline_rounded,
-                    title: l10n.accountSettings,
-                    subtitle: l10n.accountSettingsSubtitle,
-                    appColors: appColors,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ProfileSettingsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildSettingItem(
-                    icon: Icons.notifications_active_rounded,
-                    title: l10n.notificationSettingsTitle,
-                    subtitle: l10n.notificationSettingsSubtitle,
-                    appColors: appColors,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationSettingsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Divider(
-                      thickness: 0.5,
-                      color: appColors.textMuted.withOpacity(0.15),
+                  Text(
+                    l10n.settingsAndUtilities,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: appColors.primaryDark,
                     ),
                   ),
-
-                  // =========================================================
-                  // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
-                  // =========================================================
-                  _buildSettingItem(
-                    icon: Icons.language_rounded,
-                    title: l10n.language,
-                    subtitle: currentLocale.languageCode == 'en'
-                        ? l10n.english
-                        : l10n.vietnamese,
-                    appColors: appColors,
-                    trailing: Switch(
-                      value: currentLocale.languageCode == 'en',
-                      activeColor: appColors.primary,
-                      onChanged: (_) =>
-                          ref.read(localeProvider.notifier).toggleLocale(),
-                    ),
-                  ),
-                  _buildSettingItem(
-                    icon: Icons.monetization_on_rounded,
-                    title: l10n.currencyUnit,
-                    subtitle: '${l10n.currentlyUsing}: $currentCurrency',
-                    appColors: appColors,
-                    trailing: PopupMenuButton<String>(
-                      initialValue: currentCurrency,
-                      position: PopupMenuPosition.under,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      color: appColors.cardBackground,
-                      elevation: 3,
-                      onSelected: (newValue) {
-                        ref
-                            .read(currencyProvider.notifier)
-                            .setCurrency(newValue);
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return ['₫', '\$', '€', '¥'].map((String value) {
-                          final isSelected = value == currentCurrency;
-                          return PopupMenuItem<String>(
-                            value: value,
-                            height: 40,
-                            child: Center(
-                              child: Text(
-                                value,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: isSelected
-                                      ? appColors.primary
-                                      : appColors.primaryDark,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: appColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              currentCurrency,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: appColors.primary,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: appColors.primary,
-                              size: 18,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildSettingItem(
-                    icon: Icons.dark_mode_rounded,
-                    title: l10n.darkMode,
-                    subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
-                    appColors: appColors,
-                    trailing: Switch(
-                      value: isDark,
-                      activeColor: appColors.primary,
-                      onChanged: (val) =>
-                          ref.read(themeModeProvider.notifier).toggleTheme(),
-                    ),
-                    onTap: () =>
-                        ref.read(themeModeProvider.notifier).toggleTheme(),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Divider(
-                      thickness: 0.5,
-                      color: appColors.textMuted.withOpacity(0.15),
-                    ),
-                  ),
-
-                  // =========================================================
-                  // PHÂN NHÓM 3: HỖ TRỢ & ĐÓNG GÓP PHÁT TRIỂN
-                  // =========================================================
-                  _buildSettingItem(
-                    icon: Icons.help_outline_rounded,
-                    title: l10n.helpCenter,
-                    subtitle: l10n.helpCenterSubtitle,
-                    appColors: appColors,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showHelpCenterDialog(context, appColors, l10n);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDonationBanner(context, appColors, l10n),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(
-                      thickness: 0.5,
-                      color: appColors.textMuted.withOpacity(0.2),
-                    ),
-                  ),
-
-                  // =========================================================
-                  // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (ĐĂNG XUẤT)
-                  // =========================================================
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.redAccent,
-                        size: 22,
-                      ),
-                    ),
-                    title: Text(
-                      l10n.logout,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.redAccent,
-                        fontSize: 15,
-                      ),
-                    ),
-                    subtitle: Text(
-                      l10n.logoutSubtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: appColors.textMuted,
-                      ),
-                    ),
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      await ref.read(authProvider.notifier).logout();
-                      if (!context.mounted) return;
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/login', (route) => false);
-                    },
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                    color: appColors.primaryDark,
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 12),
+
+              // Danh sách các mục cài đặt cấu hình công cụ
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      // =========================================================
+                      // PHÂN NHÓM 1: QUẢN LÝ CÁ NHÂN & TƯƠNG TÁC
+                      // =========================================================
+                      _buildSettingItem(
+                        icon: Icons.person_outline_rounded,
+                        title: l10n.accountSettings,
+                        subtitle: l10n.accountSettingsSubtitle,
+                        appColors: appColors,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ProfileSettingsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.notifications_active_rounded,
+                        title: l10n.notificationSettingsTitle,
+                        subtitle: l10n.notificationSettingsSubtitle,
+                        appColors: appColors,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const NotificationSettingsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Divider(
+                          thickness: 0.5,
+                          color: appColors.textMuted.withOpacity(0.15),
+                        ),
+                      ),
+
+                      // =========================================================
+                      // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
+                      // =========================================================
+                      _buildSettingItem(
+                        icon: Icons.language_rounded,
+                        title: l10n.language,
+                        subtitle: currentLocale.languageCode == 'en'
+                            ? l10n.english
+                            : l10n.vietnamese,
+                        appColors: appColors,
+                        trailing: Switch(
+                          value: currentLocale.languageCode == 'en',
+                          activeColor: appColors.primary,
+                          onChanged: (_) =>
+                              ref.read(localeProvider.notifier).toggleLocale(),
+                        ),
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.monetization_on_rounded,
+                        title: l10n.currencyUnit,
+                        subtitle: '${l10n.currentlyUsing}: $currentCurrency',
+                        appColors: appColors,
+                        trailing: PopupMenuButton<String>(
+                          initialValue: currentCurrency,
+                          position: PopupMenuPosition.under,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          color: appColors.cardBackground,
+                          elevation: 3,
+                          onSelected: (newValue) {
+                            ref
+                                .read(currencyProvider.notifier)
+                                .setCurrency(newValue);
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return ['₫', '\$', '€', '¥'].map((String value) {
+                              final isSelected = value == currentCurrency;
+                              return PopupMenuItem<String>(
+                                value: value,
+                                height: 40,
+                                child: Center(
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? appColors.primary
+                                          : appColors.primaryDark,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  currentCurrency,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: appColors.primary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: appColors.primary,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.dark_mode_rounded,
+                        title: l10n.darkMode,
+                        subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
+                        appColors: appColors,
+                        trailing: Switch(
+                          value: isDark,
+                          activeColor: appColors.primary,
+                          onChanged: (val) => ref
+                              .read(themeModeProvider.notifier)
+                              .toggleTheme(),
+                        ),
+                        onTap: () =>
+                            ref.read(themeModeProvider.notifier).toggleTheme(),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Divider(
+                          thickness: 0.5,
+                          color: appColors.textMuted.withOpacity(0.15),
+                        ),
+                      ),
+
+                      // =========================================================
+                      // PHÂN NHÓM 3: HỖ TRỢ & ĐÓNG GÓP PHÁT TRIỂN
+                      // =========================================================
+                      _buildSettingItem(
+                        icon: Icons.help_outline_rounded,
+                        title: l10n.helpCenter,
+                        subtitle: l10n.helpCenterSubtitle,
+                        appColors: appColors,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _showHelpCenterDialog(context, appColors, l10n);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDonationBanner(context, appColors, l10n),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Divider(
+                          thickness: 0.5,
+                          color: appColors.textMuted.withOpacity(0.2),
+                        ),
+                      ),
+
+                      // =========================================================
+                      // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (ĐĂNG XUẤT)
+                      // =========================================================
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.redAccent,
+                            size: 22,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.logout,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                            fontSize: 15,
+                          ),
+                        ),
+                        subtitle: Text(
+                          l10n.logoutSubtitle,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: appColors.textMuted,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await ref.read(authProvider.notifier).logout();
+                          if (!context.mounted) return;
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/login', (route) => false);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -586,7 +597,6 @@ class SettingsBottomSheet extends ConsumerWidget {
               onTap: () async {
                 await Clipboard.setData(ClipboardData(text: l10n.contactEmail));
                 if (context.mounted) {
-                  // ✨ FIX: Thay thế SnackBar thô bằng AppToast.showSuccess đồng bộ màu sắc và style mới
                   AppToast.showSuccess(
                     context,
                     'Đã sao chép email: ${l10n.contactEmail}',

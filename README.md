@@ -18,4 +18,4 @@ samples, guidance on mobile development, and a full API reference.
 
 #NOTE
 flutter gen-l10n sau khi update các file I10N
-# FE_MomentUPayment
+# FE_MomentsUPayment

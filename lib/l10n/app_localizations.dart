@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'Moment u Payment'**
+  /// **'Moments u Payment'**
   String get appName;
 
   /// No description provided for @login.
@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @subTitle.
   ///
   /// In en, this message translates to:
-  /// **'Moment u Payment - Sweet Expense Diary'**
+  /// **'Moments U Payment - Sweet Expense Diary'**
   String get subTitle;
 
   /// No description provided for @emailHint.
@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// No description provided for @spendingMomentsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Payment Moments'**
+  /// **'Moments U Payment'**
   String get spendingMomentsTitle;
 
   /// No description provided for @loadingData.
@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorLoadData.
   ///
   /// In en, this message translates to:
-  /// **'Oopsie, the data tripped and fell 🥺'**
+  /// **'Error loading data'**
   String get errorLoadData;
 
   /// No description provided for @retryButton.
@@ -323,7 +323,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyTransactionList.
   ///
   /// In en, this message translates to:
-  /// **'No payment moments this month. Tap + to add one! 🌸'**
+  /// **'No transactions yet'**
   String get emptyTransactionList;
 
   /// No description provided for @catFood.
@@ -1239,7 +1239,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyFilterTransaction.
   ///
   /// In en, this message translates to:
-  /// **'No transactions in this date range 🌸'**
+  /// **'No transactions found for this period'**
   String get emptyFilterTransaction;
 
   /// No description provided for @from.
@@ -1396,7 +1396,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Update failed!'**
-  String get updateFailed;
+  String updateFailed(Object error);
 
   /// No description provided for @nameEmptyError.
   ///
@@ -1463,6 +1463,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New password cannot be the same as old password.'**
   String get samePasswordError;
+
+  /// No description provided for @addSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Added successfully! ✨'**
+  String get addSuccessMessage;
+
+  /// No description provided for @updateSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated successfully! ✨'**
+  String get updateSuccessMessage;
+
+  /// No description provided for @futureDateError.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot add transactions for future dates!'**
+  String get futureDateError;
+
+  /// No description provided for @deleteSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted successfully!'**
+  String get deleteSuccessMessage;
+
+  /// No description provided for @deleteErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while deleting'**
+  String get deleteErrorMessage;
 }
 
 class _AppLocalizationsDelegate

@@ -147,7 +147,7 @@ class NotificationService {
         },
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("✅ Moment u Payment: Đồng bộ FCM Token và Ngôn ngữ thành công!");
+        print("✅ Moments u Payment: Đồng bộ FCM Token và Ngôn ngữ thành công!");
       }
     } catch (e) {
       print("❌ Lỗi gửi token lên backend: $e");

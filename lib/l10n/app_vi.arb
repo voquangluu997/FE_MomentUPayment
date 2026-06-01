@@ -1,13 +1,13 @@
 {
   "@@locale": "vi",
-  "appName": "Moment u Payment",
+  "appName": "Moments U Payment",
   "login": "Đăng nhập",
   "register": "Đăng ký",
   "email": "Địa chỉ Email",
   "password": "Mật khẩu",
   "name": "Họ và tên",
   "welcomeBack": "Welcome Back! ✨",
-  "subTitle": "Moment u Payment - Nhật ký chi tiêu ngọt ngào",
+  "subTitle": "Moments u Payment - Nhật ký chi tiêu ngọt ngào",
   "emailHint": "Email của bạn... ✨",
   "passwordHint": "Mật khẩu bí mật... 🔑",
   "nameHint": "Tên dễ thương của bạn... ✨",
@@ -39,7 +39,7 @@
   "txErrorMessage": "Không lưu được khoảnh khắc này rồi bạn ơi! 😢",
   "emptyTransactionNote": "Khoảnh khắc chi tiêu không tên...",
   "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
-  "spendingMomentsTitle": "Khoảnh khắc chi tiêu của bạn",
+  "spendingMomentsTitle": "Khoảnh khắc chi tiêu nè",
   "loadingData": "Đang tải danh sách khoảnh khắc...",
   "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
   "retryButton": "Thử lại",
@@ -318,7 +318,7 @@
   "buyDevCoffeeTitle": "Tiếp thêm cafein cho dev ☕",
   "buyDevCoffeeSubtitle": "Ủng hộ ly cà phê để dev code không quạo nha! 🥰",
   "scanToSpreadLoveTitle": "Đa tạ đại hiệp búng xu! 🥰",
-  "scanToSpreadLoveSubtitle": "Mỗi ly cà phê của bạn là một chiếc bug bị tiêu diệt! Cảm ơn nhà tài trợ kim cương đã yêu thương Moment U Payment nhé! 💎✨",
+  "scanToSpreadLoveSubtitle": "Mỗi ly cà phê của bạn là một chiếc bug bị tiêu diệt! Cảm ơn nhà tài trợ kim cương đã yêu thương Moments U Payment nhé! 💎✨",
   "missingQrMessage": "Hãy thêm ảnh QR vào:\nassets/images/momo_qr.png",
   "closeButton": "Đóng",
   "buyMeACoffeeBtn": "Hoặc tặng qua Buy Me a Coffee ☕",
@@ -380,6 +380,23 @@
   "weakPasswordError": "Mật khẩu mới quá yếu.",
   "noChangeWarning": "Thông tin của bạn vẫn như cũ! ✨",
   "fillPasswordFieldsError": "Vui lòng nhập đầy đủ thông tin mật khẩu.",
-  "samePasswordError": "Mật khẩu mới không được trùng mật khẩu cũ."
+  "samePasswordError": "Mật khẩu mới không được trùng mật khẩu cũ.",
+
+  "errorLoadData": "Lỗi khi tải dữ liệu",
+  "emptyFilterTransaction": "Không có giao dịch nào trong khoảng thời gian này",
+  "emptyTransactionList": "Chưa có giao dịch nào được ghi lại",
+  "addSuccessMessage": "Thêm khoảnh khắc mới thành công rùi! ✨",
+  "updateSuccessMessage": "Cập nhật khoảnh khắc thành công rùi nha! 🥰",
+  "futureDateError": "Bạn không thể thêm khoảnh khắc cho ngày tương lai! 🫣",
+  "deleteSuccessMessage": "Đã xoá khoảnh khắc thành công rùi bạn ơi! 🌸",
+  "deleteErrorMessage": "Có lỗi xảy ra khi xoá mất rồi, thử lại nhé! 😢",
+
+  "updateButton": "Cập nhật khoảnh khắc",
+  "noteHint": "Ghi chú...",
+  "dateSectionTitle": "NGÀY KHOẢNH KHẮC",
+  "errorFutureDate": "Không thể chọn ngày tương lai!",
+  "updateSuccess": "Cập nhật thành công!",
+  "updateFailed": "Cập nhật thất bại: {error}",
+  "detailsTitle": "Chi tiết khoảnh khắc"
 
 }

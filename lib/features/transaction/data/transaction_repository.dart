@@ -2,8 +2,8 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart'; // 🔑 THÊM IMPORT ĐỂ FORMAT ĐỊNH DẠNG NGÀY KHỚP BACKEND
-import '../../../core/network/api_client.dart'; // Import dioClient toàn cục đã tích hợp Interceptor
+import 'package:intl/intl.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/utils/app_logger.dart';
 
 class TransactionRepository {
@@ -43,6 +43,7 @@ class TransactionRepository {
     String? note,
     String? imageUrl,
     String? emoji,
+    DateTime? spentAt, // ✨ Đã thêm tham số
   }) async {
     try {
       final response = await _dio.post(
@@ -53,6 +54,8 @@ class TransactionRepository {
           'note': note,
           'imageUrl': imageUrl,
           'emoji': emoji,
+          // ✨ Gửi ngày lên server (mặc định hiện tại nếu null)
+          'spentAt': (spentAt ?? DateTime.now()).toIso8601String(),
         },
       );
 
@@ -73,6 +76,7 @@ class TransactionRepository {
     String? note,
     String? imageUrl,
     String? emoji,
+    DateTime? spentAt, // ✨ Đã thêm tham số
   }) async {
     try {
       final response = await _dio.put(
@@ -83,6 +87,8 @@ class TransactionRepository {
           'note': note,
           if (imageUrl != null) 'imageUrl': imageUrl,
           'emoji': emoji,
+          // ✨ Cập nhật ngày nếu được cung cấp
+          if (spentAt != null) 'spentAt': spentAt.toIso8601String(),
         },
       );
 
@@ -134,7 +140,7 @@ class TransactionRepository {
     }
   }
 
-  /// 📊 BƯỚC 6: LẤY DỮ LIỆU THỐNG KÊ CHI TIÊU (ĐÃ UPDATE THEO KHOẢNG NGÀY ĐỘNG 🚀)
+  /// 📊 BƯỚC 6: LẤY DỮ LIỆU THỐNG KÊ CHI TIÊU
   Future<List<Map<String, dynamic>>> getTransactionAnalytics({
     required DateTime startDate,
     required DateTime endDate,

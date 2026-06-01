@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Moment u Payment';
+  String get appName => 'Moments u Payment';
 
   @override
   String get login => 'Login';
@@ -30,7 +30,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeBack => 'Welcome Back! ✨';
 
   @override
-  String get subTitle => 'Moment u Payment - Sweet Expense Diary';
+  String get subTitle => 'Moments U Payment - Sweet Expense Diary';
 
   @override
   String get emailHint => 'Your email... ✨';
@@ -115,20 +115,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSubGreeting => 'How is your payment status today?';
 
   @override
-  String get spendingMomentsTitle => 'Your Payment Moments';
+  String get spendingMomentsTitle => 'Moments U Payment';
 
   @override
   String get loadingData => 'Loading payment moments...';
 
   @override
-  String get errorLoadData => 'Oopsie, the data tripped and fell 🥺';
+  String get errorLoadData => 'Error loading data';
 
   @override
   String get retryButton => 'Give it another push 🚀';
 
   @override
-  String get emptyTransactionList =>
-      'No payment moments this month. Tap + to add one! 🌸';
+  String get emptyTransactionList => 'No transactions yet';
 
   @override
   String get catFood => 'Food 🍰';
@@ -646,7 +645,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tip: Set your budget about 20% lower than your actual income to ensure you always have savings! 🌟';
 
   @override
-  String get emptyFilterTransaction => 'No transactions in this date range 🌸';
+  String get emptyFilterTransaction => 'No transactions found for this period';
 
   @override
   String get from => 'From';
@@ -725,7 +724,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updatePassword => 'Update password';
 
   @override
-  String get updateFailed => 'Update failed!';
+  String updateFailed(Object error) {
+    return 'Update failed!';
+  }
 
   @override
   String get nameEmptyError => 'Name cannot be empty!';
@@ -762,4 +763,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get samePasswordError =>
       'New password cannot be the same as old password.';
+
+  @override
+  String get addSuccessMessage => 'Added successfully! ✨';
+
+  @override
+  String get updateSuccessMessage => 'Updated successfully! ✨';
+
+  @override
+  String get futureDateError => 'You cannot add transactions for future dates!';
+
+  @override
+  String get deleteSuccessMessage => 'Deleted successfully!';
+
+  @override
+  String get deleteErrorMessage => 'An error occurred while deleting';
 }

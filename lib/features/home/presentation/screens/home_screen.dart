@@ -17,9 +17,7 @@ import 'package:moment_u_payment/features/transaction/presentation/widgets/photo
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
-// #1. Nhớ kiểm tra lại path import file AppCalendarSheet của bạn
 
-// ✨ TẠO ENUM 3 TRẠNG THÁI VIEW
 enum ViewMode { list, grid, calendar }
 
 final viewModeProvider = StateProvider<ViewMode>((ref) => ViewMode.list);
@@ -69,11 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final appColors = ref.read(appColorsProvider);
       ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
-      AppToast.showSuccess(
-        context,
-        'Cập nhật khoảnh khắc thành công rùi nha! 🥰',
-        appColors,
-      );
+      AppToast.showSuccess(context, l10n.updateSuccessMessage, appColors);
     }
   }
 
@@ -100,7 +94,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       final DateTime? txDate = rawDate is DateTime
           ? rawDate
-          : DateTime.tryParse(rawDate.toString());
+          : DateTime.tryParse(rawDate.toString())?.toLocal();
 
       if (txDate == null) return false;
 
@@ -156,7 +150,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (viewMode == ViewMode.calendar) {
               for (var tx in filteredTransactions) {
                 final date =
-                    DateTime.tryParse(tx['spentAt']?.toString() ?? '') ??
+                    DateTime.tryParse(
+                      tx['spentAt']?.toString() ?? '',
+                    )?.toLocal() ??
                     DateTime.now();
                 final monthKey = DateTime(date.year, date.month, 1);
                 monthlyGrouped.putIfAbsent(monthKey, () => []).add(tx);
@@ -277,11 +273,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (isAdded == true && mounted) {
             ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
-            AppToast.showSuccess(
-              context,
-              'Thêm khoảnh khắc mới thành công rùi! ✨',
-              appColors,
-            );
+            AppToast.showSuccess(context, l10n.addSuccessMessage, appColors);
           }
         },
         child: const Icon(Icons.add, color: Colors.white),
@@ -294,14 +286,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       isGridView: currentMode == ViewMode.grid,
       isFiltered: _selectedDateRange != null,
       isCalendarView: currentMode == ViewMode.calendar,
-
       onToggleView: () {
         ref.read(viewModeProvider.notifier).state = currentMode == ViewMode.grid
             ? ViewMode.list
             : ViewMode.grid;
       },
-
-      // --- SỬ DỤNG APP CALENDAR SHEET Ở ĐÂY ---
       onFilterTap: () {
         AppCalendarSheet.show(
           context: context,
@@ -314,7 +303,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         );
       },
-
       onCalendarTap: () {
         ref
             .read(viewModeProvider.notifier)
@@ -458,7 +446,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Map<int, Map<String, dynamic>> dailyData = {};
     for (var tx in monthTx) {
       final date =
-          DateTime.tryParse(tx['spentAt']?.toString() ?? '') ?? DateTime.now();
+          DateTime.tryParse(tx['spentAt']?.toString() ?? '')?.toLocal() ??
+          DateTime.now();
 
       if (!dailyData.containsKey(date.day)) {
         dailyData[date.day] = {
@@ -512,8 +501,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   l10n.sat,
                   l10n.sun,
                 ].asMap().entries.map((entry) {
-                  final isWeekend =
-                      entry.key == 5 || entry.key == 6; // Thứ 7, CN
+                  final isWeekend = entry.key == 5 || entry.key == 6;
                   final day = entry.value;
 
                   return SizedBox(
@@ -564,10 +552,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     l10n,
                   );
                 } else {
+                  final now = DateTime.now();
+                  final today = DateTime(now.year, now.month, now.day);
+                  if (dayDate.isAfter(today)) {
+                    AppToast.showError(
+                      context,
+                      l10n.futureDateError,
+                      appColors,
+                    );
+                    return;
+                  }
+
                   Navigator.of(context)
                       .push<bool>(
                         MaterialPageRoute(
-                          builder: (_) => const AddTransactionScreen(),
+                          builder: (_) =>
+                              AddTransactionScreen(initialDate: dayDate),
                         ),
                       )
                       .then((isAdded) {
@@ -578,7 +578,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           AppToast.showSuccess(
                             context,
-                            'Thêm khoảnh khắc thành công rùi nè! 🎉',
+                            l10n.addSuccessMessage,
                             appColors,
                           );
                         }
@@ -741,21 +741,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             .removeMomentLocally(tx['id'].toString());
 
         if (mounted) {
-          AppToast.showSuccess(
-            context,
-            'Đã xoá khoảnh khắc thành công rùi bạn ơi! 🌸',
-            appColors,
-          );
+          AppToast.showSuccess(context, l10n.deleteSuccessMessage, appColors);
         }
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
         if (mounted) {
-          AppToast.showError(
-            context,
-            'Có lỗi xảy ra khi xoá mất rồi, thử lại nhé! 😢',
-            appColors,
-          );
+          AppToast.showError(context, l10n.deleteErrorMessage, appColors);
         }
       }
     }

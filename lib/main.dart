@@ -46,7 +46,7 @@ class MyApp extends ConsumerWidget {
     final currentLocale = ref.watch(localeProvider);
 
     return MaterialApp(
-      title: 'Moment u Payment',
+      title: 'Moments U Payment',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

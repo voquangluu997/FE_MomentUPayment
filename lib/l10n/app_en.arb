@@ -1,13 +1,13 @@
 {
   "@@locale": "en",
-  "appName": "Moment u Payment",
+  "appName": "Moments u Payment",
   "login": "Login",
   "register": "Register",
   "email": "Email Address",
   "password": "Password",
   "name": "Full Name",
   "welcomeBack": "Welcome Back! ✨",
-  "subTitle": "Moment u Payment - Sweet Expense Diary",
+  "subTitle": "Moments U Payment - Sweet Expense Diary",
   "emailHint": "Your email... ✨",
   "passwordHint": "Secret password... 🔑",
   "nameHint": "Your cute name... ✨",
@@ -39,7 +39,7 @@
   "txErrorMessage": "Could not save your moment, please try again! 😢",
   "emptyTransactionNote": "Nameless payment moment...",
   "homeSubGreeting": "How is your payment status today?",
-  "spendingMomentsTitle": "Your Payment Moments",
+  "spendingMomentsTitle": "Moments U Payment",
   "loadingData": "Loading payment moments...",
   "errorLoadData": "Failed to load data. Please try again!",
   "retryButton": "Retry",
@@ -381,5 +381,15 @@
   "weakPasswordError": "The new password is too weak.",
   "noChangeWarning": "Your information has not changed! ✨",
   "fillPasswordFieldsError": "Please enter all password fields.",
-  "samePasswordError": "New password cannot be the same as old password."
+  "samePasswordError": "New password cannot be the same as old password.",
+
+  "errorLoadData": "Error loading data",
+  "emptyFilterTransaction": "No transactions found for this period",
+  "emptyTransactionList": "No transactions yet",
+  "addSuccessMessage": "Added successfully! ✨",
+  "updateSuccessMessage": "Updated successfully! ✨",
+  "futureDateError": "You cannot add transactions for future dates!",
+  "deleteSuccessMessage": "Deleted successfully!",
+  "deleteErrorMessage": "An error occurred while deleting"
+  
 }

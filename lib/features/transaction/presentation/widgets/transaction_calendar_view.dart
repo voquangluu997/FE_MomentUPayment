@@ -21,7 +21,7 @@ class TransactionCalendarView extends ConsumerWidget {
       // Tuỳ thuộc vào field ngày tháng từ API của bạn, thường là 'spentAt' hoặc 'createdAt'
       final rawDate =
           tx['spentAt'] ?? tx['createdAt'] ?? DateTime.now().toIso8601String();
-      final parsedDate = DateTime.parse(rawDate);
+      final parsedDate = DateTime.parse(rawDate).toLocal();
       // Ép về đúng 00:00:00 của ngày đó để làm Key
       final dateKey = DateTime(
         parsedDate.year,

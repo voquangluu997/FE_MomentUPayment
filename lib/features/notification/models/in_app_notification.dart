@@ -28,7 +28,7 @@ class InAppNotification {
       type: json['type'] ?? 'general',
       isRead: json['isRead'] ?? false,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt']).toLocal()
           : DateTime.now(),
     );
   }

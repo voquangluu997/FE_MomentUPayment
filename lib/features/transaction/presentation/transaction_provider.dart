@@ -22,6 +22,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
     required String emoji,
     required String note,
     String? localImagePath,
+    DateTime? spentAt,
   }) async {
     state = TransactionState.loading;
     try {
@@ -31,12 +32,14 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
 
+      // ✨ Đã cập nhật: Truyền spentAt xuống Repository để lưu chính xác ngày được chọn
       await _repository.createTransaction(
         amount: amount,
         category: category,
         note: note,
         emoji: emoji,
         imageUrl: uploadedImageUrl,
+        spentAt: spentAt,
       );
 
       // Cập nhật lại list ở màn hình chính sau khi thêm
@@ -61,6 +64,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
     required String emoji,
     required String note,
     String? localImagePath,
+    DateTime? spentAt, // ✨ Đã thêm tham số spentAt vào đây
   }) async {
     state = TransactionState.loading;
     try {
@@ -70,6 +74,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
 
+      // ✨ Đã cập nhật: Truyền spentAt xuống Repository để cập nhật ngày
       await _repository.updateTransaction(
         id: id,
         amount: amount,
@@ -77,6 +82,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         note: note,
         emoji: emoji,
         imageUrl: uploadedImageUrl,
+        spentAt: spentAt,
       );
 
       // Cập nhật lại list ở màn hình chính sau khi sửa

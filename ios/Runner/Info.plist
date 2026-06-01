@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Moment U Payment</string>
+	<string>Moments U Payment</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Moment U Payment</string>
+	<string>Moments U Payment</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -45,9 +45,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>MomentUPayment cần quyền truy cập Camera để bạn chụp ảnh hóa đơn chi tiêu đáng yêu nhé! 📸</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>MomentUPayment cần quyền truy cập Thư viện để bạn chọn ảnh khoảnh khắc chi tiêu có sẵn nha! 🌸</string>
+    <string>MomentsUPayment needs camera access so you can take photos of your spending receipts! 📸</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>MomentsUPayment needs photo library access so you can select photos of your spending moments! 🌸</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
