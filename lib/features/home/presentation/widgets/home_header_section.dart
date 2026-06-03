@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart'; // 🍏 Đã thêm import CupertinoIcons
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +71,7 @@ class HomeHeaderSection extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.date_range_rounded,
+                            CupertinoIcons.calendar, // 🍏 Icon Lịch Cupertino
                             size: 11,
                             color: appColors.primary,
                           ),
@@ -87,7 +88,8 @@ class HomeHeaderSection extends ConsumerWidget {
                           GestureDetector(
                             onTap: onClearFilter,
                             child: Icon(
-                              Icons.close_rounded,
+                              CupertinoIcons
+                                  .multiply, // 🍏 Icon Đóng (X) Cupertino
                               size: 13,
                               color: appColors.primary,
                             ),
@@ -109,8 +111,10 @@ class HomeHeaderSection extends ConsumerWidget {
               // 2. Nút Chế độ hiển thị (List / Grid)
               _buildActionButton(
                 icon: isGridView
-                    ? Icons.format_list_bulleted_rounded
-                    : Icons.grid_view_rounded,
+                    ? CupertinoIcons
+                          .list_bullet // 🍏 Icon Dạng danh sách Cupertino
+                    : CupertinoIcons
+                          .square_grid_2x2, // 🍏 Icon Dạng lưới Cupertino
                 color: isGridView || !isCalendarView
                     ? Colors.white
                     : appColors.primary,
@@ -123,7 +127,7 @@ class HomeHeaderSection extends ConsumerWidget {
 
               // 3. Nút Lịch (Calendar)
               _buildActionButton(
-                icon: Icons.calendar_month_rounded,
+                icon: CupertinoIcons.calendar, // 🍏 Icon Lịch Cupertino
                 color: isCalendarView ? Colors.white : appColors.primary,
                 backgroundColor: isCalendarView
                     ? appColors.primary
@@ -133,9 +137,8 @@ class HomeHeaderSection extends ConsumerWidget {
               const SizedBox(width: 6),
               // 1. Nút Lọc (Filter)
               _buildActionButton(
-                icon: isFiltered
-                    ? Icons.filter_alt_rounded
-                    : Icons.filter_alt_outlined,
+                // 🍏 Dùng icon slider đặc trưng của iOS để làm bộ lọc
+                icon: CupertinoIcons.line_horizontal_3_decrease,
                 color: isFiltered ? Colors.white : appColors.primary,
                 backgroundColor: isFiltered
                     ? appColors.primary

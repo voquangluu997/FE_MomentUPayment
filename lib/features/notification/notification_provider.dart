@@ -24,6 +24,8 @@ class NotificationState {
       isLoading: isLoading ?? this.isLoading,
     );
   }
+
+  
 }
 
 class NotificationNotifier extends StateNotifier<NotificationState> {

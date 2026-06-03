@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
-import 'package:moment_u_payment/core/utils/currency_helper.dart'; // Đừng quên import helper này nếu có
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../providers/budget_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class SetBudgetScreen extends ConsumerStatefulWidget {
   const SetBudgetScreen({super.key});
@@ -152,10 +152,8 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
-            onPressed: () => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            ),
+            icon: Icon(CupertinoIcons.chevron_back, color: appColors.primary),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
         body: SafeArea(
@@ -267,7 +265,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                             suffixIcon: _budgetController.text.isNotEmpty
                                 ? IconButton(
                                     icon: Icon(
-                                      Icons.cancel_rounded,
+                                      CupertinoIcons.xmark,
                                       color: appColors.textMuted.withOpacity(
                                         0.4,
                                       ),
@@ -340,7 +338,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                               ),
                               const SizedBox(width: 4),
                               Icon(
-                                Icons.keyboard_arrow_down_rounded,
+                                CupertinoIcons.chevron_down,
                                 color: appColors.primary,
                                 size: 20,
                               ),
@@ -367,7 +365,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.warning_amber_rounded,
+                          CupertinoIcons.exclamationmark_triangle,
                           color: Colors.orange,
                           size: 20,
                         ),
@@ -406,7 +404,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Icons.calendar_today_rounded,
+                            CupertinoIcons.calendar,
                             size: 20,
                             color: appColors.success,
                           ),
@@ -468,7 +466,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      Icons.lightbulb_circle,
+                      CupertinoIcons.lightbulb,
                       color: Colors.amber.shade600,
                       size: 24,
                     ),

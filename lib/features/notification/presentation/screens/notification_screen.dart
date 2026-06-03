@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -8,8 +9,6 @@ import 'package:moment_u_payment/features/transaction/presentation/screens/add_t
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/features/notification/models/in_app_notification.dart';
-
-// 🌸 IMPORT WIDGET DÙNG CHUNG VÀ TOAST MỚI
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
 
@@ -21,18 +20,16 @@ class NotificationScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
-  bool _showOnlyUnread = false; // Trạng thái của bộ lọc (Mặc định: Tất cả)
+  bool _showOnlyUnread = false;
 
   @override
   void initState() {
     super.initState();
-    // Tự động gọi API lấy danh sách thông báo khi mở màn hình
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationProvider.notifier).fetchNotifications();
     });
   }
 
-  // ✨ PARSER XỬ LÝ THÔNG BÁO TÍCH HỢP ĐA NGÔN NGỮ ĐỘNG
   Map<String, dynamic> _parseNotificationContent(
     InAppNotification noti,
     AppLocalizations l10n,
@@ -40,18 +37,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   ) {
     String title = '';
     String body = '';
-    IconData icon = Icons.notifications_rounded;
-    Color color = appColors.primary; // Thay thế màu mặc định dynamic
+    IconData icon = CupertinoIcons.bell;
+    Color color = appColors.primary;
     String? route;
 
-    // 🌟 MAGIC L10N: Hàm con tự động dịch các argument từ Backend
+    // Logic dịch các argument backend trả về
     String translateArg(String arg) {
       if (arg == 'monthBudget') return l10n.monthBudget;
-      // Bạn có thể thêm các key khác ở đây sau này
       return arg;
     }
 
-    // Lấy và dịch argument
     final arg1 = noti.arguments.isNotEmpty
         ? translateArg(noti.arguments[0])
         : '';
@@ -66,63 +61,41 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
           arg2.isEmpty ? '80' : arg2,
         );
-        icon = Icons.warning_rounded;
+        icon = CupertinoIcons.exclamationmark_triangle;
         color = Colors.orange;
         break;
-
       case 'budget_100':
         title = l10n.notiBudgetExceededTitle;
         body = l10n.notiBudgetExceededBody(
           arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
           arg2.isEmpty ? '100' : arg2,
         );
-        icon = Icons.error_rounded;
+        icon = CupertinoIcons.exclamationmark_triangle;
         color = Colors.red;
         break;
-
       case 'email_verified':
         title = l10n.notiEmailVerifiedTitle;
         body = l10n.notiEmailVerifiedBody;
-        icon = Icons.verified_user_rounded;
+        icon = CupertinoIcons.checkmark_seal;
         color = Colors.green;
         break;
-
-      case 'aggregated_tx':
-        title = l10n.notiCategorySharedWallet;
-        body = l10n.notiAggregatedTxBody(arg1, arg2.isEmpty ? 'vài' : arg2);
-        icon = Icons.layers_rounded;
-        color = Colors.blue;
-        break;
-
-      case 'first_login_reminder':
-        title = l10n.notiFirstLoginReminderTitle;
-        // Tạm dùng 'bạn hiền' cho lém lỉnh, hoặc truyền tên user từ DB vào arg1
-        body = l10n.notiFirstLoginReminderBody(
-          arg1.isEmpty ? 'bạn hiền' : arg1,
-        );
-        icon = Icons.lock_clock_rounded;
-        color = Colors.amber;
-        break;
-
       case 'onboarding_first_transaction':
         title = l10n.notiFirstTxnTitle;
         body = l10n.notiFirstTxnBody;
-        icon = Icons.add_circle_outline_rounded;
+        icon = CupertinoIcons.add;
         color = Colors.green;
         route = '/create_transaction';
         break;
-
       case 'onboarding_set_budget':
         title = l10n.notiSetBudgetTitle;
         body = l10n.notiSetBudgetBody;
-        icon = Icons.security_rounded;
+        icon = CupertinoIcons.shield;
         color = Colors.blue;
         route = '/budget_settings';
         break;
-
       default:
-        title = l10n.notificationSettingsTitle; // Tạm dùng key title thông báo
-        body = noti.bodyKey; // Nếu không khớp type, hiển thị nguyên raw data
+        title = l10n.notificationSettingsTitle;
+        body = noti.bodyKey;
     }
 
     return {
@@ -136,19 +109,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ✨ Gọi bộ màu dynamic ngay tại đầu hàm build
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(notificationProvider);
-
-    // Kiểm tra xem có thông báo nào chưa đọc hay không
     final hasUnread = state.notifications.any((noti) => !noti.isRead);
 
-    // Lọc danh sách thông báo theo bộ lọc
     final filteredNotifications = state.notifications.where((noti) {
-      if (_showOnlyUnread) {
-        return !noti.isRead;
-      }
+      if (_showOnlyUnread) return !noti.isRead;
       return true;
     }).toList();
 
@@ -157,20 +124,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       appBar: AppBar(
         backgroundColor: appColors.background,
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            CupertinoIcons.chevron_back,
             color: appColors.primaryDark,
-            size: 20,
+            size: 24,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          l10n.notificationSettingsTitle.replaceAll(
-            "Cài đặt",
-            "Danh sách",
-          ), // Trick nhỏ để đổi tên
+          l10n.notificationListTitle,
           style: TextStyle(
             color: appColors.primaryDark,
             fontSize: 18,
@@ -182,36 +145,14 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             padding: const EdgeInsets.only(right: 16.0),
             child: AnimatedRingingBell(
               isRinging: hasUnread,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(
-                    hasUnread
-                        ? Icons.notifications_active_rounded
-                        : Icons.notifications_none_rounded,
-                    color: hasUnread
-                        ? appColors.primary
-                        : appColors.primaryDark.withOpacity(0.5),
-                    size: 26,
-                  ),
-                  if (hasUnread)
-                    Positioned(
-                      right: 2,
-                      top: 14,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: appColors.background,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+              child: Icon(
+                hasUnread
+                    ? Icons.notifications_active
+                    : Icons.notifications_none,
+                color: hasUnread
+                    ? appColors.primary
+                    : appColors.primaryDark.withOpacity(0.5),
+                size: 26,
               ),
             ),
           ),
@@ -219,90 +160,35 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       ),
       body: Column(
         children: [
-          // 🌸 NÚT CHUYỂN ĐỔI BỘ LỌC (FILTER SWITCH)
+          // Filter Bar (Modern Segmented Control)
           if (!state.isLoading && state.notifications.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: appColors.primaryDark.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(20),
+                  color: appColors.primaryDark.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _showOnlyUnread = false),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: !_showOnlyUnread
-                                ? appColors.primary
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: !_showOnlyUnread
-                                ? [
-                                    BoxShadow(
-                                      color: appColors.primary.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Tất cả", // Bạn có thể chuyển text này vào l10n
-                            style: TextStyle(
-                              color: !_showOnlyUnread
-                                  ? Colors.white
-                                  : appColors.primaryDark.withOpacity(0.6),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
+                    _buildFilterTab(
+                      l10n.allNotifications,
+                      !_showOnlyUnread,
+                      () => setState(() => _showOnlyUnread = false),
+                      appColors,
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _showOnlyUnread = true),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _showOnlyUnread
-                                ? appColors.primary
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: _showOnlyUnread
-                                ? [
-                                    BoxShadow(
-                                      color: appColors.primary.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Chưa đọc", // Bạn có thể chuyển text này vào l10n
-                            style: TextStyle(
-                              color: _showOnlyUnread
-                                  ? Colors.white
-                                  : appColors.primaryDark.withOpacity(0.6),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
+                    _buildFilterTab(
+                      l10n.unreadNotifications,
+                      _showOnlyUnread,
+                      () => setState(() => _showOnlyUnread = true),
+                      appColors,
                     ),
                   ],
                 ),
               ),
             ),
 
-          // 🌸 DANH SÁCH THÔNG BÁO CHÍNH
           Expanded(
             child: state.isLoading
                 ? Center(
@@ -310,166 +196,35 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   )
                 : state.notifications.isEmpty
                 ? _buildEmptyState(
-                    "Hộp thư trống",
-                    Icons.notifications_off_rounded,
+                    l10n.emptyNotificationsTitle,
+                    CupertinoIcons.bell_slash,
                     appColors,
                   )
                 : filteredNotifications.isEmpty
                 ? _buildEmptyState(
-                    "Bạn đã đọc hết thông báo rồi! 🎉",
-                    Icons.done_all_rounded,
+                    l10n.allReadNotificationsTitle,
+                    CupertinoIcons.checkmark_seal,
                     appColors,
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 4,
+                      vertical: 8,
                     ),
                     physics: const BouncingScrollPhysics(),
                     itemCount: filteredNotifications.length,
                     itemBuilder: (context, index) {
                       final noti = filteredNotifications[index];
-                      // ✨ L10n và AppColors đã được bơm vào đây!
                       final content = _parseNotificationContent(
                         noti,
                         l10n,
                         appColors,
                       );
-
-                      return GestureDetector(
-                        onTap: () {
-                          if (!noti.isRead) {
-                            ref
-                                .read(notificationProvider.notifier)
-                                .markAsRead(noti.id);
-
-                            // ✨ Toast thông báo siêu đáng yêu
-                            AppToast.showSuccess(
-                              context,
-                              'Đã đọc thông báo rùi nha! 💌',
-                              appColors,
-                            );
-                          }
-
-                          final route = content['route'] as String?;
-                          if (route != null) {
-                            switch (route) {
-                              case '/create_transaction':
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AddTransactionScreen(),
-                                  ),
-                                );
-                                break;
-
-                              case '/budget_settings':
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => const SetBudgetScreen(),
-                                  ),
-                                );
-                                break;
-                            }
-                          }
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: noti.isRead
-                                ? appColors.cardBackground
-                                : appColors.primary.withOpacity(0.04),
-                            borderRadius: BorderRadius.circular(20),
-                            border: noti.isRead
-                                ? null
-                                : Border.all(
-                                    color: appColors.primary.withOpacity(0.15),
-                                    width: 1,
-                                  ),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: (content['color'] as Color)
-                                      .withOpacity(0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  content['icon'] as IconData,
-                                  color: content['color'] as Color,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            content['title'] as String,
-                                            style: TextStyle(
-                                              fontWeight: noti.isRead
-                                                  ? FontWeight.bold
-                                                  : FontWeight.w900,
-                                              fontSize: 14.5,
-                                              color: appColors.primaryDark,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        if (!noti.isRead)
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                              left: 8,
-                                            ),
-                                            height: 8,
-                                            width: 8,
-                                            decoration: BoxDecoration(
-                                              color: appColors.primary,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      content['body'] as String,
-                                      style: TextStyle(
-                                        color: appColors.primaryDark
-                                            .withOpacity(
-                                              noti.isRead ? 0.6 : 0.85,
-                                            ),
-                                        fontSize: 13,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      DateFormat(
-                                        'HH:mm - dd/MM/yyyy',
-                                      ).format(noti.createdAt),
-                                      style: TextStyle(
-                                        color: appColors.primaryDark
-                                            .withOpacity(0.4),
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      return _buildNotificationCard(
+                        noti,
+                        content,
+                        appColors,
+                        l10n,
                       );
                     },
                   ),
@@ -479,19 +234,170 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     );
   }
 
-  // ✨ UI Empty State
+  Widget _buildFilterTab(
+    String text,
+    bool isSelected,
+    VoidCallback onTap,
+    AppColorTheme appColors,
+  ) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? appColors.cardBackground : Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isSelected
+                  ? appColors.primary
+                  : appColors.primaryDark.withOpacity(0.5),
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationCard(
+    InAppNotification noti,
+    Map<String, dynamic> content,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        if (!noti.isRead) {
+          ref.read(notificationProvider.notifier).markAsRead(noti.id);
+          AppToast.showSuccess(context, l10n.markAsReadSuccess, appColors);
+        }
+        final route = content['route'] as String?;
+        if (route != null) {
+          if (route == '/create_transaction')
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+            );
+          else if (route == '/budget_settings')
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SetBudgetScreen()));
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: appColors.cardBackground,
+          borderRadius: BorderRadius.circular(24),
+          border: noti.isRead
+              ? null
+              : Border.all(color: appColors.primary.withOpacity(0.1), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(noti.isRead ? 0.02 : 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: (content['color'] as Color).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                content['icon'] as IconData,
+                color: content['color'] as Color,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          content['title'] as String,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            color: appColors.primaryDark,
+                          ),
+                        ),
+                      ),
+                      if (!noti.isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: appColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    content['body'] as String,
+                    style: TextStyle(
+                      color: appColors.primaryDark.withOpacity(0.7),
+                      fontSize: 12.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    DateFormat('HH:mm - dd/MM/yyyy').format(noti.createdAt),
+                    style: TextStyle(
+                      color: appColors.primaryDark.withOpacity(0.3),
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState(String text, IconData icon, AppColorTheme appColors) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: appColors.primaryDark.withOpacity(0.1)),
-          const SizedBox(height: 16),
+          Icon(icon, size: 50, color: appColors.primaryDark.withOpacity(0.1)),
+          const SizedBox(height: 12),
           Text(
             text,
             style: TextStyle(
               color: appColors.primaryDark.withOpacity(0.4),
-              fontSize: 16,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../auth_provider.dart';
 import '../../../../core/utils/app_toast.dart'; // ✨ Thêm import Toast cute đồng bộ cho app nha!
+import 'package:flutter/cupertino.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -85,7 +86,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
+          icon: Icon(CupertinoIcons.chevron_back, color: appColors.primary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

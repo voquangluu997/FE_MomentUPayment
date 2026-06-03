@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart'; // Đảm bảo đường dẫn này chứa appColorsProvider và AppColorTheme
 import 'package:moment_u_payment/features/notification/presentation/notification_settings_provider.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
 
 class NotificationSettingsScreen extends ConsumerWidget {
   const NotificationSettingsScreen({super.key});
@@ -23,7 +24,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            CupertinoIcons.chevron_back,
             color: appColors.primaryDark,
             size: 20,
           ),
@@ -48,7 +49,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   title: l10n.notiCategoryBudget,
                   subtitle:
                       "Cảnh báo khi tiêu vượt mốc 80% hoặc quá 100% hạn mức ví.",
-                  icon: Icons.pie_chart_rounded,
+                  icon: CupertinoIcons.chart_pie,
                   iconColor: Colors.orange,
                   value: settingsState.budgetAlerts,
                   appColors: appColors,
@@ -58,7 +59,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   title: l10n.notiCategorySharedWallet,
                   subtitle:
                       "Tự động gom và thông báo các hành động thêm/sửa/xóa định kỳ để tránh làm phiền.",
-                  icon: Icons.layers_rounded,
+                  icon: Icons.layers,
                   iconColor: Colors.blue,
                   value: settingsState.sharedWalletUpdates,
                   appColors: appColors,
@@ -69,7 +70,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   title: l10n.notiCategorySecurity,
                   subtitle:
                       "Nhận thông báo trạng thái xác thực email thành công hoặc đổi thiết bị.",
-                  icon: Icons.verified_user_rounded,
+                  icon: Icons.verified_user,
                   iconColor: Colors.green,
                   value: settingsState.securitySystem,
                   appColors: appColors,

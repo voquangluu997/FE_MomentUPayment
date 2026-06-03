@@ -10,6 +10,7 @@ import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 // ==========================================
 // 📱 DIALOG CHÍNH
@@ -162,6 +163,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   Future<void> _handleUpdateTransaction() async {
     final amountText = _amountController.text.replaceAll('.', '').trim();
     final appColors = ref.read(appColorsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (amountText.isEmpty) return;
 
@@ -180,7 +182,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     if (momentId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Không tìm thấy ID của khoảnh khắc để cập nhật!'),
+          content: Text(l10n.updateFailed),
           backgroundColor: appColors.errorAccent,
         ),
       );
@@ -212,7 +214,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      debugPrint("Lỗi cập nhật: $e");
+      debugPrint("$e");
     }
   }
 
@@ -286,10 +288,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   }
 }
 
-// ==========================================
-// 🧩 WIDGETS ĐÃ ĐƯỢC TÁCH RỜI & SỬA LỖI
-// ==========================================
-
 class _ImageHeader extends ConsumerWidget {
   final bool isEditing;
   final String? localImagePath;
@@ -312,16 +310,16 @@ class _ImageHeader extends ConsumerWidget {
   });
 
   IconData _getCategoryIcon(String? category) {
-    if (category == null) return Icons.help_outline_rounded;
+    if (category == null) return Icons.help_outline;
     final catLower = category.toLowerCase();
     if (catLower.contains('food') || catLower.contains('ăn'))
-      return Icons.cake_rounded;
-    if (catLower.contains('shop')) return Icons.local_mall_rounded;
+      return CupertinoIcons.gift;
+    if (catLower.contains('shop')) return Icons.local_mall;
     if (catLower.contains('transport') || catLower.contains('xe'))
-      return Icons.directions_car_rounded;
+      return CupertinoIcons.car;
     if (catLower.contains('entertain') || catLower.contains('game'))
-      return Icons.sports_esports_rounded;
-    return Icons.edit_note_rounded;
+      return Icons.sports_esports;
+    return CupertinoIcons.pencil;
   }
 
   @override
@@ -380,7 +378,7 @@ class _ImageHeader extends ConsumerWidget {
                     ElevatedButton.icon(
                       style: _editButtonStyle(appColors),
                       onPressed: onCameraTap,
-                      icon: const Icon(Icons.camera_alt_rounded, size: 16),
+                      icon: const Icon(CupertinoIcons.camera, size: 16),
                       label: Text(
                         l10n.cameraPickActionShort,
                         style: const TextStyle(
@@ -392,7 +390,10 @@ class _ImageHeader extends ConsumerWidget {
                     ElevatedButton.icon(
                       style: _editButtonStyle(appColors),
                       onPressed: onGalleryTap,
-                      icon: const Icon(Icons.photo_library_rounded, size: 16),
+                      icon: const Icon(
+                        CupertinoIcons.photo_on_rectangle,
+                        size: 16,
+                      ),
                       label: Text(
                         l10n.galleryChangeActionShort,
                         style: const TextStyle(
@@ -413,11 +414,13 @@ class _ImageHeader extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildActionButton(
-                  icon: isEditing ? Icons.close_rounded : Icons.edit_rounded,
+                  icon: isEditing
+                      ? CupertinoIcons.xmark
+                      : CupertinoIcons.pencil,
                   onPressed: onToggleEdit,
                 ),
                 _buildActionButton(
-                  icon: Icons.power_settings_new_rounded,
+                  icon: CupertinoIcons.power,
                   onPressed: onCloseTap,
                 ),
               ],
@@ -468,16 +471,16 @@ class _ViewModeContent extends ConsumerWidget {
   });
 
   IconData _getCategoryIcon(String? category) {
-    if (category == null) return Icons.help_outline_rounded;
+    if (category == null) return Icons.help_outline;
     final catLower = category.toLowerCase();
     if (catLower.contains('food') || catLower.contains('ăn'))
-      return Icons.cake_rounded;
-    if (catLower.contains('shop')) return Icons.local_mall_rounded;
+      return CupertinoIcons.gift;
+    if (catLower.contains('shop')) return Icons.local_mall;
     if (catLower.contains('transport') || catLower.contains('xe'))
-      return Icons.directions_car_rounded;
+      return CupertinoIcons.car;
     if (catLower.contains('entertain') || catLower.contains('game'))
-      return Icons.sports_esports_rounded;
-    return Icons.edit_note_rounded;
+      return Icons.sports_esports;
+    return CupertinoIcons.pencil;
   }
 
   @override
@@ -551,7 +554,7 @@ class _ViewModeContent extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.calendar_today_rounded,
+                          CupertinoIcons.calendar,
                           size: 12,
                           color: appColors.textMuted,
                         ),
@@ -718,7 +721,7 @@ class _EditModeContent extends ConsumerWidget {
                 color: appColors.primaryDark.withOpacity(0.5),
               ),
               prefixIcon: Icon(
-                Icons.edit_note_rounded,
+                CupertinoIcons.pencil,
                 color: appColors.primary,
                 size: 18,
               ),
@@ -789,7 +792,6 @@ class _EditModeContent extends ConsumerWidget {
                   ),
                 ),
               ),
-              // 🚀 CÁCH KHẮC PHỤC TRIỆT ĐỂ: Nhấc nút X ra khỏi InputDecoration
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: amountController,
                 builder: (context, value, child) {
@@ -802,7 +804,7 @@ class _EditModeContent extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Icon(
-                        Icons.cancel_rounded,
+                        CupertinoIcons.xmark,
                         color: appColors.textMuted.withOpacity(0.4),
                         size: 18,
                       ),
@@ -823,7 +825,7 @@ class _EditModeContent extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        _buildSectionTitle("THỜI GIAN GIAO DỊCH", appColors),
+        _buildSectionTitle(l10n.transactionTime, appColors),
         const SizedBox(height: 6),
         InkWell(
           onTap: onDateTap,
@@ -838,7 +840,7 @@ class _EditModeContent extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.calendar_month_rounded,
+                  CupertinoIcons.calendar,
                   size: 20,
                   color: appColors.primary,
                 ),
@@ -852,11 +854,7 @@ class _EditModeContent extends ConsumerWidget {
                   ),
                 ),
                 const Spacer(),
-                Icon(
-                  Icons.edit_calendar_rounded,
-                  size: 16,
-                  color: appColors.textMuted,
-                ),
+                Icon(Icons.edit_calendar, size: 16, color: appColors.textMuted),
               ],
             ),
           ),
@@ -907,9 +905,12 @@ class _EditModeContent extends ConsumerWidget {
                   elevation: 0,
                 ),
                 onPressed: onSaveTap,
-                child: const Text(
-                  'Cập nhật',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                child: Text(
+                  l10n.update,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
       ],

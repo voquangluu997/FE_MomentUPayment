@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart'; // 🔑 THÊM IMPORT CURRENCY HELPER NÈ BỒ TÈO
 import 'package:moment_u_payment/l10n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
 
 // ==========================================
 // 1. THANH CHỌN THỜI GIAN NHANH (CHIPS)
@@ -122,7 +123,7 @@ class FromToDatePicker extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Icon(
-                Icons.arrow_forward_rounded,
+                CupertinoIcons.chevron_forward,
                 color: appColors.primary.withOpacity(0.5),
                 size: 18,
               ),

@@ -33,6 +33,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get subTitle => 'Moments u Payment - Nhật ký chi tiêu ngọt ngào';
 
   @override
+  String get subTitle1 => 'Moments u Payment';
+
+  @override
+  String get subTitle2 => 'Nhật ký chi tiêu ngọt ngào';
+
+  @override
   String get emailHint => 'Email của bạn... ✨';
 
   @override
@@ -172,9 +178,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể xóa. Vui lòng kiểm tra lại kết nối mạng!';
 
   @override
-  String get totalLabel => 'Tổng thiệt hại 💸';
-
-  @override
   String get today => 'Hôm nay';
 
   @override
@@ -275,8 +278,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tình hình chi tiêu tháng này rất hợp lý luôn! 👍';
 
   @override
-  String get budgetStatusWarning =>
-      'Ví của bạn còn chưa tới 15%. Thắt lưng buộc bụng thôi nào! 💸';
+  String get budgetStatusWarning => 'Ét ô ét!';
 
   @override
   String get budgetStatusOver =>
@@ -567,6 +569,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customDate => 'Tùy chỉnh';
 
   @override
+  String get totalLabel => 'Tổng chi tiêu';
+
+  @override
   String get avgPerDay => 'Mỗi ngày \'bay\' cỡ 🕊️';
 
   @override
@@ -601,7 +606,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get emptyAnalyticsData =>
-      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
+      'Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝';
 
   @override
   String get buyDevCoffeeTitle => 'Tiếp thêm cafein cho dev ☕';
@@ -710,9 +715,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currentPassword => 'Mật khẩu cũ';
 
   @override
-  String get updateSuccess => 'Cập nhật thành công!';
-
-  @override
   String get updateError => 'Ối, có lỗi gì đó rồi...';
 
   @override
@@ -734,9 +736,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updatePassword => 'Đổi mật khẩu';
 
   @override
-  String updateFailed(Object error) {
-    return 'Cập nhật thất bại: $error';
-  }
+  String get updateSuccess => 'Cập nhật thành công!';
+
+  @override
+  String get updateFailed => 'Cập nhật thất bại!';
 
   @override
   String get nameEmptyError => 'Tên không được để trống!';
@@ -798,4 +801,122 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get premiumGroupMomentsSubtitle =>
       'Tính năng ví nhóm đang tạm khóa ở bản thử nghiệm.';
+
+  @override
+  String get navHome => 'Trang chủ';
+
+  @override
+  String get navBudget => 'Ngân sách';
+
+  @override
+  String get navAnalytics => 'Thống kê';
+
+  @override
+  String get navPremium => 'Premium';
+
+  @override
+  String get navMenu => 'Menu';
+
+  @override
+  String get setBudgetTitle => 'Thiết lập ngân sách';
+
+  @override
+  String get monthlyBudgetLimit => 'Hạn mức chi tiêu tháng này';
+
+  @override
+  String get saveConfiguration => 'Lưu cấu hình';
+
+  @override
+  String get premiumFeatureTitle => 'Tính năng Premium';
+
+  @override
+  String get premiumFeatureDesc =>
+      'Chức năng ví nhóm \"Group Moments\" hiện đang được khóa. Nâng cấp lên tài khoản Premium để mở khóa tính năng chia sẻ dòng tiền, quản lý tài chính chung cùng người yêu và gia đình trong thời gian thực.';
+
+  @override
+  String get unlockPremiumNow => 'Mở khóa Premium ngay';
+
+  @override
+  String get budgetLoadError => 'Không thể tải ngân sách';
+
+  @override
+  String get budgetOverspentLabel => 'Vượt mức';
+
+  @override
+  String get budgetRemainingLabel => 'Còn lại';
+
+  @override
+  String get budgetLastDay => 'Hôm nay là ngày cuối!';
+
+  @override
+  String budgetRemainingDays(int days) {
+    return '$days ngày nữa';
+  }
+
+  @override
+  String get budgetStatusReasonable => 'Ổn áp ghê';
+
+  @override
+  String get budgetStatusNotSet => 'Cét-ting đi';
+
+  @override
+  String get budgetStatusOvertarget => 'Ví khóc á';
+
+  @override
+  String get budgetStatusHalfSpent => 'Nửa cây kem';
+
+  @override
+  String get budgetDailyNotSet =>
+      'Thiết lập hạn mức đi để ví còn biết đường cứu chủ! 🥺';
+
+  @override
+  String get budgetDailyOvertarget =>
+      'Hết quota rồi, hôm nay ăn mầm đá hít khí trời nha... 💸';
+
+  @override
+  String budgetDailySafeLimit(String amount) {
+    return 'Tém tém lại, mỗi ngày tiêu tối đa $amount thui nha sen! 🥰';
+  }
+
+  @override
+  String get emptyTransactionSubtitle =>
+      'Ghi chép khoản chi đầu tiên ngay đi nè, để ví tiền luôn ngoan ngoãn nằm trong tầm tay bạn nha! ✨';
+
+  @override
+  String get deleteActionLabel => 'Xóa';
+
+  @override
+  String transactionCount(int count) {
+    return '$count giao dịch';
+  }
+
+  @override
+  String get transactionTime => 'Thời gian';
+
+  @override
+  String get addMomentTooltip => 'Thêm nhanh khoảnh khắc chi tiêu ✨';
+
+  @override
+  String get notificationListTitle => 'Danh sách thông báo';
+
+  @override
+  String get allNotifications => 'Tất cả';
+
+  @override
+  String get unreadNotifications => 'Chưa đọc';
+
+  @override
+  String get emptyNotificationsTitle => 'Hộp thư trống';
+
+  @override
+  String get allReadNotificationsTitle => 'Bạn đã đọc hết thông báo rồi! 🎉';
+
+  @override
+  String get markAsReadSuccess => 'Đã đọc thông báo rùi nha! 💌';
+
+  @override
+  String get markAllAsRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get allReadSuccess => 'Đã đánh dấu tất cả thông báo!';
 }

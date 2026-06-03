@@ -8,6 +8,9 @@
   "name": "Full Name",
   "welcomeBack": "Welcome Back! ✨",
   "subTitle": "Moments U Payment - Sweet Expense Diary",
+  "subTitle1": "Moments U Payment",
+  "subTitle2": "Sweet Expense Diary",
+
   "emailHint": "Your email... ✨",
   "passwordHint": "Secret password... 🔑",
   "nameHint": "Your cute name... ✨",
@@ -60,7 +63,6 @@
   "deleteSuccessSnackbar": "Your moment and receipt image have been successfully cleaned up! ✨",
   "deleteErrorSnackbar": "Failed to delete. Please check your network connection!",
 
-  "totalLabel": "Total",
   "today": "Today",
   "yesterday": "Yesterday",
   "thisMonth": "This month",
@@ -303,7 +305,6 @@
   "fromDate": "From when 🐾",
   "toDate": "To when 🌿",
   
-  "totalLabel": "Total Damage 💸",
   "avgPerDay": "Daily Poof 🕊️",
   "repeatCycle": "Time Loop ⏳",
   "days": "days",
@@ -354,7 +355,6 @@
   "currentPassword": "Current Password",
   "newPassword": "New Password",
   "save": "Save it!",
-  "updateSuccess": "All done!",
   "updateError": "Oops, something went wrong...",
   "changeAvatar": "Change avatar",
   "saveSettingsSuccess": "Profile updated!",
@@ -388,6 +388,68 @@
   "deleteSuccessMessage": "Deleted successfully!",
   "deleteErrorMessage": "An error occurred while deleting",
   "premiumGroupMomentsTitle": "Group Moments 👑",
-  "premiumGroupMomentsSubtitle": "Group wallet feature is temporarily locked in beta."
+  "premiumGroupMomentsSubtitle": "Group wallet feature is temporarily locked in beta.",
+
+  "navHome": "Home",
+  "navBudget": "Budget",
+  "navAnalytics": "Analytics",
+  "navPremium": "Premium",
+  "navMenu": "Menu",
+  
+  "setBudgetTitle": "Set Budget",
+  "monthlyBudgetLimit": "Monthly spending limit",
+  "saveConfiguration": "Save Configuration",
+  
+  "premiumFeatureTitle": "Premium Feature",
+  "premiumFeatureDesc": "Group Moments shared wallet is currently locked. Upgrade to Premium to unlock shared cash flow and real-time co-management with your partner and family.",
+  "unlockPremiumNow": "Unlock Premium Now",
+
+
+  "budgetThisMonthLabel": "This month's budget",
+  "budgetLoadError": "Failed to load budget",
+  "budgetOverspentLabel": "Overspent",
+  "budgetRemainingLabel": "Remaining",
+  "budgetLastDay": "Today is the final day!",
+  "budgetRemainingDays": "{days} days left",
+  "@budgetRemainingDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "budgetStatusReasonable": "Looking good",
+  "budgetStatusNotSet": "Not set yet",
+  "budgetStatusOvertarget": "Wallet's crying",
+  "budgetStatusWarning": "S.O.S!",
+  "budgetStatusHalfSpent": "Halfway there",
+  "budgetDailyNotSet": "Set a limit so I can guard your wallet! 🥺",
+  "budgetDailyOvertarget": "Out of quota! Time for a breath-of-air diet... 💸",
+  "budgetDailySafeLimit": "Keep it steady! Spend max {amount} per day, okay? 🥰",
+  "@budgetDailySafeLimit": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+
+  "emptyTransactionSubtitle": "Log your first expense now so your wallet stays perfectly in check! ✨",
+  "deleteActionLabel": "Delete",
+  "transactionCount": "{count} transactions",
+  "@transactionCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "transactionTime": "Time",
+  "addMomentTooltip": "Quickly create a payment moment ✨",
+
+  "notificationListTitle": "Notifications",
+  "allNotifications": "All",
+  "unreadNotifications": "Unread",
+  "emptyNotificationsTitle": "Inbox is empty",
+  "allReadNotificationsTitle": "You've read all notifications! 🎉",
+  "markAsReadSuccess": "Marked as read successfully! 💌",
+
+  "markAllAsRead": "Mark all as read",
+  "allReadSuccess": "All notifications marked as read!"
   
 }

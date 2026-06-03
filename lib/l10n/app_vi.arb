@@ -8,6 +8,9 @@
   "name": "Họ và tên",
   "welcomeBack": "Welcome Back! ✨",
   "subTitle": "Moments u Payment - Nhật ký chi tiêu ngọt ngào",
+  "subTitle1": "Moments u Payment",
+  "subTitle2": "Nhật ký chi tiêu ngọt ngào",
+
   "emailHint": "Email của bạn... ✨",
   "passwordHint": "Mật khẩu bí mật... 🔑",
   "nameHint": "Tên dễ thương của bạn... ✨",
@@ -62,7 +65,6 @@
 
   "analyticsTitle": "Chi tiết đây nèe!!",
   "emptyAnalyticsData": "Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝",
-  "totalLabel": "Tổng chi",
   "today": "Hôm nay",
   "yesterday": "Hôm qua",
   "thisMonth": "Tháng này",
@@ -289,7 +291,6 @@
   "totalLabel": "Tổng chi tiêu",
   "avgPerDay": "Trung bình/Ngày",
   "timeFrame": "Số ngày",
-  "emptyAnalyticsData": "Không có dữ liệu chi tiêu trong khoảng thời gian này.",
   "errorLoadData": "Không thể tải dữ liệu. Vui lòng kiểm tra lại!",
   "retryButton": "Thử lại",
 
@@ -304,14 +305,12 @@
   "fromDate": "Từ ngày nào 🐾",
   "toDate": "Đến ngày nao 🌿",
   
-  "totalLabel": "Tổng thiệt hại 💸",
   "avgPerDay": "Mỗi ngày 'bay' cỡ 🕊️",
   "repeatCycle": "Vòng lặp ⏳",
   "days": "ngày",
   
   "spendingStructure": "Cơ cấu 'bay màu' của ví 🥧",
   
-  "emptyAnalyticsData": "Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥",
   "errorLoadData": "Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺",
   "retryButton": "Lấy đà thử lại nghen 🚀",
 
@@ -354,7 +353,6 @@
   "changePassword": "Đổi mật khẩu",
   "currentPassword": "Mật khẩu cũ",
   "newPassword": "Mật khẩu mới nè",
-  "updateSuccess": "Xong rồi đó!",
   "updateError": "Ối, có lỗi gì đó rồi...",
   "changeAvatar": "Thay ảnh xinh",
   "saveSettingsSuccess": "Cập nhật hồ sơ thành công!",
@@ -395,11 +393,70 @@
   "noteHint": "Ghi chú...",
   "dateSectionTitle": "NGÀY KHOẢNH KHẮC",
   "errorFutureDate": "Không thể chọn ngày tương lai!",
-  "updateSuccess": "Cập nhật thành công!",
-  "updateFailed": "Cập nhật thất bại: {error}",
   "detailsTitle": "Chi tiết khoảnh khắc",
 
   "premiumGroupMomentsTitle": "Group Moments 👑",
-  "premiumGroupMomentsSubtitle": "Tính năng ví nhóm đang tạm khóa ở bản thử nghiệm."
+  "premiumGroupMomentsSubtitle": "Tính năng ví nhóm đang tạm khóa ở bản thử nghiệm.",
+
+  "navHome": "Trang chủ",
+  "navBudget": "Ngân sách",
+  "navAnalytics": "Thống kê",
+  "navPremium": "Premium",
+  "navMenu": "Menu",
+  
+  "setBudgetTitle": "Thiết lập ngân sách",
+  "monthlyBudgetLimit": "Hạn mức chi tiêu tháng này",
+  "saveConfiguration": "Lưu cấu hình",
+  
+  "premiumFeatureTitle": "Tính năng Premium",
+  "premiumFeatureDesc": "Chức năng ví nhóm \"Group Moments\" hiện đang được khóa. Nâng cấp lên tài khoản Premium để mở khóa tính năng chia sẻ dòng tiền, quản lý tài chính chung cùng người yêu và gia đình trong thời gian thực.",
+  "unlockPremiumNow": "Mở khóa Premium ngay",
+
+
+  "budgetThisMonthLabel": "Ngân sách tháng này",
+  "budgetLoadError": "Không thể tải ngân sách",
+  "budgetOverspentLabel": "Vượt mức",
+  "budgetRemainingLabel": "Còn lại",
+  "budgetLastDay": "Hôm nay là ngày cuối!",
+  "budgetRemainingDays": "{days} ngày nữa",
+  "@budgetRemainingDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "budgetStatusReasonable": "Ổn áp ghê",
+  "budgetStatusNotSet": "Cét-ting đi",
+  "budgetStatusOvertarget": "Ví khóc á",
+  "budgetStatusWarning": "Ét ô ét!",
+  "budgetStatusHalfSpent": "Nửa cây kem",
+  "budgetDailyNotSet": "Thiết lập hạn mức đi để ví còn biết đường cứu chủ! 🥺",
+  "budgetDailyOvertarget": "Hết quota rồi, hôm nay ăn mầm đá hít khí trời nha... 💸",
+  "budgetDailySafeLimit": "Tém tém lại, mỗi ngày tiêu tối đa {amount} thui nha sen! 🥰",
+  "@budgetDailySafeLimit": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+
+  "emptyTransactionSubtitle": "Ghi chép khoản chi đầu tiên ngay đi nè, để ví tiền luôn ngoan ngoãn nằm trong tầm tay bạn nha! ✨",
+  "deleteActionLabel": "Xóa",
+  "transactionCount": "{count} giao dịch",
+  "@transactionCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "transactionTime": "Thời gian",
+  "addMomentTooltip": "Thêm nhanh khoảnh khắc chi tiêu ✨",
+
+  "notificationListTitle": "Danh sách thông báo",
+  "allNotifications": "Tất cả",
+  "unreadNotifications": "Chưa đọc",
+  "emptyNotificationsTitle": "Hộp thư trống",
+  "allReadNotificationsTitle": "Bạn đã đọc hết thông báo rồi! 🎉",
+  "markAsReadSuccess": "Đã đọc thông báo rùi nha! 💌",
+
+  "markAllAsRead": "Đánh dấu tất cả đã đọc",
+  "allReadSuccess": "Đã đánh dấu tất cả thông báo!"
 
 }

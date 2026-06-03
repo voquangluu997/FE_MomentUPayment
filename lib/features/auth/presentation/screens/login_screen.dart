@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../auth_provider.dart';
 import 'register_screen.dart';
-import '../../../../core/providers/locale_provider.dart';
-import '../../../../core/utils/app_toast.dart'; // ✨ Đã thêm import Toast cute của bạn ở đây nha!
+import '../../../../core/utils/app_toast.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +17,12 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove();
+  }
 
   @override
   void dispose() {
@@ -33,7 +38,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final appColors = ref.read(appColorsProvider);
 
     if (email.isEmpty || password.isEmpty) {
-      // ✨ Dùng Toast lỗi nhẹ nhàng thay cho SnackBar cũ
       AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
       return;
     }
@@ -44,24 +48,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
-    final currentLocale = ref.watch(localeProvider);
     final appColors = ref.watch(appColorsProvider);
 
+    // 🟢 Lắng nghe sự thay đổi trạng thái đăng nhập
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.loginSuccess) {
-        // ✨ Toast ngôi sao lấp lánh khi đăng nhập thành công
+        // 1. Hiển thị thông báo thành công
         AppToast.showSuccess(context, l10n.loginSuccess, appColors);
 
-        ref.read(authProvider.notifier).resetState();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        // 2. Chuyển trạng thái từ 'loginSuccess' sang 'authenticated' để AuthChecker nhận diện ổn định
+        ref.read(authProvider.notifier).completeLogin();
+
+        // 3. 🔥 ĐIỀU HƯỚNG QUAN TRỌNG: Xóa sạch toàn bộ Stack màn hình cũ (bao gồm cả LoginScreen hiện tại)
+        // và đẩy AuthChecker lên làm màn hình chính.
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/auth_check', (route) => false);
       } else if (next == AuthState.loginError) {
-        // ✨ Toast trái tim vỡ khi sai mật khẩu/tài khoản
         AppToast.showError(context, l10n.loginErrorNotification, appColors);
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.googleLoginError) {
-        // ✨ Toast lỗi đăng nhập Google
         AppToast.showError(
           context,
           l10n.googleLoginErrorNotification,
@@ -289,53 +295,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
             ),
-
-            // NÚT SWITCH NGÔN NGỮ ĐẶT GÓC TRÊN CÙNG BÊN PHẢI
-            Positioned(
-              top: 10,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: appColors.cardBackground,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: appColors.textMuted.withOpacity(0.2),
-                    width: 1.5,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('🇺🇳', style: TextStyle(fontSize: 13)),
-                    Transform.scale(
-                      scale: 0.75,
-                      child: Switch(
-                        value: currentLocale.languageCode == 'en',
-                        activeColor: const Color(0xFFFBC02D),
-                        activeTrackColor: const Color(0xFFFFF59D),
-                        inactiveThumbColor: Colors.amber,
-                        inactiveTrackColor: const Color(0xFFEEEEEE),
-                        onChanged: (_) {
-                          ref.read(localeProvider.notifier).toggleLocale();
-                        },
-                      ),
-                    ),
-                    Text(
-                      currentLocale.languageCode.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: appColors.primaryDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -400,7 +359,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ref.read(authProvider.notifier).forgotPassword(email);
                 Navigator.pop(context);
 
-                // ✨ Thao tác Toast thành công khi gửi code
                 AppToast.showSuccess(
                   context,
                   '${l10n.sendCodeSuccess} $email',
@@ -497,7 +455,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     .resetPasswordWithOtp(email, otp, newPw);
                 Navigator.pop(context);
 
-                // ✨ Toast thành công đổi mật khẩu mới ngọt ngào
                 AppToast.showSuccess(
                   context,
                   l10n.resetPasswordSuccess,

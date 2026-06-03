@@ -146,6 +146,18 @@ abstract class AppLocalizations {
   /// **'Moments U Payment - Sweet Expense Diary'**
   String get subTitle;
 
+  /// No description provided for @subTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Moments U Payment'**
+  String get subTitle1;
+
+  /// No description provided for @subTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweet Expense Diary'**
+  String get subTitle2;
+
   /// No description provided for @emailHint.
   ///
   /// In en, this message translates to:
@@ -404,12 +416,6 @@ abstract class AppLocalizations {
   /// **'Failed to delete. Please check your network connection!'**
   String get deleteErrorSnackbar;
 
-  /// No description provided for @totalLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Damage 💸'**
-  String get totalLabel;
-
   /// No description provided for @today.
   ///
   /// In en, this message translates to:
@@ -593,7 +599,7 @@ abstract class AppLocalizations {
   /// No description provided for @budgetStatusWarning.
   ///
   /// In en, this message translates to:
-  /// **'Your wallet has less than 15% left. Time to tighten your belt! 💸'**
+  /// **'S.O.S!'**
   String get budgetStatusWarning;
 
   /// No description provided for @budgetStatusOver.
@@ -1086,6 +1092,12 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get customDate;
 
+  /// No description provided for @totalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spending'**
+  String get totalLabel;
+
   /// No description provided for @avgPerDay.
   ///
   /// In en, this message translates to:
@@ -1356,12 +1368,6 @@ abstract class AppLocalizations {
   /// **'Current Password'**
   String get currentPassword;
 
-  /// No description provided for @updateSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Update successful!'**
-  String get updateSuccess;
-
   /// No description provided for @updateError.
   ///
   /// In en, this message translates to:
@@ -1404,11 +1410,17 @@ abstract class AppLocalizations {
   /// **'Update password'**
   String get updatePassword;
 
+  /// No description provided for @updateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Update successful!'**
+  String get updateSuccess;
+
   /// No description provided for @updateFailed.
   ///
   /// In en, this message translates to:
   /// **'Update failed!'**
-  String updateFailed(Object error);
+  String get updateFailed;
 
   /// No description provided for @nameEmptyError.
   ///
@@ -1517,6 +1529,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group wallet feature is temporarily locked in beta.'**
   String get premiumGroupMomentsSubtitle;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get navBudget;
+
+  /// No description provided for @navAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get navAnalytics;
+
+  /// No description provided for @navPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get navPremium;
+
+  /// No description provided for @navMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get navMenu;
+
+  /// No description provided for @setBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Budget'**
+  String get setBudgetTitle;
+
+  /// No description provided for @monthlyBudgetLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly spending limit'**
+  String get monthlyBudgetLimit;
+
+  /// No description provided for @saveConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Configuration'**
+  String get saveConfiguration;
+
+  /// No description provided for @premiumFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumFeatureTitle;
+
+  /// No description provided for @premiumFeatureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Moments shared wallet is currently locked. Upgrade to Premium to unlock shared cash flow and real-time co-management with your partner and family.'**
+  String get premiumFeatureDesc;
+
+  /// No description provided for @unlockPremiumNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium Now'**
+  String get unlockPremiumNow;
+
+  /// No description provided for @budgetLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load budget'**
+  String get budgetLoadError;
+
+  /// No description provided for @budgetOverspentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overspent'**
+  String get budgetOverspentLabel;
+
+  /// No description provided for @budgetRemainingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get budgetRemainingLabel;
+
+  /// No description provided for @budgetLastDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Today is the final day!'**
+  String get budgetLastDay;
+
+  /// No description provided for @budgetRemainingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String budgetRemainingDays(int days);
+
+  /// No description provided for @budgetStatusReasonable.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking good'**
+  String get budgetStatusReasonable;
+
+  /// No description provided for @budgetStatusNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set yet'**
+  String get budgetStatusNotSet;
+
+  /// No description provided for @budgetStatusOvertarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet\'s crying'**
+  String get budgetStatusOvertarget;
+
+  /// No description provided for @budgetStatusHalfSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Halfway there'**
+  String get budgetStatusHalfSpent;
+
+  /// No description provided for @budgetDailyNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a limit so I can guard your wallet! 🥺'**
+  String get budgetDailyNotSet;
+
+  /// No description provided for @budgetDailyOvertarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of quota! Time for a breath-of-air diet... 💸'**
+  String get budgetDailyOvertarget;
+
+  /// No description provided for @budgetDailySafeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it steady! Spend max {amount} per day, okay? 🥰'**
+  String budgetDailySafeLimit(String amount);
+
+  /// No description provided for @emptyTransactionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your first expense now so your wallet stays perfectly in check! ✨'**
+  String get emptyTransactionSubtitle;
+
+  /// No description provided for @deleteActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteActionLabel;
+
+  /// No description provided for @transactionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} transactions'**
+  String transactionCount(int count);
+
+  /// No description provided for @transactionTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get transactionTime;
+
+  /// No description provided for @addMomentTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Quickly create a payment moment ✨'**
+  String get addMomentTooltip;
+
+  /// No description provided for @notificationListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationListTitle;
+
+  /// No description provided for @allNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allNotifications;
+
+  /// No description provided for @unreadNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get unreadNotifications;
+
+  /// No description provided for @emptyNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox is empty'**
+  String get emptyNotificationsTitle;
+
+  /// No description provided for @allReadNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve read all notifications! 🎉'**
+  String get allReadNotificationsTitle;
+
+  /// No description provided for @markAsReadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as read successfully! 💌'**
+  String get markAsReadSuccess;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllAsRead;
+
+  /// No description provided for @allReadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read!'**
+  String get allReadSuccess;
 }
 
 class _AppLocalizationsDelegate

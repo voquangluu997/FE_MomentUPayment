@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
+import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
+import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart'; // 🟢 Thêm để gọi làm mới Analytics
 import '../../../../core/utils/app_logger.dart';
 import '../../data/transaction_repository.dart';
 
@@ -11,38 +13,51 @@ class TransactionTimelineController
 
   // 🔑 CÁC BIẾN QUẢN LÝ PHÂN TRANG (PAGINATION)
   int _page = 1;
-  final int _limit = 20; // Mỗi lượt bốc 20 moments từ NestJS lên
+  final int _limit = 20;
   bool _hasMore = true;
   bool _isLoadingMore = false;
 
-  // Cung cấp các Getter công khai để giao diện HomeScreen có thể lắng nghe trạng thái bận
   bool get hasMore => _hasMore;
   bool get isLoadingMore => _isLoadingMore;
 
   @override
   FutureOr<List<Map<String, dynamic>>> build() async {
-    // Khởi tạo/Khôi phục lại cấu hình phân trang gốc khi khởi tạo Provider
+    // 🟢 SỬA TẠI ĐÂY: Đổi sang ref.read để tránh bị re-build trùng lặp 2 lần khi Auth đổi trạng thái
+    final authState = ref.read(authProvider);
+
+    if (authState != AuthState.authenticated &&
+        authState != AuthState.loginSuccess) {
+      _page = 1;
+      _hasMore = false;
+      _isLoadingMore = false;
+      return [];
+    }
+
     _page = 1;
     _hasMore = true;
     _isLoadingMore = false;
     return _fetchTimelineData(page: _page, limit: _limit);
   }
 
-  /// 🔑 CẬP NHẬT: Thêm tham số page và limit để đồng bộ tham số xuống Repository
   Future<List<Map<String, dynamic>>> _fetchTimelineData({
     required int page,
     required int limit,
   }) async {
-    // Đảm bảo hàm getTransactions của Repository nhận thêm page và limit truyền đi
     return await _repository.getTransactions(page: page, limit: limit);
   }
 
   /// Làm mới danh sách quay về trang đầu tiên (Dùng khi kéo vuốt RefreshIndicator)
   Future<void> refreshTimeline() async {
+    final authState = ref.read(authProvider);
+    if (authState != AuthState.authenticated &&
+        authState != AuthState.loginSuccess)
+      return;
+
     _page = 1;
     _hasMore = true;
     _isLoadingMore = false;
-    state = const AsyncLoading();
+
+    // 🟢 ĐÃ XÓA dòng ép State loading nặng ở đây để trải nghiệm vuốt kéo mượt mà hơn
     state = await AsyncValue.guard(
       () => _fetchTimelineData(page: _page, limit: _limit),
     );
@@ -51,26 +66,22 @@ class TransactionTimelineController
   void removeMomentLocally(String id) {
     if (state.hasValue) {
       final currentList = state.value!;
-      // Lọc bỏ moment có ID vừa xóa
       final updatedList = currentList
           .where((moment) => moment['id'] != id)
           .toList();
-
-      // Gán thẳng data mới vào state, UI sẽ tự vẽ lại êm ru
       state = AsyncValue.data(updatedList);
     }
   }
 
-  /// 🔑 HÀM MỚI: Tải trang kế tiếp khi người dùng kéo xuống gần chạm đáy màn hình
+  /// Tải trang kế tiếp khi kéo xuống gần đáy màn hình
   Future<void> loadNextPage() async {
-    // Ngăn chặn gọi lặp lại nếu đang bận tải hoặc server thông báo đã hết sạch dữ liệu
     if (_isLoadingMore || !_hasMore) return;
 
     _isLoadingMore = true;
 
-    // Gạt nhẹ trạng thái cũ để UI nhận biết và kích hoạt hiển thị vòng xoáy Loading ở đáy
+    // 🟢 SỬA TẠI ĐÂY: Dùng toán tử spread [...] tạo mảng mới để kích hoạt UI vẽ lại vòng xoáy loading đáy màn hình
     if (state.hasValue) {
-      state = AsyncValue.data(state.value!);
+      state = AsyncValue.data([...state.value!]);
     }
 
     try {
@@ -80,14 +91,12 @@ class TransactionTimelineController
         limit: _limit,
       );
 
-      // Nếu số lượng data lấy về rỗng hoặc ít hơn limit -> Server đã hết dữ liệu cho các trang sau
       if (newTransactions.isEmpty || newTransactions.length < _limit) {
         _hasMore = false;
       }
 
       if (newTransactions.isNotEmpty) {
         _page = nextPage;
-        // 🔑 Nối đuôi mảng dữ liệu mới bốc về vào sau danh sách đang có trên RAM
         if (state.hasValue) {
           state = AsyncValue.data([...state.value!, ...newTransactions]);
         }
@@ -98,12 +107,10 @@ class TransactionTimelineController
         error,
         stackTrace,
       );
-      // Giữ nguyên dữ liệu cũ, không làm sập giao diện khi lỗi mạng đột xuất lúc phân trang
     } finally {
       _isLoadingMore = false;
-      // Thông báo cập nhật để ẩn vòng xoáy Loading ở đáy màn hình
       if (state.hasValue) {
-        state = AsyncValue.data(state.value!);
+        state = AsyncValue.data([...state.value!]);
       }
     }
   }
@@ -122,6 +129,9 @@ class TransactionTimelineController
     try {
       await _repository.deleteTransaction(id);
       ref.invalidate(homeBudgetProvider);
+
+      // 🟢 THẦN CHÚ: Ép biểu đồ cập nhật lại số liệu sau khi xóa thành công
+      ref.read(transactionAnalyticsProvider.notifier).refreshAnalytics();
     } catch (error, stackTrace) {
       AppLogger.e(
         'TransactionTimelineController.deleteTransaction',
@@ -134,7 +144,6 @@ class TransactionTimelineController
   }
 }
 
-// Khai báo định danh Provider hệ thống
 final transactionTimelineProvider =
     AsyncNotifierProvider<
       TransactionTimelineController,

@@ -1,181 +1,367 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/rendering.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moment_u_payment/core/constants/app_colors.dart';
 
-// import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
-// import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
+import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
+import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
+import 'package:moment_u_payment/features/settings/presentation/widgets/settings_bottom_sheet.dart';
+import 'package:moment_u_payment/l10n/app_localizations.dart';
 
-// class MainLayoutScreen extends ConsumerStatefulWidget {
-//   const MainLayoutScreen({super.key});
+class MainLayoutScreen extends ConsumerStatefulWidget {
+  const MainLayoutScreen({super.key});
 
-//   @override
-//   ConsumerState<MainLayoutScreen> createState() => _MainLayoutScreenState();
-// }
+  @override
+  ConsumerState<MainLayoutScreen> createState() => _MainLayoutScreenState();
+}
 
-// class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
-//   int _currentIndex = 0;
-//   bool _isNavbarVisible = true; // Trạng thái ẩn/hiện của Thanh điều hướng
+class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
+  int _currentIndex = 0;
+  bool _isNavbarVisible = true;
 
-//   // Danh sách các màn hình chính trong App
-//   final List<Widget> _screens = [
-//     const HomeScreen(), // Index 0: Trang chủ (chứa HomeBudgetCard của bạn)
-//     const AnalyticsScreen(), // Index 1: Phân tích chi tiêu
-//     const Center(child: Text('Lịch sử')), // Index 2: Placeholder Lịch sử
-//     const Center(child: Text('Cài đặt')), // Index 3: Placeholder Cài đặt
-//   ];
+  // 🔥 CHÚ Ý: Đã bỏ SetBudgetScreen ra khỏi IndexedStack.
+  // Giờ chỉ còn Home (index 0) và Analytics (index 1)
+  final List<Widget> _screens = [const HomeScreen(), const AnalyticsScreen()];
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final appColors = ref.watch(appColorsProvider);
+  @override
+  Widget build(BuildContext context) {
+    final appColors = ref.watch(appColorsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
-//     return Scaffold(
-//       // LƯU Ý: extendBody = true giúp nội dung màn hình tràn xuống dưới BottomNav,
-//       // khi ẩn thanh điều hướng đi sẽ không để lại khoảng trắng (vùng trống màu đen/trắng).
-//       extendBody: true,
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
 
-//       // 🟢 BỌC BODY TRONG NotificationListener để bắt sự kiện cuộn từ mọi màn hình con
-//       body: NotificationListener<UserScrollNotification>(
-//         onNotification: (notification) {
-//           if (notification.direction == ScrollDirection.reverse) {
-//             // Khi người dùng vuốt lên để cuộn xuống xem thêm dữ liệu -> ẨN thanh điều hướng
-//             if (_isNavbarVisible) {
-//               setState(() {
-//                 _isNavbarVisible = false;
-//               });
-//             }
-//           } else if (notification.direction == ScrollDirection.forward) {
-//             // Khi người dùng vuốt xuống để cuộn ngược lên trên đầu -> HIỆN thanh điều hướng
-//             if (!_isNavbarVisible) {
-//               setState(() {
-//                 _isNavbarVisible = true;
-//               });
-//             }
-//           }
-//           return true;
-//         },
-//         child: IndexedStack(index: _currentIndex, children: _screens),
-//       ),
+        // Chỉ xử lý chuyển về Home khi đang ở màn Analytics (index 1)
+        if (_currentIndex != 0) {
+          setState(() {
+            _currentIndex = 0;
+            _isNavbarVisible = true;
+          });
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: NotificationListener<UserScrollNotification>(
+          onNotification: (notification) {
+            if (notification.direction == ScrollDirection.reverse) {
+              if (_isNavbarVisible) setState(() => _isNavbarVisible = false);
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!_isNavbarVisible) setState(() => _isNavbarVisible = true);
+            }
+            return true;
+          },
+          child: IndexedStack(index: _currentIndex, children: _screens),
+        ),
+        bottomNavigationBar: _buildPremiumNavigationBar(appColors, l10n),
+      ),
+    );
+  }
 
-//       // 🛑 BOTTOM NAVIGATION BAR PHÁT SÁNG & CÓ HIỆU ỨNG TRƯỢT ẨN/HIỆN
-//       bottomNavigationBar: AnimatedSlide(
-//         duration: const Duration(milliseconds: 250),
-//         curve: Curves.easeInOut,
-//         // Nếu hiện tại: Offset(0,0) nằm đúng vị trí. Nếu ẩn: Offset(0, 2) đẩy tuột xuống dưới màn hình.
-//         offset: _isNavbarVisible ? Offset.zero : const Offset(0, 2),
-//         child: Container(
-//           margin: const EdgeInsets.fromLTRB(
-//             20,
-//             0,
-//             20,
-//             24,
-//           ), // Cách điệu dạng Floating bo góc lơ lửng
-//           height: 68,
-//           decoration: BoxDecoration(
-//             color: appColors.cardBackground.withOpacity(
-//               0.96,
-//             ), // Hơi trong suốt nhẹ premium
-//             borderRadius: BorderRadius.circular(24),
-//             border: Border.all(
-//               color: appColors.primary.withOpacity(0.08),
-//               width: 1,
-//             ),
-//             boxShadow: [
-//               BoxShadow(
-//                 color: appColors.primaryDark.withOpacity(0.06),
-//                 blurRadius: 20,
-//                 offset: const Offset(0, -4),
-//               ),
-//             ],
-//           ),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceAround,
-//             children: [
-//               _buildNavItem(
-//                 index: 0,
-//                 icon: Icons.wb_sunny_rounded,
-//                 activeIcon: Icons.wb_sunny_rounded,
-//                 label: 'Home',
-//                 appColors: appColors,
-//               ),
-//               _buildNavItem(
-//                 index: 1,
-//                 icon: Icons.analytics_outlined,
-//                 activeIcon: Icons.analytics_rounded,
-//                 label: 'Thống kê',
-//                 appColors: appColors,
-//               ),
-//               _buildNavItem(
-//                 index: 2,
-//                 icon: Icons.history_toggle_off_rounded,
-//                 activeIcon: Icons.history_rounded,
-//                 label: 'Lịch sử',
-//                 appColors: appColors,
-//               ),
-//               _buildNavItem(
-//                 index: 3,
-//                 icon: Icons.person_outline_rounded,
-//                 activeIcon: Icons.person_rounded,
-//                 label: 'Cá nhân',
-//                 appColors: appColors,
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
+  Widget _buildPremiumNavigationBar(dynamic appColors, AppLocalizations l10n) {
+    return AnimatedSlide(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOutCubic,
+      offset: _isNavbarVisible ? Offset.zero : const Offset(0, 1.5),
+      child: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+            bottom: 16,
+            top: 8,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                height: 76,
+                decoration: BoxDecoration(
+                  color: appColors.cardBackground.withOpacity(0.82),
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.15),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNavItem(
+                      index: 0,
+                      icon: CupertinoIcons.house,
+                      activeIcon: CupertinoIcons.house_fill,
+                      label: l10n.navHome,
+                      appColors: appColors,
+                    ),
 
-//   // Widget dựng từng nút Item điều hướng tùy biến (Custom) cho đẹp và mượt hơn gốc
-//   Widget _buildNavItem({
-//     required int index,
-//     required IconData icon,
-//     required IconData activeIcon,
-//     required String label,
-//     required dynamic appColors,
-//   }) {
-//     final bool isSelected = _currentIndex == index;
-//     final Color activeColor = appColors.primary;
-//     final Color inactiveColor = appColors.primaryDark.withOpacity(0.4);
+                    // 🔥 Đã đổi Budget thành Nút Push màn hình
+                    _buildNavItem(
+                      index: -1, // Không dùng index vì không thuộc IndexedStack
+                      icon: CupertinoIcons.creditcard,
+                      activeIcon: CupertinoIcons.creditcard_fill,
+                      label: l10n.navBudget,
+                      appColors: appColors,
+                      customAction: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => const SetBudgetScreen(),
+                          ),
+                        );
+                      },
+                    ),
 
-//     return InkWell(
-//       onTap: () {
-//         setState(() {
-//           _currentIndex = index;
-//         });
-//       },
-//       splashColor: Colors.transparent,
-//       highlightColor: Colors.transparent,
-//       child: AnimatedContainer(
-//         duration: const Duration(milliseconds: 200),
-//         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//         decoration: BoxDecoration(
-//           color: isSelected
-//               ? activeColor.withOpacity(0.08)
-//               : Colors.transparent,
-//           borderRadius: BorderRadius.circular(16),
-//         ),
-//         child: Row(
-//           children: [
-//             Icon(
-//               isSelected ? activeIcon : icon,
-//               color: isSelected ? activeColor : inactiveColor,
-//               size: 24,
-//             ),
-//             if (isSelected) ...[
-//               const SizedBox(width: 6),
-//               Text(
-//                 label,
-//                 style: TextStyle(
-//                   color: activeColor,
-//                   fontSize: 12,
-//                   fontWeight: FontWeight.w700,
-//                 ),
-//               ),
-//             ],
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+                    // Nút thêm giao dịch Premium
+                    Tooltip(
+                      message: l10n.addMomentTooltip,
+                      child: PremiumAddButton(
+                        appColors: appColors,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (_) => const AddTransactionScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Analytics giờ đã xuống index 1
+                    _buildNavItem(
+                      index: 1,
+                      icon: CupertinoIcons.chart_bar_square,
+                      activeIcon: CupertinoIcons.chart_bar_square_fill,
+                      label: l10n.navAnalytics,
+                      appColors: appColors,
+                    ),
+
+                    _buildNavItem(
+                      index: -1,
+                      icon: CupertinoIcons.slider_horizontal_3,
+                      activeIcon: CupertinoIcons.slider_horizontal_3,
+                      label: l10n.navMenu,
+                      appColors: appColors,
+                      customAction: () {
+                        if (mounted) SettingsBottomSheet.show(context);
+                      },
+                      isMenu: true, // Để giữ màu text đậm cho icon Menu như cũ
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required dynamic appColors,
+    VoidCallback? customAction, // 🔥 Thêm custom action
+    bool isMenu = false, // 🔥 Dùng để xác định màu riêng cho Menu
+  }) {
+    // NavItem chỉ được chọn khi nó không có action tùy chỉnh và khớp với index hiện tại
+    final bool isSelected = (customAction == null) && _currentIndex == index;
+    final Color inactiveColor = appColors.textMuted.withOpacity(0.5);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () async {
+        await HapticFeedback.selectionClick();
+        if (customAction != null) {
+          customAction(); // Nếu có action thì chạy action (chuyển trang/bottom sheet)
+        } else {
+          setState(() {
+            _currentIndex = index; // Ngược lại đổi trang bằng IndexedStack
+          });
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? appColors.primary.withOpacity(0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected
+                    ? appColors.primary
+                    : (isMenu ? appColors.text : inactiveColor),
+                size: isSelected ? 24 : 22,
+              ),
+              if (isSelected) ...[
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: appColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 🚀 NÚT THÊM GIAO DỊCH NÂNG CẤP MỚI - FINTECH GLOWING STYLE
+class PremiumAddButton extends StatefulWidget {
+  final dynamic appColors;
+  final VoidCallback onTap;
+
+  const PremiumAddButton({
+    super.key,
+    required this.appColors,
+    required this.onTap,
+  });
+
+  @override
+  State<PremiumAddButton> createState() => _PremiumAddButtonState();
+}
+
+class _PremiumAddButtonState extends State<PremiumAddButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _rotationAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.90,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.25,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = widget.appColors;
+
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) => _controller.reverse(),
+      onTapCancel: () => _controller.reverse(),
+      onTap: () async {
+        await HapticFeedback.mediumImpact();
+        widget.onTap();
+      },
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Container(
+          height: 54,
+          width: 54,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                appColors.primary,
+                Color.lerp(appColors.primary, appColors.primaryDark, 0.4)!,
+                appColors.primaryDark,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: appColors.primary.withOpacity(0.4),
+                blurRadius: 16,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: 0,
+                child: Container(
+                  width: 44,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(22),
+                    ),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.25),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+              RotationTransition(
+                turns: _rotationAnimation,
+                child: const Icon(
+                  CupertinoIcons.add,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

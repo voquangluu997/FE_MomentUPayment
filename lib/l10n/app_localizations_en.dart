@@ -33,6 +33,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subTitle => 'Moments U Payment - Sweet Expense Diary';
 
   @override
+  String get subTitle1 => 'Moments U Payment';
+
+  @override
+  String get subTitle2 => 'Sweet Expense Diary';
+
+  @override
   String get emailHint => 'Your email... ✨';
 
   @override
@@ -172,9 +178,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete. Please check your network connection!';
 
   @override
-  String get totalLabel => 'Total Damage 💸';
-
-  @override
   String get today => 'Today';
 
   @override
@@ -274,8 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your spending this month is very reasonable! 👍';
 
   @override
-  String get budgetStatusWarning =>
-      'Your wallet has less than 15% left. Time to tighten your belt! 💸';
+  String get budgetStatusWarning => 'S.O.S!';
 
   @override
   String get budgetStatusOver =>
@@ -565,6 +567,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customDate => 'Custom';
 
   @override
+  String get totalLabel => 'Total Spending';
+
+  @override
   String get avgPerDay => 'Daily Poof 🕊️';
 
   @override
@@ -706,9 +711,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentPassword => 'Current Password';
 
   @override
-  String get updateSuccess => 'Update successful!';
-
-  @override
   String get updateError => 'Oops, something went wrong...';
 
   @override
@@ -730,9 +732,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updatePassword => 'Update password';
 
   @override
-  String updateFailed(Object error) {
-    return 'Update failed!';
-  }
+  String get updateSuccess => 'Update successful!';
+
+  @override
+  String get updateFailed => 'Update failed!';
 
   @override
   String get nameEmptyError => 'Name cannot be empty!';
@@ -791,4 +794,121 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get premiumGroupMomentsSubtitle =>
       'Group wallet feature is temporarily locked in beta.';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navBudget => 'Budget';
+
+  @override
+  String get navAnalytics => 'Analytics';
+
+  @override
+  String get navPremium => 'Premium';
+
+  @override
+  String get navMenu => 'Menu';
+
+  @override
+  String get setBudgetTitle => 'Set Budget';
+
+  @override
+  String get monthlyBudgetLimit => 'Monthly spending limit';
+
+  @override
+  String get saveConfiguration => 'Save Configuration';
+
+  @override
+  String get premiumFeatureTitle => 'Premium Feature';
+
+  @override
+  String get premiumFeatureDesc =>
+      'Group Moments shared wallet is currently locked. Upgrade to Premium to unlock shared cash flow and real-time co-management with your partner and family.';
+
+  @override
+  String get unlockPremiumNow => 'Unlock Premium Now';
+
+  @override
+  String get budgetLoadError => 'Failed to load budget';
+
+  @override
+  String get budgetOverspentLabel => 'Overspent';
+
+  @override
+  String get budgetRemainingLabel => 'Remaining';
+
+  @override
+  String get budgetLastDay => 'Today is the final day!';
+
+  @override
+  String budgetRemainingDays(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String get budgetStatusReasonable => 'Looking good';
+
+  @override
+  String get budgetStatusNotSet => 'Not set yet';
+
+  @override
+  String get budgetStatusOvertarget => 'Wallet\'s crying';
+
+  @override
+  String get budgetStatusHalfSpent => 'Halfway there';
+
+  @override
+  String get budgetDailyNotSet => 'Set a limit so I can guard your wallet! 🥺';
+
+  @override
+  String get budgetDailyOvertarget =>
+      'Out of quota! Time for a breath-of-air diet... 💸';
+
+  @override
+  String budgetDailySafeLimit(String amount) {
+    return 'Keep it steady! Spend max $amount per day, okay? 🥰';
+  }
+
+  @override
+  String get emptyTransactionSubtitle =>
+      'Log your first expense now so your wallet stays perfectly in check! ✨';
+
+  @override
+  String get deleteActionLabel => 'Delete';
+
+  @override
+  String transactionCount(int count) {
+    return '$count transactions';
+  }
+
+  @override
+  String get transactionTime => 'Time';
+
+  @override
+  String get addMomentTooltip => 'Quickly create a payment moment ✨';
+
+  @override
+  String get notificationListTitle => 'Notifications';
+
+  @override
+  String get allNotifications => 'All';
+
+  @override
+  String get unreadNotifications => 'Unread';
+
+  @override
+  String get emptyNotificationsTitle => 'Inbox is empty';
+
+  @override
+  String get allReadNotificationsTitle => 'You\'ve read all notifications! 🎉';
+
+  @override
+  String get markAsReadSuccess => 'Marked as read successfully! 💌';
+
+  @override
+  String get markAllAsRead => 'Mark all as read';
+
+  @override
+  String get allReadSuccess => 'All notifications marked as read!';
 }

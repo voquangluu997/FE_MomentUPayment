@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart'; // Import Cupertino
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
@@ -14,12 +15,8 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-
-    // Lấy thông tin user
     final userInfo = ref.watch(userInfoProvider);
     final String userName = userInfo?.name ?? 'User';
-
-    // ✨ Lấy bộ màu động hiện tại (Sáng hoặc Tối)
     final appColors = ref.watch(appColorsProvider);
 
     return AppBar(
@@ -29,9 +26,13 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
       titleSpacing: 16,
       title: Row(
         children: [
-          CircleAvatar(
-            backgroundColor: appColors.cardBackground,
-            child: Text('👋', style: TextStyle(fontSize: 20)),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: appColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text('👋', style: TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -39,11 +40,12 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${l10n.hello} $userName👋',
+                  '${l10n.hello} $userName',
                   style: TextStyle(
                     color: appColors.primaryDark,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -51,8 +53,9 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 Text(
                   l10n.homeSubGreeting,
                   style: TextStyle(
-                    color: appColors.primaryDark.withOpacity(0.55),
+                    color: appColors.primaryDark.withOpacity(0.4),
                     fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -61,7 +64,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        // 1. Nút Thông Báo
+        // 1. Nút Thông Báo - Dùng CupertinoIcons
         Consumer(
           builder: (context, ref, child) {
             final unreadCount = ref.watch(notificationProvider).unreadCount;
@@ -73,17 +76,15 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 clipBehavior: Clip.none,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationScreen(),
+                      ),
+                    ),
                     icon: Icon(
                       hasUnread
-                          ? Icons.notifications_active_rounded
-                          : Icons.notifications_none_rounded,
+                          ? CupertinoIcons.bell_fill
+                          : CupertinoIcons.bell,
                       color: hasUnread
                           ? appColors.primary
                           : appColors.primaryDark,
@@ -91,13 +92,17 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   ),
                   if (hasUnread)
                     Positioned(
-                      right: 8,
-                      top: 8,
+                      right: 10,
+                      top: 10,
                       child: Container(
-                        padding: EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           color: appColors.errorAccent,
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: appColors.background,
+                            width: 1.5,
+                          ),
                         ),
                         constraints: const BoxConstraints(
                           minWidth: 16,
@@ -108,7 +113,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                             unreadCount > 99 ? '99+' : unreadCount.toString(),
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 9,
+                              fontSize: 8,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -120,18 +125,15 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
             );
           },
         ),
-        const SizedBox(width: 6),
 
-        // 2. Nút mở Settings
+        // 2. Nút Settings - Dùng CupertinoIcons.ellipsis_vertical
         IconButton(
           icon: Icon(
-            Icons.more_vert_rounded,
+            CupertinoIcons.ellipsis_vertical,
             color: appColors.primaryDark,
-            size: 24,
+            size: 22,
           ),
-          onPressed: () {
-            SettingsBottomSheet.show(context);
-          },
+          onPressed: () => SettingsBottomSheet.show(context),
         ),
         const SizedBox(width: 8),
       ],

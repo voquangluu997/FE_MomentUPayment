@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter/cupertino.dart';
 
 class AppCalendarSheet extends StatefulWidget {
   final DateTimeRange initialRange;
@@ -129,11 +130,11 @@ class _AppCalendarSheetState extends State<AppCalendarSheet> {
                 ),
                 // Fix icon mũi tên bị ẩn trong Dark Mode
                 leftChevronIcon: Icon(
-                  Icons.chevron_left,
+                  CupertinoIcons.chevron_left,
                   color: widget.appColors.text,
                 ),
                 rightChevronIcon: Icon(
-                  Icons.chevron_right,
+                  CupertinoIcons.chevron_right,
                   color: widget.appColors.text,
                 ),
               ),

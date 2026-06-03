@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,12 +29,12 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   bool _isLoading = false;
 
   final List<IconData> _avatarIcons = [
-    Icons.pets_rounded,
-    Icons.face_retouching_natural_rounded,
-    Icons.emoji_people_rounded,
-    Icons.face_rounded,
-    Icons.psychology_rounded,
-    Icons.favorite_rounded,
+    CupertinoIcons.paw,
+    CupertinoIcons.smiley,
+    CupertinoIcons.person_alt,
+    CupertinoIcons.person_crop_circle,
+    CupertinoIcons.lightbulb,
+    CupertinoIcons.heart_fill,
   ];
 
   @override
@@ -64,7 +65,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     if (image != null) setState(() => _selectedImage = File(image.path));
   }
 
-  /// Map các lỗi API sang key l10n
   String _getLocalizedErrorMessage(String error, AppLocalizations l10n) {
     final lowerError = error.toLowerCase();
     if (lowerError.contains('wrong password') ||
@@ -184,9 +184,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   }
 
   void _navigateToHome() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
+    Navigator.of(context).pop();
   }
 
   @override
@@ -206,114 +204,95 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       child: Scaffold(
         backgroundColor: appColors.background,
         appBar: AppBar(
+          centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: appColors.primaryDark),
+            icon: Icon(CupertinoIcons.back, color: appColors.primaryDark),
             onPressed: _navigateToHome,
           ),
           title: Text(
             l10n.accountSettings,
-            style: TextStyle(color: appColors.primaryDark),
+            style: TextStyle(
+              color: appColors.primaryDark,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ),
           ),
-          backgroundColor: Colors.transparent,
+          backgroundColor: appColors.background,
           elevation: 0,
+          scrolledUnderElevation: 0,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _buildSettingsCard(
-                title: l10n.personalInfo,
+              // AVATAR SECTION - THIẾT KẾ HIỆN ĐẠI
+              _buildAvatarSection(appColors, user, userIcon),
+              const SizedBox(height: 32),
+
+              // CARD 1: THÔNG TIN CÁ NHÂN
+              _buildModernCard(
                 appColors: appColors,
+                title: l10n.personalInfo.toUpperCase(),
+                icon: CupertinoIcons.person_crop_square,
                 children: [
-                  Center(
-                    child: GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: appColors.cardBackground,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: appColors.primary.withOpacity(0.3),
-                            width: 3,
-                          ),
-                        ),
-                        child: _selectedImage != null
-                            ? ClipOval(
-                                child: Image.file(
-                                  _selectedImage!,
-                                  fit: BoxFit.cover,
-                                  width: 100,
-                                  height: 100,
-                                ),
-                              )
-                            : (user?.avatar != null && user!.avatar!.isNotEmpty)
-                            ? ClipOval(
-                                child: Image.network(
-                                  user.avatar!,
-                                  fit: BoxFit.cover,
-                                  width: 100,
-                                  height: 100,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(
-                                        userIcon,
-                                        size: 50,
-                                        color: appColors.primary,
-                                      ),
-                                ),
-                              )
-                            : Icon(
-                                userIcon,
-                                size: 50,
-                                color: appColors.primary,
-                              ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildTextField(
-                    l10n.email,
-                    _emailController,
-                    appColors,
+                  _buildModernTextField(
+                    label: l10n.email,
+                    controller: _emailController,
+                    appColors: appColors,
+                    icon: CupertinoIcons.mail,
                     enabled: false,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(l10n.fullName, _nameController, appColors),
-                  const SizedBox(height: 16),
-                  _buildActionButton(
-                    l10n.updateProfile,
-                    () => _handleUpdateProfile(l10n),
-                    appColors,
+                  _buildModernTextField(
+                    label: l10n.fullName,
+                    controller: _nameController,
+                    appColors: appColors,
+                    icon: CupertinoIcons.person,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildPrimaryButton(
+                    text: l10n.updateProfile,
+                    onPressed: () => _handleUpdateProfile(l10n),
+                    appColors: appColors,
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              _buildSettingsCard(
-                title: l10n.security,
+
+              // CARD 2: BẢO MẬT & MẬT KHẨU
+              _buildModernCard(
                 appColors: appColors,
+                title: l10n.security.toUpperCase(),
+                icon: CupertinoIcons.lock_shield,
                 children: [
-                  _buildTextField(
-                    l10n.currentPassword,
-                    _oldPwController,
-                    appColors,
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    l10n.newPassword,
-                    _newPwController,
-                    appColors,
+                  _buildModernTextField(
+                    label: l10n.currentPassword,
+                    controller: _oldPwController,
+                    appColors: appColors,
+                    icon: CupertinoIcons.lock,
                     isPassword: true,
                   ),
                   const SizedBox(height: 16),
-                  _buildActionButton(
-                    l10n.updatePassword,
-                    () => _handleUpdatePassword(l10n),
-                    appColors,
+                  _buildModernTextField(
+                    label: l10n.newPassword,
+                    controller: _newPwController,
+                    appColors: appColors,
+                    icon: CupertinoIcons.lock_rotation,
+                    isPassword: true,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildPrimaryButton(
+                    text: l10n.updatePassword,
+                    onPressed: () => _handleUpdatePassword(l10n),
+                    appColors: appColors,
+                    isSecondary: true,
                   ),
                 ],
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -321,39 +300,157 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     );
   }
 
-  Widget _buildSettingsCard({
-    required String title,
+  // WIDGET: KHU VỰC AVATAR NỔI BẬT
+  Widget _buildAvatarSection(
+    AppColorTheme appColors,
+    dynamic user,
+    IconData userIcon,
+  ) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: _pickImage,
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              // Khung Avatar chính
+              Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: appColors.primary.withOpacity(0.1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: appColors.primary.withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                  border: Border.all(color: appColors.background, width: 4),
+                ),
+                child: _selectedImage != null
+                    ? ClipOval(
+                        child: Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                          width: 110,
+                          height: 110,
+                        ),
+                      )
+                    : (user?.avatar != null && user!.avatar!.isNotEmpty)
+                    ? ClipOval(
+                        child: Image.network(
+                          user.avatar!,
+                          fit: BoxFit.cover,
+                          width: 110,
+                          height: 110,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            userIcon,
+                            size: 50,
+                            color: appColors.primary,
+                          ),
+                        ),
+                      )
+                    : Icon(userIcon, size: 50, color: appColors.primary),
+              ),
+              // Nút Camera nhỏ ở góc (Overlay)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: appColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: appColors.background, width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: appColors.primaryDark.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.camera_fill,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          user?.name ?? 'Người dùng Moment',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: appColors.primaryDark,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Thay đổi ảnh đại diện',
+          style: TextStyle(
+            fontSize: 13,
+            color: appColors.textMuted,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // WIDGET: CARD CHỨA NỘI DUNG FORM (Thiết kế bo góc mềm, bóng đổ nhẹ)
+  Widget _buildModernCard({
     required AppColorTheme appColors,
+    required String title,
+    required IconData icon,
     required List<Widget> children,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: appColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: appColors.textMuted.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-              color: appColors.primaryDark,
-            ),
+          Row(
+            children: [
+              Icon(icon, color: appColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: appColors.primary,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           ...children,
         ],
       ),
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller,
-    AppColorTheme appColors, {
+  // WIDGET: TEXTFIELD HIỆN ĐẠI (Filled, không viền gắt, có icon)
+  Widget _buildModernTextField({
+    required String label,
+    required TextEditingController controller,
+    required AppColorTheme appColors,
+    required IconData icon,
     bool isPassword = false,
     bool enabled = true,
   }) {
@@ -361,55 +458,81 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       controller: controller,
       obscureText: isPassword,
       enabled: enabled,
-      style: TextStyle(color: enabled ? appColors.text : appColors.textMuted),
+      style: TextStyle(
+        color: enabled ? appColors.text : appColors.textMuted,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: appColors.textMuted),
+        labelStyle: TextStyle(
+          color: appColors.textMuted.withOpacity(0.8),
+          fontWeight: FontWeight.w500,
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: enabled
+              ? appColors.primaryDark.withOpacity(0.5)
+              : appColors.textMuted.withOpacity(0.4),
+          size: 22,
+        ),
         filled: true,
-        fillColor: enabled ? appColors.background : appColors.cardBackground,
-        enabledBorder: OutlineInputBorder(
+        fillColor: enabled
+            ? appColors.background.withOpacity(0.5)
+            : appColors.background.withOpacity(0.2),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 20,
+        ),
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: appColors.textMuted.withOpacity(0.2)),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: appColors.primary, width: 2),
+          borderSide: BorderSide(color: appColors.primary, width: 1.5),
         ),
       ),
     );
   }
 
-  Widget _buildActionButton(
-    String text,
-    VoidCallback onPressed,
-    AppColorTheme appColors,
-  ) {
+  // WIDGET: NÚT BẤM KÊU GỌI HÀNH ĐỘNG
+  Widget _buildPrimaryButton({
+    required String text,
+    required VoidCallback onPressed,
+    required AppColorTheme appColors,
+    bool isSecondary = false,
+  }) {
     return SizedBox(
       width: double.infinity,
-      height: 50,
+      height: 54,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: appColors.primary,
+          backgroundColor: isSecondary
+              ? appColors.primary.withOpacity(0.1)
+              : appColors.primary,
+          foregroundColor: isSecondary ? appColors.primary : Colors.white,
+          elevation: isSecondary ? 0 : 4,
+          shadowColor: appColors.primary.withOpacity(0.4),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
           ),
-          elevation: 0,
         ),
         onPressed: _isLoading ? null : onPressed,
         child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
+            ? SizedBox(
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
+                  color: isSecondary ? appColors.primary : Colors.white,
+                  strokeWidth: 2.5,
                 ),
               )
             : Text(
                 text,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
               ),
       ),

@@ -19,6 +19,8 @@ class InAppNotification {
     required this.createdAt,
   });
 
+  
+
   factory InAppNotification.fromJson(Map<String, dynamic> json) {
     return InAppNotification(
       id: json['id']?.toString() ?? '',
@@ -33,3 +35,5 @@ class InAppNotification {
     );
   }
 }
+
+

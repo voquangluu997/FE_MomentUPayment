@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:flutter/cupertino.dart';
 
 class AppToast {
   /// ✨ Toast thành công - Vibe Xanh Sage bình yên, ngọt ngào
@@ -13,7 +14,7 @@ class AppToast {
       message: message,
       backgroundColor: const Color(0xFFE8F5E9), // Xanh Sage pastel sáng
       borderColor: const Color(0xFFC8E6C9),
-      icon: Icons.star_rounded,
+      icon: Icons.star,
       iconColor: const Color(0xFF2E7D32),
       iconBgColor: Colors.white,
     );
@@ -31,7 +32,7 @@ class AppToast {
       message: message,
       backgroundColor: const Color(0xFFFFEBEE), // Hồng phấn nhẹ
       borderColor: const Color(0xFFFFCDD2),
-      icon: Icons.heart_broken_rounded,
+      icon: Icons.heart_broken,
       iconColor: const Color(0xFFD32F2F),
       iconBgColor: Colors.white,
     );
@@ -48,7 +49,7 @@ class AppToast {
       message: message,
       backgroundColor: const Color(0xFFF3E5F5), // Lavender pastel
       borderColor: const Color(0xFFE1BEE7),
-      icon: Icons.auto_awesome_rounded, // Icon "tỏa sáng" xịn sò
+      icon: CupertinoIcons.sparkles, // Icon "tỏa sáng" xịn sò
       iconColor: const Color(0xFF7B1FA2),
       iconBgColor: Colors.white,
     );

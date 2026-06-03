@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -74,6 +73,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void resetState() => state = AuthState.initial;
 
+  // 🟢 THÊM MỚI: Hàm để SplashScreen gọi khi kết thúc Animation
+  void completeLoginTransition() {
+    state = AuthState.authenticated;
+  }
+
   Future<void> checkAuthStatus() async {
     state = AuthState.loading;
     try {
@@ -123,10 +127,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     state = AuthState.loading;
     try {
+      // 🟢 DEBUG LOG: In ra console để biết App đang gọi đi đâu
+      print(
+        "====== [DEBUG LOGIN] Đang gọi API tới: $_baseUrl/auth/login ======",
+      );
+
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      // 🟢 DEBUG LOG: Xem Server trả về mã gì
+      print(
+        "====== [DEBUG LOGIN] Mã phản hồi từ Server: ${response.statusCode} ======",
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -149,16 +163,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
 
-        // --- FIX: Refresh dữ liệu giao dịch khi login thành công ---
+        // Refresh dữ liệu giao dịch khi login thành công
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
-        // -----------------------------------------------------------
 
         state = AuthState.loginSuccess;
       } else {
+        // 🟢 DEBUG LOG: Lỗi từ phía Server (Sai pass, sai email, v.v.)
+        print(
+          "====== [DEBUG LOGIN] Đăng nhập thất bại: ${response.body} ======",
+        );
         state = AuthState.loginError;
       }
-    } catch (_) {
+    } catch (e, stack) {
+      // 🟢 DEBUG LOG: Lỗi do mạng (Không có wifi, sai IP localhost, Server chết)
+      print("====== [DEBUG LOGIN] LỖI KẾT NỐI MẠNG: $e ======");
+      print(stack);
       state = AuthState.loginError;
     }
   }
@@ -211,10 +231,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
 
-        // --- FIX: Refresh dữ liệu giao dịch khi login GG thành công ---
         ref.invalidate(transactionTimelineProvider);
         ref.invalidate(transactionProvider);
-        // -----------------------------------------------------------
 
         state = AuthState.loginSuccess;
       } else {
@@ -224,8 +242,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState.googleLoginError;
     }
   }
-
-  // ... Các hàm khác giữ nguyên ...
 
   Future<bool> resendVerificationEmail(String email) async {
     try {
@@ -408,6 +424,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState.initial;
       return "Lỗi kết nối máy chủ";
     }
+  }
+
+  void completeLogin() {
+    state = AuthState.authenticated;
   }
 }
 

@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +15,7 @@ import '../controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
 
 // ==========================================
-// 🛠️ UTILS LOGIC (Tách logic để tái sử dụng)
+// 🛠️ UTILS LOGIC
 // ==========================================
 class NumberFormatUtil {
   static String formatNumber(String s) {
@@ -40,7 +42,7 @@ class NumberFormatUtil {
 }
 
 // ==========================================
-// 📱 MÀN HÌNH CHÍNH
+// 📱 MÀN HÌNH CHÍNH - SIZE CHUẨN NỀN NÃ
 // ==========================================
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final DateTime? initialDate;
@@ -78,8 +80,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _customCategoryController.dispose();
     super.dispose();
   }
-
-  // --- LOGIC XỬ LÝ SỰ KIỆN ---
 
   Future<void> _pickDate() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -122,7 +122,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       );
       if (photo != null) setState(() => _localImagePath = photo.path);
     } catch (e) {
-      debugPrint("Lỗi khi chọn ảnh từ thư viện: $e");
+      debugPrint("Lỗi khi chọn ảnh: $e");
     }
   }
 
@@ -197,9 +197,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       if (next == TransactionState.success) {
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        Navigator.of(context).pop();
       } else if (next == TransactionState.error) {
         AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
@@ -210,44 +208,61 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       child: Scaffold(
         backgroundColor: appColors.background,
         appBar: AppBar(
-          title: Text(
-            l10n.newMomentTitle,
-            style: TextStyle(
-              color: appColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(CupertinoIcons.sparkles, color: appColors.primary, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                l10n.newMomentTitle.toUpperCase(),
+                style: TextStyle(
+                  color: appColors.primary,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
+          centerTitle: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: appColors.primary),
-            onPressed: () => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: appColors.cardBackground,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                CupertinoIcons.chevron_back,
+                color: appColors.primary,
+                size: 18,
+              ),
             ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(
-              horizontal: 18.0,
-              vertical: 8.0,
+              horizontal: 16.0,
+              vertical: 6.0,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. Ảnh chụp / Thư viện
                 _ImageSelector(
                   imagePath: _localImagePath,
                   onCameraTap: _openCamera,
                   onGalleryTap: _openGallery,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // 2. Chọn Ngày
                 _DateSelector(selectedDate: _selectedDate, onTap: _pickDate),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
 
-                // 3. Danh mục
                 _CategorySelector(
                   selectedCategory: _selectedCategory,
                   onSelect: (id, emoji, isCustom) {
@@ -263,21 +278,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   const SizedBox(height: 8),
                   _CustomCategoryInput(controller: _customCategoryController),
                 ],
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
-                // 4. Nhập số tiền (Đã sửa lỗi phình layout)
                 _AmountInput(
                   controller: _amountController,
                   onChanged: _onAmountChanged,
                   onAppendZeros: _appendZeros,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
-                // 5. Ghi chú
                 _NoteInput(controller: _noteController),
-                const SizedBox(height: 24),
+                const SizedBox(height: 22),
 
-                // 6. Nút Lưu
                 _SaveButton(
                   isLoading: txState == TransactionState.loading,
                   onPressed: _handleSaveTransaction,
@@ -293,7 +305,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 }
 
 // ==========================================
-// 🧩 WIDGETS ĐÃ ĐƯỢC TÁCH RỜI & TỐI ƯU
+// 🧩 WIDGETS
 // ==========================================
 
 class _ImageSelector extends ConsumerWidget {
@@ -313,47 +325,82 @@ class _ImageSelector extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         GestureDetector(
           onTap: onCameraTap,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
             height: 245,
+            width: double.infinity,
             decoration: BoxDecoration(
-              color: appColors.cardBackground,
-              borderRadius: BorderRadius.circular(22),
+              color: imagePath != null
+                  ? appColors.cardBackground
+                  : appColors.primary.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: appColors.primary.withOpacity(0.12),
+                color: imagePath != null
+                    ? Colors.transparent
+                    : appColors.primary.withOpacity(0.15),
                 width: 1.5,
               ),
             ),
             child: imagePath != null
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(20.0),
-                    child: Image.file(
-                      File(imagePath!),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.file(File(imagePath!), fit: BoxFit.cover),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: 40,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.25),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.camera_enhance_outlined,
-                        size: 48,
-                        color: appColors.primary,
+                      Transform.rotate(
+                        angle: -math.pi / 15,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            CupertinoIcons.camera_fill,
+                            size: 32,
+                            color: appColors.primary,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           l10n.cameraTapInstruction,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: appColors.textMuted,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500,
+                            color: appColors.primaryDark,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
@@ -361,77 +408,41 @@ class _ImageSelector extends ConsumerWidget {
                   ),
           ),
         ),
-        const SizedBox(height: 2),
-        Center(
-          child: TextButton.icon(
-            onPressed: onGalleryTap,
-            icon: Icon(
-              Icons.photo_library_rounded,
-              color: appColors.primary,
-              size: 16,
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onGalleryTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: appColors.cardBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: appColors.primary.withOpacity(0.1)),
             ),
-            label: Text(
-              imagePath != null
-                  ? l10n.galleryChangeAction
-                  : l10n.galleryPickAction,
-              style: TextStyle(
-                color: appColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 12.5,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  CupertinoIcons.photo_on_rectangle,
+                  color: appColors.primary,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  imagePath != null
+                      ? l10n.galleryChangeAction
+                      : l10n.galleryPickAction,
+                  style: TextStyle(
+                    color: appColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _DateSelector extends ConsumerWidget {
-  final DateTime selectedDate;
-  final VoidCallback onTap;
-
-  const _DateSelector({required this.selectedDate, required this.onTap});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appColors = ref.watch(appColorsProvider);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: appColors.cardBackground,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: appColors.primary.withOpacity(0.1)),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_month_rounded,
-              color: appColors.primary,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              DateFormat('dd/MM/yyyy').format(selectedDate),
-              style: TextStyle(
-                color: appColors.text,
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-              ),
-            ),
-            const Spacer(),
-            Icon(
-              Icons.edit_calendar_rounded,
-              color: appColors.textMuted.withOpacity(0.5),
-              size: 18,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -453,22 +464,28 @@ class _CategorySelector extends ConsumerWidget {
     final List<Map<String, dynamic>> categories = [
       {'id': 'Food', 'name': l10n.catFood, 'emoji': '🍰'},
       {'id': 'Shopping', 'name': l10n.catShopping, 'emoji': '🛍️'},
-      {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🚗'},
-      {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🎮'},
-      {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '📝'},
+      {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🛵'},
+      {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🍿'},
+      {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '✨'},
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.categorySectionTitle.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: appColors.primaryDark.withOpacity(0.6),
-            letterSpacing: 0.8,
-          ),
+        Row(
+          children: [
+            const Text("🏷️", style: TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Text(
+              l10n.categorySectionTitle.toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: appColors.primaryDark.withOpacity(0.7),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         SingleChildScrollView(
@@ -478,25 +495,31 @@ class _CategorySelector extends ConsumerWidget {
             children: categories.map((cat) {
               final isSelected = selectedCategory == cat['id'];
               return Padding(
-                padding: const EdgeInsets.only(right: 5.0),
-                child: InkWell(
+                padding: const EdgeInsets.only(right: 6.0),
+                child: GestureDetector(
                   onTap: () =>
                       onSelect(cat['id'], cat['emoji'], cat['id'] == 'Custom'),
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? appColors.primary
-                          : appColors.cardBackground,
-                      borderRadius: BorderRadius.circular(10),
+                      gradient: isSelected
+                          ? LinearGradient(
+                              colors: [
+                                appColors.primary,
+                                appColors.primaryDark,
+                              ],
+                            )
+                          : null,
+                      color: isSelected ? null : appColors.cardBackground,
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : appColors.primary.withOpacity(0.04),
+                            : appColors.primary.withOpacity(0.05),
                       ),
                     ),
                     child: Row(
@@ -504,15 +527,17 @@ class _CategorySelector extends ConsumerWidget {
                       children: [
                         Text(
                           cat['emoji'],
-                          style: const TextStyle(fontSize: 13),
+                          style: const TextStyle(fontSize: 14),
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 4),
                         Text(
                           cat['name'],
                           style: TextStyle(
                             color: isSelected ? Colors.white : appColors.text,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11.5,
+                            fontWeight: isSelected
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -540,33 +565,95 @@ class _CustomCategoryInput extends ConsumerWidget {
 
     return TextField(
       controller: controller,
-      style: TextStyle(color: appColors.text),
+      style: TextStyle(
+        color: appColors.text,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
       decoration: InputDecoration(
         hintText: l10n.customCategoryHint,
-        hintStyle: TextStyle(color: appColors.textMuted),
-        prefixIcon: Icon(Icons.edit_note_rounded, color: appColors.primary),
+        hintStyle: TextStyle(color: appColors.textMuted, fontSize: 13),
+        prefixIcon: Icon(
+          CupertinoIcons.pencil_outline,
+          color: appColors.primary,
+          size: 18,
+        ),
         filled: true,
         fillColor: appColors.cardBackground,
         contentPadding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
+          vertical: 10,
+          horizontal: 12,
         ),
+        isDense: true,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: appColors.primary.withOpacity(0.1)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: appColors.primary, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: appColors.primary, width: 1.2),
         ),
       ),
     );
   }
 }
 
-// ==========================================
-// 🚀 NƠI FIX LỖI PHÌNH TO TEXTFIELD
-// ==========================================
+class _DateSelector extends ConsumerWidget {
+  final DateTime selectedDate;
+  final VoidCallback onTap;
+
+  const _DateSelector({required this.selectedDate, required this.onTap});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appColors = ref.watch(appColorsProvider);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: appColors.cardBackground,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: appColors.primary.withOpacity(0.08)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: appColors.primary.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                CupertinoIcons.calendar,
+                color: appColors.primary,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              DateFormat('dd/MM/yyyy').format(selectedDate),
+              style: TextStyle(
+                color: appColors.text,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              CupertinoIcons.calendar_badge_plus,
+              color: appColors.textMuted.withOpacity(0.4),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _AmountInput extends ConsumerWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -585,50 +672,68 @@ class _AmountInput extends ConsumerWidget {
     final currencySymbol = ref.watch(currencyProvider);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // CẬP NHẬT: Dòng tiêu đề và shortcut hỗ trợ kéo vuốt ngang không tràn màn hình
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              l10n.amountSectionTitle,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: appColors.primaryDark.withOpacity(0.6),
-                letterSpacing: 0.8,
-              ),
-            ),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildShortcutButton(
-                  '.000',
-                  () => onAppendZeros('000'),
-                  appColors,
-                ),
+                const Text("💸", style: TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),
-                _buildShortcutButton(
-                  '.000.000',
-                  () => onAppendZeros('000000'),
-                  appColors,
+                Text(
+                  l10n.amountSectionTitle.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: appColors.primaryDark,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildShortcutButton(
+                        '.000',
+                        () => onAppendZeros('000'),
+                        appColors,
+                      ),
+                      const SizedBox(width: 6),
+                      _buildShortcutButton(
+                        '.000.000',
+                        () => onAppendZeros('000000'),
+                        appColors,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: appColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: appColors.primary.withOpacity(0.06),
+              color: appColors.primary.withOpacity(0.25),
               width: 1.2,
             ),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center, // Căn giữa trục dọc
             children: [
               Expanded(
                 child: TextField(
@@ -636,22 +741,22 @@ class _AmountInput extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                   onChanged: onChanged,
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: appColors.primary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: appColors.primaryDark,
                   ),
                   decoration: InputDecoration(
                     hintText: '0',
                     hintStyle: TextStyle(
-                      color: appColors.primary.withOpacity(0.2),
+                      color: appColors.primary.withOpacity(0.25),
+                      fontSize: 28,
                     ),
                     border: InputBorder.none,
+                    isDense: true,
                     contentPadding: EdgeInsets.zero,
-                    isDense: true, // Ép chặt khoảng cách trống thừa
                   ),
                 ),
               ),
-              // 💡 GIẢI PHÁP: Nhấc ValueListenableBuilder chứa nút X ra khỏi InputDecoration
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: controller,
                 builder: (context, value, child) {
@@ -662,22 +767,34 @@ class _AmountInput extends ConsumerWidget {
                       onChanged('');
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Icon(
-                        Icons.cancel_rounded,
-                        color: appColors.textMuted.withOpacity(0.4),
-                        size: 20,
+                        CupertinoIcons.clear_thick_circled,
+                        color: appColors.primary.withOpacity(0.4),
+                        size: 18,
                       ),
                     ),
                   );
                 },
               ),
-              Text(
-                currencySymbol,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: appColors.primary,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [appColors.primary, appColors.primaryDark],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  currencySymbol,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -693,7 +810,7 @@ class _AmountInput extends ConsumerWidget {
     AppColorTheme appColors,
   ) {
     return Material(
-      color: appColors.primary.withOpacity(0.05),
+      color: appColors.primary.withOpacity(0.08),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onTap,
@@ -706,7 +823,6 @@ class _AmountInput extends ConsumerWidget {
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: appColors.primary,
-              letterSpacing: 0.3,
             ),
           ),
         ),
@@ -728,30 +844,48 @@ class _NoteInput extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.noteSectionTitle,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: appColors.primaryDark.withOpacity(0.6),
-            letterSpacing: 0.8,
-          ),
+        Row(
+          children: [
+            const Text("📝", style: TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Text(
+              l10n.noteSectionTitle.toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: appColors.primaryDark.withOpacity(0.6),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
-          style: TextStyle(color: appColors.text),
+          style: TextStyle(
+            color: appColors.text,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          maxLines: 2,
+          minLines: 1,
           decoration: InputDecoration(
             hintText: l10n.noteHint,
-            hintStyle: TextStyle(color: appColors.textMuted),
+            hintStyle: TextStyle(color: appColors.textMuted, fontSize: 13),
+            prefixIcon: Icon(
+              CupertinoIcons.doc_text,
+              color: appColors.primary,
+              size: 18,
+            ),
             filled: true,
             fillColor: appColors.cardBackground,
+            isDense: true,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 12,
-              horizontal: 16,
+              horizontal: 12,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
           ),
@@ -786,17 +920,40 @@ class _SaveButton extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: appColors.primary,
+          gradient: LinearGradient(
+            colors: [appColors.primary, appColors.primaryDark],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
           borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: appColors.primary.withOpacity(0.25),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         alignment: Alignment.center,
-        child: Text(
-          l10n.saveMomentButton,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.saveMomentButton.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              CupertinoIcons.paperplane_fill,
+              color: Colors.white,
+              size: 14,
+            ),
+          ],
         ),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart'; // 🍏 Đã thêm import Cupertino để đồng bộ thiết kế iOS
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,7 +75,9 @@ class SettingsBottomSheet extends ConsumerWidget {
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(
+                      CupertinoIcons.xmark,
+                    ), // 🍏 Đổi từ CupertinoIcons.xmark sang Cupertino
                     color: appColors.primaryDark,
                   ),
                 ],
@@ -89,28 +92,32 @@ class SettingsBottomSheet extends ConsumerWidget {
                     children: [
                       // PHÂN NHÓM 1: QUẢN LÝ CÁ NHÂN & TƯƠNG TÁC
                       _buildSettingItem(
-                        icon: Icons.person_outline_rounded,
+                        icon: CupertinoIcons
+                            .person, // 🍏 Đổi từ CupertinoIcons.person_outline_rounded sang Cupertino
                         title: l10n.accountSettings,
                         subtitle: l10n.accountSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
+                              // 🍏 Đổi sang hiệu ứng chuyển trang iOS (CupertinoPageRoute)
                               builder: (_) => const ProfileSettingsScreen(),
                             ),
                           );
                         },
                       ),
                       _buildSettingItem(
-                        icon: Icons.notifications_active_rounded,
+                        icon: CupertinoIcons
+                            .bell, // 🍏 Đổi từ Icons.notifications_active sang Cupertino
                         title: l10n.notificationSettingsTitle,
                         subtitle: l10n.notificationSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
+                              // 🍏 Đổi sang hiệu ứng chuyển trang iOS (CupertinoPageRoute)
                               builder: (_) =>
                                   const NotificationSettingsScreen(),
                             ),
@@ -128,7 +135,8 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                       // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
                       _buildSettingItem(
-                        icon: Icons.language_rounded,
+                        icon: CupertinoIcons
+                            .globe, // 🍏 Đổi từ CupertinoIcons.language_rounded sang Cupertino
                         title: l10n.language,
                         subtitle: currentLocale.languageCode == 'en'
                             ? l10n.english
@@ -142,7 +150,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                         ),
                       ),
                       _buildSettingItem(
-                        icon: Icons.monetization_on_rounded,
+                        icon: CupertinoIcons
+                            .money_dollar_circle, // 🍏 Đổi từ CupertinoIcons.monetization_on_rounded sang Cupertino
                         title: l10n.currencyUnit,
                         subtitle: '${l10n.currentlyUsing}: $currentCurrency',
                         appColors: appColors,
@@ -204,9 +213,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Icon(
-                                  Icons.keyboard_arrow_down_rounded,
+                                  CupertinoIcons
+                                      .chevron_down, // 🍏 Đổi từ CupertinoIcons.chevron_down sang Cupertino
                                   color: appColors.primary,
-                                  size: 18,
+                                  size: 14,
                                 ),
                               ],
                             ),
@@ -214,7 +224,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                         ),
                       ),
                       _buildSettingItem(
-                        icon: Icons.dark_mode_rounded,
+                        icon: CupertinoIcons
+                            .moon, // 🍏 Đổi từ CupertinoIcons.dark_mode_rounded sang Cupertino
                         title: l10n.darkMode,
                         subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
                         appColors: appColors,
@@ -239,7 +250,8 @@ class SettingsBottomSheet extends ConsumerWidget {
 
                       // PHÂN NHÓM 3: HỖ TRỢ
                       _buildSettingItem(
-                        icon: Icons.help_outline_rounded,
+                        icon: CupertinoIcons
+                            .question_circle, // 🍏 Đổi từ Icons.help_outline sang Cupertino
                         title: l10n.helpCenter,
                         subtitle: l10n.helpCenterSubtitle,
                         appColors: appColors,
@@ -267,7 +279,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
-                            Icons.logout_rounded,
+                            CupertinoIcons
+                                .square_arrow_right, // 🍏 Đổi từ CupertinoIcons.logout_rounded sang Cupertino
                             color: Colors.redAccent,
                             size: 22,
                           ),
@@ -354,7 +367,8 @@ class SettingsBottomSheet extends ConsumerWidget {
       trailing:
           trailing ??
           Icon(
-            Icons.arrow_forward_ios_rounded,
+            CupertinoIcons
+                .chevron_forward, // 🍏 Đổi từ CupertinoIcons.chevron_forward sang Cupertino
             size: 16,
             color: appColors.textMuted,
           ),
@@ -403,7 +417,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                 ],
               ),
               child: const Icon(
-                Icons.coffee_rounded,
+                CupertinoIcons
+                    .heart, // 🍏 Đổi từ CupertinoIcons.coffee_rounded sang Cupertino (vì iOS không có sẵn icon ly cafe gốc, dùng Trái Tim tượng trưng Donation rất hợp lý)
                 color: Colors.white,
                 size: 24,
               ),
@@ -429,7 +444,11 @@ class SettingsBottomSheet extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(Icons.favorite_rounded, color: appColors.primary, size: 20),
+            Icon(
+              CupertinoIcons.heart_fill,
+              color: appColors.primary,
+              size: 20,
+            ), // 🍏 Đổi từ CupertinoIcons.favorite_rounded sang Cupertino
           ],
         ),
       ),
@@ -468,7 +487,8 @@ class SettingsBottomSheet extends ConsumerWidget {
               ],
             ),
             child: const Icon(
-              Icons.workspace_premium_rounded,
+              CupertinoIcons
+                  .star_fill, // 🍏 Đổi từ CupertinoIcons.star_fill sang Cupertino
               color: Colors.white,
               size: 24,
             ),
@@ -499,7 +519,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.lock_rounded,
+                        CupertinoIcons
+                            .lock_fill, // 🍏 Đổi từ CupertinoIcons.lock_rounded sang Cupertino
                         size: 12,
                         color: Color(0xFFD99B00),
                       ),
@@ -544,7 +565,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.qr_code_2_rounded,
+                CupertinoIcons
+                    .qrcode, // 🍏 Đổi từ CupertinoIcons.qrcode_viewfinder sang Cupertino
                 color: Color(0xFFA50064),
                 size: 40,
               ),
@@ -657,7 +679,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.support_agent_rounded,
+                CupertinoIcons
+                    .chat_bubble_2, // 🍏 Đổi từ CupertinoIcons.support_agent_rounded sang Cupertino
                 color: appColors.primary,
                 size: 40,
               ),
@@ -708,7 +731,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.email_outlined,
+                      CupertinoIcons
+                          .mail, // 🍏 Đổi từ CupertinoIcons.email_outlined sang Cupertino
                       color: appColors.primary,
                       size: 20,
                     ),
@@ -730,7 +754,8 @@ class SettingsBottomSheet extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      Icons.copy_rounded,
+                      CupertinoIcons
+                          .doc_on_doc, // 🍏 Đổi từ CupertinoIcons.doc_on_doc sang Cupertino
                       color: appColors.textMuted,
                       size: 18,
                     ),
