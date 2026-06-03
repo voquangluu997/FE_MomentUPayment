@@ -1,10 +1,15 @@
+import 'dart:async'; // 👇 THÊM IMPORT NÀY ĐỂ QUẢN LÝ LUỒNG STREAM
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart'; // 👇 THÊM IMPORT ĐỂ SỬ DỤNG STREAM CLICK WIDGET
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+
+import 'package:moment_u_payment/core/services/quick_actions_service.dart';
+import 'package:moment_u_payment/core/services/home_widget_service.dart';
 
 import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
@@ -24,9 +29,52 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
   int _currentIndex = 0;
   bool _isNavbarVisible = true;
 
-  // 🔥 CHÚ Ý: Đã bỏ SetBudgetScreen ra khỏi IndexedStack.
+  // Luồng lắng nghe click widget khi app chạy ngầm (Warm Start)
+  StreamSubscription<Uri?>? _widgetClickSubscription;
+
   // Giờ chỉ còn Home (index 0) và Analytics (index 1)
   final List<Widget> _screens = [const HomeScreen(), const AnalyticsScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 1. Lắng nghe sự kiện từ Quick Actions
+      // BẠN SỬA Ở ĐÂY: Xóa bỏ 'context' khỏi đối số của hàm init
+      ref.read(quickActionsServiceProvider).init(() {
+        _navigateToAddTransaction();
+      });
+
+      // 2. Lắng nghe sự kiện từ Home Widget
+      HomeWidgetService.checkWidgetLaunch(() {
+        _navigateToAddTransaction();
+      });
+    });
+
+    // 3. ✨ NÂNG CẤP ĐỘT PHÁ: Lắng nghe click từ Home Widget khi app đang chạy ngầm (Background / Warm Start)
+    _widgetClickSubscription = HomeWidget.widgetClicked.listen((Uri? uri) {
+      if (uri != null && uri.host == 'add_transaction') {
+        _navigateToAddTransaction();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // 💥 CHÚ Ý BẮT BUỘC: Hủy lắng nghe luồng stream khi widget layout bị hủy để tránh leak bộ nhớ
+    _widgetClickSubscription?.cancel();
+    super.dispose();
+  }
+
+  // Hàm helper để mở màn hình Thêm giao dịch tái sử dụng được nhiều nơi
+  void _navigateToAddTransaction() {
+    // Kiểm tra xem màn hình AddTransaction đã được mở chưa để tránh mở đè trùng lặp nhiều màn
+    Navigator.push(
+      context,
+      CupertinoPageRoute(builder: (_) => const AddTransactionScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +158,9 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       appColors: appColors,
                     ),
 
-                    // 🔥 Đã đổi Budget thành Nút Push màn hình
+                    // Nút Ngân sách Push màn hình
                     _buildNavItem(
-                      index: -1, // Không dùng index vì không thuộc IndexedStack
+                      index: -1,
                       icon: CupertinoIcons.creditcard,
                       activeIcon: CupertinoIcons.creditcard_fill,
                       label: l10n.navBudget,
@@ -132,18 +180,11 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       message: l10n.addMomentTooltip,
                       child: PremiumAddButton(
                         appColors: appColors,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (_) => const AddTransactionScreen(),
-                            ),
-                          );
-                        },
+                        onTap: _navigateToAddTransaction,
                       ),
                     ),
 
-                    // Analytics giờ đã xuống index 1
+                    // Analytics index 1
                     _buildNavItem(
                       index: 1,
                       icon: CupertinoIcons.chart_bar_square,
@@ -161,7 +202,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       customAction: () {
                         if (mounted) SettingsBottomSheet.show(context);
                       },
-                      isMenu: true, // Để giữ màu text đậm cho icon Menu như cũ
+                      isMenu: true,
                     ),
                   ],
                 ),
@@ -179,10 +220,9 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
     required IconData activeIcon,
     required String label,
     required dynamic appColors,
-    VoidCallback? customAction, // 🔥 Thêm custom action
-    bool isMenu = false, // 🔥 Dùng để xác định màu riêng cho Menu
+    VoidCallback? customAction,
+    bool isMenu = false,
   }) {
-    // NavItem chỉ được chọn khi nó không có action tùy chỉnh và khớp với index hiện tại
     final bool isSelected = (customAction == null) && _currentIndex == index;
     final Color inactiveColor = appColors.textMuted.withOpacity(0.5);
 
@@ -191,10 +231,10 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
       onTap: () async {
         await HapticFeedback.selectionClick();
         if (customAction != null) {
-          customAction(); // Nếu có action thì chạy action (chuyển trang/bottom sheet)
+          customAction();
         } else {
           setState(() {
-            _currentIndex = index; // Ngược lại đổi trang bằng IndexedStack
+            _currentIndex = index;
           });
         }
       },

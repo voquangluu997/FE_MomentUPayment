@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/screens/main_layout_screen.dart';
 import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
 import 'package:moment_u_payment/features/splash/presentation/screens/splash_screen.dart';
@@ -106,6 +107,7 @@ class MyApp extends ConsumerWidget {
             const OnboardingScreen(), // Khai báo route mới
         '/login': (context) => const LoginScreen(),
         '/auth_check': (context) => const AuthChecker(),
+        '/main': (context) => const MainLayoutScreen(),
       },
     );
   }

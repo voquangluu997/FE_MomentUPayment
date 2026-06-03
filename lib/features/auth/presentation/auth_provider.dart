@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moment_u_payment/features/auth/data/auth_repository.dart';
-// Bạn có thể xóa luôn các import transactionProvider ở trên cùng nếu không còn dùng tới ở file này nữa
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 
@@ -74,27 +73,37 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void resetState() => state = AuthState.initial;
 
-  // 🟢 THÊM MỚI: Hàm để SplashScreen gọi khi kết thúc Animation
   void completeLoginTransition() {
     state = AuthState.authenticated;
   }
 
+  /// ✨ ĐÃ SỬA: Tối ưu hóa tốc độ load app, vào thẳng Main Layout chạy ngầm API
   Future<void> checkAuthStatus() async {
     state = AuthState.loading;
     try {
+      // 1. Đọc nhanh token từ bộ nhớ thiết bị (mất ~5-10ms)
       String? token = await _secureStorage.read(key: 'access_token');
+
       if (token == null) {
         state = AuthState.unauthenticated;
         return;
       }
 
-      final response = await http.get(
-        Uri.parse('$_baseUrl/auth/me'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+      // 2. LẬP TỨC cho phép người dùng vào màn hình chính (Không bắt UI chờ mạng)
+      state = AuthState.authenticated;
+
+      // 3. Gọi API lấy thông tin Profile dưới nền (Background)
+      final response = await http
+          .get(
+            Uri.parse('$_baseUrl/auth/me'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(
+            const Duration(seconds: 8),
+          ); // Giới hạn thời gian chờ tránh treo ngầm
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -110,15 +119,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
                 user['avatar'] as String?,
               );
         }
-
-        // ❌ ĐÃ XÓA: ref.invalidate các transaction provider
-        state = AuthState.authenticated;
-      } else {
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        // Nếu Server báo Token sai/hết hạn thực sự, lúc này mới đẩy ra Login
         await _secureStorage.delete(key: 'access_token');
+        ref.read(userInfoProvider.notifier).clearUserInfo();
         state = AuthState.unauthenticated;
       }
+      // Các trường hợp lỗi mạng khác (Mất mạng, lỗi 500) giữ nguyên trạng thái authenticated để dùng offline
     } catch (_) {
-      state = AuthState.unauthenticated;
+      // Nếu có lỗi kết nối lúc khởi động nhưng máy vẫn giữ token cũ -> Cho giữ trạng thái đăng nhập để trải nghiệm không gián đoạn
+      String? token = await _secureStorage.read(key: 'access_token');
+      if (token == null) {
+        state = AuthState.unauthenticated;
+      } else {
+        state = AuthState.authenticated;
+      }
     }
   }
 
@@ -158,9 +173,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
                 user['avatar'] as String?,
               );
         }
-
-        // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây
-        // Chỉ cần đổi state, Riverpod sẽ TỰ ĐỘNG reload dữ liệu giao dịch ở màn Home
         state = AuthState.loginSuccess;
       } else {
         print(
@@ -222,8 +234,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
                 user['avatar'] as String?,
               );
         }
-
-        // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây
         state = AuthState.loginSuccess;
       } else {
         state = AuthState.googleLoginError;
@@ -307,8 +317,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     ref.read(userInfoProvider.notifier).clearUserInfo();
     state = AuthState.unauthenticated;
-
-    // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây vì transaction provider tự reset khi authState thành unauthenticated
   }
 
   Future<bool> forgotPassword(String email) async {
@@ -370,6 +378,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }),
       );
 
+      state = AuthState.authenticated;
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       } else {
@@ -377,12 +387,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return data['message'] ?? "Cập nhật thất bại. Vui lòng thử lại.";
       }
     } catch (e) {
+      state = AuthState.authenticated;
       return "Lỗi kết nối máy chủ";
     }
   }
 
   Future<String?> updateProfile(String name, String? avatarUrl) async {
-    state = AuthState.loading;
     try {
       final response = await ref
           .read(authRepositoryProvider)
@@ -403,15 +413,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
             .read(userInfoProvider.notifier)
             .updateUserInfo(newName, currentEmail, isVerified, newAvatar);
 
-        state = AuthState.initial;
+        state = AuthState.authenticated;
         return null;
       }
 
-      state = AuthState.initial;
+      state = AuthState.authenticated;
       final data = response.data;
       return data['message'] ?? "Cập nhật hồ sơ thất bại";
     } catch (e) {
-      state = AuthState.initial;
+      state = AuthState.authenticated;
       return "Lỗi kết nối máy chủ";
     }
   }

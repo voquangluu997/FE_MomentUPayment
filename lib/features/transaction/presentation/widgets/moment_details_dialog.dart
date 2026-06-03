@@ -51,11 +51,8 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     super.initState();
     _currentImageUrl = widget.moment['imageUrl'] ?? '';
 
-    // Lấy danh mục và emoji gốc từ bản ghi
     final originalCategory = widget.moment['category'] ?? '';
-    _selectedEmoji =
-        widget.moment['emoji'] ??
-        '📝'; // Bug 3: Gán emoji cũ thay vì mặc định '📝'
+    _selectedEmoji = widget.moment['emoji'] ?? '📝';
 
     final double rawAmount = (widget.moment['amount'] ?? 0).toDouble();
     _amountController = TextEditingController(
@@ -64,7 +61,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     _noteController = TextEditingController(text: widget.moment['note'] ?? '');
 
-    // 👇 KHỐI LOGIC KIỂM TRA CATEGORY TÙY CHỈNH
     final standardCategories = [
       'Food',
       'Shopping',
@@ -75,9 +71,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         !standardCategories.contains(originalCategory)) {
       _isCustomCategory = true;
       _selectedCategory = 'Custom';
-      _customCategoryController = TextEditingController(
-        text: originalCategory,
-      ); // Điền sẵn chữ vào ô nhập
+      _customCategoryController = TextEditingController(text: originalCategory);
     } else {
       _isCustomCategory = false;
       _selectedCategory = originalCategory.isEmpty ? 'Food' : originalCategory;
@@ -99,12 +93,22 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     super.dispose();
   }
 
+  // ✨ ĐÃ SỬA: Bảo vệ DatePicker không bị crash nếu dữ liệu cũ từ server bị lệch tương lai
   Future<void> _pickDate() async {
+    final now = DateTime.now();
+    DateTime initialDateToShow = _selectedDate;
+
+    // Nếu ngày đang chọn vô tình vượt quá thời gian hiện tại (do lỗi lệch múi giờ cũ)
+    // thì hạ xuống thời gian hiện tại để không bị lỗi gãy AssertionError của Flutter.
+    if (initialDateToShow.isAfter(now)) {
+      initialDateToShow = now;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: initialDateToShow,
       firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
+      lastDate: now,
       builder: (context, child) {
         final appColors = ref.read(appColorsProvider);
         return Theme(
@@ -184,6 +188,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     });
   }
 
+  // ✨ ĐÃ SỬA: Chuyển đổi sang UTC trước khi đẩy dữ liệu lên máy chủ để đúng giờ local
   Future<void> _handleUpdateTransaction() async {
     final amountText = _amountController.text.replaceAll('.', '').trim();
     final appColors = ref.read(appColorsProvider);
@@ -204,17 +209,15 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         '';
 
     if (momentId.isEmpty) {
-      AppToast.showError(
-        context,
-        l10n.updateFailed,
-        appColors,
-      ); // Đổi SnackBar thành AppToast cho đồng bộ UI
+      AppToast.showError(context, l10n.updateFailed, appColors);
       return;
     }
 
     try {
       final now = DateTime.now();
-      final spentAtWithCurrentTime = DateTime(
+
+      // Tạo thời gian kết hợp ngày chọn và giờ hiện tại (Local)
+      final spentAtLocal = DateTime(
         _selectedDate.year,
         _selectedDate.month,
         _selectedDate.day,
@@ -222,6 +225,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         now.minute,
         now.second,
       );
+
+      // 🟢 QUAN TRỌNG: Chuyển sang chuỗi chuẩn UTC (.toUtc()) trước khi gửi đi
+      // để chuỗi JSON có đuôi chữ 'Z', ép server không nhận nhầm múi giờ.
+      final spentAtWithCurrentTime = spentAtLocal.toUtc();
 
       await ref
           .read(transactionProvider.notifier)
@@ -236,17 +243,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           );
 
       if (mounted) {
-        // 👇 1. Hiển thị thông báo thành công
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
-
-        // 👇 2. Chủ động làm mới Timeline và đếm lại số chuông thông báo
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         ref.read(notificationProvider.notifier).fetchUnreadCount();
-
         Navigator.of(context).pop(true);
       }
     } catch (e) {
-      // 👇 3. Hiển thị thông báo lỗi trực quan cho người dùng thay vì chỉ debugPrint
       if (mounted) {
         AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
@@ -467,7 +469,7 @@ class _ImageHeader extends ConsumerWidget {
     );
   }
 
-  ButtonStyle _editButtonStyle(AppColorTheme appColors) {
+  ButtonStyle _editButtonStyle(dynamic appColors) {
     return ElevatedButton.styleFrom(
       backgroundColor: Colors.white.withOpacity(0.9),
       foregroundColor: appColors.primary,
@@ -639,6 +641,7 @@ class _ViewModeContent extends ConsumerWidget {
   }
 }
 
+// ✨ ĐÃ HOÀN THIỆN: Viết tiếp phần code bị cắt cụt của giao diện chỉnh sửa
 class _EditModeContent extends ConsumerWidget {
   final String selectedCategory;
   final bool isCustomCategory;
@@ -824,7 +827,7 @@ class _EditModeContent extends ConsumerWidget {
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
-                    isDense: true, // Ép sát text field không có padding thừa
+                    isDense: true,
                   ),
                 ),
               ),
@@ -901,16 +904,13 @@ class _EditModeContent extends ConsumerWidget {
         const SizedBox(height: 6),
         TextField(
           controller: noteController,
+          maxLines: 3,
           style: TextStyle(fontSize: 13.5, color: appColors.primaryDark),
           decoration: InputDecoration(
             hintText: l10n.noteHint,
             hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.5)),
             filled: true,
             fillColor: appColors.background,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 12,
-            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -919,49 +919,47 @@ class _EditModeContent extends ConsumerWidget {
         ),
         const SizedBox(height: 20),
 
-        isLoading
-            ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+        // Nút Lưu giao dịch sau khi chỉnh sửa
+        ElevatedButton(
+          onPressed: isLoading ? null : onSaveTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: appColors.primary,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
+          ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      appColors.primary,
-                    ),
+                    color: Colors.white,
+                    strokeWidth: 2,
                   ),
-                ),
-              )
-            : ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: appColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                onPressed: onSaveTap,
-                child: Text(
+                )
+              : Text(
                   l10n.update,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+        ),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title, AppColorTheme appColors) {
+  Widget _buildSectionTitle(String title, dynamic appColors) {
     return Text(
       title,
-      overflow: TextOverflow.ellipsis,
       style: TextStyle(
-        fontSize: 10.5,
-        fontWeight: FontWeight.w800,
-        color: appColors.primaryDark.withOpacity(0.5),
-        letterSpacing: 0.8,
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: appColors.textMuted,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -969,24 +967,23 @@ class _EditModeContent extends ConsumerWidget {
   Widget _buildShortcutZeroButton(
     String label,
     VoidCallback onTap,
-    AppColorTheme appColors,
+    dynamic appColors,
   ) {
-    return Material(
-      color: appColors.primary.withOpacity(0.05),
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: appColors.primary,
-              letterSpacing: 0.3,
-            ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: appColors.primary.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: appColors.primary,
           ),
         ),
       ),

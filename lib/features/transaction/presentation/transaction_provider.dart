@@ -40,10 +40,11 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         spentAt: spentAt,
       );
 
-      // Làm mới dòng thời gian
+      // 🔄 Làm mới dòng thời gian
+      // (Lưu ý: Hàm refreshTimeline này đã được tích hợp sẵn HomeWidgetService để cập nhật ra màn hình chính)
       _ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
-      // Ép ví ngoan tính lại tiền
+      // 🔄 Ép ví ngoan tính lại tiền
       _ref.invalidate(homeBudgetProvider);
 
       // 🟢 THẦN CHÚ: Làm mới biểu đồ thống kê ngay lập tức
@@ -85,7 +86,10 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         spentAt: spentAt,
       );
 
+      // 🔄 Làm mới dòng thời gian và cập nhật Home Widget
       _ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+
+      // 🔄 Cập nhật ngân sách
       _ref.invalidate(homeBudgetProvider);
 
       // 🟢 THẦN CHÚ: Cập nhật lại số liệu biểu đồ sau khi sửa đổi thành công

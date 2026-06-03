@@ -51,7 +51,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _animationController.forward();
 
     // 3. ĐIỀU HƯỚNG TỰ ĐỘNG SAU 2.8 GIÂY
-    Timer(const Duration(milliseconds: 2800), () {
+    Timer(const Duration(milliseconds: 1800), () {
       if (mounted) {
         // 👇 KIỂM TRA TRẠNG THÁI ONBOARDING ĐỂ QUYẾT ĐỊNH MÀN HÌNH TIẾP THEO
         Widget nextScreen = widget.hasSeenOnboarding

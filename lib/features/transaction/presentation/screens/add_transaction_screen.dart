@@ -165,8 +165,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           : 'Khác';
     }
 
+    // 1. Lấy giờ, phút, giây hiện tại của máy user
     final now = DateTime.now();
-    final finalDateTime = DateTime(
+
+    // 2. Tạo đối tượng DateTime Local kết hợp giữa ngày được chọn và giờ hiện tại
+    final localDateTime = DateTime(
       _selectedDate.year,
       _selectedDate.month,
       _selectedDate.day,
@@ -174,6 +177,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       now.minute,
       now.second,
     );
+
+    final finalDateTimeUtc = localDateTime.toUtc();
 
     ref
         .read(transactionProvider.notifier)
@@ -183,7 +188,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           emoji: _selectedEmoji,
           note: _noteController.text.trim(),
           localImagePath: _localImagePath,
-          spentAt: finalDateTime,
+          spentAt: finalDateTimeUtc, // Truyền biến đã fix timezone vào đây
         );
   }
 
@@ -675,7 +680,6 @@ class _AmountInput extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // CẬP NHẬT: Dòng tiêu đề và shortcut hỗ trợ kéo vuốt ngang không tràn màn hình
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

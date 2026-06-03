@@ -18,11 +18,12 @@ class TransactionCalendarView extends ConsumerWidget {
     final Map<DateTime, Map<String, dynamic>> grouped = {};
 
     for (var tx in transactions) {
-      // Tuỳ thuộc vào field ngày tháng từ API của bạn, thường là 'spentAt' hoặc 'createdAt'
       final rawDate =
           tx['spentAt'] ?? tx['createdAt'] ?? DateTime.now().toIso8601String();
+      // Parse sang Local để không bị lệch ngày so với timezone người dùng
       final parsedDate = DateTime.parse(rawDate).toLocal();
-      // Ép về đúng 00:00:00 của ngày đó để làm Key
+
+      // Ép về đúng 00:00:00 của ngày đó để làm Key gom nhóm
       final dateKey = DateTime(
         parsedDate.year,
         parsedDate.month,
@@ -34,9 +35,7 @@ class TransactionCalendarView extends ConsumerWidget {
           'totalAmount': (tx['amount'] as num?)?.toDouble() ?? 0.0,
           'imageUrl': tx['imageUrl'] ?? '',
           'emoji': tx['emoji'] ?? '✨',
-          'transactions': [
-            tx,
-          ], // Lưu lại mảng để sau này bấm vào hiện danh sách
+          'transactions': [tx],
         };
       } else {
         // Cộng dồn tiền
@@ -70,7 +69,6 @@ class TransactionCalendarView extends ConsumerWidget {
     List<DateTime?> days = [];
 
     // Thêm các ô trống (null) cho các ngày trước mùng 1
-    // Ví dụ: Mùng 1 là Thứ 4 (weekday = 3) -> Cần 2 ô trống cho Thứ 2, Thứ 3.
     for (int i = 1; i < firstWeekday; i++) {
       days.add(null);
     }
@@ -122,8 +120,8 @@ class TransactionCalendarView extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             physics: const BouncingScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7, // 7 cột
-              childAspectRatio: 0.75, // Dáng Polaroid (cao hơn rộng 1 chút)
+              crossAxisCount: 7,
+              childAspectRatio: 0.75,
               mainAxisSpacing: 2,
               crossAxisSpacing: 2,
             ),
@@ -150,12 +148,27 @@ class TransactionCalendarView extends ConsumerWidget {
                       appColors,
                     );
                   } else {
-                    // Logic mở màn hình thêm mới chi tiêu (truyền date vào)
-                    // Navigator.pushNamed(context, '/add_transaction', arguments: date);
+                    // 🔥 FIX LỖI TIMEZONE VÀ MỐC 00:00:00 Ở ĐÂY
+                    final now = DateTime.now();
+
+                    // Ghép (Năm-Tháng-Ngày của ô được chọn) với (Giờ-Phút-Giây hiện tại)
+                    // Như vậy khi chuyển sang UTC sẽ không bị lùi về ngày hôm trước do kẹt ở mốc 0h
+                    final safeDateTime = DateTime(
+                      date.year,
+                      date.month,
+                      date.day,
+                      now.hour,
+                      now.minute,
+                      now.second,
+                    );
+
+                    // TODO: Truyền safeDateTime vào màn hình Add Transaction của bạn
+                    // Navigator.pushNamed(context, '/add_transaction', arguments: safeDateTime);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Thêm chi tiêu cho ngày ${date.day}/${date.month}',
+                          'Thêm chi tiêu cho: ${safeDateTime.day}/${safeDateTime.month} lúc ${safeDateTime.hour}:${safeDateTime.minute.toString().padLeft(2, '0')}',
                         ),
                       ),
                     );

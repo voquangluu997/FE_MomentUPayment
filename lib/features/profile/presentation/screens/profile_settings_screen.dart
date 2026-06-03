@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
-import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/features/transaction/data/transaction_repository.dart';
@@ -90,7 +89,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     final hasImageChanged = _selectedImage != null;
 
     if (!hasNameChanged && !hasImageChanged) {
-      AppToast.showSuccess(context, l10n.noChangeWarning, appColors);
+      AppToast.showInfo(context, l10n.noChangeWarning, appColors);
       return;
     }
 
@@ -183,7 +182,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     }
   }
 
+  // ✨ Đã sửa lại thành pop() thông thường để không làm mất data màn hình Home
   void _navigateToHome() {
+    FocusScope.of(context).unfocus(); // Đóng bàn phím trước khi lùi về
     Navigator.of(context).pop();
   }
 
@@ -195,12 +196,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     final userId = user?.email ?? "default_user";
     final userIcon = _getAvatarIcon(userId);
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        _navigateToHome();
-      },
+    // ✨ Bọc GestureDetector toàn màn hình để chạm ra ngoài tự đóng bàn phím
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: appColors.background,
         appBar: AppBar(
@@ -228,11 +226,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // AVATAR SECTION - THIẾT KẾ HIỆN ĐẠI
               _buildAvatarSection(appColors, user, userIcon),
               const SizedBox(height: 32),
 
-              // CARD 1: THÔNG TIN CÁ NHÂN
               _buildModernCard(
                 appColors: appColors,
                 title: l10n.personalInfo.toUpperCase(),
@@ -262,7 +258,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               ),
               const SizedBox(height: 24),
 
-              // CARD 2: BẢO MẬT & MẬT KHẨU
               _buildModernCard(
                 appColors: appColors,
                 title: l10n.security.toUpperCase(),
@@ -300,7 +295,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     );
   }
 
-  // WIDGET: KHU VỰC AVATAR NỔI BẬT
   Widget _buildAvatarSection(
     AppColorTheme appColors,
     dynamic user,
@@ -313,7 +307,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           child: Stack(
             alignment: Alignment.bottomRight,
             children: [
-              // Khung Avatar chính
               Container(
                 width: 110,
                 height: 110,
@@ -354,7 +347,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                       )
                     : Icon(userIcon, size: 50, color: appColors.primary),
               ),
-              // Nút Camera nhỏ ở góc (Overlay)
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -400,7 +392,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     );
   }
 
-  // WIDGET: CARD CHỨA NỘI DUNG FORM (Thiết kế bo góc mềm, bóng đổ nhẹ)
   Widget _buildModernCard({
     required AppColorTheme appColors,
     required String title,
@@ -445,7 +436,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     );
   }
 
-  // WIDGET: TEXTFIELD HIỆN ĐẠI (Filled, không viền gắt, có icon)
   Widget _buildModernTextField({
     required String label,
     required TextEditingController controller,
@@ -495,7 +485,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     );
   }
 
-  // WIDGET: NÚT BẤM KÊU GỌI HÀNH ĐỘNG
   Widget _buildPrimaryButton({
     required String text,
     required VoidCallback onPressed,
