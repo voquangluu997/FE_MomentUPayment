@@ -8,6 +8,8 @@ import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
 import 'package:moment_u_payment/features/splash/presentation/screens/splash_screen.dart';
+// 👇 Đừng quên import file onboarding bạn vừa tạo nhé
+import 'package:moment_u_payment/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:moment_u_payment/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_colors.dart';
@@ -21,10 +23,10 @@ void main() async {
   // 1. Đảm bảo Flutter bindings được khởi tạo trước
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Giữ màn hình Splash Native không bị tắt sớm trong lúc chờ init hệ thống
+  // 2. Giữ màn hình Splash Native không bị tắt sớm
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // 3. Tải biến môi trường an toàn (Tránh Crash Isolate nếu thiếu file)
+  // 3. Tải biến môi trường an toàn
   try {
     await dotenv.load(fileName: '.env');
   } catch (e) {
@@ -50,18 +52,24 @@ void main() async {
   // 6. Khởi tạo SharedPreferences cho Riverpod
   final prefs = await SharedPreferences.getInstance();
 
+  // 👇 Đọc trạng thái xem user đã xem Onboarding chưa
+  // final hasSeenOnboarding = false; // <--- Ép luôn bằng false
+  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
   // 7. Chạy ứng dụng
   runApp(
     ProviderScope(
-      // Bơm instance của prefs vào Riverpod để các chỗ khác có thể lấy dùng ngay lập tức
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const MyApp(),
+      // 👇 Truyền trạng thái vào MyApp
+      child: MyApp(hasSeenOnboarding: hasSeenOnboarding),
     ),
   );
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+  final bool hasSeenOnboarding; // Nhận biến trạng thái
+
+  const MyApp({super.key, required this.hasSeenOnboarding});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -89,10 +97,13 @@ class MyApp extends ConsumerWidget {
       supportedLocales: const [Locale('en'), Locale('vi')],
       locale: currentLocale,
 
-      // 🟢 Điểm chạm đầu tiên: Gọi SplashScreen để chạy hiệu ứng intro ban đầu khi mở app
-      home: const SplashScreen(),
+      // Nếu bạn muốn giữ SplashScreen làm trang đầu tiên (để xử lý animation)
+      // thì để nguyên home là SplashScreen, sau đó truyền hasSeenOnboarding vào nó.
+      home: SplashScreen(hasSeenOnboarding: hasSeenOnboarding),
 
       routes: {
+        '/onboarding': (context) =>
+            const OnboardingScreen(), // Khai báo route mới
         '/login': (context) => const LoginScreen(),
         '/auth_check': (context) => const AuthChecker(),
       },

@@ -6,13 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
-import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
 import '../transaction_provider.dart';
 import '../controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
+import 'package:moment_u_payment/features/notification/notification_provider.dart';
 
 // ==========================================
 // 🛠️ UTILS LOGIC
@@ -197,6 +197,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       if (next == TransactionState.success) {
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+        ref.read(notificationProvider.notifier).fetchUnreadCount();
         Navigator.of(context).pop();
       } else if (next == TransactionState.error) {
         AppToast.showError(context, l10n.txErrorMessage, appColors);

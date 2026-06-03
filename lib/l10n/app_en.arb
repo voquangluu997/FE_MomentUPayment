@@ -5,7 +5,7 @@
   "register": "Register",
   "email": "Email Address",
   "password": "Password",
-  "name": "Full Name",
+  "name": "Username",
   "welcomeBack": "Welcome Back! ✨",
   "subTitle": "Moments U Payment - Sweet Expense Diary",
   "subTitle1": "Moments U Payment",
@@ -14,7 +14,6 @@
   "emailHint": "Your email... ✨",
   "passwordHint": "Secret password... 🔑",
   "nameHint": "Your cute name... ✨",
-  "loginButton": "Let's Go Inside ✨",
   "registerButton": "Sign Up Account ✨",
   "dontHaveAccount": "Don't have an account? Sign up now! 💕",
   "emptyFieldsWarning": "Please don't leave any fields empty! 💕",
@@ -23,7 +22,7 @@
   "loginCreateAccountSub": "Join the lovely expense management world",
   "loginErrorNotification": "Incorrect email or password, please try again! 😢",
   "googleLoginErrorNotification": "Google sign-in failed! Please try again 🌸",
-  "loginButtonText": "Let's Go inside ✨",
+  "loginButtonText": "Let's Go Inside ✨",
   "loginGGButtonText": "Let's Go By Google 🚀",
   "emailNotVerifiedAlert": "Email {email} is not verified yet! 🔑",
   "@emailNotVerifiedAlert": {
@@ -450,6 +449,16 @@
   "markAsReadSuccess": "Marked as read successfully! 💌",
 
   "markAllAsRead": "Mark all as read",
-  "allReadSuccess": "All notifications marked as read!"
+  "allReadSuccess": "All notifications marked as read!",
+
+  "obTitle1": "Smart Tracking",
+  "obDesc1": "Log your daily expenses in seconds with an intuitive and cute interface.",
+  "obTitle2": "Budget Management",
+  "obDesc2": "No more empty wallets. Set goals and effortlessly track your spending progress.",
+  "obTitle3": "Absolute Privacy",
+  "obDesc3": "Your data belongs to you. 100% private and secure cloud synchronization.",
+  "obSkip": "Skip",
+  "obNext": "Next",
+  "obStart": "Get Started"
   
 }

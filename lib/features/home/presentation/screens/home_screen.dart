@@ -1,18 +1,15 @@
-import 'package:flutter/cupertino.dart'; // 🍏 Đã thêm import Cupertino để đồng bộ thiết kế iOS
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
-import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
-import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
@@ -69,6 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isUpdated == true && mounted) {
       final appColors = ref.read(appColorsProvider);
       ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+      ref.read(notificationProvider.notifier).fetchUnreadCount();
       AppToast.showSuccess(context, l10n.updateSuccessMessage, appColors);
     }
   }
@@ -151,6 +149,112 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  // ✨ UI Khung xương lấp lánh (Skeleton Loading) đồng bộ cấu trúc trang Home
+  Widget _buildSkeletonLoading(
+    AppColorTheme appColors,
+    ViewMode viewMode,
+    AppLocalizations l10n,
+  ) {
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _buildBudgetCardWithNavigation(l10n),
+        _buildControlHeaderRow(appColors, viewMode, []),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Giả lập thanh tiêu đề ngày tháng
+              Container(
+                width: 120,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: appColors.cardBackground.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Tạo danh sách các card ảo đang lấp lánh nhẹ nhàng
+              ...List.generate(
+                4,
+                (index) => _buildSkeletonItem(appColors, viewMode),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonItem(AppColorTheme appColors, ViewMode viewMode) {
+    if (viewMode == ViewMode.grid) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 140,
+                decoration: BoxDecoration(
+                  color: appColors.cardBackground.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  color: appColors.cardBackground.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        height: 84,
+        decoration: BoxDecoration(
+          color: appColors.cardBackground.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: appColors.background,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(width: 140, height: 16, color: appColors.background),
+                const SizedBox(height: 8),
+                Container(width: 80, height: 12, color: appColors.background),
+              ],
+            ),
+            const Spacer(),
+            Container(width: 60, height: 18, color: appColors.background),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -168,13 +272,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         color: appColors.primary,
         backgroundColor: appColors.cardBackground,
         strokeWidth: 3,
-        onRefresh: () =>
-            ref.read(transactionTimelineProvider.notifier).refreshTimeline(),
+        onRefresh: () async {
+          ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+          ref.read(notificationProvider.notifier).fetchUnreadCount();
+        },
         child: timelineState.when(
           skipLoadingOnRefresh: true,
-          loading: () => Center(
-            child: CircularProgressIndicator(color: appColors.primary),
-          ),
+          // Đưa hiệu ứng Skeleton Loading vào
+          loading: () => _buildSkeletonLoading(appColors, viewMode, l10n),
           error: (error, stack) => Center(
             child: Text(
               l10n.errorLoadData,
@@ -183,6 +288,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           data: (allTransactions) {
             final filteredTransactions = _applyDateFilter(allTransactions);
+
+            // ✨ LỚP PHÒNG VỆ TỐI CAO:
+            // Nếu danh sách trống VÀ hệ thống ngầm báo là đang bận load API
+            // thì lập tức đá giao diện về Skeleton Loading, không cho hiển thị chữ "Không có data"!
+            if (filteredTransactions.isEmpty && timelineState.isLoading) {
+              return _buildSkeletonLoading(appColors, viewMode, l10n);
+            }
+
             final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
               filteredTransactions,
             );
@@ -345,12 +458,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              CupertinoIcons
-                  .calendar, // 🍏 Đổi từ CupertinoIcons.calendar sang Cupertino
-              size: 16,
-              color: appColors.primary,
-            ),
+            Icon(CupertinoIcons.calendar, size: 16, color: appColors.primary),
             const SizedBox(width: 8),
             Text(
               DateTimeHelper.getFriendlyDateLabel(dateKey, l10n),
@@ -552,26 +660,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                     return;
                   }
-                  Navigator.of(context)
-                      .push<bool>(
-                        CupertinoPageRoute(
-                          // 🍏 Đổi sang hiệu ứng chuyển trang iOS (CupertinoPageRoute)
-                          builder: (_) =>
-                              AddTransactionScreen(initialDate: dayDate),
-                        ),
-                      )
-                      .then((isAdded) {
-                        if (isAdded == true && mounted) {
-                          ref
-                              .read(transactionTimelineProvider.notifier)
-                              .refreshTimeline();
-                          AppToast.showSuccess(
-                            context,
-                            l10n.addSuccessMessage,
-                            appColors,
-                          );
-                        }
-                      });
+                  Navigator.of(context).push<bool>(
+                    CupertinoPageRoute(
+                      builder: (_) =>
+                          AddTransactionScreen(initialDate: dayDate),
+                    ),
+                  );
                 }
               },
             );
@@ -622,8 +716,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        CupertinoIcons
-                            .doc_text, // 🍏 Đổi từ CupertinoIcons.doc_text sang Cupertino
+                        CupertinoIcons.doc_text,
                         color: appColors.primary,
                         size: 24,
                       ),
@@ -714,8 +807,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(width: 8),
             const Icon(
-              CupertinoIcons
-                  .trash, // 🍏 Đổi từ CupertinoIcons.trash sang Cupertino
+              CupertinoIcons.trash,
               color: Color(0xFFFF4B4B),
               size: 24,
             ),
@@ -751,8 +843,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                CupertinoIcons
-                    .exclamationmark_triangle, // 🍏 Đổi từ CupertinoIcons.exclamationmark_triangle sang Cupertino
+                CupertinoIcons.exclamationmark_triangle,
                 color: Color(0xFFFF4B4B),
                 size: 32,
               ),

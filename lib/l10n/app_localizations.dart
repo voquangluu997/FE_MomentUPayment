@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @name.
   ///
   /// In en, this message translates to:
-  /// **'Full Name'**
+  /// **'Username'**
   String get name;
 
   /// No description provided for @welcomeBack.
@@ -175,12 +175,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your cute name... ✨'**
   String get nameHint;
-
-  /// No description provided for @loginButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Let\'s Go Inside ✨'**
-  String get loginButton;
 
   /// No description provided for @registerButton.
   ///
@@ -233,7 +227,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginButtonText.
   ///
   /// In en, this message translates to:
-  /// **'Let\'s Go inside ✨'**
+  /// **'Let\'s Go Inside ✨'**
   String get loginButtonText;
 
   /// No description provided for @loginGGButtonText.
@@ -1745,6 +1739,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All notifications marked as read!'**
   String get allReadSuccess;
+
+  /// No description provided for @obTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Tracking'**
+  String get obTitle1;
+
+  /// No description provided for @obDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your daily expenses in seconds with an intuitive and cute interface.'**
+  String get obDesc1;
+
+  /// No description provided for @obTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Management'**
+  String get obTitle2;
+
+  /// No description provided for @obDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'No more empty wallets. Set goals and effortlessly track your spending progress.'**
+  String get obDesc2;
+
+  /// No description provided for @obTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Absolute Privacy'**
+  String get obTitle3;
+
+  /// No description provided for @obDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data belongs to you. 100% private and secure cloud synchronization.'**
+  String get obDesc3;
+
+  /// No description provided for @obSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get obSkip;
+
+  /// No description provided for @obNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get obNext;
+
+  /// No description provided for @obStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get obStart;
 }
 
 class _AppLocalizationsDelegate

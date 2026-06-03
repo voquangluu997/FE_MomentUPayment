@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moment_u_payment/features/auth/data/auth_repository.dart';
+// Bạn có thể xóa luôn các import transactionProvider ở trên cùng nếu không còn dùng tới ở file này nữa
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 
@@ -110,10 +111,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
 
-        // Force reload transactions
-        ref.invalidate(transactionTimelineProvider);
-        ref.invalidate(transactionProvider);
-
+        // ❌ ĐÃ XÓA: ref.invalidate các transaction provider
         state = AuthState.authenticated;
       } else {
         await _secureStorage.delete(key: 'access_token');
@@ -127,7 +125,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     state = AuthState.loading;
     try {
-      // 🟢 DEBUG LOG: In ra console để biết App đang gọi đi đâu
       print(
         "====== [DEBUG LOGIN] Đang gọi API tới: $_baseUrl/auth/login ======",
       );
@@ -138,7 +135,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      // 🟢 DEBUG LOG: Xem Server trả về mã gì
       print(
         "====== [DEBUG LOGIN] Mã phản hồi từ Server: ${response.statusCode} ======",
       );
@@ -163,20 +159,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
 
-        // Refresh dữ liệu giao dịch khi login thành công
-        ref.invalidate(transactionTimelineProvider);
-        ref.invalidate(transactionProvider);
-
+        // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây
+        // Chỉ cần đổi state, Riverpod sẽ TỰ ĐỘNG reload dữ liệu giao dịch ở màn Home
         state = AuthState.loginSuccess;
       } else {
-        // 🟢 DEBUG LOG: Lỗi từ phía Server (Sai pass, sai email, v.v.)
         print(
           "====== [DEBUG LOGIN] Đăng nhập thất bại: ${response.body} ======",
         );
         state = AuthState.loginError;
       }
     } catch (e, stack) {
-      // 🟢 DEBUG LOG: Lỗi do mạng (Không có wifi, sai IP localhost, Server chết)
       print("====== [DEBUG LOGIN] LỖI KẾT NỐI MẠNG: $e ======");
       print(stack);
       state = AuthState.loginError;
@@ -231,9 +223,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
 
-        ref.invalidate(transactionTimelineProvider);
-        ref.invalidate(transactionProvider);
-
+        // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây
         state = AuthState.loginSuccess;
       } else {
         state = AuthState.googleLoginError;
@@ -317,8 +307,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     ref.read(userInfoProvider.notifier).clearUserInfo();
     state = AuthState.unauthenticated;
-    ref.invalidate(transactionTimelineProvider);
-    ref.invalidate(transactionProvider);
+
+    // ❌ ĐÃ XÓA: Các dòng ref.invalidate ở đây vì transaction provider tự reset khi authState thành unauthenticated
   }
 
   Future<bool> forgotPassword(String email) async {

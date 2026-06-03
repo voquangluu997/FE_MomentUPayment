@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
-  String get name => 'Full Name';
+  String get name => 'Username';
 
   @override
   String get welcomeBack => 'Welcome Back! ✨';
@@ -46,9 +46,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nameHint => 'Your cute name... ✨';
-
-  @override
-  String get loginButton => 'Let\'s Go Inside ✨';
 
   @override
   String get registerButton => 'Sign Up Account ✨';
@@ -78,7 +75,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Google sign-in failed! Please try again 🌸';
 
   @override
-  String get loginButtonText => 'Let\'s Go inside ✨';
+  String get loginButtonText => 'Let\'s Go Inside ✨';
 
   @override
   String get loginGGButtonText => 'Let\'s Go By Google 🚀';
@@ -911,4 +908,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allReadSuccess => 'All notifications marked as read!';
+
+  @override
+  String get obTitle1 => 'Smart Tracking';
+
+  @override
+  String get obDesc1 =>
+      'Log your daily expenses in seconds with an intuitive and cute interface.';
+
+  @override
+  String get obTitle2 => 'Budget Management';
+
+  @override
+  String get obDesc2 =>
+      'No more empty wallets. Set goals and effortlessly track your spending progress.';
+
+  @override
+  String get obTitle3 => 'Absolute Privacy';
+
+  @override
+  String get obDesc3 =>
+      'Your data belongs to you. 100% private and secure cloud synchronization.';
+
+  @override
+  String get obSkip => 'Skip';
+
+  @override
+  String get obNext => 'Next';
+
+  @override
+  String get obStart => 'Get Started';
 }

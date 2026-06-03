@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/number_format_util.dart';
+import 'package:moment_u_payment/features/notification/notification_provider.dart';
+import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/services/media_service.dart';
@@ -12,9 +15,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
 import 'package:flutter/cupertino.dart';
 
-// ==========================================
-// 📱 DIALOG CHÍNH
-// ==========================================
 class MomentDetailsDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
   final AppLocalizations l10n;
@@ -50,7 +50,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   void initState() {
     super.initState();
     _currentImageUrl = widget.moment['imageUrl'] ?? '';
-    _selectedCategory = widget.moment['category'] ?? '';
+
+    // Lấy danh mục và emoji gốc từ bản ghi
+    final originalCategory = widget.moment['category'] ?? '';
+    _selectedEmoji =
+        widget.moment['emoji'] ??
+        '📝'; // Bug 3: Gán emoji cũ thay vì mặc định '📝'
 
     final double rawAmount = (widget.moment['amount'] ?? 0).toDouble();
     _amountController = TextEditingController(
@@ -58,7 +63,26 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
 
     _noteController = TextEditingController(text: widget.moment['note'] ?? '');
-    _customCategoryController = TextEditingController();
+
+    // 👇 KHỐI LOGIC KIỂM TRA CATEGORY TÙY CHỈNH
+    final standardCategories = [
+      'Food',
+      'Shopping',
+      'Transport',
+      'Entertainment',
+    ];
+    if (originalCategory.isNotEmpty &&
+        !standardCategories.contains(originalCategory)) {
+      _isCustomCategory = true;
+      _selectedCategory = 'Custom';
+      _customCategoryController = TextEditingController(
+        text: originalCategory,
+      ); // Điền sẵn chữ vào ô nhập
+    } else {
+      _isCustomCategory = false;
+      _selectedCategory = originalCategory.isEmpty ? 'Food' : originalCategory;
+      _customCategoryController = TextEditingController();
+    }
 
     if (widget.moment['spentAt'] != null) {
       _selectedDate =
@@ -180,12 +204,11 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         '';
 
     if (momentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.updateFailed),
-          backgroundColor: appColors.errorAccent,
-        ),
-      );
+      AppToast.showError(
+        context,
+        l10n.updateFailed,
+        appColors,
+      ); // Đổi SnackBar thành AppToast cho đồng bộ UI
       return;
     }
 
@@ -212,8 +235,21 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
             spentAt: spentAtWithCurrentTime,
           );
 
-      if (mounted) Navigator.of(context).pop(true);
+      if (mounted) {
+        // 👇 1. Hiển thị thông báo thành công
+        AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
+
+        // 👇 2. Chủ động làm mới Timeline và đếm lại số chuông thông báo
+        ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+        ref.read(notificationProvider.notifier).fetchUnreadCount();
+
+        Navigator.of(context).pop(true);
+      }
     } catch (e) {
+      // 👇 3. Hiển thị thông báo lỗi trực quan cho người dùng thay vì chỉ debugPrint
+      if (mounted) {
+        AppToast.showError(context, l10n.txErrorMessage, appColors);
+      }
       debugPrint("$e");
     }
   }

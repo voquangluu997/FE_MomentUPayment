@@ -5,16 +5,15 @@
   "register": "Đăng ký",
   "email": "Địa chỉ Email",
   "password": "Mật khẩu",
-  "name": "Họ và tên",
+  "name": "Tên hiển thị",
   "welcomeBack": "Welcome Back! ✨",
-  "subTitle": "Moments u Payment - Nhật ký chi tiêu ngọt ngào",
-  "subTitle1": "Moments u Payment",
+  "subTitle": "Moments U Payment - Nhật ký chi tiêu ngọt ngào",
+  "subTitle1": "Moments U Payment",
   "subTitle2": "Nhật ký chi tiêu ngọt ngào",
 
   "emailHint": "Email của bạn... ✨",
   "passwordHint": "Mật khẩu bí mật... 🔑",
   "nameHint": "Tên dễ thương của bạn... ✨",
-  "loginButton": "Đi vào thuiii ✨",
   "registerButton": "Đăng ký tài khoản ✨",
   "dontHaveAccount": "Chưa có tài khoản ư? Đăng ký liền nè! 💕",
   "emptyFieldsWarning": "Đừng để trống ô nào nhé bạn ơi! 💕",
@@ -23,7 +22,7 @@
   "loginCreateAccountSub": "Tham gia vào thế giới quản lý chi tiêu đáng yêu",
   "loginErrorNotification": "Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢",
   "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
-  "loginButtonText": "Đi vào thuiiii ✨",
+  "loginButtonText": "Đi vào thuiii ✨",
   "loginGGButtonText": "Vào bằng google nè 🚀",
   "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑",
   "@emailNotVerifiedAlert": {
@@ -457,6 +456,16 @@
   "markAsReadSuccess": "Đã đọc thông báo rùi nha! 💌",
 
   "markAllAsRead": "Đánh dấu tất cả đã đọc",
-  "allReadSuccess": "Đã đánh dấu tất cả thông báo!"
+  "allReadSuccess": "Đã đánh dấu tất cả thông báo!",
+
+  "obTitle1": "Ghi chép thông minh",
+  "obDesc1": "Lưu lại mọi khoảnh khắc chi tiêu chỉ trong vài giây với giao diện trực quan, dễ thương.",
+  "obTitle2": "Quản lý ngân sách",
+  "obDesc2": "Không lo rỗng ví vào cuối tháng. Đặt mục tiêu và theo dõi tiến độ chi tiêu cực dễ.",
+  "obTitle3": "Bảo mật tuyệt đối",
+  "obDesc3": "Dữ liệu của bạn là của bạn. Đồng bộ đám mây an toàn và riêng tư 100%.",
+  "obSkip": "Bỏ qua",
+  "obNext": "Tiếp tục",
+  "obStart": "Bắt đầu ngay"
 
 }

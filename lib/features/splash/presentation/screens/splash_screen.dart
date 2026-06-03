@@ -4,10 +4,15 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
+// 👇 Nhớ import màn hình Onboarding của bạn vào đây
+import 'package:moment_u_payment/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
-  const SplashScreen({super.key});
+  // 👇 Thêm biến nhận trạng thái Onboarding từ main.dart
+  final bool hasSeenOnboarding;
+
+  const SplashScreen({super.key, required this.hasSeenOnboarding});
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
@@ -24,7 +29,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     super.initState();
 
     // 1. GỠ BỎ MÀN HÌNH NATIVE SPLASH CỦA HỆ THỐNG NGAY LẬP TỨC
-    // Nhờ lệnh này, app sẽ không bao giờ bị treo cứng ở màn hình mở app lần đầu nữa.
     FlutterNativeSplash.remove();
 
     // 2. THIẾT LẬP BỘ ĐIỀU KHIỂN ANIMATION (1.2 GIÂY)
@@ -49,13 +53,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // 3. ĐIỀU HƯỚNG TỰ ĐỘNG SAU 2.8 GIÂY
     Timer(const Duration(milliseconds: 2800), () {
       if (mounted) {
-        // 🔥 BÀN GIAO CHO AUTHCHECKER:
-        // Chuyển thẳng sang AuthChecker bằng hiệu ứng mờ mượt mà (FadeTransition).
-        // AuthChecker sẽ tự kiểm tra xem có Token hay chưa để hiện MainLayoutScreen hoặc LoginScreen.
+        // 👇 KIỂM TRA TRẠNG THÁI ONBOARDING ĐỂ QUYẾT ĐỊNH MÀN HÌNH TIẾP THEO
+        Widget nextScreen = widget.hasSeenOnboarding
+            ? const AuthChecker()
+            : const OnboardingScreen();
+
+        // Chuyển sang màn hình tiếp theo bằng hiệu ứng mờ mượt mà (FadeTransition).
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 600),
-            pageBuilder: (_, __, ___) => const AuthChecker(),
+            pageBuilder: (_, __, ___) => nextScreen,
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -105,7 +112,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   // TÊN ỨNG DỤNG
                   Text(
                     l10n.subTitle1, // "Moments U Payment"
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,

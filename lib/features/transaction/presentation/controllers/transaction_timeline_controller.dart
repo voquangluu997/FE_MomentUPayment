@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
-import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart'; // 🟢 Thêm để gọi làm mới Analytics
+import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 import '../../../../core/utils/app_logger.dart';
 import '../../data/transaction_repository.dart';
 
@@ -22,11 +22,17 @@ class TransactionTimelineController
 
   @override
   FutureOr<List<Map<String, dynamic>>> build() async {
-    // 🟢 SỬA TẠI ĐÂY: Đổi sang ref.read để tránh bị re-build trùng lặp 2 lần khi Auth đổi trạng thái
-    final authState = ref.read(authProvider);
+    // ✨ NÂNG CẤP: Sử dụng ref.watch kết hợp .select để theo dõi trạng thái Đăng nhập một cách phản xạ (Reactive)
+    // Giải quyết triệt để vấn đề không tự động tải dữ liệu khi vừa đăng nhập xong,
+    // đồng thời chọn lọc trả về giá trị bool giúp chặn đứng việc bị re-build 2 lần liên tiếp (khi chuyển từ loginSuccess sang authenticated).
+    final isAuthenticated = ref.watch(
+      authProvider.select(
+        (auth) =>
+            auth == AuthState.authenticated || auth == AuthState.loginSuccess,
+      ),
+    );
 
-    if (authState != AuthState.authenticated &&
-        authState != AuthState.loginSuccess) {
+    if (!isAuthenticated) {
       _page = 1;
       _hasMore = false;
       _isLoadingMore = false;
@@ -46,18 +52,29 @@ class TransactionTimelineController
     return await _repository.getTransactions(page: page, limit: limit);
   }
 
-  /// Làm mới danh sách quay về trang đầu tiên (Dùng khi kéo vuốt RefreshIndicator)
+  /// Làm mới danh sách quay về trang đầu tiên (Dùng khi kéo vuốt RefreshIndicator hoặc gọi lại sau khi đăng nhập)
   Future<void> refreshTimeline() async {
-    final authState = ref.read(authProvider);
-    if (authState != AuthState.authenticated &&
-        authState != AuthState.loginSuccess)
-      return;
+    final isAuthenticated = ref.read(
+      authProvider.select(
+        (auth) =>
+            auth == AuthState.authenticated || auth == AuthState.loginSuccess,
+      ),
+    );
+    if (!isAuthenticated) return;
 
     _page = 1;
     _hasMore = true;
     _isLoadingMore = false;
 
-    // 🟢 ĐÃ XÓA dòng ép State loading nặng ở đây để trải nghiệm vuốt kéo mượt mà hơn
+    // ✨ SỬA LỖI ĐỘT PHÁ (Smart-Loading):
+    // - Nếu app vừa mở/vừa đăng nhập thành công và danh sách đang RỖNG (hoặc chưa có dữ liệu),
+    //   ta bắt buộc phải đưa state về loading ngay lập tức để UI bật Skeleton lên, không được hiện chữ "Không có data".
+    // - Ngược lại nếu người dùng đang dùng app bình thường và chủ động "kéo vuốt xuống để refresh",
+    //   ta bỏ qua không ép loading để danh sách cũ giữ nguyên trên màn hình, giúp trải nghiệm mượt mà không bị chớp trắng.
+    if (!state.hasValue || state.value!.isEmpty) {
+      state = const AsyncValue.loading();
+    }
+
     state = await AsyncValue.guard(
       () => _fetchTimelineData(page: _page, limit: _limit),
     );
@@ -79,7 +96,6 @@ class TransactionTimelineController
 
     _isLoadingMore = true;
 
-    // 🟢 SỬA TẠI ĐÂY: Dùng toán tử spread [...] tạo mảng mới để kích hoạt UI vẽ lại vòng xoáy loading đáy màn hình
     if (state.hasValue) {
       state = AsyncValue.data([...state.value!]);
     }
@@ -129,8 +145,6 @@ class TransactionTimelineController
     try {
       await _repository.deleteTransaction(id);
       ref.invalidate(homeBudgetProvider);
-
-      // 🟢 THẦN CHÚ: Ép biểu đồ cập nhật lại số liệu sau khi xóa thành công
       ref.read(transactionAnalyticsProvider.notifier).refreshAnalytics();
     } catch (error, stackTrace) {
       AppLogger.e(

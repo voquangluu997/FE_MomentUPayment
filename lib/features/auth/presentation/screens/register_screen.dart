@@ -18,6 +18,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // ✨ Trạng thái ẩn/hiện mật khẩu
+  bool _obscurePassword = true;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -27,6 +30,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _handleRegister() {
+    // 🔥 TẮT BÀN PHÍM XUỐNG NGAY LẬP TỨC
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
@@ -47,9 +53,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
     final appColors = ref.watch(appColorsProvider);
-
-    // ✨ SỬA LỖI: Xác định Dark Mode chính xác dựa trên màu nền của Provider
-    final isDark = appColors.background.computeLuminance() < 0.5;
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.registerSuccess) {
@@ -80,142 +83,227 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: appColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(CupertinoIcons.chevron_back, color: appColors.primary),
-          onPressed: () => Navigator.of(context).pop(),
+    // 🔥 BỌC GESTURE DETECTOR ĐỂ TẮT BÀN PHÍM KHI CHẠM RA NGOÀI
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        backgroundColor: appColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(CupertinoIcons.chevron_back, color: appColors.primary),
+            onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              Navigator.of(context).pop();
+            },
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.loginCreateAccountTitle,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: appColors.primary,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(), // Cuộn mượt mà chuẩn iOS
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 12.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 🌸 ĐIỂM NHẤN THỊ GIÁC (Icon Header)
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: appColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      CupertinoIcons.person_badge_plus,
+                      size: 56,
+                      color: appColors.primary,
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.loginCreateAccountSub,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.grey[400] : Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
+                const SizedBox(height: 24),
 
-              // Họ tên
-              TextField(
-                controller: _nameController,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: l10n.name,
-                  labelStyle: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                Text(
+                  l10n.loginCreateAccountTitle,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: appColors.primaryDark,
+                    letterSpacing: -0.5,
                   ),
-                  hintText: l10n.nameHint,
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[600] : Colors.grey[400],
-                  ),
-                  filled: true,
-                  fillColor: appColors.cardBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Email
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: l10n.email,
-                  labelStyle: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                const SizedBox(height: 8),
+                Text(
+                  l10n.loginCreateAccountSub,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: appColors.textMuted,
+                    height: 1.5,
                   ),
-                  hintText: l10n.emailHint,
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[600] : Colors.grey[400],
-                  ),
-                  filled: true,
-                  fillColor: appColors.cardBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 40),
 
-              // Mật khẩu
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: l10n.password,
-                  labelStyle: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                // 🌸 NÂNG CẤP: Họ tên
+                TextField(
+                  controller: _nameController,
+                  textInputAction: TextInputAction.next,
+                  style: TextStyle(
+                    color: appColors.text,
+                    fontWeight: FontWeight.w500,
                   ),
-                  hintText: l10n.passwordHint,
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[600] : Colors.grey[400],
-                  ),
-                  filled: true,
-                  fillColor: appColors.cardBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              authState == AuthState.loading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          appColors.primary,
-                        ),
-                      ),
-                    )
-                  : InkWell(
-                      onTap: _handleRegister,
+                  decoration: InputDecoration(
+                    labelText: l10n.name,
+                    labelStyle: TextStyle(color: appColors.textMuted),
+                    hintText: l10n.nameHint,
+                    prefixIcon: Icon(
+                      CupertinoIcons.person,
+                      color: appColors.textMuted,
+                    ),
+                    filled: true,
+                    fillColor: appColors.cardBackground,
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: appColors.primary,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          l10n.registerButton,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.black : Colors.white,
-                          ),
-                        ),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: appColors.primary,
+                        width: 1.5,
                       ),
                     ),
-            ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 🌸 NÂNG CẤP: Email
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  style: TextStyle(
+                    color: appColors.text,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: l10n.email,
+                    labelStyle: TextStyle(color: appColors.textMuted),
+                    hintText: l10n.emailHint,
+                    prefixIcon: Icon(
+                      CupertinoIcons.mail,
+                      color: appColors.textMuted,
+                    ),
+                    filled: true,
+                    fillColor: appColors.cardBackground,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: appColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 🌸 NÂNG CẤP: Mật khẩu (Có nút Show/Hide)
+                TextField(
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _handleRegister(),
+                  style: TextStyle(
+                    color: appColors.text,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: l10n.password,
+                    labelStyle: TextStyle(color: appColors.textMuted),
+                    hintText: l10n.passwordHint,
+                    prefixIcon: Icon(
+                      CupertinoIcons.lock,
+                      color: appColors.textMuted,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? CupertinoIcons.eye_slash
+                            : CupertinoIcons.eye,
+                        color: _obscurePassword
+                            ? appColors.textMuted
+                            : appColors.primary,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor: appColors.cardBackground,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: appColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // 🌸 NÂNG CẤP: Nút Đăng ký (Đồng bộ với LoginScreen)
+                ElevatedButton(
+                  onPressed: authState == AuthState.loading
+                      ? null
+                      : _handleRegister,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: appColors.primary,
+                    foregroundColor:
+                        Colors.white, // Text color luôn màu trắng để nổi bật
+                    disabledBackgroundColor: appColors.primary.withOpacity(0.6),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 4,
+                    shadowColor: appColors.primary.withOpacity(0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: authState == AuthState.loading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : Text(
+                          l10n.registerButton,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                ),
+
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),

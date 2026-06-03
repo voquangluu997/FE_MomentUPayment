@@ -24,16 +24,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get password => 'Mật khẩu';
 
   @override
-  String get name => 'Họ và tên';
+  String get name => 'Tên hiển thị';
 
   @override
   String get welcomeBack => 'Welcome Back! ✨';
 
   @override
-  String get subTitle => 'Moments u Payment - Nhật ký chi tiêu ngọt ngào';
+  String get subTitle => 'Moments U Payment - Nhật ký chi tiêu ngọt ngào';
 
   @override
-  String get subTitle1 => 'Moments u Payment';
+  String get subTitle1 => 'Moments U Payment';
 
   @override
   String get subTitle2 => 'Nhật ký chi tiêu ngọt ngào';
@@ -46,9 +46,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get nameHint => 'Tên dễ thương của bạn... ✨';
-
-  @override
-  String get loginButton => 'Đi vào thuiii ✨';
 
   @override
   String get registerButton => 'Đăng ký tài khoản ✨';
@@ -78,7 +75,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸';
 
   @override
-  String get loginButtonText => 'Đi vào thuiiii ✨';
+  String get loginButtonText => 'Đi vào thuiii ✨';
 
   @override
   String get loginGGButtonText => 'Vào bằng google nè 🚀';
@@ -919,4 +916,34 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get allReadSuccess => 'Đã đánh dấu tất cả thông báo!';
+
+  @override
+  String get obTitle1 => 'Ghi chép thông minh';
+
+  @override
+  String get obDesc1 =>
+      'Lưu lại mọi khoảnh khắc chi tiêu chỉ trong vài giây với giao diện trực quan, dễ thương.';
+
+  @override
+  String get obTitle2 => 'Quản lý ngân sách';
+
+  @override
+  String get obDesc2 =>
+      'Không lo rỗng ví vào cuối tháng. Đặt mục tiêu và theo dõi tiến độ chi tiêu cực dễ.';
+
+  @override
+  String get obTitle3 => 'Bảo mật tuyệt đối';
+
+  @override
+  String get obDesc3 =>
+      'Dữ liệu của bạn là của bạn. Đồng bộ đám mây an toàn và riêng tư 100%.';
+
+  @override
+  String get obSkip => 'Bỏ qua';
+
+  @override
+  String get obNext => 'Tiếp tục';
+
+  @override
+  String get obStart => 'Bắt đầu ngay';
 }
