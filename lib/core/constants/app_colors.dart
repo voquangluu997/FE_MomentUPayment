@@ -3,63 +3,73 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
 
 class AppColors {
-  // ✨ Hệ màu nền chính (Theme Colors) - LIGHT MODE
-  static const Color background = Color(0xFFFAF8F5); // Kem sữa Pastel ngọt ngào
+  // ✨ Hệ màu nền chính (Theme Colors) - LIGHT MODE (Crisp & Vibrant)
+  static const Color background = Color(
+    0xFFF4F6F8,
+  ); // Xám khói cực nhạt, làm nổi bật card trắng
   static const Color primary = Color(
-    0xFFD4A373,
-  ); // Nâu trà sữa (Milk Tea Brown)
-  static const Color primaryDark = Color(0xFF8B5A2B); // Nâu đậm tiêu đề
+    0xFFFF3366,
+  ); // Hồng Coral / Đỏ Neon (Cực cháy, trẻ trung, hút mắt)
+  static const Color primaryDark = Color(
+    0xFF14171F,
+  ); // Đen nhám sâu thẳm (Dành cho tiêu đề bùng nổ)
   static const Color cardBackground =
-      Colors.white; // Nền ô nhập liệu / Khung chứa trắng sạch
+      Colors.white; // Trắng tinh khiết (Tạo cảm giác sạch sẽ, cao cấp)
 
-  // 📝 Màu chữ bổ sung cho Light Mode (Giúp hiển thị rõ ràng trên ô nhập màu trắng)
+  // 📝 Màu chữ bổ sung cho Light Mode
   static const Color text = Color(
-    0xFF2B221E,
-  ); // Chữ chính nâu đen đậm (Hợp tone trà sữa, không bị thô như đen tuyền)
+    0xFF2D3142,
+  ); // Xanh Navy ngả đen (Chữ sắc nét, hiện đại, không bị "quê")
   static const Color textMuted = Color(
-    0xFF8C7E74,
-  ); // Chữ phụ / Hint text màu xám nâu dịu mắt
+    0xFF8A94A6,
+  ); // Xám bạc (Dịu mắt, phân cấp thông tin tốt)
 
-  // 🍓 Hệ màu trạng thái Pastel
+  // 🍓 Hệ màu trạng thái (Vivid & Punchy)
   static const Color success = Color(
-    0xFFCCD5AE,
-  ); // Xanh Sage tươi mát (Thành công)
+    0xFF1DD1A1,
+  ); // Xanh Mint rực rỡ (Cảm giác positive, năng lượng)
   static const Color error = Color(
-    0xFFFFCAD4,
-  ); // Hồng dâu dịu nhẹ (Thất bại / Lỗi)
+    0xFFFF4757,
+  ); // Đỏ Watermelon (Báo lỗi nổi bần bật)
   static const Color errorAccent = Color(
-    0xFFFF9B9B,
-  ); // Hồng đỏ đậm cho các lỗi nổi bật
+    0xFFFF6B81,
+  ); // Hồng đỏ rực (Dành cho các lỗi cần highlight)
 
-  // 🌈 Bảng màu rực rỡ cho biểu đồ chi tiêu
+  // 🌈 Bảng màu rực rỡ cho biểu đồ chi tiêu (Pop-Art Vibe)
   static const List<Color> chartPalette = [
-    Color(0xFFFF6B6B), // Đỏ pastel
-    Color(0xFF4DABF7), // Xanh biển
-    Color(0xFF51CF66), // Xanh lá
-    Color(0xFFFCC419), // Vàng hoàng gia
-    Color(0xFFFF922B), // Cam
-    Color(0xFF845EF7), // Tím
-    Color(0xFFE64980), // Hồng cánh sen
-    Color(0xFF22B8CF), // Xanh ngọc
+    Color(0xFFFF3366), // Đỏ Neon
+    Color(0xFF00D2D3), // Xanh Aqua/Cyan
+    Color(0xFF54A0FF), // Xanh Sky Blue
+    Color(0xFF1DD1A1), // Xanh Mint
+    Color(0xFFFECA57), // Vàng chanh rực rỡ
+    Color(0xFF5F27CD), // Tím Electric
+    Color(0xFFFF9F43), // Cam sặc sỡ
+    Color(0xFFF368E0), // Hồng Magenta
   ];
 
   static Color getCategoryColor(int index) {
     return chartPalette[index % chartPalette.length];
   }
 
-  // --- MÀU DARK MODE (CUTE VIBE) ---
-  static const darkPrimary = Color(0xFFFF6090); // Hồng sáng neon
-  static const darkPrimaryDark = Color(0xFFFCE4EC); // Chữ màu hồng phấn nhạt
-  static const darkBackground = Color(0xFF160D10); // Nền hồng đen đêm
-  static const darkCardBackground = Color(0xFF25161A); // Nền Card tím mận
+  // --- MÀU DARK MODE (NIGHT LIFE & NEON VIBE) ---
+  static const darkPrimary = Color(
+    0xFF00E0FF,
+  ); // Cyan Neon (Sáng rực rỡ trong đêm, cực kỳ Cyberpunk/Tech)
+  static const darkPrimaryDark = Color(
+    0xFFF1F2F6,
+  ); // Trắng sáng (Phản quang trên nền tối)
+  static const darkBackground = Color(0xFF090A0F); // Đen thẳm (Deep OLED Black)
+  static const darkCardBackground = Color(
+    0xFF181A20,
+  ); // Xám than chì (Tạo khối 3D nịnh mắt cho thẻ)
 
-  // 📝 Màu chữ bổ sung cho Dark Mode (Sửa triệt để lỗi chữ bị đen khi gõ)
+  // 📝 Màu chữ bổ sung cho Dark Mode
   static const darkText = Color(
     0xFFFFFFFF,
-  ); // Chữ chính màu trắng tinh tương phản cao
+  ); // Trắng tinh khiết (Tương phản tuyệt đối)
   static const darkTextMuted = Color(
-    0xFF9E8E93,
-  ); // Chữ phụ / Hint text màu xám hồng nhạt dịu
+    0xFFA4B0BE,
+  ); // Xám sáng (Dễ đọc trên nền đen, không mỏi mắt)
 }
 
 // Lớp chứa bộ màu sẽ được dùng trực tiếp ở UI
@@ -68,8 +78,8 @@ class AppColorTheme {
   final Color primaryDark;
   final Color background;
   final Color cardBackground;
-  final Color text; // ✨ Thêm trường màu chữ chính
-  final Color textMuted; // ✨ Thêm trường màu chữ phụ / hint
+  final Color text;
+  final Color textMuted;
   final Color success;
   final Color error;
   final Color errorAccent;
@@ -79,8 +89,8 @@ class AppColorTheme {
     required this.primaryDark,
     required this.background,
     required this.cardBackground,
-    required this.text, // ✨ Yêu cầu trong constructor
-    required this.textMuted, // ✨ Yêu cầu trong constructor
+    required this.text,
+    required this.textMuted,
     required this.success,
     required this.error,
     required this.errorAccent,
@@ -99,12 +109,8 @@ final appColorsProvider = Provider<AppColorTheme>((ref) {
     cardBackground: isDark
         ? AppColors.darkCardBackground
         : AppColors.cardBackground,
-    text: isDark
-        ? AppColors.darkText
-        : AppColors.text, // ✨ Tự động map màu chữ theo Theme
-    textMuted: isDark
-        ? AppColors.darkTextMuted
-        : AppColors.textMuted, // ✨ Tự động map màu hint theo Theme
+    text: isDark ? AppColors.darkText : AppColors.text,
+    textMuted: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
     success: AppColors.success,
     error: AppColors.error,
     errorAccent: AppColors.errorAccent,
