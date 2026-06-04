@@ -1,11 +1,11 @@
+import 'package:moment_u_payment/core/utils/notification_translator.dart';
+
 class InAppNotification {
   final String id;
-  final String titleKey; // Key để dịch tiêu đề đa ngôn ngữ
-  final String bodyKey; // Key để dịch nội dung đa ngôn ngữ
-  final List<String>
-  arguments; // Các biến truyền vào (Ví dụ: tên ví, số %, số lượng tx)
-  final String
-  type; // 'budget_80', 'budget_100', 'email_verified', 'aggregated_tx'
+  final String titleKey;
+  final String bodyKey;
+  final List<String> arguments;
+  final String type;
   final bool isRead;
   final DateTime createdAt;
 
@@ -19,7 +19,11 @@ class InAppNotification {
     required this.createdAt,
   });
 
-  
+  // HÀM HELPER MỚI
+  String getTitle(String langCode) =>
+      NotificationTranslator.translate(titleKey, arguments, langCode);
+  String getBody(String langCode) =>
+      NotificationTranslator.translate(bodyKey, arguments, langCode);
 
   factory InAppNotification.fromJson(Map<String, dynamic> json) {
     return InAppNotification(
@@ -35,5 +39,3 @@ class InAppNotification {
     );
   }
 }
-
-

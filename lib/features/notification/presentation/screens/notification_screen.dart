@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/utils/notification_translator.dart';
 import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
@@ -30,72 +31,60 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     });
   }
 
+  /// 🧠 Dịch nội dung bằng Translator và xác định style UI
   Map<String, dynamic> _parseNotificationContent(
     InAppNotification noti,
-    AppLocalizations l10n,
     AppColorTheme appColors,
+    String langCode,
   ) {
-    String title = '';
-    String body = '';
+    // 1. Dịch tiêu đề & nội dung thông qua Translator (tự động thay thế arguments)
+    final String title = NotificationTranslator.translate(
+      noti.titleKey,
+      noti.arguments,
+      langCode,
+    );
+    final String body = NotificationTranslator.translate(
+      noti.bodyKey,
+      noti.arguments,
+      langCode,
+    );
+
     IconData icon = CupertinoIcons.bell;
     Color color = appColors.primary;
     String? route;
 
-    // Logic dịch các argument backend trả về
-    String translateArg(String arg) {
-      if (arg == 'monthBudget') return l10n.monthBudget;
-      return arg;
-    }
-
-    final arg1 = noti.arguments.isNotEmpty
-        ? translateArg(noti.arguments[0])
-        : '';
-    final arg2 = noti.arguments.length > 1
-        ? translateArg(noti.arguments[1])
-        : '';
-
+    // 2. Logic xác định Style UI dựa trên type
     switch (noti.type) {
       case 'budget_80':
-        title = l10n.notiBudgetWarningTitle;
-        body = l10n.notiBudgetWarningBody(
-          arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
-          arg2.isEmpty ? '80' : arg2,
-        );
         icon = CupertinoIcons.exclamationmark_triangle;
         color = Colors.orange;
         break;
       case 'budget_100':
-        title = l10n.notiBudgetExceededTitle;
-        body = l10n.notiBudgetExceededBody(
-          arg1.isEmpty ? l10n.budgetThisMonthLabel : arg1,
-          arg2.isEmpty ? '100' : arg2,
-        );
         icon = CupertinoIcons.exclamationmark_triangle;
         color = Colors.red;
         break;
+      case 'monthly_summary':
+        icon = CupertinoIcons.chart_bar_alt_fill;
+        color = Colors.purple;
+        route = '/budget_analytics';
+        break;
       case 'email_verified':
-        title = l10n.notiEmailVerifiedTitle;
-        body = l10n.notiEmailVerifiedBody;
         icon = CupertinoIcons.checkmark_seal;
         color = Colors.green;
         break;
       case 'onboarding_first_transaction':
-        title = l10n.notiFirstTxnTitle;
-        body = l10n.notiFirstTxnBody;
         icon = CupertinoIcons.add;
         color = Colors.green;
         route = '/create_transaction';
         break;
       case 'onboarding_set_budget':
-        title = l10n.notiSetBudgetTitle;
-        body = l10n.notiSetBudgetBody;
         icon = CupertinoIcons.shield;
         color = Colors.blue;
         route = '/budget_settings';
         break;
       default:
-        title = l10n.notificationSettingsTitle;
-        body = noti.bodyKey;
+        icon = CupertinoIcons.bell;
+        color = appColors.primary;
     }
 
     return {
@@ -113,6 +102,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(notificationProvider);
     final hasUnread = state.notifications.any((noti) => !noti.isRead);
+    final String lang = Localizations.localeOf(context).languageCode;
 
     final filteredNotifications = state.notifications.where((noti) {
       if (_showOnlyUnread) return !noti.isRead;
@@ -160,7 +150,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       ),
       body: Column(
         children: [
-          // Filter Bar (Modern Segmented Control)
           if (!state.isLoading && state.notifications.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -215,10 +204,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     itemCount: filteredNotifications.length,
                     itemBuilder: (context, index) {
                       final noti = filteredNotifications[index];
+                      // Gọi parse với lang code
                       final content = _parseNotificationContent(
                         noti,
-                        l10n,
                         appColors,
+                        lang,
                       );
                       return _buildNotificationCard(
                         noti,
