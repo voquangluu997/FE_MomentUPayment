@@ -69,7 +69,7 @@
   "noMomentsAvailable": "No moments available",
   "cameraTapInstruction": "Tap here to snap your receipt! 📸",
   "galleryPickAction": "Or pick a cute photo from your gallery ✨",
-  "cameraPickActionShort": "Pick a photo",
+  "cameraPickActionShort": "Take a photo",
   "galleryChangeAction": "Change photo from your collection 🌸",
   "galleryChangeActionShort": "Change photo",
   "amountSectionTitle": "TOTAL DAMAGE THIS TIME 💰",
@@ -459,6 +459,17 @@
   "obDesc3": "Your data belongs to you. 100% private and secure cloud synchronization.",
   "obSkip": "Skip",
   "obNext": "Next",
-  "obStart": "Get Started"
+  "obStart": "Get Started",
+
+  "dayLabel": "day",
+  "spentLabel": "Spent",
+  "budgetWarningLow": "Uh-oh, this new limit is even lower than the amount you've already spent this month ({amountSpent})! 🚨🥺",
+  "@budgetWarningLow": {
+    "placeholders": {
+      "amountSpent": {
+        "type": "String"
+      }
+    }
+  }
   
 }

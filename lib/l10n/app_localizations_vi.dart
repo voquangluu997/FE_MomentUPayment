@@ -197,7 +197,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get galleryPickAction => 'Hoặc ghé tiệm ảnh chọn hình có sẵn nè ✨';
 
   @override
-  String get cameraPickActionShort => 'Chọn ảnh';
+  String get cameraPickActionShort => 'Chụp ảnh';
 
   @override
   String get galleryChangeAction => 'Đổi ảnh khác từ bộ sưu tập nha 🌸';
@@ -946,4 +946,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get obStart => 'Bắt đầu ngay';
+
+  @override
+  String get dayLabel => 'ngày';
+
+  @override
+  String get spentLabel => 'Đã tiêu';
+
+  @override
+  String budgetWarningLow(String amountSpent) {
+    return 'Úi úi, hạn mức mới này còn thấp hơn cả số tiền cậu đã vung tay trong tháng ($amountSpent) đó nha! 🚨🥺';
+  }
 }

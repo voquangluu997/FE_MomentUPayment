@@ -1,5 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moment_u_payment/core/network/api_client.dart';
+import 'package:moment_u_payment/core/network/api_client.dart'; // Thay bằng đg dẫn ApiClient của bạn
 import 'models/in_app_notification.dart';
 
 class NotificationState {
@@ -29,6 +30,7 @@ class NotificationState {
 class NotificationNotifier extends StateNotifier<NotificationState> {
   NotificationNotifier() : super(NotificationState());
 
+  /// 📥 Lấy số lượng chưa đọc chính xác từ Server
   Future<void> fetchUnreadCount() async {
     try {
       final response = await dioClient.get('/notifications/unread-count');
@@ -36,9 +38,12 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         final data = response.data;
         state = state.copyWith(unreadCount: data['count'] ?? 0);
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("❌ Lỗi fetchUnreadCount: $e");
+    }
   }
 
+  /// 📥 Lấy danh sách thông báo
   Future<void> fetchNotifications() async {
     state = state.copyWith(isLoading: true);
     try {
@@ -51,18 +56,20 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
             )
             .toList();
 
-        state = state.copyWith(
-          notifications: list,
-          unreadCount: list.where((n) => !n.isRead).length,
-          isLoading: false,
-        );
+        // ✅ FIX: Không dùng list.where...length nữa vì list bị giới hạn bởi 'take: 20' ở BE
+        // Chúng ta giữ nguyên unreadCount hiện tại hoặc gọi kèm fetchUnreadCount() để đồng bộ toàn DB
+        state = state.copyWith(notifications: list, isLoading: false);
+
+        // Gọi sync lại số lượng chuẩn từ server
+        await fetchUnreadCount();
       }
-    } catch (_) {
+    } catch (e) {
       state = state.copyWith(isLoading: false);
+      debugPrint("❌ Lỗi fetchNotifications: $e");
     }
   }
 
-  // ✅ Đã sửa lỗi: Dùng Optimistic Update để UI phản hồi tức thì
+  /// 📑 Đánh dấu đọc 1 mục (Optimistic Update)
   Future<void> markAsRead(String id) async {
     final updatedList = state.notifications.map((n) {
       if (n.id == id) {
@@ -72,7 +79,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
           bodyKey: n.bodyKey,
           arguments: n.arguments,
           type: n.type,
-          isRead: true, // Chuyển thành đã đọc ngay lập tức
+          isRead: true,
           createdAt: n.createdAt,
         );
       }
@@ -81,19 +88,23 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 
     state = state.copyWith(
       notifications: updatedList,
-      unreadCount: updatedList.where((n) => !n.isRead).length,
+      unreadCount: (state.unreadCount - 1).clamp(0, double.infinity).toInt(),
     );
 
     try {
       await dioClient.patch('/notifications/$id/read');
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("❌ Lỗi markAsRead: $e");
+      // Nếu lỗi thì fetch lại để sync với DB
+      fetchNotifications();
+    }
   }
 
-  // 🚀 HÀM MỚI: ĐÁNH DẤU TẤT CẢ ĐÃ ĐỌC
+  /// 🚀 Đánh dấu đọc TẤT CẢ (Optimistic Update)
   Future<void> markAllAsRead() async {
-    if (state.unreadCount == 0) return; // Không cần gọi API nếu đã đọc hết
+    if (state.unreadCount == 0) return;
 
-    // 1. Cập nhật UI ngay lập tức
+    // 1. Cập nhật UI ngay lập tức thành đã đọc hết
     final updatedList = state.notifications.map((n) {
       return InAppNotification(
         id: n.id,
@@ -101,21 +112,21 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         bodyKey: n.bodyKey,
         arguments: n.arguments,
         type: n.type,
-        isRead: true, // Force tất cả thành true
+        isRead: true,
         createdAt: n.createdAt,
       );
     }).toList();
 
-    state = state.copyWith(
-      notifications: updatedList,
-      unreadCount: 0, // Reset badge về 0
-    );
+    state = state.copyWith(notifications: updatedList, unreadCount: 0);
 
-    // 2. Gửi request chạy ngầm ở background
+    // 2. Gọi API chạy ngầm dữ liệu xuống DB
     try {
-      // Giả định bạn tạo route này ở Backend (VD: /notifications/read-all)
       await dioClient.patch('/notifications/read-all');
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("❌ Lỗi markAllAsRead API: $e. Kiểm tra lại route backend!");
+      // Nếu API lỗi (ví dụ 404), fetch lại để giao diện hiển thị đúng thực tế DB
+      fetchNotifications();
+    }
   }
 }
 

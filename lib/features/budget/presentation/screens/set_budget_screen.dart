@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 📳 Thêm Haptic để đồng bộ trải nghiệm rung với màn hình trước
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
+import 'package:moment_u_payment/core/utils/app_toast.dart'; // 🚀 IMPORT APPTOAST TẠI ĐÂY
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../providers/budget_provider.dart';
@@ -23,7 +25,6 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   @override
   void initState() {
     super.initState();
-    // 🚀 LẤY NGÂN SÁCH HIỆN TẠI VÀ GÁN VÀO CONTROLLER KHI MỞ MÀN HÌNH
     final currentSummary = ref.read(homeBudgetProvider).valueOrNull;
     if (currentSummary != null && currentSummary.budgetLimit > 0) {
       _currentAmount = currentSummary.budgetLimit;
@@ -80,6 +81,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   }
 
   void _appendZeros(String zeros) {
+    HapticFeedback.lightImpact(); // 📳 Rung nhẹ phản hồi
     final text = _budgetController.text.replaceAll('.', '').trim();
     if (text.isEmpty || text == '0') return;
 
@@ -88,7 +90,27 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   }
 
   void _setQuickBudget(String amountStr) {
+    HapticFeedback.lightImpact(); // 📳 Rung nhẹ phản hồi
     _onBudgetChanged(amountStr);
+  }
+
+  /// 💡 Ý TƯỞNG UI: Danh sách gợi ý thay đổi động theo loại Tiền tệ (VND khác USD/EUR)
+  List<Map<String, String>> _getQuickSuggestions(String currency) {
+    if (currency == '₫') {
+      return [
+        {'value': '5000000', 'label': '5M'},
+        {'value': '10000000', 'label': '10M'},
+        {'value': '15000000', 'label': '15M'},
+        {'value': '20000000', 'label': '20M'},
+      ];
+    } else {
+      return [
+        {'value': '500', 'label': '500'},
+        {'value': '1000', 'label': '1K'},
+        {'value': '2000', 'label': '2K'},
+        {'value': '5000', 'label': '5K'},
+      ];
+    }
   }
 
   @override
@@ -98,40 +120,29 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
 
-    // Lấy thông tin chi tiêu hiện tại để làm tính năng Cảnh báo
     final budgetSummary = ref.watch(homeBudgetProvider).valueOrNull;
     final double totalSpent = budgetSummary?.totalSpent ?? 0.0;
     final bool isBudgetTooLow =
         _currentAmount > 0 && _currentAmount < totalSpent;
 
+    // Tính toán % tiến độ ngân sách mới đã bị "nuốt" bởi số tiền đã tiêu
+    final double initialProgress = _currentAmount > 0
+        ? (totalSpent / _currentAmount).clamp(0.0, 1.0)
+        : 0.0;
+
     ref.listen<BudgetState>(budgetProvider, (previous, next) {
       if (next == BudgetState.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.budgetSuccessMessage),
-            backgroundColor: appColors.success,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
+        HapticFeedback.mediumImpact(); // 📳 Rung vừa khi lưu thành công
+        // 🚀 ĐÃ SỬA: Thay thế bằng AppToast
+        AppToast.showSuccess(context, l10n.budgetSuccessMessage, appColors);
+
         ref.read(homeBudgetProvider.notifier).refreshSummary();
         ref.read(budgetProvider.notifier).resetState();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        Navigator.of(context).pop();
       } else if (next == BudgetState.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.budgetErrorMessage),
-            backgroundColor: appColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
+        HapticFeedback.heavyImpact(); // 📳 Rung mạnh cảnh báo lỗi
+        // 🚀 ĐÃ SỬA: Thay thế bằng AppToast
+        AppToast.showError(context, l10n.budgetErrorMessage, appColors);
       }
     });
 
@@ -153,7 +164,10 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
           centerTitle: true,
           leading: IconButton(
             icon: Icon(CupertinoIcons.chevron_back, color: appColors.primary),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pop();
+            },
           ),
         ),
         body: SafeArea(
@@ -180,9 +194,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              l10n.budgetSectionTitle,
+                              l10n.budgetSectionTitle.toUpperCase(),
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: appColors.primaryDark.withOpacity(0.7),
                                 letterSpacing: 0.5,
@@ -230,7 +244,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     ],
                     border: Border.all(
                       color: isBudgetTooLow
-                          ? Colors.orange.withOpacity(0.5)
+                          ? appColors.error.withOpacity(0.5)
                           : appColors.primary.withOpacity(0.1),
                       width: isBudgetTooLow ? 1.5 : 1,
                     ),
@@ -241,7 +255,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                       Expanded(
                         child: TextField(
                           controller: _budgetController,
-                          autofocus: true, // 💡 TỰ ĐỘNG BẬT BÀN PHÍM LÊN
+                          autofocus: true,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
                           onSubmitted: (_) => FocusScope.of(context).unfocus(),
@@ -250,7 +264,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
                             color: isBudgetTooLow
-                                ? Colors.orange.shade700
+                                ? appColors.error
                                 : appColors.primary,
                           ),
                           decoration: InputDecoration(
@@ -261,17 +275,17 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
-                            // 💡 NÚT XÓA NHANH KHI ĐÃ NHẬP SỐ
                             suffixIcon: _budgetController.text.isNotEmpty
                                 ? IconButton(
                                     icon: Icon(
-                                      CupertinoIcons.xmark,
+                                      CupertinoIcons.xmark_circle_fill,
                                       color: appColors.textMuted.withOpacity(
                                         0.4,
                                       ),
-                                      size: 24,
+                                      size: 20,
                                     ),
                                     onPressed: () {
+                                      HapticFeedback.lightImpact();
                                       _budgetController.clear();
                                       _onBudgetChanged('');
                                     },
@@ -289,6 +303,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                         color: appColors.cardBackground,
                         elevation: 3,
                         onSelected: (newValue) {
+                          HapticFeedback.selectionClick();
                           ref
                               .read(currencyProvider.notifier)
                               .setCurrency(newValue);
@@ -340,7 +355,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                               Icon(
                                 CupertinoIcons.chevron_down,
                                 color: appColors.primary,
-                                size: 20,
+                                size: 16,
                               ),
                             ],
                           ),
@@ -352,31 +367,36 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
 
                 const SizedBox(height: 16),
 
-                // 💡 HIỂN THỊ CẢNH BÁO NẾU NGÂN SÁCH MỚI < SỐ TIỀN ĐÃ TIÊU
+                // 🛑 ĐA NGÔN NGỮ: HIỂN THỊ CẢNH BÁO NẾU NGÂN SÁCH MỚI < SỐ TIỀN ĐÃ TIÊU
                 if (isBudgetTooLow)
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      color: appColors.error.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: appColors.error.withOpacity(0.2),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          CupertinoIcons.exclamationmark_triangle,
-                          color: Colors.orange,
+                        Icon(
+                          CupertinoIcons.exclamationmark_shield_fill,
+                          color: appColors.error,
                           size: 20,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Ngân sách này thấp hơn số tiền bạn đã tiêu trong tháng (${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol).',
+                            l10n.budgetWarningLow(
+                              '${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol',
+                            ),
                             style: TextStyle(
-                              color: Colors.orange.shade800,
+                              color: appColors.error,
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
                             ),
                           ),
                         ),
@@ -384,104 +404,187 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     ),
                   ),
 
+                // 🌟 Ý TƯỞNG UI: CARD THÔNG TIN TIẾN ĐỘ THÔNG MINH (DÀNH CHO NGÂN SÁCH HỢP LỆ)
                 if (_currentAmount > 0)
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: appColors.success.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
+                      color:
+                          (isBudgetTooLow ? appColors.error : appColors.success)
+                              .withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: appColors.success.withOpacity(0.3),
+                        color:
+                            (isBudgetTooLow
+                                    ? appColors.error
+                                    : appColors.success)
+                                .withOpacity(0.15),
                       ),
                     ),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: appColors.success.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            CupertinoIcons.calendar,
-                            size: 20,
-                            color: appColors.success,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color:
+                                    (isBudgetTooLow
+                                            ? appColors.error
+                                            : appColors.success)
+                                        .withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isBudgetTooLow
+                                    ? CupertinoIcons.chart_pie_fill
+                                    : CupertinoIcons.calendar_today,
+                                size: 18,
+                                color: isBudgetTooLow
+                                    ? appColors.error
+                                    : appColors.success,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.dailyAllowance,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: appColors.textMuted,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '~ ${_formatNumber(_dailyAmount.toStringAsFixed(0))} $currencySymbol / ${l10n.dayLabel}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isBudgetTooLow
+                                          ? appColors.error
+                                          : appColors.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        // 📊 Thanh Progress Bar trực quan thể hiện tỉ lệ "Đã tiêu / Ngân sách dự kiến"
+                        if (totalSpent > 0) ...[
+                          const SizedBox(height: 14),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: initialProgress,
+                              backgroundColor: appColors.textMuted.withOpacity(
+                                0.1,
+                              ),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isBudgetTooLow
+                                    ? appColors.error
+                                    : appColors.primary,
+                              ),
+                              minHeight: 6,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                l10n.dailyAllowance,
+                                '${l10n.spentLabel}: ${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   color: appColors.textMuted,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 4),
                               Text(
-                                '~ ${_formatNumber(_dailyAmount.toStringAsFixed(0))} $currencySymbol / ngày',
+                                '${(initialProgress * 100).toStringAsFixed(0)}%',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 11,
+                                  color: isBudgetTooLow
+                                      ? appColors.error
+                                      : appColors.primary,
                                   fontWeight: FontWeight.bold,
-                                  color: appColors.success,
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 Text(
                   l10n.quickSuggestions,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: appColors.primaryDark,
+                    letterSpacing: 0.3,
                   ),
                 ),
                 const SizedBox(height: 12),
+
+                // 🔄 CHIPS ĐÃ ĐƯỢC THÍCH ỨNG THEO ĐƠN VỊ TIỀN TỆ CỦA USER
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _buildQuickSelectChip('5000000', '5M', appColors),
-                    _buildQuickSelectChip('10000000', '10M', appColors),
-                    _buildQuickSelectChip('15000000', '15M', appColors),
-                    _buildQuickSelectChip('20000000', '20M', appColors),
-                  ],
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _getQuickSuggestions(currencySymbol).map((
+                    suggestion,
+                  ) {
+                    return _buildQuickSelectChip(
+                      suggestion['value']!,
+                      suggestion['label']!,
+                      appColors,
+                    );
+                  }).toList(),
                 ),
 
                 const SizedBox(height: 32),
 
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      CupertinoIcons.lightbulb,
-                      color: Colors.amber.shade600,
-                      size: 24,
+                // CARD GỢI Ý (TIP) NỀN NÃ
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: appColors.cardBackground,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: appColors.primary.withOpacity(0.04),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l10n.budgetTip,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: appColors.textMuted,
-                          height: 1.5,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        CupertinoIcons.lightbulb_fill,
+                        color: Colors.amber.shade600,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          l10n.budgetTip,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: appColors.textMuted,
+                            height: 1.5,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -496,19 +599,14 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
               top: 10,
             ),
             child: budgetState == BudgetState.loading
-                ? Row(
+                ? const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          appColors.primary,
-                        ),
-                      ),
-                    ],
+                    children: [CircularProgressIndicator()],
                   )
                 : ElevatedButton(
                     onPressed: _currentAmount > 0
                         ? () {
+                            HapticFeedback.mediumImpact();
                             final budgetText = _budgetController.text
                                 .replaceAll('.', '')
                                 .trim();
@@ -520,21 +618,22 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: appColors.primary,
                       disabledBackgroundColor: appColors.primary.withOpacity(
-                        0.3,
+                        0.25,
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      elevation: _currentAmount > 0 ? 4 : 0,
-                      shadowColor: appColors.primary.withOpacity(0.4),
+                      elevation: _currentAmount > 0 ? 2 : 0,
+                      shadowColor: appColors.primary.withOpacity(0.3),
                     ),
                     child: Text(
-                      l10n.budgetSaveButton,
+                      l10n.budgetSaveButton.toUpperCase(),
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
@@ -550,13 +649,13 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     AppColorTheme appColors,
   ) {
     return Material(
-      color: appColors.primary.withOpacity(0.08),
+      color: appColors.primary.withOpacity(0.06),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Text(
             label,
             style: TextStyle(
@@ -579,25 +678,33 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
         _currentAmount.toString() == amountStr ||
         _currentAmount.toStringAsFixed(0) == amountStr;
 
-    return InkWell(
-      onTap: () => _setQuickBudget(amountStr),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? appColors.primary : appColors.background,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? appColors.primary
-                : appColors.textMuted.withOpacity(0.2),
-          ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      decoration: BoxDecoration(
+        color: isSelected ? appColors.primary : appColors.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSelected
+              ? appColors.primary
+              : appColors.primary.withOpacity(0.08),
+          width: 1,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : appColors.textMuted,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _setQuickBudget(amountStr),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.white : appColors.text,
+              ),
+            ),
           ),
         ),
       ),

@@ -37,7 +37,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     AppColorTheme appColors,
     String langCode,
   ) {
-    // 1. Dịch tiêu đề & nội dung thông qua Translator (tự động thay thế arguments)
     final String title = NotificationTranslator.translate(
       noti.titleKey,
       noti.arguments,
@@ -53,7 +52,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     Color color = appColors.primary;
     String? route;
 
-    // 2. Logic xác định Style UI dựa trên type
     switch (noti.type) {
       case 'budget_80':
         icon = CupertinoIcons.exclamationmark_triangle;
@@ -96,13 +94,42 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     };
   }
 
+  /// 💡 LOGIC GỘP: Nhóm các thông báo giống nhau nằm liên tiếp
+  List<List<InAppNotification>> _groupNotifications(
+    List<InAppNotification> notifications,
+  ) {
+    final groupedList = <List<InAppNotification>>[];
+
+    for (final noti in notifications) {
+      if (groupedList.isEmpty) {
+        groupedList.add([noti]);
+        continue;
+      }
+
+      final lastGroup = groupedList.last;
+      final lastNoti = lastGroup.first;
+
+      // Điều kiện gộp: Cùng Type, Cùng Title, và cách nhau dưới 24 giờ
+      final isSameType = noti.type == lastNoti.type;
+      final isSameTitle = noti.titleKey == lastNoti.titleKey;
+      final timeDiff = lastNoti.createdAt.difference(noti.createdAt).abs();
+
+      if (isSameType && isSameTitle && timeDiff.inHours < 24) {
+        lastGroup.add(noti); // Nhét chung vào 1 nhóm nếu thỏa mãn
+      } else {
+        groupedList.add([noti]); // Tạo nhóm mới
+      }
+    }
+
+    return groupedList;
+  }
+
   @override
   Widget build(BuildContext context) {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(notificationProvider);
 
-    // ✅ Fix 1: Sử dụng unreadCount thay vì loop .any() gây thừa thãi
     final hasUnread = state.unreadCount > 0;
     final String lang = Localizations.localeOf(context).languageCode;
 
@@ -110,6 +137,9 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       if (_showOnlyUnread) return !noti.isRead;
       return true;
     }).toList();
+
+    // 🚀 GỌI HÀM NHÓM THÔNG BÁO TẠI ĐÂY
+    final groupedNotifications = _groupNotifications(filteredNotifications);
 
     return Scaffold(
       backgroundColor: appColors.background,
@@ -133,7 +163,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           ),
         ),
         actions: [
-          // 🚀 NÚT MỚI: Đánh dấu tất cả đã đọc
           if (hasUnread)
             IconButton(
               icon: Icon(Icons.done_all, color: appColors.primary, size: 24),
@@ -205,7 +234,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     CupertinoIcons.bell_slash,
                     appColors,
                   )
-                : filteredNotifications.isEmpty
+                : groupedNotifications.isEmpty
                 ? _buildEmptyState(
                     l10n.allReadNotificationsTitle,
                     CupertinoIcons.checkmark_seal,
@@ -217,17 +246,21 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       vertical: 8,
                     ),
                     physics: const BouncingScrollPhysics(),
-                    itemCount: filteredNotifications.length,
+                    itemCount: groupedNotifications
+                        .length, // Render theo số lượng NHÓM
                     itemBuilder: (context, index) {
-                      final noti = filteredNotifications[index];
-                      // Gọi parse với lang code
+                      final group = groupedNotifications[index];
+                      final primaryNoti =
+                          group.first; // Lấy thông báo đầu tiên làm chuẩn
+
                       final content = _parseNotificationContent(
-                        noti,
+                        primaryNoti,
                         appColors,
                         lang,
                       );
+
                       return _buildNotificationCard(
-                        noti,
+                        group, // Truyền nguyên list vào card
                         content,
                         appColors,
                         l10n,
@@ -282,21 +315,32 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 
   Widget _buildNotificationCard(
-    InAppNotification noti,
+    List<InAppNotification> group, // Cập nhật tham số nhận list
     Map<String, dynamic> content,
     AppColorTheme appColors,
     AppLocalizations l10n,
   ) {
+    final primaryNoti = group.first;
+    // Nhóm được coi là "Chưa đọc" nếu CÓ BẤT KỲ 1 thông báo nào trong nhóm chưa đọc
+    final bool hasUnreadInGroup = group.any((n) => !n.isRead);
+
     return GestureDetector(
       onTap: () {
-        if (!noti.isRead) {
-          ref.read(notificationProvider.notifier).markAsRead(noti.id);
+        // Đánh dấu tất cả trong nhóm này là đã đọc
+        bool markedAny = false;
+        for (var n in group) {
+          if (!n.isRead) {
+            ref.read(notificationProvider.notifier).markAsRead(n.id);
+            markedAny = true;
+          }
+        }
+
+        if (markedAny) {
           AppToast.showSuccess(context, l10n.markAsReadSuccess, appColors);
         }
 
         final route = content['route'] as String?;
         if (route != null) {
-          // ✅ Fix 2: Thêm block {} an toàn cho lệnh rẽ nhánh điều hướng
           if (route == '/create_transaction') {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
@@ -314,12 +358,12 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         decoration: BoxDecoration(
           color: appColors.cardBackground,
           borderRadius: BorderRadius.circular(24),
-          border: noti.isRead
+          border: !hasUnreadInGroup
               ? null
               : Border.all(color: appColors.primary.withOpacity(0.1), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(noti.isRead ? 0.02 : 0.06),
+              color: Colors.black.withOpacity(!hasUnreadInGroup ? 0.02 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -349,17 +393,48 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          content['title'] as String,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                            color: appColors.primaryDark,
-                          ),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                content['title'] as String,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 14,
+                                  color: appColors.primaryDark,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // 🌟 HIỂN THỊ BADGE x2, x3... NẾU NHÓM CÓ > 1 THÔNG BÁO
+                            if (group.length > 1) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: appColors.primary.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'x${group.length}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: appColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                      if (!noti.isRead)
+                      if (hasUnreadInGroup)
                         Container(
+                          margin: const EdgeInsets.only(left: 8),
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
@@ -379,7 +454,9 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    DateFormat('HH:mm - dd/MM/yyyy').format(noti.createdAt),
+                    DateFormat(
+                      'HH:mm - dd/MM/yyyy',
+                    ).format(primaryNoti.createdAt),
                     style: TextStyle(
                       color: appColors.primaryDark.withOpacity(0.3),
                       fontSize: 10,

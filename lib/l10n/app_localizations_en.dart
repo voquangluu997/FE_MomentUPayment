@@ -196,7 +196,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get galleryPickAction => 'Or pick a cute photo from your gallery ✨';
 
   @override
-  String get cameraPickActionShort => 'Pick a photo';
+  String get cameraPickActionShort => 'Take a photo';
 
   @override
   String get galleryChangeAction => 'Change photo from your collection 🌸';
@@ -938,4 +938,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obStart => 'Get Started';
+
+  @override
+  String get dayLabel => 'day';
+
+  @override
+  String get spentLabel => 'Spent';
+
+  @override
+  String budgetWarningLow(String amountSpent) {
+    return 'Uh-oh, this new limit is even lower than the amount you\'ve already spent this month ($amountSpent)! 🚨🥺';
+  }
 }

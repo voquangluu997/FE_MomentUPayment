@@ -904,8 +904,8 @@ class _EditModeContent extends ConsumerWidget {
         const SizedBox(height: 6),
         TextField(
           controller: noteController,
-          maxLines: 3,
-          style: TextStyle(fontSize: 13.5, color: appColors.primaryDark),
+          maxLines: 1,
+          style: TextStyle(fontSize: 12, color: appColors.primaryDark),
           decoration: InputDecoration(
             hintText: l10n.noteHint,
             hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.5)),

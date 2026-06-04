@@ -455,7 +455,7 @@ abstract class AppLocalizations {
   /// No description provided for @cameraPickActionShort.
   ///
   /// In en, this message translates to:
-  /// **'Pick a photo'**
+  /// **'Take a photo'**
   String get cameraPickActionShort;
 
   /// No description provided for @galleryChangeAction.
@@ -1793,6 +1793,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get Started'**
   String get obStart;
+
+  /// No description provided for @dayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get dayLabel;
+
+  /// No description provided for @spentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get spentLabel;
+
+  /// No description provided for @budgetWarningLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Uh-oh, this new limit is even lower than the amount you\'ve already spent this month ({amountSpent})! 🚨🥺'**
+  String budgetWarningLow(String amountSpent);
 }
 
 class _AppLocalizationsDelegate

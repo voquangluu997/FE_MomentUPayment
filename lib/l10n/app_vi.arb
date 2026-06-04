@@ -369,7 +369,7 @@
 
   "maxOneYearWarning": "Moment U chỉ hỗ trợ xem tối đa 1 năm thui nè! 🗓️",
   "analyticsTitle": "Thống kê chi tiêu",
-  "cameraPickActionShort": "Chọn ảnh",
+  "cameraPickActionShort": "Chụp ảnh",
   "galleryChangeActionShort": "Đổi ảnh",
 
   "wrongOldPassword": "Mật khẩu cũ không chính xác.",
@@ -466,6 +466,17 @@
   "obDesc3": "Dữ liệu của bạn là của bạn. Đồng bộ đám mây an toàn và riêng tư 100%.",
   "obSkip": "Bỏ qua",
   "obNext": "Tiếp tục",
-  "obStart": "Bắt đầu ngay"
+  "obStart": "Bắt đầu ngay",
+
+  "dayLabel": "ngày",
+  "spentLabel": "Đã tiêu",
+  "budgetWarningLow": "Úi úi, hạn mức mới này còn thấp hơn cả số tiền cậu đã vung tay trong tháng ({amountSpent}) đó nha! 🚨🥺",
+  "@budgetWarningLow": {
+    "placeholders": {
+      "amountSpent": {
+        "type": "String"
+      }
+    }
+  }
 
 }

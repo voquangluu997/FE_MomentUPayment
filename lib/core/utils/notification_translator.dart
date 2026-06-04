@@ -3,7 +3,7 @@ class NotificationTranslator {
   static final Map<String, Map<String, String>> _templates = {
     'en': {
       'notiBudgetExceededTitle': 'The Beggar Era Begins! 💸',
-      'notiBudgetExceededBody': '{0} is empty. You overspent by {1}!',
+      'notiBudgetExceededBody': '{0} is empty. You overspent by {1}%',
       'notiBudgetWarningTitle': 'Red Alert: Wallet on ICU! 🚨',
       'notiBudgetWarningBody': '{0} is at {1}% usage. SOS!',
       'notiMonthlySummaryTitle': 'Spending Report: Month {0} 📊',
@@ -12,7 +12,7 @@ class NotificationTranslator {
     },
     'vi': {
       'notiBudgetExceededTitle': 'Kỷ nguyên Cái Bang! 💸',
-      'notiBudgetExceededBody': '{0} đã hết. Bạn đã tiêu lố {1}!',
+      'notiBudgetExceededBody': '{0} đã hết. Bạn đã tiêu lố {1}%!',
       'notiBudgetWarningTitle': 'Báo động đỏ: Ví thở oxy! 🚨',
       'notiBudgetWarningBody': '{0} đã chạm {1}% ngân sách. SOS!',
       'notiMonthlySummaryTitle': 'Báo cáo chi tiêu tháng {0} 📊',
