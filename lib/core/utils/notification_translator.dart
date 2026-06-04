@@ -1,6 +1,6 @@
 class NotificationTranslator {
-  // Từ điển nội dung (Phải khớp với titleKey/bodyKey của Backend)
-  static final Map<String, Map<String, String>> _dictionary = {
+  // 1. Từ điển nội dung thông báo
+  static final Map<String, Map<String, String>> _templates = {
     'en': {
       'notiBudgetExceededTitle': 'The Beggar Era Begins! 💸',
       'notiBudgetExceededBody': '{0} is empty. You overspent by {1}!',
@@ -9,7 +9,6 @@ class NotificationTranslator {
       'notiMonthlySummaryTitle': 'Spending Report: Month {0} 📊',
       'notiMonthlySummaryBody':
           'You spent {1} last month. {2} {3} was your biggest expense.',
-      // Thêm các key khác nếu cần
     },
     'vi': {
       'notiBudgetExceededTitle': 'Kỷ nguyên Cái Bang! 💸',
@@ -22,17 +21,35 @@ class NotificationTranslator {
     },
   };
 
-  static String translate(String key, List<String> args, String langCode) {
-    // Lấy template, fallback về English nếu không tìm thấy
-    final Map<String, String> langDict =
-        _dictionary[langCode] ?? _dictionary['en']!;
-    String template =
-        langDict[key] ?? key; // Nếu không có key, trả về chính cái key đó
+  // 2. Từ điển dịch thuật cho các ARGUMENTS (biến)
+  static final Map<String, Map<String, String>> _argDictionary = {
+    'monthBudget': {'en': 'Monthly Budget', 'vi': 'Ngân sách tháng'},
+    'savingsGoal': {'en': 'Savings Goal', 'vi': 'Mục tiêu tiết kiệm'},
+    'dailyLimit': {'en': 'Daily Limit', 'vi': 'Hạn mức hàng ngày'},
+    // Thêm các biến khác vào đây khi cần
+  };
 
-    // Thay thế {0}, {1}, {2}... bằng giá trị trong args
-    for (int i = 0; i < args.length; i++) {
-      template = template.replaceAll('{$i}', args[i]);
+  static String translate(String key, List<String> args, String langCode) {
+    // 1. Dịch các arguments trước
+    final List<String> translatedArgs = args.map((arg) {
+      // Nếu arg nằm trong từ điển, lấy giá trị đã dịch
+      if (_argDictionary.containsKey(arg)) {
+        return _argDictionary[arg]![langCode] ?? _argDictionary[arg]!['en']!;
+      }
+      // Nếu không (hoặc là số như '80', '100'), giữ nguyên
+      return arg;
+    }).toList();
+
+    // 2. Lấy template
+    final Map<String, String> langDict =
+        _templates[langCode] ?? _templates['en']!;
+    String template = langDict[key] ?? key;
+
+    // 3. Thay thế {0}, {1}... bằng các arguments đã dịch
+    for (int i = 0; i < translatedArgs.length; i++) {
+      template = template.replaceAll('{$i}', translatedArgs[i]);
     }
+
     return template;
   }
 }

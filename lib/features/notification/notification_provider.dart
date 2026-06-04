@@ -24,14 +24,11 @@ class NotificationState {
       isLoading: isLoading ?? this.isLoading,
     );
   }
-
-  
 }
 
 class NotificationNotifier extends StateNotifier<NotificationState> {
   NotificationNotifier() : super(NotificationState());
 
-  // Lấy số lượng thông báo chưa đọc hiển thị ở badge trên HomeAppBar
   Future<void> fetchUnreadCount() async {
     try {
       final response = await dioClient.get('/notifications/unread-count');
@@ -39,22 +36,15 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         final data = response.data;
         state = state.copyWith(unreadCount: data['count'] ?? 0);
       }
-    } catch (_) {
-      // Xử lý lỗi im lặng để không làm gián đoạn UI trang chủ
-    }
+    } catch (_) {}
   }
 
-  // Lấy danh sách chi tiết hộp thư thông báo nội bộ
   Future<void> fetchNotifications() async {
     state = state.copyWith(isLoading: true);
     try {
       final response = await dioClient.get('/notifications');
       if (response.statusCode == 200) {
-        // 1. Ép kiểu response data về List<dynamic>
         final List<dynamic> data = response.data;
-
-        // 2. 🔑 SỬA LỖI Ở ĐÂY: Chỉ định rõ <InAppNotification> cho hàm map()
-        // và ép kiểu json element về Map<String, dynamic>
         final List<InAppNotification> list = data
             .map<InAppNotification>(
               (e) => InAppNotification.fromJson(e as Map<String, dynamic>),
@@ -72,32 +62,59 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
     }
   }
 
-  // Đánh dấu đã đọc một mục thông báo cụ thể
+  // ✅ Đã sửa lỗi: Dùng Optimistic Update để UI phản hồi tức thì
   Future<void> markAsRead(String id) async {
-    try {
-      final response = await dioClient.patch('/notifications/$id/read');
-      if (response.statusCode == 200) {
-        // Hàm map ở đây tự động nội suy đúng kiểu vì state.notifications đã là List<InAppNotification>
-        final updatedList = state.notifications.map((n) {
-          if (n.id == id) {
-            return InAppNotification(
-              id: n.id,
-              titleKey: n.titleKey,
-              bodyKey: n.bodyKey,
-              arguments: n.arguments,
-              type: n.type,
-              isRead: true,
-              createdAt: n.createdAt,
-            );
-          }
-          return n;
-        }).toList();
-
-        state = state.copyWith(
-          notifications: updatedList,
-          unreadCount: updatedList.where((n) => !n.isRead).length,
+    final updatedList = state.notifications.map((n) {
+      if (n.id == id) {
+        return InAppNotification(
+          id: n.id,
+          titleKey: n.titleKey,
+          bodyKey: n.bodyKey,
+          arguments: n.arguments,
+          type: n.type,
+          isRead: true, // Chuyển thành đã đọc ngay lập tức
+          createdAt: n.createdAt,
         );
       }
+      return n;
+    }).toList();
+
+    state = state.copyWith(
+      notifications: updatedList,
+      unreadCount: updatedList.where((n) => !n.isRead).length,
+    );
+
+    try {
+      await dioClient.patch('/notifications/$id/read');
+    } catch (_) {}
+  }
+
+  // 🚀 HÀM MỚI: ĐÁNH DẤU TẤT CẢ ĐÃ ĐỌC
+  Future<void> markAllAsRead() async {
+    if (state.unreadCount == 0) return; // Không cần gọi API nếu đã đọc hết
+
+    // 1. Cập nhật UI ngay lập tức
+    final updatedList = state.notifications.map((n) {
+      return InAppNotification(
+        id: n.id,
+        titleKey: n.titleKey,
+        bodyKey: n.bodyKey,
+        arguments: n.arguments,
+        type: n.type,
+        isRead: true, // Force tất cả thành true
+        createdAt: n.createdAt,
+      );
+    }).toList();
+
+    state = state.copyWith(
+      notifications: updatedList,
+      unreadCount: 0, // Reset badge về 0
+    );
+
+    // 2. Gửi request chạy ngầm ở background
+    try {
+      // Giả định bạn tạo route này ở Backend (VD: /notifications/read-all)
+      await dioClient.patch('/notifications/read-all');
     } catch (_) {}
   }
 }

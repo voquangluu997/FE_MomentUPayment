@@ -101,7 +101,9 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(notificationProvider);
-    final hasUnread = state.notifications.any((noti) => !noti.isRead);
+
+    // ✅ Fix 1: Sử dụng unreadCount thay vì loop .any() gây thừa thãi
+    final hasUnread = state.unreadCount > 0;
     final String lang = Localizations.localeOf(context).languageCode;
 
     final filteredNotifications = state.notifications.where((noti) {
@@ -131,8 +133,22 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           ),
         ),
         actions: [
+          // 🚀 NÚT MỚI: Đánh dấu tất cả đã đọc
+          if (hasUnread)
+            IconButton(
+              icon: Icon(Icons.done_all, color: appColors.primary, size: 24),
+              onPressed: () {
+                ref.read(notificationProvider.notifier).markAllAsRead();
+                AppToast.showSuccess(
+                  context,
+                  'Đã đánh dấu đọc tất cả',
+                  appColors,
+                );
+              },
+            ),
+
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 16.0, left: 4.0),
             child: AnimatedRingingBell(
               isRinging: hasUnread,
               child: Icon(
@@ -277,16 +293,19 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           ref.read(notificationProvider.notifier).markAsRead(noti.id);
           AppToast.showSuccess(context, l10n.markAsReadSuccess, appColors);
         }
+
         final route = content['route'] as String?;
         if (route != null) {
-          if (route == '/create_transaction')
+          // ✅ Fix 2: Thêm block {} an toàn cho lệnh rẽ nhánh điều hướng
+          if (route == '/create_transaction') {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
             );
-          else if (route == '/budget_settings')
+          } else if (route == '/budget_settings') {
             Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const SetBudgetScreen()));
+          }
         }
       },
       child: Container(
