@@ -98,6 +98,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.accountSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
@@ -114,6 +115,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.notificationSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
@@ -145,8 +147,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                         trailing: Switch(
                           value: currentLocale.languageCode == 'en',
                           activeColor: appColors.primary,
-                          onChanged: (_) =>
-                              ref.read(localeProvider.notifier).toggleLocale(),
+                          onChanged: (_) {
+                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
+                            ref.read(localeProvider.notifier).toggleLocale();
+                          },
                         ),
                       ),
                       _buildSettingItem(
@@ -164,6 +168,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           color: appColors.cardBackground,
                           elevation: 3,
                           onSelected: (newValue) {
+                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chọn tiền tệ mới
                             ref
                                 .read(currencyProvider.notifier)
                                 .setCurrency(newValue);
@@ -232,12 +237,15 @@ class SettingsBottomSheet extends ConsumerWidget {
                         trailing: Switch(
                           value: isDark,
                           activeColor: appColors.primary,
-                          onChanged: (val) => ref
-                              .read(themeModeProvider.notifier)
-                              .toggleTheme(),
+                          onChanged: (val) {
+                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
+                            ref.read(themeModeProvider.notifier).toggleTheme();
+                          },
                         ),
-                        onTap: () =>
-                            ref.read(themeModeProvider.notifier).toggleTheme(),
+                        onTap: () {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn vào row
+                          ref.read(themeModeProvider.notifier).toggleTheme();
+                        },
                       ),
 
                       Padding(
@@ -256,6 +264,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.helpCenterSubtitle,
                         appColors: appColors,
                         onTap: () {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
                           Navigator.of(context).pop();
                           _showHelpCenterDialog(context, appColors, l10n);
                         },
@@ -301,6 +310,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           ),
                         ),
                         onTap: () async {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn đăng xuất
                           Navigator.of(context).pop();
                           await ref.read(authProvider.notifier).logout();
                           if (!context.mounted) return;
@@ -382,7 +392,10 @@ class SettingsBottomSheet extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     return InkWell(
-      onTap: () => _showDonationDialog(context, appColors, l10n),
+      onTap: () {
+        HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi mở dialog ủng hộ
+        _showDonationDialog(context, appColors, l10n);
+      },
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -418,7 +431,7 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
               child: const Icon(
                 CupertinoIcons
-                    .heart, // 🍏 Đổi từ CupertinoIcons.coffee_rounded sang Cupertino (vì iOS không có sẵn icon ly cafe gốc, dùng Trái Tim tượng trưng Donation rất hợp lý)
+                    .heart, // 🍏 Đổi từ CupertinoIcons.coffee_rounded sang Cupertino
                 color: Colors.white,
                 size: 24,
               ),
@@ -643,7 +656,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                 minimumSize: const Size(double.infinity, 48),
                 elevation: 0,
               ),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi đóng
+                Navigator.of(context).pop();
+              },
               child: Text(
                 l10n.closeButton,
                 style: const TextStyle(
@@ -708,6 +724,7 @@ class SettingsBottomSheet extends ConsumerWidget {
             const SizedBox(height: 24),
             InkWell(
               onTap: () async {
+                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn sao chép email
                 await Clipboard.setData(ClipboardData(text: l10n.contactEmail));
                 if (context.mounted) {
                   AppToast.showSuccess(
@@ -783,7 +800,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                 minimumSize: const Size(double.infinity, 48),
                 elevation: 0,
               ),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi đóng
+                Navigator.of(context).pop();
+              },
               child: Text(
                 l10n.closeButton,
                 style: const TextStyle(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,9 +18,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // Trạng thái ẩn/hiện mật khẩu
-  bool _obscurePassword = true;
-
   @override
   void initState() {
     super.initState();
@@ -36,6 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleLogin() {
+    // 🔥 TẮT BÀN PHÍM XUỐNG NGAY LẬP TỨC KHI BẤM NÚT ĐĂNG NHẬP
     FocusManager.instance.primaryFocus?.unfocus();
 
     final l10n = AppLocalizations.of(context)!;
@@ -56,10 +53,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
     final appColors = ref.watch(appColorsProvider);
 
+    // 🟢 Lắng nghe sự thay đổi trạng thái đăng nhập
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.loginSuccess) {
-        // AppToast.showSuccess(context, l10n.loginSuccess, appColors);
+        // 1. Hiển thị thông báo thành công
+        AppToast.showSuccess(context, l10n.loginSuccess, appColors);
+
+        // 2. Chuyển trạng thái từ 'loginSuccess' sang 'authenticated' để AuthChecker nhận diện ổn định
         ref.read(authProvider.notifier).completeLogin();
+
+        // 3. 🔥 ĐIỀU HƯỚNG QUAN TRỌNG: Xóa sạch toàn bộ Stack màn hình cũ (bao gồm cả LoginScreen hiện tại)
+        // và đẩy AuthChecker lên làm màn hình chính.
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil('/auth_check', (route) => false);
@@ -76,318 +80,242 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
+    // 🔥 BỌC GESTURE DETECTOR ĐỂ TẮT BÀN PHÍM KHI CHẠM RA NGOÀI
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       child: Scaffold(
         backgroundColor: appColors.background,
         body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 32.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-
-                // 🌸 ĐIỂM NHẤN THỊ GIÁC (Icon/Logo)
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: appColors.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      CupertinoIcons.person_crop_circle_fill_badge_checkmark,
-                      size: 64,
-                      color: appColors.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Tiêu đề & Lời chào
-                Text(
-                  l10n.welcomeBack,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: appColors.primaryDark,
-                    letterSpacing: -0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.subTitle,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: appColors.textMuted,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-
-                // 🌸 NÂNG CẤP: Ô Nhập Email
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  style: TextStyle(
-                    color: appColors.text,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: l10n.email,
-                    labelStyle: TextStyle(color: appColors.textMuted),
-                    hintText: l10n.emailHint,
-                    prefixIcon: Icon(
-                      CupertinoIcons.mail,
-                      color: appColors.textMuted,
-                    ),
-                    filled: true,
-                    fillColor: appColors.cardBackground,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: appColors.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // 🌸 NÂNG CẤP: Ô Nhập Mật Khẩu (Có nút Show/Hide)
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) =>
-                      _handleLogin(), // Hỗ trợ bấm Enter/Done trên bàn phím để login
-                  style: TextStyle(
-                    color: appColors.text,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: l10n.password,
-                    labelStyle: TextStyle(color: appColors.textMuted),
-                    hintText: l10n.passwordHint,
-                    prefixIcon: Icon(
-                      CupertinoIcons.lock,
-                      color: appColors.textMuted,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? CupertinoIcons.eye_slash
-                            : CupertinoIcons.eye,
-                        color: _obscurePassword
-                            ? appColors.textMuted
-                            : appColors.primary,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                    filled: true,
-                    fillColor: appColors.cardBackground,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: appColors.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Thanh nút bấm Quên / Đặt lại mật khẩu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        _showForgotPasswordDialog(context);
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: appColors.primary,
+                    const SizedBox(height: 50),
+                    Text(
+                      l10n.welcomeBack,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: appColors.primary,
                       ),
-                      child: Text(
-                        l10n.forgotPasswordText,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.subTitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: appColors.textMuted,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Ô nhập Email
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: TextStyle(color: appColors.text),
+                      decoration: InputDecoration(
+                        labelText: l10n.email,
+                        labelStyle: TextStyle(color: appColors.textMuted),
+                        hintText: l10n.emailHint,
+                        hintStyle: TextStyle(
+                          color: appColors.textMuted.withOpacity(0.6),
+                        ),
+                        filled: true,
+                        fillColor: appColors.cardBackground,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Ô nhập Mật khẩu
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: TextStyle(color: appColors.text),
+                      decoration: InputDecoration(
+                        labelText: l10n.password,
+                        labelStyle: TextStyle(color: appColors.textMuted),
+                        hintText: l10n.passwordHint,
+                        hintStyle: TextStyle(
+                          color: appColors.textMuted.withOpacity(0.6),
+                        ),
+                        filled: true,
+                        fillColor: appColors.cardBackground,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Thanh nút bấm Quên / Đặt lại mật khẩu
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            _showForgotPasswordDialog(context);
+                          },
+                          child: Text(
+                            l10n.forgotPasswordText,
+                            style: TextStyle(
+                              color: appColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            _showResetPasswordDialog(context);
+                          },
+                          child: Text(
+                            l10n.resetPasswordText,
+                            style: TextStyle(
+                              color: appColors.primaryDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Nút Đăng Nhập
+                    authState == AuthState.loading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                appColors.primary,
+                              ),
+                            ),
+                          )
+                        : InkWell(
+                            onTap: _handleLogin,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: appColors.primary,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                l10n.loginButtonText,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: appColors.background,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                    const SizedBox(height: 24),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: appColors.textMuted.withOpacity(0.3),
+                            thickness: 0.5,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'OR',
+                            style: TextStyle(
+                              color: appColors.textMuted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: appColors.textMuted.withOpacity(0.3),
+                            thickness: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // NÚT BẤM ĐĂNG NHẬP BẰNG GOOGLE
+                    InkWell(
+                      onTap: authState == AuthState.loading
+                          ? null
+                          : () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              ref.read(authProvider.notifier).loginWithGoogle();
+                            },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: appColors.cardBackground,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: appColors.textMuted.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.network(
+                              'https://developers.google.com/static/identity/images/g-logo.png',
+                              height: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.loginGGButtonText,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: appColors.text,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Điều hướng sang Đăng ký
                     TextButton(
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
-                        _showResetPasswordDialog(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: appColors.primaryDark,
-                      ),
                       child: Text(
-                        l10n.resetPasswordText,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
+                        l10n.dontHaveAccount,
+                        style: TextStyle(color: appColors.primaryDark),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-
-                // 🌸 NÂNG CẤP: Nút Đăng Nhập
-                ElevatedButton(
-                  onPressed: authState == AuthState.loading
-                      ? null
-                      : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: appColors.primary,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: appColors.primary.withOpacity(0.6),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 4,
-                    shadowColor: appColors.primary.withOpacity(0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: authState == AuthState.loading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : Text(
-                          l10n.loginButtonText,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Thanh ngăn cách (Divider)
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: appColors.textMuted.withOpacity(0.2),
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(
-                          color: appColors.textMuted.withOpacity(0.7),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: appColors.textMuted.withOpacity(0.2),
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // 🌸 NÂNG CẤP: Nút Đăng nhập Google
-                OutlinedButton(
-                  onPressed: authState == AuthState.loading
-                      ? null
-                      : () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          ref.read(authProvider.notifier).loginWithGoogle();
-                        },
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: appColors.cardBackground,
-                    foregroundColor: appColors.text,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(
-                      color: appColors.textMuted.withOpacity(0.2),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.network(
-                        'https://developers.google.com/static/identity/images/g-logo.png',
-                        height: 22,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.loginGGButtonText,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Điều hướng sang Đăng ký
-                TextButton(
-                  onPressed: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterScreen(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    l10n.dontHaveAccount, // Giữ nguyên thông báo gốc của bạn
-                    textAlign: TextAlign
-                        .center, // Xử lý tràn viền: Tự động xuống dòng ở giữa nếu text dài
-                    style: TextStyle(
-                      color: appColors.primaryDark,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

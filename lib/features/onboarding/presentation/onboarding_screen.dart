@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io'; // Thêm import này nếu dùng PlatformDispatcher hoặc kiểm tra thiết bị
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,20 +43,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  // 🌍 Lấy ngôn ngữ từ thiết bị, mặc định là Tiếng Anh
-  Locale _getDeviceLocale() {
-    final deviceLocale = PlatformDispatcher.instance.locale;
-    if (deviceLocale.languageCode == 'vi') {
-      return const Locale('vi');
-    }
-    return const Locale('en');
-  }
-
   @override
   Widget build(BuildContext context) {
     final appColors = ref.watch(appColorsProvider);
-
-    // Sử dụng localization dựa trên thiết bị (hoặc giữ nguyên AppLocalizations.of(context)! nếu đã cấu hình ở MaterialApp)
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -63,31 +53,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // 🌸 Nút "Bỏ qua" (Skip) - Đặt nổi lên trên cùng
-            Positioned(
-              top: 16.0,
-              right: 24.0,
-              child: AnimatedOpacity(
-                opacity: _isLastPage ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 300),
-                child: TextButton(
-                  onPressed: () => _completeOnboarding(context),
-                  style: TextButton.styleFrom(
-                    foregroundColor: appColors.primaryDark.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    l10n.obSkip,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // 🌸 Khu vực nội dung vuốt chính
+            // 🌸 1. Khu vực nội dung vuốt chính (ĐƯA LÊN TRƯỚC LÀM NỀN PHÍA DƯỚI)
             Column(
               children: [
                 Expanded(
@@ -100,20 +66,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     children: [
                       _buildMomentPage(
                         appColors: appColors,
-                        icon: CupertinoIcons
-                            .camera_fill, // Icon máy ảnh/khoảnh khắc
+                        icon: CupertinoIcons.camera_fill,
                         title: l10n.obTitle1,
                         description: l10n.obDesc1,
-                        color: const Color(0xFF9D84B7), // Tím pastel hoài niệm
-                        rotation:
-                            -0.05, // Nghiêng nhẹ ảnh tạo cảm giác tự nhiên
+                        color: const Color(0xFF9D84B7),
+                        rotation: -0.05,
                       ),
                       _buildMomentPage(
                         appColors: appColors,
                         icon: CupertinoIcons.chart_pie_fill,
                         title: l10n.obTitle2,
                         description: l10n.obDesc2,
-                        color: const Color(0xFFF2A6A6), // Hồng cam hoàng hôn
+                        color: const Color(0xFFF2A6A6),
                         rotation: 0.05,
                       ),
                       _buildMomentPage(
@@ -121,7 +85,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         icon: CupertinoIcons.lock_shield_fill,
                         title: l10n.obTitle3,
                         description: l10n.obDesc3,
-                        color: const Color(0xFF83BCA9), // Xanh vintage mint
+                        color: const Color(0xFF83BCA9),
                         rotation: -0.02,
                       ),
                     ],
@@ -131,6 +95,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 // 🌸 Bottom Controls (Chỉ báo & Nút)
                 _buildBottomControls(appColors, l10n),
               ],
+            ),
+
+            // 🌟 2. NÚT SKIP (ĐƯA XUỐNG DƯỚI ĐỂ NỔI LÊN TRÊN CÙNG LAYER)
+            Positioned(
+              top: 16.0,
+              right: 24.0,
+              child: AnimatedOpacity(
+                opacity: _isLastPage ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                child: IgnorePointer(
+                  ignoring:
+                      _isLastPage, // Vô hiệu hóa vùng click hoàn toàn khi tàng hình ở trang cuối
+                  child: TextButton(
+                    onPressed: () => _completeOnboarding(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: appColors.primaryDark.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      l10n.obSkip,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -152,7 +144,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Hiệu ứng khung ảnh nghiêng
           Transform.rotate(
             angle: rotation,
             child: Container(
@@ -177,7 +168,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               child: Column(
                 children: [
-                  // Phần hình ảnh bên trong thẻ
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -201,7 +191,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Phần viền ghi chú giả lập ở dưới thẻ ảnh
                   Container(
                     height: 4,
                     width: 40,
@@ -216,8 +205,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 56),
-
-          // Typography phong cách sang trọng, mềm mại
           Text(
             title,
             textAlign: TextAlign.center,
@@ -236,7 +223,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: appColors.primaryDark.withOpacity(0.6),
-              height: 1.6, // Tăng khoảng cách dòng để dễ đọc hơn
+              height: 1.6,
             ),
           ),
           const SizedBox(height: 24),
@@ -252,7 +239,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Chỉ báo chấm động (Smooth Indicator)
           SmoothPageIndicator(
             controller: _controller,
             count: 3,
@@ -262,21 +248,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               activeDotColor: appColors.primary,
               dotHeight: 10,
               dotWidth: 10,
-              type: WormType.thinUnderground, // Hiệu ứng lướt nhẹ nhàng
+              type: WormType.thinUnderground,
             ),
           ),
-
-          // Nút bấm mềm mại
           AnimatedContainer(
             duration: const Duration(milliseconds: 400),
             curve: Curves.fastOutSlowIn,
-            width: _isLastPage ? 180 : 70, // Dài ra mềm mại khi đến trang cuối
+            width: _isLastPage ? 180 : 70,
             height: 60,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: appColors.primary,
                 padding: EdgeInsets.zero,
-                elevation: 0, // Bỏ bóng đổ cục bộ để dùng bóng tổng thể
+                elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),

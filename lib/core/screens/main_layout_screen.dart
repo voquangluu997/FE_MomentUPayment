@@ -1,11 +1,11 @@
-import 'dart:async'; // 👇 THÊM IMPORT NÀY ĐỂ QUẢN LÝ LUỒNG STREAM
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart'; // 📳 Quản lý HapticFeedback
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:home_widget/home_widget.dart'; // 👇 THÊM IMPORT ĐỂ SỬ DỤNG STREAM CLICK WIDGET
+import 'package:home_widget/home_widget.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 
 import 'package:moment_u_payment/core/services/quick_actions_service.dart';
@@ -40,19 +40,15 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 1. Lắng nghe sự kiện từ Quick Actions
-      // BẠN SỬA Ở ĐÂY: Xóa bỏ 'context' khỏi đối số của hàm init
       ref.read(quickActionsServiceProvider).init(() {
         _navigateToAddTransaction();
       });
 
-      // 2. Lắng nghe sự kiện từ Home Widget
       HomeWidgetService.checkWidgetLaunch(() {
         _navigateToAddTransaction();
       });
     });
 
-    // 3. ✨ NÂNG CẤP ĐỘT PHÁ: Lắng nghe click từ Home Widget khi app đang chạy ngầm (Background / Warm Start)
     _widgetClickSubscription = HomeWidget.widgetClicked.listen((Uri? uri) {
       if (uri != null && uri.host == 'add_transaction') {
         _navigateToAddTransaction();
@@ -62,14 +58,11 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
 
   @override
   void dispose() {
-    // 💥 CHÚ Ý BẮT BUỘC: Hủy lắng nghe luồng stream khi widget layout bị hủy để tránh leak bộ nhớ
     _widgetClickSubscription?.cancel();
     super.dispose();
   }
 
-  // Hàm helper để mở màn hình Thêm giao dịch tái sử dụng được nhiều nơi
   void _navigateToAddTransaction() {
-    // Kiểm tra xem màn hình AddTransaction đã được mở chưa để tránh mở đè trùng lặp nhiều màn
     Navigator.push(
       context,
       CupertinoPageRoute(builder: (_) => const AddTransactionScreen()),
@@ -86,7 +79,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
-        // Chỉ xử lý chuyển về Home khi đang ở màn Analytics (index 1)
         if (_currentIndex != 0) {
           setState(() {
             _currentIndex = 0;
@@ -158,7 +150,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       appColors: appColors,
                     ),
 
-                    // Nút Ngân sách Push màn hình
                     _buildNavItem(
                       index: -1,
                       icon: CupertinoIcons.creditcard,
@@ -175,7 +166,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       },
                     ),
 
-                    // Nút thêm giao dịch Premium
                     Tooltip(
                       message: l10n.addMomentTooltip,
                       child: PremiumAddButton(
@@ -184,7 +174,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
                       ),
                     ),
 
-                    // Analytics index 1
                     _buildNavItem(
                       index: 1,
                       icon: CupertinoIcons.chart_bar_square,
@@ -228,14 +217,20 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () async {
-        await HapticFeedback.selectionClick();
+      onTap: () {
         if (customAction != null) {
+          // 📳 Đã đổi sang Rung NHẸ (light) khi mở một màn hình mới hoặc BottomSheet
+          HapticFeedback.lightImpact();
           customAction();
         } else {
-          setState(() {
-            _currentIndex = index;
-          });
+          // Chỉ rung khi thực sự chuyển sang tab khác (không bấm trùng tab hiện tại)
+          if (_currentIndex != index) {
+            // 📳 Rung NHẸ (light) tạo cảm giác mượt mà khi chuyển Tab
+            HapticFeedback.lightImpact();
+            setState(() {
+              _currentIndex = index;
+            });
+          }
         }
       },
       child: AnimatedContainer(
@@ -331,11 +326,16 @@ class _PremiumAddButtonState extends State<PremiumAddButton>
     final appColors = widget.appColors;
 
     return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
+      onTapDown: (_) {
+        // 📳 Rung NHẸ ngay khoảnh khắc ngón tay vừa ấn xuống làm nút co lại
+        HapticFeedback.lightImpact();
+        _controller.forward();
+      },
       onTapUp: (_) => _controller.reverse(),
       onTapCancel: () => _controller.reverse(),
-      onTap: () async {
-        await HapticFeedback.mediumImpact();
+      onTap: () {
+        // 📳 Đã đổi sang Rung NHẸ khi thả tay ra và mở màn hình
+        HapticFeedback.lightImpact();
         widget.onTap();
       },
       child: ScaleTransition(

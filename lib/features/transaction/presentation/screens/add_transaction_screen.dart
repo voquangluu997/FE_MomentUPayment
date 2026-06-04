@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart'; // 📳 Import thư viện Haptic của Flutter
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -82,6 +83,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _pickDate() async {
+    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi mở DatePicker
+
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -105,6 +108,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _openCamera() async {
+    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ
     try {
       final photo = await _mediaService.takePhoto();
       if (photo != null) setState(() => _localImagePath = photo.path);
@@ -114,6 +118,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _openGallery() async {
+    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -127,6 +132,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _onAmountChanged(String value) {
+    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gõ số tiền
+
     String cleanStr = NumberFormatUtil.cleanValue(value);
     if (cleanStr.isEmpty) {
       _amountController.text = '';
@@ -140,6 +147,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _appendZeros(String zeros) {
+    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi bấm nút ".000"
     final text = _amountController.text.replaceAll('.', '').trim();
     if (text.isEmpty || text == '0') return;
     _onAmountChanged(text + zeros);
@@ -150,6 +158,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final appColors = ref.read(appColorsProvider);
 
     if (amountText.isEmpty) {
+      HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ cảnh báo lỗi
       AppToast.showError(
         context,
         'Vui lòng nhập số tiền hợp lệ nha! 💸',
@@ -157,6 +166,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       );
       return;
     }
+
+    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi bấm Lưu
 
     String finalCategory = _selectedCategory;
     if (_isCustomCategory) {
@@ -188,7 +199,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           emoji: _selectedEmoji,
           note: _noteController.text.trim(),
           localImagePath: _localImagePath,
-          spentAt: finalDateTimeUtc, // Truyền biến đã fix timezone vào đây
+          spentAt: finalDateTimeUtc,
         );
   }
 
@@ -198,13 +209,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final txState = ref.watch(transactionProvider);
     final l10n = AppLocalizations.of(context)!;
 
+    // 📳 Xử lý rung khi nhận kết quả từ API/State
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
       if (next == TransactionState.success) {
+        HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi thành công
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         ref.read(notificationProvider.notifier).fetchUnreadCount();
         Navigator.of(context).pop();
       } else if (next == TransactionState.error) {
+        HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi có lỗi
         AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
     });
@@ -246,7 +260,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 size: 18,
               ),
             ),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi bấm Back
+              Navigator.of(context).pop();
+            },
           ),
         ),
         body: SafeArea(
@@ -272,6 +289,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 _CategorySelector(
                   selectedCategory: _selectedCategory,
                   onSelect: (id, emoji, isCustom) {
+                    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chọn danh mục
                     setState(() {
                       _selectedCategory = id;
                       _selectedEmoji = emoji;
@@ -768,6 +786,7 @@ class _AmountInput extends ConsumerWidget {
                   if (value.text.isEmpty) return const SizedBox.shrink();
                   return GestureDetector(
                     onTap: () {
+                      HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi bấm xoá
                       controller.clear();
                       onChanged('');
                     },
