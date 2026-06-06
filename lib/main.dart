@@ -4,13 +4,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moment_u_payment/core/features/badges/screens/badge_gallery_page.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/screens/main_layout_screen.dart';
 import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
+import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/splash/presentation/screens/splash_screen.dart';
 // 👇 Đừng quên import file onboarding bạn vừa tạo nhé
 import 'package:moment_u_payment/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
 import 'package:moment_u_payment/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_colors.dart';
@@ -108,6 +112,10 @@ class MyApp extends ConsumerWidget {
         '/login': (context) => const LoginScreen(),
         '/auth_check': (context) => const AuthChecker(),
         '/main': (context) => const MainLayoutScreen(),
+        '/badge_gallery': (context) => const BadgeGalleryPage(),
+        '/budget_analytics': (context) => const AnalyticsScreen(),
+        '/create_transaction': (context) => const AddTransactionScreen(),
+        '/budget_settings': (context) => const SetBudgetScreen(),
       },
     );
   }

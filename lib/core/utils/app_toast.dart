@@ -64,7 +64,7 @@ class AppToast {
     );
   }
 
-  /// 🎨 Cấu trúc lõi "Full-Width Premium Banner Toast" - Trải dài 100% chiều rộng
+  /// 🎨 Cấu trúc lõi "Full-Width Premium Banner Toast" - Trải dài 100% chiều rộng≈
   static void _show({
     required BuildContext context,
     required String message,

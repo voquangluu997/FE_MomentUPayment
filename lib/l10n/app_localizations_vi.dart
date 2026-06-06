@@ -957,4 +957,334 @@ class AppLocalizationsVi extends AppLocalizations {
   String budgetWarningLow(String amountSpent) {
     return 'Úi úi, hạn mức mới này còn thấp hơn cả số tiền cậu đã vung tay trong tháng ($amountSpent) đó nha! 🚨🥺';
   }
+
+  @override
+  String get analyticsSwitchPeriod => 'Theo Giai Đoạn';
+
+  @override
+  String get analyticsSwitchMonthly => 'Tổng Kết Tháng';
+
+  @override
+  String analyticsMonthlyHonor(String month) {
+    return 'Vinh danh tháng $month';
+  }
+
+  @override
+  String get analyticsLastMonthReview => 'Nhìn lại tháng trước';
+
+  @override
+  String get analyticsAchievement => 'Thành Tích Của Bạn';
+
+  @override
+  String get analyticsTitleThrifty => 'Thánh Tiết Kiệm 🌿';
+
+  @override
+  String get analyticsDescThrifty =>
+      'Quản lý tuyệt vời, ví tiền của bạn đang rất hạnh phúc!';
+
+  @override
+  String get analyticsTitleSpender => 'Tay Chơi Thứ Thiệt 🔥';
+
+  @override
+  String get analyticsDescSpender =>
+      'Tháng này bạn đã vung tay khá mạnh, hãy cẩn thận nhé!';
+
+  @override
+  String get analyticsTitleConsistent => 'Người Kỷ Luật 🛡️';
+
+  @override
+  String get analyticsDescConsistent =>
+      'Chăm chỉ ghi chép, bạn đang làm chủ tài chính rất tốt!';
+
+  @override
+  String get chooseMonthYear => 'Chọn Tháng / Năm';
+
+  @override
+  String get badgeTabTitle => 'Bộ sưu tập';
+
+  @override
+  String get badgeUnlocked => 'Đã mở khóa';
+
+  @override
+  String get badgeLocked => 'Chưa mở khóa';
+
+  @override
+  String get badgeGhostTitle => 'Chúa Tể Lười Biếng';
+
+  @override
+  String get badgeGhostDesc =>
+      'Nguyên 1 tháng trời không ghi chép bất kỳ giao dịch nào. Lười thế là cùng!';
+
+  @override
+  String get badgeShopaholicTitle => 'Cơn Lốc Chốt Đơn';
+
+  @override
+  String get badgeShopaholicDesc =>
+      'Vung tiền hơn 40 lần trong tháng. Shipper chắc nhẵn mặt bạn rồi!';
+
+  @override
+  String get badgeWhaleTitle => 'Đại Gia Bạo Chi';
+
+  @override
+  String get badgeWhaleDesc =>
+      'Tiêu sương sương hơn 10 triệu đồng. Cho xin một vé làm quen đi sếp!';
+
+  @override
+  String get badgeSurvivalistTitle => 'Chiến Thần Sinh Tồn';
+
+  @override
+  String get badgeSurvivalistDesc =>
+      'Tháng này tiêu dưới 2 triệu đồng. Kỷ luật thép hay đang húp mì tôm qua ngày vậy?';
+
+  @override
+  String get badgeNightOwlTitle => 'Cú Đêm Cháy Ví';
+
+  @override
+  String get badgeNightOwlDesc =>
+      'Chốt đơn vào khung giờ thiêng từ 0h - 4h sáng. Lại lướt săn sale đúng không?';
+
+  @override
+  String get badgePaydayFlashTitle => 'Máy Xúc Ngày Lương';
+
+  @override
+  String get badgePaydayFlashDesc =>
+      'Mới ngày 1 đến ngày 5 đầu tháng mà tiền đã bay màu. Tiền đúng là phù du!';
+
+  @override
+  String get badgeFoodDestroyerTitle => 'Thực Thần Càn Quét';
+
+  @override
+  String get badgeFoodDestroyerDesc =>
+      'Hơn 50% số đơn là dành cho việc ăn uống. Đạo hàm của hạnh phúc là đồ ăn!';
+
+  @override
+  String get badgeWeekendStormTitle => 'Bão Táp Cuối Tuần';
+
+  @override
+  String get badgeWeekendStormDesc =>
+      'Cả tuần nhịn nhục, Thứ 7 Chủ Nhật xõa tung nóc. Dân chơi thứ thiệt đây rồi!';
+
+  @override
+  String get badgeGoldfishTitle => 'Não Cá Vàng';
+
+  @override
+  String get badgeGoldfishDesc =>
+      'Có tới 5 lần trở lên phải ghi bù lùi ngày cũ. Có quên mật khẩu két sắt không đấy?';
+
+  @override
+  String get badgeBrokeAFTitle => 'Đỗ Nghèo Khỉ';
+
+  @override
+  String get badgeBrokeAFDesc =>
+      'Chuyên gia ghi chép hơn 10 món lắt nhắt dưới 10.000đ. Tích tiểu thành đại ráng lên!';
+
+  @override
+  String get badgeBigTicketTitle => 'Quẹt Thẻ Khét Lẹt';
+
+  @override
+  String get badgeBigTicketDesc =>
+      'Một phát chốt đơn siêu to khổng lồ trị giá hơn 5 triệu đồng! Nhìn thông báo trừ tiền mà xót giùm.';
+
+  @override
+  String get badgeFirstBloodTitle => 'Khởi Đầu Mới';
+
+  @override
+  String get badgeFirstBloodDesc =>
+      'Tạo thành công giao dịch đầu tiên trên ứng dụng. Chào mừng bạn!';
+
+  @override
+  String get badgeCenturionTitle => 'Trăm Trận Trăm Thắng';
+
+  @override
+  String get badgeCenturionDesc =>
+      'Đạt cột mốc 100 giao dịch trọn đời. Sự kiên trì đáng kinh ngạc!';
+
+  @override
+  String get badgeBalancedTitle => 'Bậc Thầy Cân Bằng';
+
+  @override
+  String get badgeBalancedDesc =>
+      'Kiểm soát chi tiêu hoàn hảo trong mức 2 đến 7 triệu đồng. Không hoang phí cũng không túng thiếu!';
+
+  @override
+  String notiMonthlySummaryTitle(String month) {
+    return 'Báo cáo chi tiêu tháng $month 📊';
+  }
+
+  @override
+  String notiMonthlySummaryBody(String total, String category, String emoji) {
+    return 'Bạn đã tiêu $total tháng qua. $category $emoji là thủ phạm lớn nhất.';
+  }
+
+  @override
+  String get notiBadgeUnlockedTitle => 'Mở khóa thành tựu mới! 🏆';
+
+  @override
+  String notiBadgeUnlockedBody(String badgeName) {
+    return 'Đỉnh quá! Bạn vừa nhận được huy hiệu \"$badgeName\".';
+  }
+
+  @override
+  String get notiBadgeResetTitle => 'Làm mới huy hiệu tháng 🔄';
+
+  @override
+  String get notiBadgeResetBody =>
+      'Tháng mới đã sang! Các huy hiệu đua top đã được reset. Chinh phục lại nào!';
+
+  @override
+  String get congratsSingleTitle => 'Đỉnh chóp! Huy hiệu mới trình làng! 🏆';
+
+  @override
+  String get congratsMultipleTitle =>
+      'Úi chà chà! Đợt này \'trúng mánh\' danh hiệu rồi! ⛈️🏆';
+
+  @override
+  String get congratsSingleSub =>
+      'Hào quang rực rỡ! Bạn vừa chính thức chinh phục thành tựu:';
+
+  @override
+  String get congratsMultipleSub =>
+      'Quá gke gớm! Bộ sưu tập vinh danh của bạn vừa kết nạp thêm:';
+
+  @override
+  String get congratsButton => 'Chốt luôn, quá đã! 😎';
+
+  @override
+  String get homeBadgeTitle => 'Huy chương khoe khéo';
+
+  @override
+  String get emptyBadgeText =>
+      'Chưa có huy hiệu nào? Thử thách bản thân ngay đi bạn ơi! 👀';
+
+  @override
+  String get defaultUser => 'Người dùng';
+
+  @override
+  String get congratsTitle => 'Tuyệt vời! 🎉';
+
+  @override
+  String badgeOwnedMessage(String badgeName) {
+    return 'Bạn đang sở hữu huy hiệu đặc quyền:\n$badgeName';
+  }
+
+  @override
+  String get exploreCollection => 'Khám phá Bộ sưu tập';
+
+  @override
+  String get later => 'Để sau';
+
+  @override
+  String get badgesTitle => 'Huy hiệu';
+
+  @override
+  String get badgesSubtitle => 'Thu thập và hiển thị các thành tựu của bạn';
+
+  @override
+  String get badgeTagMonthly => 'THÁNG';
+
+  @override
+  String get badgeTagElite => 'ĐẲNG CẤP';
+
+  @override
+  String get badgeTypeMonthly => 'DANH HIỆU THÁNG';
+
+  @override
+  String get badgeTypeElite => 'THÀNH TỰU ĐẲNG CẤP';
+
+  @override
+  String get badgeLockedTitle => 'Thành Tựu Bí Ẩn';
+
+  @override
+  String get badgeLockedSecretDesc => 'Năng lượng đang tích tụ. Sắp bùng nổ...';
+
+  @override
+  String get badgeLockedDialogDesc =>
+      'Thực thể này đang bị phong ấn! Hãy duy trì chuỗi giao dịch và phá vỡ giới hạn chi tiêu để kích hoạt sức mạnh đang ngủ yên này nhé. 💥';
+
+  @override
+  String get myCollectionButton => 'Bộ sưu tập của tôi';
+
+  @override
+  String get badgeHintAlmost =>
+      'Bạn đã đi được hơn nửa chặng đường! Sắp thành công rồi...';
+
+  @override
+  String get badgeHintStart =>
+      'Hành trình ngàn dặm bắt đầu từ một bước chân...';
+
+  @override
+  String get shareBadgeMessage =>
+      'Tuyệt vời! Tôi vừa xuất sắc mở khóa huy hiệu';
+
+  @override
+  String get shareBadgeAction => 'Khoe chiến tích ✨';
+
+  @override
+  String get hintFirstBlood =>
+      'Mọi hành trình vĩ đại đều bắt đầu từ một bước chân đầu tiên...';
+
+  @override
+  String get hintCenturion =>
+      'Sự bền bỉ tạo nên huyền thoại. Hãy tiếp tục ghi lại những khoảnh khắc...';
+
+  @override
+  String get hintGhost =>
+      'Đôi khi sự im lặng lại là âm thanh lớn nhất. Đã bao lâu rồi bạn chưa ghé thăm?';
+
+  @override
+  String get hintBigTicket =>
+      'Đừng ngại chi tiêu cho những quyết định lớn xứng đáng...';
+
+  @override
+  String get hintPaydayFlash =>
+      'Ngày lương về là lúc tự thưởng cho bản thân một chút nuông chiều...';
+
+  @override
+  String get hintNightOwl =>
+      'Bóng tối là đồng minh của bạn. Hãy thử thanh toán khi thành phố đã ngủ say...';
+
+  @override
+  String get hintWeekendStorm =>
+      'Cuối tuần là để xả hơi. Bạn đã chuẩn bị cho một cơn bão mua sắm chưa?';
+
+  @override
+  String get hintShopaholic =>
+      'Đam mê không giới hạn. Đôi khi số lượng áp đảo tất cả...';
+
+  @override
+  String get hintWhale =>
+      'Đại dương mênh mông cần những vị vua. Kỷ lục chi tiêu của bạn ở đâu?';
+
+  @override
+  String get hintSurvivalist =>
+      'Nghệ thuật giữ tiền vĩ đại không kém việc kiếm tiền. Hãy thật tiết kiệm...';
+
+  @override
+  String get hintFoodDestroyer =>
+      'Dạ dày của bạn là một vũ trụ vô tận. Hãy lấp đầy nó bằng những món ngon...';
+
+  @override
+  String get hintBrokeAF =>
+      'Tích tiểu thành đại, hay nhiều khoản nhỏ làm cạn ví? Hãy chú ý những chi phí vụn vặt...';
+
+  @override
+  String get hintGoldfish =>
+      'Quá khứ cần được ghi lại. Bạn có thường quên nhập giao dịch rồi phải ghi lùi ngày không?';
+
+  @override
+  String get hintBalanced =>
+      'Sự hoàn hảo nằm ở điểm cân bằng. Không quá phung phí, không quá tằn tiện...';
+
+  @override
+  String get hintDefault =>
+      'Bí mật đang chờ đợi những người kiên nhẫn khám phá...';
+
+  @override
+  String get markAllAsReadSuccess => 'Đã đánh dấu đọc tất cả thông báo';
+
+  @override
+  String get readMore => 'Xem thêm...';
+
+  @override
+  String get collapse => 'Thu gọn';
 }

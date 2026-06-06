@@ -211,7 +211,7 @@
   "@notiFirstLoginReminderBody": {
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String"  
       }
     }
   },
@@ -470,6 +470,142 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "analyticsSwitchPeriod": "By Period",
+  "analyticsSwitchMonthly": "Monthly Summary",
+  "analyticsMonthlyHonor": "Honor of Month {month}",
+  "@analyticsMonthlyHonor": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsLastMonthReview": "Last Month Review",
+  "analyticsAchievement": "Your Achievement",
+  "analyticsTitleThrifty": "Thrifty Ninja 🌿",
+  "analyticsDescThrifty": "Great management, your wallet is very happy!",
+  "analyticsTitleSpender": "Big Spender 🔥",
+  "analyticsDescSpender": "You spent quite heavily this month, be careful!",
+  "analyticsTitleConsistent": "Discipline Master 🛡️",
+  "analyticsDescConsistent": "Diligent tracking, you are mastering your finances!",
+  "chooseMonthYear": "Choose Month / Year",
+
+  "badgeTabTitle": "My Badges",
+  "badgeUnlocked": "Unlocked",
+  "badgeLocked": "Locked",
   
+  "badgeGhostTitle": "The Ultimate Sloth",
+  "badgeGhostDesc": "Didn't log a single transaction all month. Talk about lazy!",
+  "badgeShopaholicTitle": "Checkout Tornado",
+  "badgeShopaholicDesc": "Logged over 40 transactions this month. The delivery guy probably knows you by name now!",
+  "badgeWhaleTitle": "The Great Whale",
+  "badgeWhaleDesc": "Casually dropped over $500 this month. Mind if we become friends, boss?",
+  "badgeSurvivalistTitle": "Survival God",
+  "badgeSurvivalistDesc": "Spent under $100 this month. Iron discipline or just eating instant noodles everyday?",
+  "badgeNightOwlTitle": "Midnight Burner",
+  "badgeNightOwlDesc": "Made a transaction between 12 AM and 4 AM. 2 AM sale hunting again, huh?",
+  "badgePaydayFlashTitle": "Payday Evaporator",
+  "badgePaydayFlashDesc": "Spent heavily between the 1st and 5th of the month. Money is just an illusion!",
+  "badgeFoodDestroyerTitle": "Foodie Destroyer",
+  "badgeFoodDestroyerDesc": "Over 50% of your transactions went to food. The true path to happiness!",
+  "badgeWeekendStormTitle": "Weekend Hurricane",
+  "badgeWeekendStormDesc": "Held back all week just to go wild on Saturday or Sunday. A true party animal!",
+  "badgeGoldfishTitle": "Goldfish Brain",
+  "badgeGoldfishDesc": "Logged 5 or more backdated expenses. Did you forget your phone password too?",
+  "badgeBrokeAFTitle": "Broke AF",
+  "badgeBrokeAFDesc": "Logged over 10 tiny transactions under $0.5. Every penny counts, keep it up!",
+  "badgeBigTicketTitle": "Swiped & Scorched",
+  "badgeBigTicketDesc": "One giant transaction over $250! Even looking at the bank notification hurts.",
+  "badgeFirstBloodTitle": "First Blood",
+  "badgeFirstBloodDesc": "Logged your very first transaction. Welcome to the club!",
+  "badgeCenturionTitle": "The Centurion",
+  "badgeCenturionDesc": "Reached 100 total transactions. What a dedication!",
+  "badgeBalancedTitle": "Zen Master",
+  "badgeBalancedDesc": "Kept your monthly spending perfectly balanced between $100 and $350.",
+
+  "notiMonthlySummaryTitle": "Spending Report: Month {month} 📊",
+  "@notiMonthlySummaryTitle": {
+    "placeholders": {
+      "month": { "type": "String" }
+    }
+  },
+  "notiMonthlySummaryBody": "You spent {total} last month. {category} {emoji} was your biggest expense.",
+  "@notiMonthlySummaryBody": {
+    "placeholders": {
+      "total": { "type": "String" },
+      "category": { "type": "String" },
+      "emoji": { "type": "String" }
+    }
+  },
+
+  "notiBadgeUnlockedTitle": "New Achievement Unlocked! 🏆",
+  "notiBadgeUnlockedBody": "Awesome! You have earned the \"{badgeName}\" badge.",
+  "@notiBadgeUnlockedBody": {
+    "placeholders": {
+      "badgeName": { "type": "String" }
+    }
+  },
+  "notiBadgeResetTitle": "Monthly Badges Reset 🔄",
+  "notiBadgeResetBody": "A new month begins! Monthly rankings have been reset. Time to conquer them again!",
+  "congratsSingleTitle": "Boom! New Badge on the Block! 🏆",
+  "congratsMultipleTitle": "Look at You! Catching a Shower of Badges! ⛈️🏆",
+  "congratsSingleSub": "Absolute legend! You just conquered:",
+  "congratsMultipleSub": "Unstoppable! Your collection just welcomed a fresh squad:",
+  "congratsButton": "Sweet! Let's gooo! 😎",
+  "homeBadgeTitle": "Flex Zone",
+  "emptyBadgeText": "No badges yet? Time to flex your financial superpowers! 👀",
+
+  "defaultUser": "User",
+  "congratsTitle": "Wonderful! 🎉",
+  "badgeOwnedMessage": "You own an exclusive badge:\n{badgeName}",
+  "@badgeOwnedMessage": {
+    "placeholders": {
+      "badgeName": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreCollection": "Explore Collection",
+  "later": "Later",
+  
+  "badgesTitle": "Badges",
+  "badgesSubtitle": "Collect and display your achievements",
+
+  "badgeTagMonthly": "MONTHLY",
+  "badgeTagElite": "ELITE",
+  "badgeTypeMonthly": "MONTHLY BADGE",
+  "badgeTypeElite": "ELITE ACHIEVEMENT",
+  "badgeLockedTitle": "Mysterious Relic",
+  "badgeLockedSecretDesc": "Energy is building up. Ready to explode...",
+  "badgeLockedDialogDesc": "This entity is currently sealed! Maintain your transaction streak and break your spending limits to awaken this dormant power. 💥",
+  "closeButton": "Close",
+  "myCollectionButton": "My Collection",
+
+  "badgeHintAlmost": "You are halfway there! Keep it up...",
+  "badgeHintStart": "A journey of a thousand miles begins with a single step...",
+  "shareBadgeMessage": "Awesome! I just unlocked the badge",
+  "shareBadgeAction": "Share Achievement ✨",
+
+  "hintFirstBlood": "Every great journey begins with a single step...",
+  "hintCenturion": "Persistence creates legends. Keep recording those moments...",
+  "hintGhost": "Sometimes silence is the loudest sound. How long has it been since you last visited?",
+  "hintBigTicket": "Don't hesitate to splurge on those worthy big decisions...",
+  "hintPaydayFlash": "Payday is the time to treat yourself to a little indulgence...",
+  "hintNightOwl": "Darkness is your ally. Try making a transaction while the city sleeps...",
+  "hintWeekendStorm": "Weekends are for unwinding. Are you ready for a shopping storm?",
+  "hintShopaholic": "Passion has no limits. Sometimes quantity trumps everything...",
+  "hintWhale": "The vast ocean needs kings. Where's your spending record?",
+  "hintSurvivalist": "The art of saving is just as great as earning. Stay frugal...",
+  "hintFoodDestroyer": "Your stomach is an endless universe. Fill it with something delicious...",
+  "hintBrokeAF": "Small expenses add up. Watch those tiny costs that drain your wallet...",
+  "hintGoldfish": "The past needs to be recorded. Do you often forget to enter transactions and have to backdate them?",
+  "hintBalanced": "Perfection lies in balance. Not too extravagant, not too frugal...",
+  "hintDefault": "Secrets await those patient enough to discover them...",
+
+  "markAllAsReadSuccess": "All notifications marked as read",
+  "readMore": "Read more...",
+  "collapse": "Collapse"
+
 }

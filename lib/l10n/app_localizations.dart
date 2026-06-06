@@ -1811,6 +1811,564 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uh-oh, this new limit is even lower than the amount you\'ve already spent this month ({amountSpent})! 🚨🥺'**
   String budgetWarningLow(String amountSpent);
+
+  /// No description provided for @analyticsSwitchPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'By Period'**
+  String get analyticsSwitchPeriod;
+
+  /// No description provided for @analyticsSwitchMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Summary'**
+  String get analyticsSwitchMonthly;
+
+  /// No description provided for @analyticsMonthlyHonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Honor of Month {month}'**
+  String analyticsMonthlyHonor(String month);
+
+  /// No description provided for @analyticsLastMonthReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Month Review'**
+  String get analyticsLastMonthReview;
+
+  /// No description provided for @analyticsAchievement.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Achievement'**
+  String get analyticsAchievement;
+
+  /// No description provided for @analyticsTitleThrifty.
+  ///
+  /// In en, this message translates to:
+  /// **'Thrifty Ninja 🌿'**
+  String get analyticsTitleThrifty;
+
+  /// No description provided for @analyticsDescThrifty.
+  ///
+  /// In en, this message translates to:
+  /// **'Great management, your wallet is very happy!'**
+  String get analyticsDescThrifty;
+
+  /// No description provided for @analyticsTitleSpender.
+  ///
+  /// In en, this message translates to:
+  /// **'Big Spender 🔥'**
+  String get analyticsTitleSpender;
+
+  /// No description provided for @analyticsDescSpender.
+  ///
+  /// In en, this message translates to:
+  /// **'You spent quite heavily this month, be careful!'**
+  String get analyticsDescSpender;
+
+  /// No description provided for @analyticsTitleConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Discipline Master 🛡️'**
+  String get analyticsTitleConsistent;
+
+  /// No description provided for @analyticsDescConsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Diligent tracking, you are mastering your finances!'**
+  String get analyticsDescConsistent;
+
+  /// No description provided for @chooseMonthYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Month / Year'**
+  String get chooseMonthYear;
+
+  /// No description provided for @badgeTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Badges'**
+  String get badgeTabTitle;
+
+  /// No description provided for @badgeUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get badgeUnlocked;
+
+  /// No description provided for @badgeLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get badgeLocked;
+
+  /// No description provided for @badgeGhostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Ultimate Sloth'**
+  String get badgeGhostTitle;
+
+  /// No description provided for @badgeGhostDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t log a single transaction all month. Talk about lazy!'**
+  String get badgeGhostDesc;
+
+  /// No description provided for @badgeShopaholicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout Tornado'**
+  String get badgeShopaholicTitle;
+
+  /// No description provided for @badgeShopaholicDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged over 40 transactions this month. The delivery guy probably knows you by name now!'**
+  String get badgeShopaholicDesc;
+
+  /// No description provided for @badgeWhaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Great Whale'**
+  String get badgeWhaleTitle;
+
+  /// No description provided for @badgeWhaleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Casually dropped over \$500 this month. Mind if we become friends, boss?'**
+  String get badgeWhaleDesc;
+
+  /// No description provided for @badgeSurvivalistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Survival God'**
+  String get badgeSurvivalistTitle;
+
+  /// No description provided for @badgeSurvivalistDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent under \$100 this month. Iron discipline or just eating instant noodles everyday?'**
+  String get badgeSurvivalistDesc;
+
+  /// No description provided for @badgeNightOwlTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight Burner'**
+  String get badgeNightOwlTitle;
+
+  /// No description provided for @badgeNightOwlDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Made a transaction between 12 AM and 4 AM. 2 AM sale hunting again, huh?'**
+  String get badgeNightOwlDesc;
+
+  /// No description provided for @badgePaydayFlashTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payday Evaporator'**
+  String get badgePaydayFlashTitle;
+
+  /// No description provided for @badgePaydayFlashDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent heavily between the 1st and 5th of the month. Money is just an illusion!'**
+  String get badgePaydayFlashDesc;
+
+  /// No description provided for @badgeFoodDestroyerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Foodie Destroyer'**
+  String get badgeFoodDestroyerTitle;
+
+  /// No description provided for @badgeFoodDestroyerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Over 50% of your transactions went to food. The true path to happiness!'**
+  String get badgeFoodDestroyerDesc;
+
+  /// No description provided for @badgeWeekendStormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend Hurricane'**
+  String get badgeWeekendStormTitle;
+
+  /// No description provided for @badgeWeekendStormDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Held back all week just to go wild on Saturday or Sunday. A true party animal!'**
+  String get badgeWeekendStormDesc;
+
+  /// No description provided for @badgeGoldfishTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Goldfish Brain'**
+  String get badgeGoldfishTitle;
+
+  /// No description provided for @badgeGoldfishDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged 5 or more backdated expenses. Did you forget your phone password too?'**
+  String get badgeGoldfishDesc;
+
+  /// No description provided for @badgeBrokeAFTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Broke AF'**
+  String get badgeBrokeAFTitle;
+
+  /// No description provided for @badgeBrokeAFDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged over 10 tiny transactions under \$0.5. Every penny counts, keep it up!'**
+  String get badgeBrokeAFDesc;
+
+  /// No description provided for @badgeBigTicketTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Swiped & Scorched'**
+  String get badgeBigTicketTitle;
+
+  /// No description provided for @badgeBigTicketDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'One giant transaction over \$250! Even looking at the bank notification hurts.'**
+  String get badgeBigTicketDesc;
+
+  /// No description provided for @badgeFirstBloodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First Blood'**
+  String get badgeFirstBloodTitle;
+
+  /// No description provided for @badgeFirstBloodDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged your very first transaction. Welcome to the club!'**
+  String get badgeFirstBloodDesc;
+
+  /// No description provided for @badgeCenturionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Centurion'**
+  String get badgeCenturionTitle;
+
+  /// No description provided for @badgeCenturionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reached 100 total transactions. What a dedication!'**
+  String get badgeCenturionDesc;
+
+  /// No description provided for @badgeBalancedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Zen Master'**
+  String get badgeBalancedTitle;
+
+  /// No description provided for @badgeBalancedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept your monthly spending perfectly balanced between \$100 and \$350.'**
+  String get badgeBalancedDesc;
+
+  /// No description provided for @notiMonthlySummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Report: Month {month} 📊'**
+  String notiMonthlySummaryTitle(String month);
+
+  /// No description provided for @notiMonthlySummaryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You spent {total} last month. {category} {emoji} was your biggest expense.'**
+  String notiMonthlySummaryBody(String total, String category, String emoji);
+
+  /// No description provided for @notiBadgeUnlockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Achievement Unlocked! 🏆'**
+  String get notiBadgeUnlockedTitle;
+
+  /// No description provided for @notiBadgeUnlockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome! You have earned the \"{badgeName}\" badge.'**
+  String notiBadgeUnlockedBody(String badgeName);
+
+  /// No description provided for @notiBadgeResetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Badges Reset 🔄'**
+  String get notiBadgeResetTitle;
+
+  /// No description provided for @notiBadgeResetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A new month begins! Monthly rankings have been reset. Time to conquer them again!'**
+  String get notiBadgeResetBody;
+
+  /// No description provided for @congratsSingleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Boom! New Badge on the Block! 🏆'**
+  String get congratsSingleTitle;
+
+  /// No description provided for @congratsMultipleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at You! Catching a Shower of Badges! ⛈️🏆'**
+  String get congratsMultipleTitle;
+
+  /// No description provided for @congratsSingleSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Absolute legend! You just conquered:'**
+  String get congratsSingleSub;
+
+  /// No description provided for @congratsMultipleSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstoppable! Your collection just welcomed a fresh squad:'**
+  String get congratsMultipleSub;
+
+  /// No description provided for @congratsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweet! Let\'s gooo! 😎'**
+  String get congratsButton;
+
+  /// No description provided for @homeBadgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flex Zone'**
+  String get homeBadgeTitle;
+
+  /// No description provided for @emptyBadgeText.
+  ///
+  /// In en, this message translates to:
+  /// **'No badges yet? Time to flex your financial superpowers! 👀'**
+  String get emptyBadgeText;
+
+  /// No description provided for @defaultUser.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get defaultUser;
+
+  /// No description provided for @congratsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderful! 🎉'**
+  String get congratsTitle;
+
+  /// No description provided for @badgeOwnedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You own an exclusive badge:\n{badgeName}'**
+  String badgeOwnedMessage(String badgeName);
+
+  /// No description provided for @exploreCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Collection'**
+  String get exploreCollection;
+
+  /// No description provided for @later.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
+
+  /// No description provided for @badgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badgesTitle;
+
+  /// No description provided for @badgesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect and display your achievements'**
+  String get badgesSubtitle;
+
+  /// No description provided for @badgeTagMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'MONTHLY'**
+  String get badgeTagMonthly;
+
+  /// No description provided for @badgeTagElite.
+  ///
+  /// In en, this message translates to:
+  /// **'ELITE'**
+  String get badgeTagElite;
+
+  /// No description provided for @badgeTypeMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'MONTHLY BADGE'**
+  String get badgeTypeMonthly;
+
+  /// No description provided for @badgeTypeElite.
+  ///
+  /// In en, this message translates to:
+  /// **'ELITE ACHIEVEMENT'**
+  String get badgeTypeElite;
+
+  /// No description provided for @badgeLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mysterious Relic'**
+  String get badgeLockedTitle;
+
+  /// No description provided for @badgeLockedSecretDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy is building up. Ready to explode...'**
+  String get badgeLockedSecretDesc;
+
+  /// No description provided for @badgeLockedDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This entity is currently sealed! Maintain your transaction streak and break your spending limits to awaken this dormant power. 💥'**
+  String get badgeLockedDialogDesc;
+
+  /// No description provided for @myCollectionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'My Collection'**
+  String get myCollectionButton;
+
+  /// No description provided for @badgeHintAlmost.
+  ///
+  /// In en, this message translates to:
+  /// **'You are halfway there! Keep it up...'**
+  String get badgeHintAlmost;
+
+  /// No description provided for @badgeHintStart.
+  ///
+  /// In en, this message translates to:
+  /// **'A journey of a thousand miles begins with a single step...'**
+  String get badgeHintStart;
+
+  /// No description provided for @shareBadgeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome! I just unlocked the badge'**
+  String get shareBadgeMessage;
+
+  /// No description provided for @shareBadgeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Achievement ✨'**
+  String get shareBadgeAction;
+
+  /// No description provided for @hintFirstBlood.
+  ///
+  /// In en, this message translates to:
+  /// **'Every great journey begins with a single step...'**
+  String get hintFirstBlood;
+
+  /// No description provided for @hintCenturion.
+  ///
+  /// In en, this message translates to:
+  /// **'Persistence creates legends. Keep recording those moments...'**
+  String get hintCenturion;
+
+  /// No description provided for @hintGhost.
+  ///
+  /// In en, this message translates to:
+  /// **'Sometimes silence is the loudest sound. How long has it been since you last visited?'**
+  String get hintGhost;
+
+  /// No description provided for @hintBigTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t hesitate to splurge on those worthy big decisions...'**
+  String get hintBigTicket;
+
+  /// No description provided for @hintPaydayFlash.
+  ///
+  /// In en, this message translates to:
+  /// **'Payday is the time to treat yourself to a little indulgence...'**
+  String get hintPaydayFlash;
+
+  /// No description provided for @hintNightOwl.
+  ///
+  /// In en, this message translates to:
+  /// **'Darkness is your ally. Try making a transaction while the city sleeps...'**
+  String get hintNightOwl;
+
+  /// No description provided for @hintWeekendStorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekends are for unwinding. Are you ready for a shopping storm?'**
+  String get hintWeekendStorm;
+
+  /// No description provided for @hintShopaholic.
+  ///
+  /// In en, this message translates to:
+  /// **'Passion has no limits. Sometimes quantity trumps everything...'**
+  String get hintShopaholic;
+
+  /// No description provided for @hintWhale.
+  ///
+  /// In en, this message translates to:
+  /// **'The vast ocean needs kings. Where\'s your spending record?'**
+  String get hintWhale;
+
+  /// No description provided for @hintSurvivalist.
+  ///
+  /// In en, this message translates to:
+  /// **'The art of saving is just as great as earning. Stay frugal...'**
+  String get hintSurvivalist;
+
+  /// No description provided for @hintFoodDestroyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stomach is an endless universe. Fill it with something delicious...'**
+  String get hintFoodDestroyer;
+
+  /// No description provided for @hintBrokeAF.
+  ///
+  /// In en, this message translates to:
+  /// **'Small expenses add up. Watch those tiny costs that drain your wallet...'**
+  String get hintBrokeAF;
+
+  /// No description provided for @hintGoldfish.
+  ///
+  /// In en, this message translates to:
+  /// **'The past needs to be recorded. Do you often forget to enter transactions and have to backdate them?'**
+  String get hintGoldfish;
+
+  /// No description provided for @hintBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfection lies in balance. Not too extravagant, not too frugal...'**
+  String get hintBalanced;
+
+  /// No description provided for @hintDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Secrets await those patient enough to discover them...'**
+  String get hintDefault;
+
+  /// No description provided for @markAllAsReadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read'**
+  String get markAllAsReadSuccess;
+
+  /// No description provided for @readMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more...'**
+  String get readMore;
+
+  /// No description provided for @collapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapse;
 }
 
 class _AppLocalizationsDelegate

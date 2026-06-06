@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/features/badges/screens/badge_gallery_page.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/providers/locale_provider.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
@@ -136,6 +137,45 @@ class SettingsBottomSheet extends ConsumerWidget {
                       ),
 
                       // PHÂN NHÓM 2: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
+
+                      // --- MỤC HUY HIỆU MỚI THÊM VÀO ĐÂY ---
+                      _buildSettingItem(
+                        icon: CupertinoIcons.rosette,
+                        title: l10n.badgesTitle,
+                        subtitle: l10n.badgesSubtitle,
+                        appColors: appColors,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(context).pop(); // Đóng BottomSheet
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (_) =>
+                                  const BadgeGalleryPage(), // Thay bằng tên Screen của bạn
+                            ),
+                          );
+                        },
+                      ),
+
+                      _buildSettingItem(
+                        icon: CupertinoIcons
+                            .moon, // 🍏 Đổi từ CupertinoIcons.dark_mode_rounded sang Cupertino
+                        title: l10n.darkMode,
+                        subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
+                        appColors: appColors,
+                        trailing: Switch(
+                          value: isDark,
+                          activeColor: appColors.primary,
+                          onChanged: (val) {
+                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
+                            ref.read(themeModeProvider.notifier).toggleTheme();
+                          },
+                        ),
+                        onTap: () {
+                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn vào row
+                          ref.read(themeModeProvider.notifier).toggleTheme();
+                        },
+                      ),
+
                       _buildSettingItem(
                         icon: CupertinoIcons
                             .globe, // 🍏 Đổi từ CupertinoIcons.language_rounded sang Cupertino
@@ -153,6 +193,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           },
                         ),
                       ),
+
                       _buildSettingItem(
                         icon: CupertinoIcons
                             .money_dollar_circle, // 🍏 Đổi từ CupertinoIcons.monetization_on_rounded sang Cupertino
@@ -227,25 +268,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                             ),
                           ),
                         ),
-                      ),
-                      _buildSettingItem(
-                        icon: CupertinoIcons
-                            .moon, // 🍏 Đổi từ CupertinoIcons.dark_mode_rounded sang Cupertino
-                        title: l10n.darkMode,
-                        subtitle: isDark ? "Giao diện tối" : l10n.lightTheme,
-                        appColors: appColors,
-                        trailing: Switch(
-                          value: isDark,
-                          activeColor: appColors.primary,
-                          onChanged: (val) {
-                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
-                            ref.read(themeModeProvider.notifier).toggleTheme();
-                          },
-                        ),
-                        onTap: () {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn vào row
-                          ref.read(themeModeProvider.notifier).toggleTheme();
-                        },
                       ),
 
                       Padding(

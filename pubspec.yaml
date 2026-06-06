@@ -33,7 +33,7 @@ dependencies:
   flutter_localizations: # ✨ để hỗ trợ các component hệ thống (DatePicker, v.v.)
     sdk: flutter
   intl: ^0.20.2 # ✨ để xử lý định dạng ngôn ngữ/ngày tháng
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.5.1
   dio: ^5.4.1
   image_picker: ^1.1.2 # ✨thư viện camera & media này vào
@@ -54,6 +54,7 @@ dependencies:
   flutter_native_splash: ^2.4.8
   quick_actions: ^1.0.8
   home_widget: ^0.7.0
+  share_plus: ^13.1.0
 
 dev_dependencies:
   flutter_test:

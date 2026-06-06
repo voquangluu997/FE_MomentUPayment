@@ -7,6 +7,7 @@ import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/home_badge_carousel.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
@@ -32,6 +33,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   DateTimeRange? _selectedDateRange;
+  bool _showBadgeCarousel = true;
 
   @override
   void initState() {
@@ -104,7 +106,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBudgetCardWithNavigation(AppLocalizations l10n) {
-    return const Stack(children: [HomeBudgetCard()]);
+    return Column(
+      children: [
+        if (_showBadgeCarousel) ...[
+          HomeBadgeCarousel(
+            onClose: () {
+              setState(() {
+                _showBadgeCarousel = false;
+              });
+            },
+          ),
+          const SizedBox(height: 8),
+        ],
+        const Stack(children: [HomeBudgetCard()]),
+      ],
+    );
   }
 
   Widget _buildEmptyState(AppColorTheme appColors, AppLocalizations l10n) {
@@ -149,7 +165,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ✨ UI Khung xương lấp lánh (Skeleton Loading) đồng bộ cấu trúc trang Home
   Widget _buildSkeletonLoading(
     AppColorTheme appColors,
     ViewMode viewMode,
@@ -165,7 +180,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Giả lập thanh tiêu đề ngày tháng
               Container(
                 width: 120,
                 height: 28,
@@ -175,7 +189,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Tạo danh sách các card ảo đang lấp lánh nhẹ nhàng
               ...List.generate(
                 4,
                 (index) => _buildSkeletonItem(appColors, viewMode),
@@ -278,7 +291,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         },
         child: timelineState.when(
           skipLoadingOnRefresh: true,
-          // Đưa hiệu ứng Skeleton Loading vào
           loading: () => _buildSkeletonLoading(appColors, viewMode, l10n),
           error: (error, stack) => Center(
             child: Text(
@@ -289,9 +301,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           data: (allTransactions) {
             final filteredTransactions = _applyDateFilter(allTransactions);
 
-            // ✨ LỚP PHÒNG VỆ TỐI CAO:
-            // Nếu danh sách trống VÀ hệ thống ngầm báo là đang bận load API
-            // thì lập tức đá giao diện về Skeleton Loading, không cho hiển thị chữ "Không có data"!
             if (filteredTransactions.isEmpty && timelineState.isLoading) {
               return _buildSkeletonLoading(appColors, viewMode, l10n);
             }
@@ -640,7 +649,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return PhotoCalendarCell(
               date: dayDate,
               dayData: dayData,
-              onTap: () {
+              onTap: () async {
                 if (dayData != null) {
                   _showDayDetailsBottomSheet(
                     context,
@@ -660,12 +669,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                     return;
                   }
-                  Navigator.of(context).push<bool>(
+
+                  // 🚀 UPDATE: Await kết quả trả về từ màn hình thêm giao dịch
+                  final bool? isAdded = await Navigator.of(context).push<bool>(
                     CupertinoPageRoute(
                       builder: (_) =>
                           AddTransactionScreen(initialDate: dayDate),
                     ),
                   );
+
+                  // 🚀 Kích hoạt load lại dữ liệu & tính toán huy hiệu ngầm
+                  // nếu người dùng đã thêm thành công
+                  if (isAdded == true && mounted) {
+                    ref
+                        .read(transactionTimelineProvider.notifier)
+                        .refreshTimeline();
+                  }
                 }
               },
             );
@@ -922,15 +941,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await ref
             .read(transactionTimelineProvider.notifier)
             .deleteTransaction(tx['id'].toString());
-        ref
-            .read(transactionTimelineProvider.notifier)
-            .removeMomentLocally(tx['id'].toString());
-        if (mounted)
+
+        // 🚀 UPDATE: Đã gỡ bỏ hàm removeMomentLocally thừa thãi ở đây
+        // vì hàm deleteTransaction của Controller ĐÃ BAO GỒM logic xóa dữ liệu khỏi State
+        // VÀ nó cũng đã chạy ngầm hàm _evaluateBadges() cho ta luôn rồi.
+
+        if (mounted) {
           AppToast.showSuccess(context, l10n.deleteSuccessMessage, appColors);
+        }
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
-        if (mounted)
+        if (mounted) {
           AppToast.showError(context, l10n.deleteErrorMessage, appColors);
+        }
       }
     }
   }

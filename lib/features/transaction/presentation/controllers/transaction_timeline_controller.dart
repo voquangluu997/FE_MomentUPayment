@@ -7,6 +7,9 @@ import 'package:moment_u_payment/core/utils/app_logger.dart';
 import '../../data/transaction_repository.dart';
 import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 
+// 🚀 BỔ SUNG IMPORT: Service quản lý Huy hiệu
+import 'package:moment_u_payment/core/features/badges/badge_service.dart';
+
 class TransactionTimelineController
     extends AsyncNotifier<List<Map<String, dynamic>>> {
   TransactionRepository get _repository =>
@@ -22,25 +25,20 @@ class TransactionTimelineController
 
   Future<void> _syncHomeWidget() async {
     try {
-      // Nếu không có .future, nó sẽ lấy ngay giá trị lúc đang loading -> trả về null -> ra số 0
       final budgetSummary = await ref
           .read(homeBudgetProvider.future)
           .catchError((_) => null);
 
-      if (budgetSummary == null)
-        return; // Nếu lỗi mạng, dừng lại để giữ nguyên số cũ trên Widget
+      if (budgetSummary == null) return;
 
-      // 1. Logic Ngân sách (Lấy trực tiếp từ HomeBudgetCard)
       final totalBudget = budgetSummary.budgetLimit.toDouble();
       final totalSpent = budgetSummary.totalSpent.toDouble();
       final remaining = totalBudget - totalSpent;
 
-      // 2. Logic Ngày tháng (Lấy trực tiếp từ HomeBudgetCard)
       final now = DateTime.now();
       final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
       final daysRemaining = lastDayOfMonth.day - now.day;
 
-      // 3. Đẩy dữ liệu chuẩn ra Widget
       await HomeWidgetService.updateBudgetWidget(
         budget: totalBudget,
         spent: totalSpent,
@@ -49,6 +47,39 @@ class TransactionTimelineController
       );
     } catch (e, stack) {
       AppLogger.e('TransactionTimelineController._syncHomeWidget', e, stack);
+    }
+  }
+
+  // 🚀 BỔ SUNG: Hàm chạy ngầm để tính toán huy hiệu dựa trên dữ liệu hiện tại
+  Future<void> _evaluateBadges(List<Map<String, dynamic>> currentData) async {
+    try {
+      // 1. Lấy tổng tiền đã chi trong tháng từ provider ngân sách
+      final budgetSummary = await ref
+          .read(homeBudgetProvider.future)
+          .catchError((_) => null);
+      final thisMonthTotal = budgetSummary?.totalSpent.toDouble() ?? 0.0;
+
+      // 2. Lọc ra các giao dịch của tháng này từ danh sách timeline
+      final now = DateTime.now();
+      final thisMonthData = currentData.where((tx) {
+        // Tùy theo field backend trả về (spentAt, dateTime, createdAt)
+        final dateStr = tx['spentAt'] ?? tx['dateTime'] ?? tx['createdAt'];
+        if (dateStr == null) return false;
+
+        final date = DateTime.tryParse(dateStr.toString()) ?? now;
+        return date.year == now.year && date.month == now.month;
+      }).toList();
+
+      // 3. Kích hoạt xét duyệt (Badge Service tự so sánh và trigger UI nếu có huy hiệu mới)
+      ref
+          .read(badgeServiceProvider.notifier)
+          .evaluateTransactions(
+            currentData, // allTimeData
+            thisMonthData, // thisMonthData
+            thisMonthTotal, // thisMonthTotalSpent
+          );
+    } catch (e, stack) {
+      AppLogger.e('TransactionTimelineController._evaluateBadges', e, stack);
     }
   }
 
@@ -74,8 +105,10 @@ class TransactionTimelineController
 
     final initialData = await _fetchTimelineData(page: _page, limit: _limit);
 
-    // Gọi hàm đồng bộ (chạy ngầm, không cần await block UI)
     _syncHomeWidget();
+
+    // 🚀 BỔ SUNG: Đánh giá huy hiệu khi vừa tải xong dữ liệu mở app
+    _evaluateBadges(initialData);
 
     return initialData;
   }
@@ -110,7 +143,10 @@ class TransactionTimelineController
         limit: _limit,
       );
 
-      _syncHomeWidget(); // Đồng bộ sau khi refresh
+      _syncHomeWidget();
+
+      // 🚀 BỔ SUNG: Đánh giá huy hiệu lại sau khi người dùng kéo thả refresh
+      _evaluateBadges(refreshedData);
 
       return refreshedData;
     });
@@ -124,7 +160,7 @@ class TransactionTimelineController
           .toList();
       state = AsyncValue.data(updatedList);
 
-      _syncHomeWidget(); // Đồng bộ lại
+      _syncHomeWidget();
     }
   }
 
@@ -151,8 +187,13 @@ class TransactionTimelineController
       if (newTransactions.isNotEmpty) {
         _page = nextPage;
         if (state.hasValue) {
-          state = AsyncValue.data([...state.value!, ...newTransactions]);
-          _syncHomeWidget(); // Cập nhật khi tải thêm
+          final updatedData = [...state.value!, ...newTransactions];
+          state = AsyncValue.data(updatedData);
+
+          _syncHomeWidget();
+
+          // 🚀 BỔ SUNG: Khi tải thêm page mới (có thể đạt mốc 100 tx) thì quét lại
+          _evaluateBadges(updatedData);
         }
       }
     } catch (error, stackTrace) {
@@ -171,19 +212,21 @@ class TransactionTimelineController
     if (!state.hasValue) return;
 
     final currentList = state.value!;
-    state = AsyncValue.data(
-      currentList.where((tx) => tx['id'].toString() != id).toList(),
-    );
+    final updatedList = currentList
+        .where((tx) => tx['id'].toString() != id)
+        .toList();
+    state = AsyncValue.data(updatedList);
 
     try {
       await _repository.deleteTransaction(id);
 
-      // Xóa thành công -> yêu cầu Provider ngân sách tính lại tiền
       ref.invalidate(homeBudgetProvider);
       ref.read(transactionAnalyticsProvider.notifier).refreshAnalytics();
 
-      // Chạy đồng bộ (hàm này sẽ tự động đợi homeBudgetProvider tải xong số mới)
       _syncHomeWidget();
+
+      // 🚀 BỔ SUNG: Quét lại vì ngân sách và data đã thay đổi do bị xóa
+      _evaluateBadges(updatedList);
     } catch (error, stackTrace) {
       AppLogger.e(
         'TransactionTimelineController.deleteTransaction',
