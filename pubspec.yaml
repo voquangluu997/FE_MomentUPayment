@@ -55,6 +55,7 @@ dependencies:
   quick_actions: ^1.0.8
   home_widget: ^0.7.0
   share_plus: ^13.1.0
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

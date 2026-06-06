@@ -202,7 +202,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get galleryChangeAction => 'Change photo from your collection 🌸';
 
   @override
-  String get galleryChangeActionShort => 'Change photo';
+  String get galleryChangeActionShort => 'Gallery';
 
   @override
   String get amountSectionTitle => 'TOTAL DAMAGE THIS TIME 💰';
@@ -1277,4 +1277,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get collapse => 'Collapse';
+
+  @override
+  String get hintSecret =>
+      'Secrets await those who are patient enough to explore...';
+
+  @override
+  String progressTitle(String percent) {
+    return 'Progress: $percent%';
+  }
+
+  @override
+  String get boastAchievement => 'Show off ✨';
+
+  @override
+  String get creatingImage => 'Creating image...';
+
+  @override
+  String get shareNow => 'Share now';
+
+  @override
+  String get achievementUnlocked => 'ACHIEVEMENT UNLOCKED';
+
+  @override
+  String shareAppPromoMessage(String badgeTitle) {
+    return 'Awesome! I just unlocked the \'$badgeTitle\' badge on Moments U Payment! 🏆✨\n\nTracking expenses has never been this fun. Download the app and let\'s set new records together! 🚀\n#MomentsUPayment #Achievement';
+  }
 }

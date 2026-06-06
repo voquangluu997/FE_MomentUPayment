@@ -203,7 +203,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get galleryChangeAction => 'Đổi ảnh khác từ bộ sưu tập nha 🌸';
 
   @override
-  String get galleryChangeActionShort => 'Đổi ảnh';
+  String get galleryChangeActionShort => 'Thư viện';
 
   @override
   String get amountSectionTitle => 'TỔNG THIỆT HẠI ĐỢT NÀY 💰';
@@ -1287,4 +1287,30 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get collapse => 'Thu gọn';
+
+  @override
+  String get hintSecret =>
+      'Bí mật đang chờ đợi những người kiên nhẫn khám phá...';
+
+  @override
+  String progressTitle(String percent) {
+    return 'Tiến độ: $percent%';
+  }
+
+  @override
+  String get boastAchievement => 'Khoe chiến tích ✨';
+
+  @override
+  String get creatingImage => 'Đang tạo ảnh...';
+
+  @override
+  String get shareNow => 'Chia sẻ ngay';
+
+  @override
+  String get achievementUnlocked => 'ACHIEVEMENT UNLOCKED';
+
+  @override
+  String shareAppPromoMessage(String badgeTitle) {
+    return 'Tuyệt đỉnh! Tôi vừa mở khoá huy hiệu \'$badgeTitle\' trên ứng dụng Moments U Payment! 🏆✨\n\nQuản lý chi tiêu chưa bao giờ thú vị đến thế. Cùng tải app và thiết lập kỷ lục mới nhé! 🚀\n#MomentsUPayment #Achievement';
+  }
 }

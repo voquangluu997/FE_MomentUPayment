@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:moment_u_payment/core/constants/app_colors.dart';
@@ -15,6 +18,10 @@ import 'package:moment_u_payment/core/features/badges/badge_model.dart';
 
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
+
+// ==========================================
+// 1. PROVIDER & MAIN PAGE
+// ==========================================
 
 final badgeProgressProvider = Provider<Map<BadgeType, double>>((ref) {
   final allTransactions = ref.watch(transactionTimelineProvider).value ?? [];
@@ -90,7 +97,7 @@ class BadgeGalleryPage extends ConsumerWidget {
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: _BadgeRectangularCard(
+            child: BadgeRectangularCard(
               badge: badge,
               isUnlocked: isUnlocked,
               progress: progress,
@@ -104,14 +111,19 @@ class BadgeGalleryPage extends ConsumerWidget {
   }
 }
 
-class _BadgeRectangularCard extends StatefulWidget {
+// ==========================================
+// 2. BADGE CARD LIST ITEM
+// ==========================================
+
+class BadgeRectangularCard extends StatefulWidget {
   final UserBadge badge;
   final bool isUnlocked;
   final double progress;
   final AppLocalizations l10n;
   final AppColorTheme appColors;
 
-  const _BadgeRectangularCard({
+  const BadgeRectangularCard({
+    super.key,
     required this.badge,
     required this.isUnlocked,
     required this.progress,
@@ -120,17 +132,15 @@ class _BadgeRectangularCard extends StatefulWidget {
   });
 
   @override
-  State<_BadgeRectangularCard> createState() => _BadgeRectangularCardState();
+  State<BadgeRectangularCard> createState() => _BadgeRectangularCardState();
 }
 
-class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
+class _BadgeRectangularCardState extends State<BadgeRectangularCard>
     with TickerProviderStateMixin {
   late AnimationController _sheenController;
   late Animation<double> _sheenAnimation;
-
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
 
@@ -181,7 +191,6 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
     super.dispose();
   }
 
-  // 🌟 HÀM TRUY XUẤT MẬT THƯ THEO TỪNG LOẠI HUY HIỆU
   String _getBadgeHint() {
     try {
       switch (widget.badge.type) {
@@ -217,12 +226,10 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
           return widget.l10n.hintDefault;
       }
     } catch (e) {
-      // Fallback khi file gen-l10n chưa kịp update
-      return "Mật thư: Bí mật đang chờ đợi những người kiên nhẫn khám phá...";
+      return widget.l10n.hintSecret;
     }
   }
 
-  // 🌟 PROGRESS BAR VỚI GRADIENT HÀI HÒA VÀ SANG TRỌNG
   Widget _buildHarmoniousProgressBar() {
     const Color lockedAuraColor = Color(0xFF8A2BE2);
     final int percent = (widget.progress.clamp(0.0, 1.0) * 100).toInt();
@@ -235,7 +242,7 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
             child: Container(
               height: 6,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08), // Màu nền tinh tế
+                color: Colors.white.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: FractionallySizedBox(
@@ -248,7 +255,7 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
                       colors: [
                         lockedAuraColor.withOpacity(0.4),
                         lockedAuraColor,
-                        Colors.white.withOpacity(0.85), // Phát sáng ở đầu thanh
+                        Colors.white.withOpacity(0.85),
                       ],
                     ),
                     boxShadow: [
@@ -474,11 +481,10 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
                                 ],
                               ),
                               const SizedBox(height: 6),
-
                               Text(
                                 widget.isUnlocked
                                     ? widget.badge.getLocalizedDesc(widget.l10n)
-                                    : _getBadgeHint(), // 🚀 GỌI HÀM MẬT THƯ
+                                    : _getBadgeHint(),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -495,8 +501,6 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-
-                              // 🚀 GỌI PROGRESS BAR VỚI GRADIENT
                               if (!widget.isUnlocked)
                                 _buildHarmoniousProgressBar(),
                             ],
@@ -539,24 +543,18 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
 
   void _handleBadgeClick(BuildContext context) {
     if (widget.isUnlocked) {
-      String btnText;
-      try {
-        btnText = widget.l10n.shareBadgeAction;
-      } catch (e) {
-        btnText = "Khoe chiến tích ✨";
-      }
-
       showDialog(
         context: context,
         builder: (context) => BadgePremiumDialog(
           badge: widget.badge,
           title: widget.badge.getLocalizedTitle(widget.l10n),
           description: widget.badge.getLocalizedDesc(widget.l10n),
-          buttonText: btnText,
+          // Đã cập nhật đa ngôn ngữ
+          buttonText: widget.l10n.boastAchievement,
           appColors: widget.appColors,
           onButtonPressed: () {
             Navigator.pop(context);
-            _triggerShareFeature(context);
+            _showSharePreview(context);
           },
         ),
       );
@@ -565,18 +563,15 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
     }
   }
 
-  void _triggerShareFeature(BuildContext context) {
-    String shareMsg;
-    try {
-      shareMsg = widget.l10n.shareBadgeMessage;
-    } catch (e) {
-      shareMsg = "Tuyệt vời! Tôi vừa xuất sắc mở khóa huy hiệu";
-    }
-
-    final String badgeTitle = widget.badge.getLocalizedTitle(widget.l10n);
-    final String textToShare = "$shareMsg: $badgeTitle! 🏆✨\n#MomentUPayment";
-
-    Share.share(textToShare);
+  void _showSharePreview(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'SharePreview',
+      barrierColor: Colors.black.withOpacity(0.9),
+      pageBuilder: (context, _, __) =>
+          BadgeSharePreviewDialog(badge: widget.badge, l10n: widget.l10n),
+    );
   }
 
   void _showLockedMysteryDialog(BuildContext context) {
@@ -591,6 +586,7 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
+        var ImageFilter;
         return BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: 16 * anim1.value,
@@ -697,7 +693,7 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
                       child: Column(
                         children: [
                           Text(
-                            "Tiến độ: $percent%",
+                            widget.l10n.progressTitle(percent.toString()),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -706,7 +702,7 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            _getBadgeHint(), 
+                            _getBadgeHint(),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 14,
@@ -750,6 +746,331 @@ class _BadgeRectangularCardState extends State<_BadgeRectangularCard>
           ),
         );
       },
+    );
+  }
+}
+
+// ==========================================
+// 3. SHARE PREVIEW DIALOG & CAPTURE LOGIC
+// ==========================================
+
+class BadgeSharePreviewDialog extends StatefulWidget {
+  final UserBadge badge;
+  final AppLocalizations l10n;
+
+  const BadgeSharePreviewDialog({
+    super.key,
+    required this.badge,
+    required this.l10n,
+  });
+
+  @override
+  State<BadgeSharePreviewDialog> createState() =>
+      _BadgeSharePreviewDialogState();
+}
+
+class _BadgeSharePreviewDialogState extends State<BadgeSharePreviewDialog> {
+  final GlobalKey _globalKey = GlobalKey();
+  bool _isProcessing = false;
+
+  Future<void> _captureAndShare() async {
+    setState(() => _isProcessing = true);
+    try {
+      // 1. Chụp màn hình thẻ Share từ RepaintBoundary
+      RenderRepaintBoundary boundary =
+          _globalKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+      // 2. Ghi ra file tạm thời
+      final directory = await getTemporaryDirectory();
+      final imagePath = await File(
+        '${directory.path}/badge_achievement.png',
+      ).create();
+      await imagePath.writeAsBytes(pngBytes);
+
+      // 3. Chuẩn bị nội dung chữ đính kèm mang tính quảng bá App (Marketing)
+      final String badgeTitle = widget.badge.getLocalizedTitle(widget.l10n);
+      final String textToShare = widget.l10n.shareAppPromoMessage(badgeTitle);
+
+      // 4. Chia sẻ
+      final xFile = XFile(imagePath.path);
+      await Share.shareXFiles([xFile], text: textToShare);
+    } catch (e) {
+      debugPrint("Lỗi khi chia sẻ: $e");
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Thẻ hiển thị thực tế sẽ được chụp
+          RepaintBoundary(
+            key: _globalKey,
+            child: BadgeStunningExportCard(
+              badge: widget.badge,
+              l10n: widget.l10n,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Các nút bấm điều hướng
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: _isProcessing
+                      ? null
+                      : () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white54,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(
+                    widget.l10n.closeButton,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton.icon(
+                  onPressed: _isProcessing ? null : _captureAndShare,
+                  icon: _isProcessing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(CupertinoIcons.share, color: Colors.white),
+                  label: Text(
+                    _isProcessing
+                        ? widget.l10n.creatingImage
+                        : widget.l10n.shareNow,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: widget.badge.color,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 10,
+                    shadowColor: widget.badge.color.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 4. THE BEAUTIFUL EXPORTABLE CARD TEMPLATE
+// ==========================================
+
+// ==========================================
+// 4. THE BEAUTIFUL EXPORTABLE CARD TEMPLATE (ĐÃ SỬA LỖI OVERFLOW)
+// ==========================================
+
+class BadgeStunningExportCard extends StatelessWidget {
+  final UserBadge badge;
+  final AppLocalizations l10n;
+
+  const BadgeStunningExportCard({
+    super.key,
+    required this.badge,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 💡 Thêm Material(transparency) để đảm bảo không lỗi Text Direction trong RepaintBoundary
+    return Material(
+      type: MaterialType.transparency,
+      child: AspectRatio(
+        aspectRatio: 4 / 5,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            color: const Color(0xFF0F0F16), // Nền đen sâu thẳm
+            border: Border.all(color: badge.color.withOpacity(0.3), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: badge.color.withOpacity(0.4),
+                blurRadius: 40,
+                spreadRadius: -10,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Stack(
+              children: [
+                // 1. Ánh sáng Ambient đằng sau
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: Alignment.center,
+                        radius: 0.8,
+                        colors: [
+                          badge.color.withOpacity(0.35),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 2. Nội dung chính - 💡 SỬ DỤNG FITTED BOX ĐỂ KHÔNG BAO GIỜ BỊ SỌC VÀNG ĐEN
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      24,
+                      32,
+                      24,
+                      60,
+                    ), // Chừa không gian cho watermark ở đáy
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Header Text
+                            Text(
+                              l10n.achievementUnlocked,
+                              style: TextStyle(
+                                color: badge.color.withOpacity(0.9),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 3.0,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+
+                            // Icon phát sáng
+                            Container(
+                              width: 140, // Đã thu nhỏ nhẹ để cân đối hơn
+                              height: 140,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: badge.gradientColors,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: badge.gradientColors.first
+                                        .withOpacity(0.6),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  badge.icon,
+                                  size: 64,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+
+                            // Title - Cố định width để chữ rớt dòng đẹp mắt
+                            SizedBox(
+                              width: 300,
+                              child: Text(
+                                badge.getLocalizedTitle(l10n).toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 1.0,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Description
+                            SizedBox(
+                              width: 300,
+                              child: Text(
+                                badge.getLocalizedDesc(l10n),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white.withOpacity(0.8),
+                                  height: 1.5,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 3. Branding & Watermark nằm cố định ở đáy thẻ
+                Positioned(
+                  bottom: 24,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.sparkles,
+                        color: Colors.white.withOpacity(0.4),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Moments U Payment",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white.withOpacity(0.4),
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

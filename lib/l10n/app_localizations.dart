@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @galleryChangeActionShort.
   ///
   /// In en, this message translates to:
-  /// **'Change photo'**
+  /// **'Gallery'**
   String get galleryChangeActionShort;
 
   /// No description provided for @amountSectionTitle.
@@ -2369,6 +2369,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collapse'**
   String get collapse;
+
+  /// No description provided for @hintSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Secrets await those who are patient enough to explore...'**
+  String get hintSecret;
+
+  /// No description provided for @progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress: {percent}%'**
+  String progressTitle(String percent);
+
+  /// No description provided for @boastAchievement.
+  ///
+  /// In en, this message translates to:
+  /// **'Show off ✨'**
+  String get boastAchievement;
+
+  /// No description provided for @creatingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating image...'**
+  String get creatingImage;
+
+  /// No description provided for @shareNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Share now'**
+  String get shareNow;
+
+  /// No description provided for @achievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'ACHIEVEMENT UNLOCKED'**
+  String get achievementUnlocked;
+
+  /// No description provided for @shareAppPromoMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome! I just unlocked the \'{badgeTitle}\' badge on Moments U Payment! 🏆✨\n\nTracking expenses has never been this fun. Download the app and let\'s set new records together! 🚀\n#MomentsUPayment #Achievement'**
+  String shareAppPromoMessage(String badgeTitle);
 }
 
 class _AppLocalizationsDelegate

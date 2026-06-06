@@ -71,7 +71,7 @@
   "galleryPickAction": "Or pick a cute photo from your gallery ✨",
   "cameraPickActionShort": "Take a photo",
   "galleryChangeAction": "Change photo from your collection 🌸",
-  "galleryChangeActionShort": "Change photo",
+  "galleryChangeActionShort": "Gallery",
   "amountSectionTitle": "TOTAL DAMAGE THIS TIME 💰",
   "noteSectionTitle": "A LITTLE CHITCHAT ABOUT THIS 💬",
   "monthLabel": "{month}/{year}",
@@ -606,6 +606,24 @@
 
   "markAllAsReadSuccess": "All notifications marked as read",
   "readMore": "Read more...",
-  "collapse": "Collapse"
+  "collapse": "Collapse",
+
+  "hintSecret": "Secrets await those who are patient enough to explore...",
+"progressTitle": "Progress: {percent}%",
+"@progressTitle": {
+  "placeholders": {
+    "percent": { "type": "String" }
+  }
+},
+"boastAchievement": "Show off ✨",
+"creatingImage": "Creating image...",
+"shareNow": "Share now",
+"achievementUnlocked": "ACHIEVEMENT UNLOCKED",
+"shareAppPromoMessage": "Awesome! I just unlocked the '{badgeTitle}' badge on Moments U Payment! 🏆✨\n\nTracking expenses has never been this fun. Download the app and let's set new records together! 🚀\n#MomentsUPayment #Achievement",
+"@shareAppPromoMessage": {
+  "placeholders": {
+    "badgeTitle": { "type": "String" }
+  }
+}
 
 }

@@ -370,7 +370,7 @@
   "maxOneYearWarning": "Moment U chỉ hỗ trợ xem tối đa 1 năm thui nè! 🗓️",
   "analyticsTitle": "Thống kê chi tiêu",
   "cameraPickActionShort": "Chụp ảnh",
-  "galleryChangeActionShort": "Đổi ảnh",
+  "galleryChangeActionShort": "Thư viện",
 
   "wrongOldPassword": "Mật khẩu cũ không chính xác.",
   "userNotFoundError": "Không tìm thấy thông tin tài khoản.",
@@ -612,6 +612,24 @@
 
   "markAllAsReadSuccess": "Đã đánh dấu đọc tất cả thông báo",
   "readMore": "Xem thêm...",
-  "collapse": "Thu gọn"
+  "collapse": "Thu gọn",
+
+  "hintSecret": "Bí mật đang chờ đợi những người kiên nhẫn khám phá...",
+"progressTitle": "Tiến độ: {percent}%",
+"@progressTitle": {
+  "placeholders": {
+    "percent": { "type": "String" }
+  }
+},
+"boastAchievement": "Khoe chiến tích ✨",
+"creatingImage": "Đang tạo ảnh...",
+"shareNow": "Chia sẻ ngay",
+"achievementUnlocked": "ACHIEVEMENT UNLOCKED",
+"shareAppPromoMessage": "Tuyệt đỉnh! Tôi vừa mở khoá huy hiệu '{badgeTitle}' trên ứng dụng Moments U Payment! 🏆✨\n\nQuản lý chi tiêu chưa bao giờ thú vị đến thế. Cùng tải app và thiết lập kỷ lục mới nhé! 🚀\n#MomentsUPayment #Achievement",
+"@shareAppPromoMessage": {
+  "placeholders": {
+    "badgeTitle": { "type": "String" }
+  }
+}
 
 }

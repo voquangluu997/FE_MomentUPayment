@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
@@ -13,7 +15,6 @@ import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
-import 'package:flutter/cupertino.dart';
 
 class MomentDetailsDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
@@ -93,13 +94,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     super.dispose();
   }
 
-  // ✨ ĐÃ SỬA: Bảo vệ DatePicker không bị crash nếu dữ liệu cũ từ server bị lệch tương lai
   Future<void> _pickDate() async {
     final now = DateTime.now();
     DateTime initialDateToShow = _selectedDate;
 
-    // Nếu ngày đang chọn vô tình vượt quá thời gian hiện tại (do lỗi lệch múi giờ cũ)
-    // thì hạ xuống thời gian hiện tại để không bị lỗi gãy AssertionError của Flutter.
     if (initialDateToShow.isAfter(now)) {
       initialDateToShow = now;
     }
@@ -188,7 +186,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     });
   }
 
-  // ✨ ĐÃ SỬA: Chuyển đổi sang UTC trước khi đẩy dữ liệu lên máy chủ để đúng giờ local
   Future<void> _handleUpdateTransaction() async {
     final amountText = _amountController.text.replaceAll('.', '').trim();
     final appColors = ref.read(appColorsProvider);
@@ -215,8 +212,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     try {
       final now = DateTime.now();
-
-      // Tạo thời gian kết hợp ngày chọn và giờ hiện tại (Local)
       final spentAtLocal = DateTime(
         _selectedDate.year,
         _selectedDate.month,
@@ -225,9 +220,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         now.minute,
         now.second,
       );
-
-      // 🟢 QUAN TRỌNG: Chuyển sang chuỗi chuẩn UTC (.toUtc()) trước khi gửi đi
-      // để chuỗi JSON có đuôi chữ 'Z', ép server không nhận nhầm múi giờ.
       final spentAtWithCurrentTime = spentAtLocal.toUtc();
 
       await ref
@@ -268,10 +260,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         '-${CurrencyHelper.formatCompactAmount(currentAmount)}$currencySymbol';
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: appColors.cardBackground,
+      elevation: 0,
       clipBehavior: Clip.antiAlias,
       child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -280,19 +275,22 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
               isEditing: _isEditing,
               localImagePath: _localImagePath,
               currentImageUrl: _currentImageUrl,
-              selectedCategory: _selectedCategory,
+              emoji: _selectedEmoji,
               onCameraTap: () => _changePhoto(ImageSource.camera),
               onGalleryTap: () => _changePhoto(ImageSource.gallery),
               onToggleEdit: _toggleEditMode,
               onCloseTap: () => Navigator.of(context).pop(false),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 300),
+                switchInCurve: Curves.easeOutBack,
+                switchOutCurve: Curves.easeIn,
                 child: !_isEditing
                     ? _ViewModeContent(
                         selectedCategory: _selectedCategory,
+                        selectedEmoji: _selectedEmoji,
                         selectedDate: _selectedDate,
                         compactAmount: compactAmount,
                         note: _noteController.text,
@@ -326,11 +324,14 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   }
 }
 
+// =============================================================================
+// HEADER MỚI CỰC KỲ PREMIUM
+// =============================================================================
 class _ImageHeader extends ConsumerWidget {
   final bool isEditing;
   final String? localImagePath;
   final String currentImageUrl;
-  final String selectedCategory;
+  final String emoji;
   final VoidCallback onCameraTap;
   final VoidCallback onGalleryTap;
   final VoidCallback onToggleEdit;
@@ -340,53 +341,80 @@ class _ImageHeader extends ConsumerWidget {
     required this.isEditing,
     this.localImagePath,
     required this.currentImageUrl,
-    required this.selectedCategory,
+    required this.emoji,
     required this.onCameraTap,
     required this.onGalleryTap,
     required this.onToggleEdit,
     required this.onCloseTap,
   });
 
-  IconData _getCategoryIcon(String? category) {
-    if (category == null) return Icons.help_outline;
-    final catLower = category.toLowerCase();
-    if (catLower.contains('food') || catLower.contains('ăn'))
-      return CupertinoIcons.gift;
-    if (catLower.contains('shop')) return Icons.local_mall;
-    if (catLower.contains('transport') || catLower.contains('xe'))
-      return CupertinoIcons.car;
-    if (catLower.contains('entertain') || catLower.contains('game'))
-      return Icons.sports_esports;
-    return CupertinoIcons.pencil;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
+    final bool hasImage = localImagePath != null || currentImageUrl.isNotEmpty;
 
-    return AspectRatio(
-      aspectRatio: 4 / 3,
+    return SizedBox(
+      height: 240, // Tăng chiều cao để ảnh đẹp hơn
       child: Stack(
         fit: StackFit.expand,
         children: [
-          localImagePath != null
-              ? Image.file(File(localImagePath!), fit: BoxFit.cover)
-              : currentImageUrl.isNotEmpty
-              ? Image.network(
-                  CloudinaryHelper.getOptimizedOriginalUrl(currentImageUrl),
-                  fit: BoxFit.cover,
-                )
-              : Container(
-                  color: appColors.primary.withOpacity(0.04),
-                  child: Center(
-                    child: Icon(
-                      _getCategoryIcon(selectedCategory),
-                      size: 64,
-                      color: appColors.primary.withOpacity(0.15),
+          // NỀN: Nếu có ảnh thì hiển thị ảnh, nếu không thì hiển thị Memo Pad Style
+          if (hasImage)
+            localImagePath != null
+                ? Image.file(File(localImagePath!), fit: BoxFit.cover)
+                : Image.network(
+                    CloudinaryHelper.getOptimizedOriginalUrl(currentImageUrl),
+                    fit: BoxFit.cover,
+                  )
+          else
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    appColors.background,
+                    appColors.primary.withOpacity(0.1),
+                    appColors.primary.withOpacity(0.2),
+                  ],
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Opacity(
+                      opacity: 0.05,
+                      child: GridPaper(
+                        color: appColors.primaryDark,
+                        divisions: 1,
+                        subdivisions: 1,
+                        interval: 24,
+                      ),
                     ),
                   ),
-                ),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: appColors.primary.withOpacity(0.15),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Text(emoji, style: const TextStyle(fontSize: 48)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // LỚP PHỦ MỜ DẦN (Fade out to bottom)
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -394,72 +422,63 @@ class _ImageHeader extends ConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(isEditing ? 0.4 : 0.05),
                     Colors.transparent,
-                    Colors.transparent,
-                    Colors.black.withOpacity(isEditing ? 0.4 : 0.1),
+                    appColors.cardBackground.withOpacity(0.0),
+                    appColors.cardBackground, // Mờ dần tiệp màu với Card
                   ],
-                  stops: const [0.0, 0.25, 0.7, 1.0],
+                  stops: const [0.0, 0.3, 0.8, 1.0],
                 ),
               ),
             ),
           ),
+
+          // CỤM NÚT ĐỔI ẢNH KHI EDITING
           if (isEditing)
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 12,
+                  runSpacing: 12,
                   alignment: WrapAlignment.center,
                   children: [
-                    ElevatedButton.icon(
-                      style: _editButtonStyle(appColors),
-                      onPressed: onCameraTap,
-                      icon: const Icon(CupertinoIcons.camera, size: 16),
-                      label: Text(
-                        l10n.cameraPickActionShort,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    _buildEditBtn(
+                      icon: CupertinoIcons.camera,
+                      label: l10n.cameraPickActionShort,
+                      onTap: onCameraTap,
+                      appColors: appColors,
                     ),
-                    ElevatedButton.icon(
-                      style: _editButtonStyle(appColors),
-                      onPressed: onGalleryTap,
-                      icon: const Icon(
-                        CupertinoIcons.photo_on_rectangle,
-                        size: 16,
-                      ),
-                      label: Text(
-                        l10n.galleryChangeActionShort,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    _buildEditBtn(
+                      icon: CupertinoIcons.photo_on_rectangle,
+                      label: l10n.galleryChangeActionShort,
+                      onTap: onGalleryTap,
+                      appColors: appColors,
                     ),
                   ],
                 ),
               ),
             ),
+
+          // NÚT ĐÓNG VÀ EDIT TRÊN CÙNG (GLASSMORPHISM)
           Positioned(
-            top: 12,
-            left: 12,
-            right: 12,
+            top: 16,
+            left: 16,
+            right: 16,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildActionButton(
+                _buildGlassButton(
                   icon: isEditing
                       ? CupertinoIcons.xmark
                       : CupertinoIcons.pencil,
                   onPressed: onToggleEdit,
+                  appColors: appColors,
                 ),
-                _buildActionButton(
-                  icon: CupertinoIcons.power,
+                _buildGlassButton(
+                  icon: CupertinoIcons.clear,
                   onPressed: onCloseTap,
+                  appColors: appColors,
                 ),
               ],
             ),
@@ -469,57 +488,92 @@ class _ImageHeader extends ConsumerWidget {
     );
   }
 
-  ButtonStyle _editButtonStyle(dynamic appColors) {
-    return ElevatedButton.styleFrom(
-      backgroundColor: Colors.white.withOpacity(0.9),
-      foregroundColor: appColors.primary,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  Widget _buildGlassButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    required AppColorTheme appColors,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.4),
+                width: 0.5,
+              ),
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildActionButton({
+  Widget _buildEditBtn({
     required IconData icon,
-    required VoidCallback onPressed,
+    required String label,
+    required VoidCallback onTap,
+    required AppColorTheme appColors,
   }) {
-    return CircleAvatar(
-      backgroundColor: Colors.black.withOpacity(0.5),
-      radius: 16,
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, color: Colors.white, size: 16),
-        onPressed: onPressed,
+    return InkWell(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16, color: appColors.primary),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: appColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
+// =============================================================================
+// GIAO DIỆN VIEW CAO CẤP
+// =============================================================================
 class _ViewModeContent extends ConsumerWidget {
   final String selectedCategory;
+  final String selectedEmoji;
   final DateTime selectedDate;
   final String compactAmount;
   final String note;
 
   const _ViewModeContent({
     required this.selectedCategory,
+    required this.selectedEmoji,
     required this.selectedDate,
     required this.compactAmount,
     required this.note,
   });
-
-  IconData _getCategoryIcon(String? category) {
-    if (category == null) return Icons.help_outline;
-    final catLower = category.toLowerCase();
-    if (catLower.contains('food') || catLower.contains('ăn'))
-      return CupertinoIcons.gift;
-    if (catLower.contains('shop')) return Icons.local_mall;
-    if (catLower.contains('transport') || catLower.contains('xe'))
-      return CupertinoIcons.car;
-    if (catLower.contains('entertain') || catLower.contains('game'))
-      return Icons.sports_esports;
-    return CupertinoIcons.pencil;
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -530,118 +584,117 @@ class _ViewModeContent extends ConsumerWidget {
 
     return Column(
       key: const ValueKey('ViewMode'),
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // SỐ TIỀN KHỔNG LỒ Ở GIỮA
+        Text(
+          compactAmount,
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w900,
+            color: appColors.errorAccent,
+            letterSpacing: -1,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // HÀNG TAGS (CHIPS) CATEGORY & DATE
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Flexible(
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: appColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: appColors.primary.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getCategoryIcon(selectedCategory),
-                          size: 14,
-                          color: appColors.primary,
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            selectedCategory.isNotEmpty
-                                ? selectedCategory
-                                : l10n.emptyTransactionNote,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: appColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: appColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: appColors.primary.withOpacity(0.1),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          CupertinoIcons.calendar,
-                          size: 12,
-                          color: appColors.textMuted,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: appColors.textMuted,
-                          ),
-                        ),
-                      ],
+                  Text(selectedEmoji, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    selectedCategory.isNotEmpty
+                        ? selectedCategory
+                        : l10n.emptyTransactionNote,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: appColors.primaryDark,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              compactAmount,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: appColors.errorAccent,
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: appColors.background,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: appColors.primary.withOpacity(0.1)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.calendar,
+                    size: 14,
+                    color: appColors.textMuted,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    formattedDate,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: appColors.textMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        const Divider(height: 1, thickness: 0.5),
-        const SizedBox(height: 16),
-        Text(
-          note.isNotEmpty ? note : l10n.emptyTransactionNote,
-          style: TextStyle(
-            fontSize: 14.5,
-            fontWeight: FontWeight.bold,
-            color: appColors.primaryDark.withOpacity(0.6),
-            letterSpacing: 0.5,
-            height: 1.4,
+        const SizedBox(height: 28),
+
+        // QUOTE BOX CHO GHI CHÚ
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: appColors.background,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: appColors.primary.withOpacity(0.05)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                CupertinoIcons.quote_bubble_fill,
+                color: appColors.primary.withOpacity(0.2),
+                size: 20,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                note.isNotEmpty ? note : l10n.emptyTransactionNote,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: appColors.primaryDark.withOpacity(0.8),
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 4),
       ],
     );
   }
 }
 
-// ✨ ĐÃ HOÀN THIỆN: Viết tiếp phần code bị cắt cụt của giao diện chỉnh sửa
+// =============================================================================
+// GIAO DIỆN EDIT GỌN GÀNG, BO GÓC MƯỢT MÀ
+// =============================================================================
 class _EditModeContent extends ConsumerWidget {
   final String selectedCategory;
   final bool isCustomCategory;
@@ -699,45 +752,46 @@ class _EditModeContent extends ConsumerWidget {
             children: categories.map((cat) {
               final isSelected = selectedCategory == cat['id'];
               return Padding(
-                padding: const EdgeInsets.only(right: 5.0),
+                padding: const EdgeInsets.only(right: 8.0),
                 child: InkWell(
                   onTap: () => onCategorySelect(
                     cat['id']!,
                     cat['emoji']!,
                     cat['id'] == 'Custom',
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 14,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? appColors.primary
-                          : appColors.cardBackground,
-                      borderRadius: BorderRadius.circular(10),
+                          : appColors.background,
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : appColors.primary.withOpacity(0.08),
+                            : appColors.primary.withOpacity(0.1),
                       ),
                     ),
                     child: Row(
                       children: [
                         Text(
                           cat['emoji'],
-                          style: const TextStyle(fontSize: 12),
+                          style: const TextStyle(fontSize: 14),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Text(
                           cat['name'],
                           style: TextStyle(
                             color: isSelected
                                 ? Colors.white
                                 : appColors.primaryDark,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -750,34 +804,37 @@ class _EditModeContent extends ConsumerWidget {
         ),
 
         if (isCustomCategory) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           TextField(
             controller: customCategoryController,
-            style: TextStyle(color: appColors.primaryDark),
+            style: TextStyle(
+              color: appColors.primaryDark,
+              fontWeight: FontWeight.w600,
+            ),
             decoration: InputDecoration(
               hintText: l10n.customCategoryHint,
               hintStyle: TextStyle(
-                color: appColors.primaryDark.withOpacity(0.5),
+                color: appColors.primaryDark.withOpacity(0.4),
               ),
               prefixIcon: Icon(
-                CupertinoIcons.pencil,
+                CupertinoIcons.tag,
                 color: appColors.primary,
                 size: 18,
               ),
               filled: true,
               fillColor: appColors.background,
               contentPadding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 12,
+                vertical: 14,
+                horizontal: 16,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -793,7 +850,7 @@ class _EditModeContent extends ConsumerWidget {
                   () => onAppendZeros('000'),
                   appColors,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 8),
                 _buildShortcutZeroButton(
                   '.000.000',
                   () => onAppendZeros('000000'),
@@ -803,13 +860,13 @@ class _EditModeContent extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: appColors.background,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: appColors.primary.withOpacity(0.06)),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: appColors.primary.withOpacity(0.08)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -820,9 +877,9 @@ class _EditModeContent extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                   onChanged: onAmountChanged,
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: appColors.primary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: appColors.errorAccent,
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -843,9 +900,9 @@ class _EditModeContent extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Icon(
-                        CupertinoIcons.xmark,
+                        CupertinoIcons.clear_circled_solid,
                         color: appColors.textMuted.withOpacity(0.4),
-                        size: 18,
+                        size: 20,
                       ),
                     ),
                   );
@@ -854,82 +911,95 @@ class _EditModeContent extends ConsumerWidget {
               Text(
                 currencySymbol,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: appColors.primary,
+                  color: appColors.errorAccent,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         _buildSectionTitle(l10n.transactionTime, appColors),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         InkWell(
           onTap: onDateTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color: appColors.background,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: appColors.primary.withOpacity(0.06)),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: appColors.primary.withOpacity(0.08)),
             ),
             child: Row(
               children: [
                 Icon(
-                  CupertinoIcons.calendar,
+                  CupertinoIcons.calendar_today,
                   size: 20,
                   color: appColors.primary,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Text(
                   "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
                   style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                     color: appColors.primaryDark,
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.edit_calendar, size: 16, color: appColors.textMuted),
+                Icon(
+                  CupertinoIcons.pencil,
+                  size: 16,
+                  color: appColors.textMuted.withOpacity(0.5),
+                ),
               ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        _buildSectionTitle(l10n.noteSectionTitle, appColors),
-        const SizedBox(height: 6),
-        TextField(
-          controller: noteController,
-          maxLines: 1,
-          style: TextStyle(fontSize: 12, color: appColors.primaryDark),
-          decoration: InputDecoration(
-            hintText: l10n.noteHint,
-            hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.5)),
-            filled: true,
-            fillColor: appColors.background,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
             ),
           ),
         ),
         const SizedBox(height: 20),
 
-        // Nút Lưu giao dịch sau khi chỉnh sửa
+        _buildSectionTitle(l10n.noteSectionTitle, appColors),
+        const SizedBox(height: 8),
+        TextField(
+          controller: noteController,
+          maxLines: 2,
+          minLines: 1,
+          style: TextStyle(
+            fontSize: 14,
+            color: appColors.primaryDark,
+            fontWeight: FontWeight.w500,
+          ),
+          decoration: InputDecoration(
+            hintText: l10n.noteHint,
+            hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.4)),
+            filled: true,
+            fillColor: appColors.background,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+
         ElevatedButton(
           onPressed: isLoading ? null : onSaveTap,
           style: ElevatedButton.styleFrom(
             backgroundColor: appColors.primary,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
             ),
-            elevation: 0,
+            elevation: 4,
+            shadowColor: appColors.primary.withOpacity(0.4),
           ),
           child: isLoading
               ? const SizedBox(
@@ -937,14 +1007,15 @@ class _EditModeContent extends ConsumerWidget {
                   width: 20,
                   child: CircularProgressIndicator(
                     color: Colors.white,
-                    strokeWidth: 2,
+                    strokeWidth: 2.5,
                   ),
                 )
               : Text(
                   l10n.update,
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
                   ),
                 ),
         ),
@@ -956,10 +1027,10 @@ class _EditModeContent extends ConsumerWidget {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.bold,
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
         color: appColors.textMuted,
-        letterSpacing: 0.5,
+        letterSpacing: 0.6,
       ),
     );
   }
@@ -971,18 +1042,18 @@ class _EditModeContent extends ConsumerWidget {
   ) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: appColors.primary.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(6),
+          color: appColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
             color: appColors.primary,
           ),
         ),
