@@ -1,13 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
-import 'package:moment_u_payment/core/utils/currency_helper.dart'; // 🔑 THÊM IMPORT CURRENCY HELPER NÈ BỒ TÈO
+import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 
 // ==========================================
-// 1. THANH CHỌN THỜI GIAN NHANH (CHIPS)
+// 1. THANH CHỌN THỜI GIAN NHANH
 // ==========================================
 class QuickPeriodChips extends StatelessWidget {
   final String selectedTimeFrame;
@@ -26,11 +27,11 @@ class QuickPeriodChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final periods = [
-      {'id': '1W', 'label': l10n.pastWeek ?? 'Tuần qua 🌷'},
-      {'id': '1M', 'label': l10n.pastMonth ?? 'Tháng qua 🌙'},
-      {'id': '3M', 'label': l10n.threeMonths ?? '3 tháng 🍄'},
-      {'id': '6M', 'label': l10n.sixMonths ?? 'Nửa năm 🐢'},
-      {'id': '1Y', 'label': l10n.pastYear ?? 'Năm qua 🌟'},
+      {'id': '1D', 'label': l10n.todayChip ?? 'Hôm nay ☀️'},
+      {'id': '1W', 'label': l10n.pastWeekChip ?? 'Tuần qua 🌷'},
+      {'id': '1M', 'label': l10n.pastMonthChip ?? 'Tháng qua 🌙'},
+      {'id': '3M', 'label': l10n.threeMonthsChip ?? '3 tháng 🍄'},
+      {'id': '6M', 'label': l10n.sixMonthsChip ?? 'Nửa năm 🐢'},
     ];
 
     return Padding(
@@ -47,25 +48,43 @@ class QuickPeriodChips extends StatelessWidget {
 
             return Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: ChoiceChip(
-                label: Text(label),
-                selected: isSelected,
-                selectedColor: appColors.primary.withOpacity(0.2),
-                backgroundColor: appColors.cardBackground,
-                side: BorderSide(
-                  color: isSelected ? appColors.primary : Colors.transparent,
-                  width: 1.5,
+              child: GestureDetector(
+                onTap: () => onPeriodSelected(id),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? appColors.primary
+                        : appColors.cardBackground,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected
+                          ? appColors.primary
+                          : appColors.textMuted.withOpacity(0.2),
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: appColors.primary.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : appColors.textMuted,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
-                labelStyle: TextStyle(
-                  color: isSelected ? appColors.primary : appColors.textMuted,
-                  fontWeight: FontWeight.bold,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onSelected: (val) {
-                  if (val) onPeriodSelected(id);
-                },
               ),
             );
           }).toList(),
@@ -76,9 +95,9 @@ class QuickPeriodChips extends StatelessWidget {
 }
 
 // ==========================================
-// 2. BỘ CHỌN NGÀY FROM - TO (CUTE)
+// 2A. BỘ CHỌN NGÀY FROM - TO (ĐÃ TRONG TÂM - VÀO GIỮA)
 // ==========================================
-class FromToDatePicker extends StatelessWidget {
+class DateRangeSelectorCard extends StatelessWidget {
   final DateTime startDate;
   final DateTime endDate;
   final VoidCallback onSelectStart;
@@ -86,7 +105,7 @@ class FromToDatePicker extends StatelessWidget {
   final AppColorTheme appColors;
   final AppLocalizations l10n;
 
-  const FromToDatePicker({
+  const DateRangeSelectorCard({
     super.key,
     required this.startDate,
     required this.endDate,
@@ -98,79 +117,163 @@ class FromToDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat df = DateFormat('dd/MM/yyyy');
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: appColors.cardBackground,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: onSelectStart,
-                borderRadius: BorderRadius.circular(18),
-                child: _buildDateBox(
-                  l10n.fromDate ?? "Từ ngày nào 🐾",
-                  df.format(startDate),
-                  appColors,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Icon(
-                CupertinoIcons.chevron_forward,
-                color: appColors.primary.withOpacity(0.5),
-                size: 18,
-              ),
-            ),
-            Expanded(
-              child: InkWell(
-                onTap: onSelectEnd,
-                borderRadius: BorderRadius.circular(18),
-                child: _buildDateBox(
-                  l10n.toDate ?? "Đến ngày nao 🌿",
-                  df.format(endDate),
-                  appColors,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    final int durationInDays = endDate.difference(startDate).inDays;
+    final DateFormat df = DateFormat('dd MMM, yyyy', l10n.localeName);
 
-  Widget _buildDateBox(String label, String dateStr, AppColorTheme appColors) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: appColors.background,
-        borderRadius: BorderRadius.circular(18),
+        color: appColors.cardBackground,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: appColors.primary.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: appColors.primary.withOpacity(0.1), width: 1),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: appColors.textMuted,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
+          // --- BADGE ĐẾM NGÀY ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: appColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.timer,
+                      size: 14,
+                      color: appColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      durationInDays == 0
+                          ? (l10n.todayOnly)
+                          : (l10n.journeyDuration(
+                                    durationInDays.toString(),
+                                  )),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: appColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            dateStr,
-            style: TextStyle(
-              color: appColors.text,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+          const SizedBox(height: 16),
+
+          // --- 2 VÙNG CHỌN NGÀY ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Cột trái: TỪ NGÀY
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    onSelectStart();
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          (l10n.fromDate).toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: appColors.textMuted.withOpacity(0.6),
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          df.format(startDate),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: appColors.text,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Icon Mũi tên ở giữa phân cách
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: appColors.background,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  CupertinoIcons.arrow_right,
+                  size: 14,
+                  color: appColors.textMuted.withOpacity(0.5),
+                ),
+              ),
+
+              // Cột phải: ĐẾN NGÀY
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    onSelectEnd();
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          (l10n.toDate ?? 'Đến ngày').toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: appColors.textMuted.withOpacity(0.6),
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          df.format(endDate),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: appColors.text,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -179,7 +282,152 @@ class FromToDatePicker extends StatelessWidget {
 }
 
 // ==========================================
-// 3. THẺ TỔNG QUAN XINH XẮN (Giữ nguyên không sửa)
+// 2B. BỘ CHỌN THÁNG NĂM CHO PHẦN MONTHLY (🔥 UPDATE ĐỒNG BỘ UI & ĐA NGÔN NGỮ)
+// ==========================================
+class MonthSelectorCard extends StatelessWidget {
+  final DateTime selectedMonth;
+  final VoidCallback onSelectMonth;
+  final AppColorTheme appColors;
+  final AppLocalizations l10n;
+
+  const MonthSelectorCard({
+    super.key,
+    required this.selectedMonth,
+    required this.onSelectMonth,
+    required this.appColors,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 🌍 Tự động lấy định dạng cấu hình ngôn ngữ hệ thống qua intl
+    final DateFormat mf = DateFormat.yMMMM(l10n.localeName);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: appColors.cardBackground,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: appColors.primary.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: appColors.primary.withOpacity(0.1), width: 1),
+      ),
+      child: Column(
+        children: [
+          // --- BADGE TIÊU ĐỀ KHỐI ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: appColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.calendar_today,
+                      size: 14,
+                      color: appColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.monthlySummaryTab,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: appColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // --- VÙNG CHỌN THÁNG NĂM CHÍNH GIỮA (ĐỒNG BỘ TYPOGRAPHY VỚI 2A) ---
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    onSelectMonth();
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // 🎯 Căn giữa tuyệt đối giống 2A
+                      children: [
+                        Text(
+                          (l10n.selectMonthLabel ?? 'Thời gian tổng kết')
+                              .toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: appColors.textMuted.withOpacity(0.6),
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              mf.format(selectedMonth),
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: appColors.text, // Đồng bộ màu sắc 2A
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: appColors.background,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                CupertinoIcons.chevron_down,
+                                size: 12,
+                                color: appColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 3. THẺ TỔNG QUAN XINH XẮN
 // ==========================================
 class CuteOverviewCard extends StatelessWidget {
   final double total;
@@ -227,7 +475,7 @@ class CuteOverviewCard extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              (l10n.totalLabel ?? "Tổng thiệt hại 💸").toUpperCase(),
+              (l10n.totalLabel ?? "Tổng chi tiêu").toUpperCase(),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.85),
                 fontSize: 12,
@@ -255,12 +503,12 @@ class CuteOverviewCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildSubInfo(
-                    l10n.avgPerDay ?? "Mỗi ngày 'bay' cỡ 🕊️",
+                    l10n.avgPerDay ?? "Trung bình/ngày",
                     currencyFormatter.format(avgPerDay),
                   ),
                   _buildSubInfo(
-                    l10n.repeatCycle ?? "Vòng lặp ⏳",
-                    "$totalDays ${l10n.days ?? "ngày"}",
+                    l10n.repeatCycle ?? "Chu kỳ",
+                    "$totalDays ${l10n.days ?? 'ngày'}",
                   ),
                 ],
               ),
@@ -344,7 +592,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
               SizedBox(height: 220, child: _buildDonutChart()),
               const SizedBox(height: 16),
               Text(
-                widget.l10n.spendingStructure ?? "Cơ cấu 'bay màu' của ví 🥧",
+                widget.l10n.spendingStructure ?? "Cơ cấu chi tiêu",
                 style: TextStyle(
                   color: widget.appColors.textMuted,
                   fontSize: 14,
@@ -355,9 +603,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
             ],
           ),
         ),
-
         const SizedBox(height: 12),
-
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(8),
@@ -378,7 +624,6 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
   }
 
   Widget _buildDonutChart() {
-    // Lấy số tiền hiện tại tùy thuộc vào việc có đang nhấn vào phần nào hay không
     final dynamic activeAmount = touchedIndex != -1
         ? widget.analyticsData[touchedIndex]['totalAmount']
         : widget.totalSpending;
@@ -436,7 +681,6 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
               ),
             ),
             const SizedBox(height: 4),
-            // 🛠️ ĐÃ FIX TRÀN VIỀN: Sử dụng cách hiển thị rút gọn (Compact) từ CurrencyHelper
             Text(
               '${CurrencyHelper.formatCompactAmount(activeAmount)}₫',
               style: TextStyle(
@@ -575,8 +819,7 @@ class EmptyAnalyticsWidget extends StatelessWidget {
             const Text("🐥✨☁️", style: TextStyle(fontSize: 36)),
             const SizedBox(height: 16),
             Text(
-              l10n.emptyAnalyticsData ??
-                  "Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥",
+              l10n.emptyAnalyticsData ?? "Chưa có dữ liệu phân tích nào 🐥",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: appColors.textMuted,
@@ -610,7 +853,7 @@ class ErrorAnalyticsWidget extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 60),
-          Text("🥺🔧", style: const TextStyle(fontSize: 40)),
+          const Text("🥺🔧", style: TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(
             l10n.errorLoadData ??

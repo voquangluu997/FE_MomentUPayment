@@ -649,6 +649,60 @@
 "errorEmailAlreadyExists": "Email này có chủ nhân rồi nè, thử cái khác hoặc đăng nhập đi bạn ơi! 🌸",
 "errorInvalidCredentials": "Sai mật khẩu hoặc email rồi, làm lại lần nữa là đúng nè! 🐾",
 "errorGoogleLinked": "Tài khoản này đang dùng Google rồi, đăng nhập bằng Google cho nhanh nè! 🚀",
-"errorEmailNotFound": "Email này chưa được đăng ký tài khoản rùi! 😢"
+"errorEmailNotFound": "Email này chưa được đăng ký tài khoản rùi! 😢",
+
+"analyticsTitle": "Thống kê",
+  "analyticsSwitchPeriod": "Giai đoạn",
+  "analyticsSwitchMonthly": "Từng tháng",
+  
+  "analyticsMonthlyHonor": "Tháng {month}",
+  "@analyticsMonthlyHonor": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  
+"analyticsLastMonthReview": "Đổi tháng",
+"selectStartDate": "Chọn ngày bắt đầu",
+"selectEndDate": "Chọn ngày kết thúc",
+"applyButtonTitle": "Áp dụng",
+"chooseMonthYear": "Chọn Tháng & Năm",
+"monthShort": "Th",
+  
+"todayChip": "Hôm nay ☀️",
+"pastWeekChip": "Tuần qua 🌷",
+"pastMonthChip": "Tháng qua 🌙",
+"threeMonthsChip": "3 tháng 🍄",
+"sixMonthsChip": "Nửa năm 🐢",
+  
+"fromDate": "Từ",
+"toDate": "Đến",
+  
+"totalLabel": "Tổng thiệt hại 💸",
+"avgPerDay": "Mỗi ngày 'bay' cỡ 🕊️",
+"repeatCycle": "Vòng lặp ⏳",
+"days": "ngày",
+  
+"spendingStructure": "Cơ cấu 'bay màu' của ví 🥧",
+"emptyAnalyticsData": "Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥",
+"errorLoadData": "Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺",
+"retryButton": "Lấy đà thử lại nghen 🚀",
+"filterActiveTitle": "Bộ lọc thời gian",
+"selectMonthLabel": "Thời gian tổng kết",
+"monthlySummaryTab": "Tổng kết tháng 🌙",
+
+"todayOnly": "Chỉ trong hôm nay ☀️",
+"journeyDuration": "Hành trình {count} ngày 🚀",
+"@journeyDuration": {
+  "description": "Hiển thị số ngày của hành trình",
+  "placeholders": {
+    "count": {
+      "type": "String",
+      "example": "5"
+    }
+  }
+}
 
 }

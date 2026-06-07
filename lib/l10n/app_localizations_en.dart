@@ -124,10 +124,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingData => 'Loading payment moments...';
 
   @override
-  String get errorLoadData => 'Error loading data';
+  String get errorLoadData => 'Oops, the data tripped on a rock, so unlucky 🥺';
 
   @override
-  String get retryButton => 'Give it another push 🚀';
+  String get retryButton => 'Take a run and try again 🚀';
 
   @override
   String get emptyTransactionList => 'No moments yet';
@@ -555,22 +555,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your password has been changed successfully! Please log in.';
 
   @override
-  String get analyticsTitle => 'Wallet X-Ray 🔍';
+  String get analyticsTitle => 'Analytics';
 
   @override
   String get spendingTrend => 'Trend';
 
   @override
-  String get spendingStructure => 'Where did my money go? 🥧';
+  String get spendingStructure => 'Wallet \'burn\' structure 🥧';
 
   @override
   String get customDate => 'Custom';
 
   @override
-  String get totalLabel => 'Total Spending';
+  String get totalLabel => 'Total Damage 💸';
 
   @override
-  String get avgPerDay => 'Daily Poof 🕊️';
+  String get avgPerDay => 'Avg daily burn 🕊️';
 
   @override
   String get timeFrame => 'Days';
@@ -591,20 +591,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pastYear => 'Past Year 🌟';
 
   @override
-  String get fromDate => 'From when 🐾';
+  String get fromDate => 'From';
 
   @override
-  String get toDate => 'To when 🌿';
+  String get toDate => 'To';
 
   @override
-  String get repeatCycle => 'Time Loop ⏳';
+  String get repeatCycle => 'Cycle ⏳';
 
   @override
   String get days => 'days';
 
   @override
   String get emptyAnalyticsData =>
-      'Nothing here! Your wallet is safely untouched 🐥';
+      'Piggy bank is empty~ Haven\'t spent a single dime yet 🐥';
 
   @override
   String get buyDevCoffeeTitle => 'Buy the Dev a Coffee ☕';
@@ -954,18 +954,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get analyticsSwitchPeriod => 'By Period';
+  String get analyticsSwitchPeriod => 'Period';
 
   @override
-  String get analyticsSwitchMonthly => 'Monthly Summary';
+  String get analyticsSwitchMonthly => 'Monthly';
 
   @override
   String analyticsMonthlyHonor(String month) {
-    return 'Honor of Month $month';
+    return 'Month $month';
   }
 
   @override
-  String get analyticsLastMonthReview => 'Last Month Review';
+  String get analyticsLastMonthReview => 'Change Month';
 
   @override
   String get analyticsAchievement => 'Your Achievement';
@@ -992,7 +992,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Diligent tracking, you are mastering your finances!';
 
   @override
-  String get chooseMonthYear => 'Choose Month / Year';
+  String get chooseMonthYear => 'Select Month & Year';
 
   @override
   String get badgeTabTitle => 'My Badges';
@@ -1357,4 +1357,48 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorGoogleLinked =>
       'This account is linked with Google. Just sign in with Google! 🚀';
+
+  @override
+  String get selectStartDate => 'Select start date';
+
+  @override
+  String get selectEndDate => 'Select end date';
+
+  @override
+  String get applyButtonTitle => 'Apply';
+
+  @override
+  String get monthShort => 'M';
+
+  @override
+  String get todayChip => 'Today ☀️';
+
+  @override
+  String get pastWeekChip => 'Past week 🌷';
+
+  @override
+  String get pastMonthChip => 'Past month 🌙';
+
+  @override
+  String get threeMonthsChip => '3 months 🍄';
+
+  @override
+  String get sixMonthsChip => 'Half a year 🐢';
+
+  @override
+  String get filterActiveTitle => 'Time Filter';
+
+  @override
+  String get selectMonthLabel => 'Summary Period';
+
+  @override
+  String get monthlySummaryTab => 'Monthly Summary 🌙';
+
+  @override
+  String get todayOnly => 'Today only ☀️';
+
+  @override
+  String journeyDuration(String count) {
+    return '$count days journey 🚀';
+  }
 }

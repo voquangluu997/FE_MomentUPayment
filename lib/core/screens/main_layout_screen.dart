@@ -15,11 +15,11 @@ import 'package:moment_u_payment/features/budget/presentation/screens/set_budget
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
+import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_analytics_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/analytics_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/settings/presentation/widgets/settings_bottom_sheet.dart';
-import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 // Đảm bảo import đúng model UserBadge của bạn

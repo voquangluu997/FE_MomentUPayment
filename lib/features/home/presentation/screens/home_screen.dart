@@ -424,6 +424,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       isCalendarView: currentMode == ViewMode.calendar,
       selectedDateRange: _selectedDateRange,
       onClearFilter: () => setState(() => _selectedDateRange = null),
+      onSelectStart: () {},
+      onSelectEnd: () {},
       onToggleView: () {
         ref.read(viewModeProvider.notifier).state = currentMode == ViewMode.grid
             ? ViewMode.list

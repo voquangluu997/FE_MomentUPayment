@@ -317,13 +317,13 @@ abstract class AppLocalizations {
   /// No description provided for @errorLoadData.
   ///
   /// In en, this message translates to:
-  /// **'Error loading data'**
+  /// **'Oops, the data tripped on a rock, so unlucky 🥺'**
   String get errorLoadData;
 
   /// No description provided for @retryButton.
   ///
   /// In en, this message translates to:
-  /// **'Give it another push 🚀'**
+  /// **'Take a run and try again 🚀'**
   String get retryButton;
 
   /// No description provided for @emptyTransactionList.
@@ -1071,7 +1071,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wallet X-Ray 🔍'**
+  /// **'Analytics'**
   String get analyticsTitle;
 
   /// No description provided for @spendingTrend.
@@ -1083,7 +1083,7 @@ abstract class AppLocalizations {
   /// No description provided for @spendingStructure.
   ///
   /// In en, this message translates to:
-  /// **'Where did my money go? 🥧'**
+  /// **'Wallet \'burn\' structure 🥧'**
   String get spendingStructure;
 
   /// No description provided for @customDate.
@@ -1095,13 +1095,13 @@ abstract class AppLocalizations {
   /// No description provided for @totalLabel.
   ///
   /// In en, this message translates to:
-  /// **'Total Spending'**
+  /// **'Total Damage 💸'**
   String get totalLabel;
 
   /// No description provided for @avgPerDay.
   ///
   /// In en, this message translates to:
-  /// **'Daily Poof 🕊️'**
+  /// **'Avg daily burn 🕊️'**
   String get avgPerDay;
 
   /// No description provided for @timeFrame.
@@ -1143,19 +1143,19 @@ abstract class AppLocalizations {
   /// No description provided for @fromDate.
   ///
   /// In en, this message translates to:
-  /// **'From when 🐾'**
+  /// **'From'**
   String get fromDate;
 
   /// No description provided for @toDate.
   ///
   /// In en, this message translates to:
-  /// **'To when 🌿'**
+  /// **'To'**
   String get toDate;
 
   /// No description provided for @repeatCycle.
   ///
   /// In en, this message translates to:
-  /// **'Time Loop ⏳'**
+  /// **'Cycle ⏳'**
   String get repeatCycle;
 
   /// No description provided for @days.
@@ -1167,7 +1167,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyAnalyticsData.
   ///
   /// In en, this message translates to:
-  /// **'Nothing here! Your wallet is safely untouched 🐥'**
+  /// **'Piggy bank is empty~ Haven\'t spent a single dime yet 🐥'**
   String get emptyAnalyticsData;
 
   /// No description provided for @buyDevCoffeeTitle.
@@ -1821,25 +1821,25 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsSwitchPeriod.
   ///
   /// In en, this message translates to:
-  /// **'By Period'**
+  /// **'Period'**
   String get analyticsSwitchPeriod;
 
   /// No description provided for @analyticsSwitchMonthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly Summary'**
+  /// **'Monthly'**
   String get analyticsSwitchMonthly;
 
   /// No description provided for @analyticsMonthlyHonor.
   ///
   /// In en, this message translates to:
-  /// **'Honor of Month {month}'**
+  /// **'Month {month}'**
   String analyticsMonthlyHonor(String month);
 
   /// No description provided for @analyticsLastMonthReview.
   ///
   /// In en, this message translates to:
-  /// **'Last Month Review'**
+  /// **'Change Month'**
   String get analyticsLastMonthReview;
 
   /// No description provided for @analyticsAchievement.
@@ -1887,7 +1887,7 @@ abstract class AppLocalizations {
   /// No description provided for @chooseMonthYear.
   ///
   /// In en, this message translates to:
-  /// **'Choose Month / Year'**
+  /// **'Select Month & Year'**
   String get chooseMonthYear;
 
   /// No description provided for @badgeTabTitle.
@@ -2501,6 +2501,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This account is linked with Google. Just sign in with Google! 🚀'**
   String get errorGoogleLinked;
+
+  /// No description provided for @selectStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select start date'**
+  String get selectStartDate;
+
+  /// No description provided for @selectEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select end date'**
+  String get selectEndDate;
+
+  /// No description provided for @applyButtonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyButtonTitle;
+
+  /// No description provided for @monthShort.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get monthShort;
+
+  /// No description provided for @todayChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Today ☀️'**
+  String get todayChip;
+
+  /// No description provided for @pastWeekChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Past week 🌷'**
+  String get pastWeekChip;
+
+  /// No description provided for @pastMonthChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Past month 🌙'**
+  String get pastMonthChip;
+
+  /// No description provided for @threeMonthsChip.
+  ///
+  /// In en, this message translates to:
+  /// **'3 months 🍄'**
+  String get threeMonthsChip;
+
+  /// No description provided for @sixMonthsChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Half a year 🐢'**
+  String get sixMonthsChip;
+
+  /// No description provided for @filterActiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Filter'**
+  String get filterActiveTitle;
+
+  /// No description provided for @selectMonthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary Period'**
+  String get selectMonthLabel;
+
+  /// No description provided for @monthlySummaryTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Summary 🌙'**
+  String get monthlySummaryTab;
+
+  /// No description provided for @todayOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Today only ☀️'**
+  String get todayOnly;
+
+  /// Display the duration of the journey
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days journey 🚀'**
+  String journeyDuration(String count);
 }
 
 class _AppLocalizationsDelegate

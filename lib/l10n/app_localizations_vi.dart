@@ -123,7 +123,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loadingData => 'Đang tải danh sách khoảnh khắc...';
 
   @override
-  String get errorLoadData => 'Lỗi khi tải dữ liệu';
+  String get errorLoadData => 'Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺';
 
   @override
   String get retryButton => 'Lấy đà thử lại nghen 🚀';
@@ -557,7 +557,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.';
 
   @override
-  String get analyticsTitle => 'Thống kê chi tiêu';
+  String get analyticsTitle => 'Thống kê';
 
   @override
   String get spendingTrend => 'Xu hướng';
@@ -569,7 +569,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customDate => 'Tùy chỉnh';
 
   @override
-  String get totalLabel => 'Tổng chi tiêu';
+  String get totalLabel => 'Tổng thiệt hại 💸';
 
   @override
   String get avgPerDay => 'Mỗi ngày \'bay\' cỡ 🕊️';
@@ -593,10 +593,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get pastYear => 'Năm qua 🌟';
 
   @override
-  String get fromDate => 'Từ ngày nào 🐾';
+  String get fromDate => 'Từ';
 
   @override
-  String get toDate => 'Đến ngày nao 🌿';
+  String get toDate => 'Đến';
 
   @override
   String get repeatCycle => 'Vòng lặp ⏳';
@@ -606,7 +606,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get emptyAnalyticsData =>
-      'Chưa có nhật ký khoảnh khắc nào trong tháng này! 📝';
+      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
 
   @override
   String get buyDevCoffeeTitle => 'Tiếp thêm cafein cho dev ☕';
@@ -962,18 +962,18 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get analyticsSwitchPeriod => 'Theo Giai Đoạn';
+  String get analyticsSwitchPeriod => 'Giai đoạn';
 
   @override
-  String get analyticsSwitchMonthly => 'Tổng Kết Tháng';
+  String get analyticsSwitchMonthly => 'Từng tháng';
 
   @override
   String analyticsMonthlyHonor(String month) {
-    return 'Vinh danh tháng $month';
+    return 'Tháng $month';
   }
 
   @override
-  String get analyticsLastMonthReview => 'Nhìn lại tháng trước';
+  String get analyticsLastMonthReview => 'Đổi tháng';
 
   @override
   String get analyticsAchievement => 'Thành Tích Của Bạn';
@@ -1000,7 +1000,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chăm chỉ ghi chép, bạn đang làm chủ tài chính rất tốt!';
 
   @override
-  String get chooseMonthYear => 'Chọn Tháng / Năm';
+  String get chooseMonthYear => 'Chọn Tháng & Năm';
 
   @override
   String get badgeTabTitle => 'Bộ sưu tập';
@@ -1370,4 +1370,48 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get errorGoogleLinked =>
       'Tài khoản này đang dùng Google rồi, đăng nhập bằng Google cho nhanh nè! 🚀';
+
+  @override
+  String get selectStartDate => 'Chọn ngày bắt đầu';
+
+  @override
+  String get selectEndDate => 'Chọn ngày kết thúc';
+
+  @override
+  String get applyButtonTitle => 'Áp dụng';
+
+  @override
+  String get monthShort => 'Th';
+
+  @override
+  String get todayChip => 'Hôm nay ☀️';
+
+  @override
+  String get pastWeekChip => 'Tuần qua 🌷';
+
+  @override
+  String get pastMonthChip => 'Tháng qua 🌙';
+
+  @override
+  String get threeMonthsChip => '3 tháng 🍄';
+
+  @override
+  String get sixMonthsChip => 'Nửa năm 🐢';
+
+  @override
+  String get filterActiveTitle => 'Bộ lọc thời gian';
+
+  @override
+  String get selectMonthLabel => 'Thời gian tổng kết';
+
+  @override
+  String get monthlySummaryTab => 'Tổng kết tháng 🌙';
+
+  @override
+  String get todayOnly => 'Chỉ trong hôm nay ☀️';
+
+  @override
+  String journeyDuration(String count) {
+    return 'Hành trình $count ngày 🚀';
+  }
 }

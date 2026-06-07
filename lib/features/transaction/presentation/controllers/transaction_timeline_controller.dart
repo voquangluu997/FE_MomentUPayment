@@ -4,8 +4,8 @@ import 'package:moment_u_payment/features/budget/providers/home_budget_provider.
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/core/services/home_widget_service.dart';
 import 'package:moment_u_payment/core/utils/app_logger.dart';
+import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_analytics_controller.dart';
 import '../../data/transaction_repository.dart';
-import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
 
 // 🚀 BỔ SUNG IMPORT: Service quản lý Huy hiệu
 import 'package:moment_u_payment/core/features/badges/badge_service.dart';

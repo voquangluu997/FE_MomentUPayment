@@ -643,6 +643,60 @@
 "errorEmailAlreadyExists": "This email is already taken! Try another one or log in instead. 🌸",
 "errorInvalidCredentials": "Incorrect email or password. Give it another try! 🐾",
 "errorGoogleLinked": "This account is linked with Google. Just sign in with Google! 🚀",
-"errorEmailNotFound": "This email isn't registered yet! 😢"
+"errorEmailNotFound": "This email isn't registered yet! 😢",
+"analyticsTitle": "Analytics",
+  "analyticsSwitchPeriod": "Period",
+  "analyticsSwitchMonthly": "Monthly",
+  
+  "analyticsMonthlyHonor": "Month {month}",
+  "@analyticsMonthlyHonor": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  
+"analyticsLastMonthReview": "Change Month",
+"selectStartDate": "Select start date",
+"selectEndDate": "Select end date",
+"applyButtonTitle": "Apply",
+"chooseMonthYear": "Select Month & Year",
+"monthShort": "M",
+  
+"todayChip": "Today ☀️",
+"pastWeekChip": "Past week 🌷",
+"pastMonthChip": "Past month 🌙",
+"threeMonthsChip": "3 months 🍄",
+"sixMonthsChip": "Half a year 🐢",
+  
+"fromDate": "From",
+"toDate": "To",
+  
+"totalLabel": "Total Damage 💸",
+"avgPerDay": "Avg daily burn 🕊️",
+"repeatCycle": "Cycle ⏳",
+"days": "days",
+  
+"spendingStructure": "Wallet 'burn' structure 🥧",
+"emptyAnalyticsData": "Piggy bank is empty~ Haven't spent a single dime yet 🐥",
+"errorLoadData": "Oops, the data tripped on a rock, so unlucky 🥺",
+"retryButton": "Take a run and try again 🚀",
+
+"filterActiveTitle": "Time Filter",
+"selectMonthLabel": "Summary Period",
+"monthlySummaryTab": "Monthly Summary 🌙",
+
+"todayOnly": "Today only ☀️",
+"journeyDuration": "{count} days journey 🚀",
+"@journeyDuration": {
+  "description": "Display the duration of the journey",
+  "placeholders": {
+    "count": {
+      "type": "String",
+      "example": "5"
+    }
+  }
+} 
 
 }
