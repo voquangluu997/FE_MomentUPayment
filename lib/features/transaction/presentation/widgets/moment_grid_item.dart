@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/screens/full_screen_image_viewer.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
@@ -67,6 +68,7 @@ class MomentGridItem extends ConsumerWidget {
                     emoji,
                     category,
                     appColors,
+                    context,
                   )
                 : _buildCuteMemoPad(
                     emoji,
@@ -91,20 +93,37 @@ class MomentGridItem extends ConsumerWidget {
     String emoji,
     String category,
     AppColorTheme appColors,
+    BuildContext
+    context, // Bắt buộc thêm BuildContext vào tham số để chuyển trang
   ) {
+    // Tạo ID duy nhất cho Hero Animation
+    final String momentId =
+        moment['id']?.toString() ??
+        moment['_id']?.toString() ??
+        DateTime.now().millisecondsSinceEpoch.toString();
+    final String heroTag = 'moment-pic-$momentId';
+
+    // Giả sử bạn có CloudinaryHelper để tối ưu URL.
+    // Nếu có thể, hãy truyền thêm tham số c_fill,g_auto để lấy trung tâm khuôn mặt.
+    final String optimizedUrl = CloudinaryHelper.getOptimizedOriginalUrl(
+      imageUrl,
+    );
+
     return Stack(
       children: [
-        // Nền hình ảnh
         Positioned.fill(
-          child: Image.network(
-            CloudinaryHelper.getOptimizedOriginalUrl(imageUrl),
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _buildCuteMemoPad(
-              emoji,
-              category,
-              appColors,
-              compactAmount,
-              note,
+          child: Hero(
+            tag: heroTag,
+            child: Image.network(
+              optimizedUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => _buildCuteMemoPad(
+                emoji,
+                category,
+                appColors,
+                compactAmount,
+                note,
+              ),
             ),
           ),
         ),

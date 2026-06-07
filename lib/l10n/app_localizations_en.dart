@@ -1322,4 +1322,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get registerFailedError =>
       'Registration failed! Please check your network connection 😢';
+
+  @override
+  String get errorEmailNotFound => 'This email isn\'t registered yet! 😢';
+
+  @override
+  String get errorInvalidAccount => 'Invalid account credentials! ❌';
+
+  @override
+  String get errorInvalidOtp => 'The OTP code is incorrect or has expired! ❌';
+
+  @override
+  String get errorMissingPassword => 'Please provide a new password!';
+
+  @override
+  String get errorDefault => 'An error occurred. Please try again later!';
+
+  @override
+  String get errorIncorrectOldPassword =>
+      'Oops! That\'s not your old password. Double-check it! 🧐';
+
+  @override
+  String get errorUserNotFound =>
+      'We couldn\'t find this account. Are you sure the email is correct? 🕵️‍♀️';
+
+  @override
+  String get errorEmailAlreadyExists =>
+      'This email is already taken! Try another one or log in instead. 🌸';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Incorrect email or password. Give it another try! 🐾';
+
+  @override
+  String get errorGoogleLinked =>
+      'This account is linked with Google. Just sign in with Google! 🚀';
 }

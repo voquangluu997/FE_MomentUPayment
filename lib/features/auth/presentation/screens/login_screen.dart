@@ -31,8 +31,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  // 💡 HÀM HELPER: Dịch Error Key từ Backend thành Đa ngôn ngữ từ file ARB
+  String _translateErrorMessage(String errorKey, AppLocalizations l10n) {
+    switch (errorKey) {
+      case 'error_email_already_exists':
+        return l10n.errorEmailAlreadyExists;
+      case 'error_invalid_credentials':
+        return l10n.errorInvalidCredentials;
+      case 'error_google_linked':
+        return l10n.errorGoogleLinked;
+      case 'error_email_not_found':
+        return l10n.errorEmailNotFound;
+      case 'error_invalid_account':
+        return l10n.errorInvalidAccount;
+      case 'error_invalid_otp':
+        return l10n.errorInvalidOtp;
+      case 'error_missing_password':
+        return l10n.errorMissingPassword;
+      case 'error_incorrect_old_password':
+        return l10n.errorIncorrectOldPassword;
+      case 'error_user_not_found':
+        return l10n.errorUserNotFound;
+      default:
+        // Fallback hiển thị lỗi mặc định nếu mã lỗi từ Backend chưa được định nghĩa ở Client
+        return l10n.errorDefault;
+    }
+  }
+
   void _handleLogin() {
-    // 🔥 TẮT BÀN PHÍM XUỐNG NGAY LẬP TỨC KHI BẤM NÚT ĐĂNG NHẬP
     FocusManager.instance.primaryFocus?.unfocus();
 
     final l10n = AppLocalizations.of(context)!;
@@ -53,17 +79,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
     final appColors = ref.watch(appColorsProvider);
 
-    // 🟢 Lắng nghe sự thay đổi trạng thái đăng nhập
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.loginSuccess) {
-        // 1. Hiển thị thông báo thành công
-        AppToast.showSuccess(context, l10n.loginSuccess, appColors);
-
-        // 2. Chuyển trạng thái từ 'loginSuccess' sang 'authenticated' để AuthChecker nhận diện ổn định
         ref.read(authProvider.notifier).completeLogin();
-
-        // 3. 🔥 ĐIỀU HƯỚNG QUAN TRỌNG: Xóa sạch toàn bộ Stack màn hình cũ (bao gồm cả LoginScreen hiện tại)
-        // và đẩy AuthChecker lên làm màn hình chính.
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil('/auth_check', (route) => false);
@@ -80,11 +98,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
-    // 🔥 BỌC GESTURE DETECTOR ĐỂ TẮT BÀN PHÍM KHI CHẠM RA NGOÀI
     return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: appColors.background,
         body: SafeArea(
@@ -115,8 +130,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 40),
-
-                    // Ô nhập Email
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -137,8 +150,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Ô nhập Mật khẩu
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
@@ -159,8 +170,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-
-                    // Thanh nút bấm Quên / Đặt lại mật khẩu
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -193,8 +202,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Nút Đăng Nhập
                     authState == AuthState.loading
                         ? Center(
                             child: CircularProgressIndicator(
@@ -223,9 +230,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                           ),
-
                     const SizedBox(height: 24),
-
                     Row(
                       children: [
                         Expanded(
@@ -252,10 +257,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 24),
-
-                    // NÚT BẤM ĐĂNG NHẬP BẰNG GOOGLE
                     InkWell(
                       onTap: authState == AuthState.loading
                           ? null
@@ -294,10 +296,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Điều hướng sang Đăng ký
                     TextButton(
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
@@ -380,24 +379,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: () async {
               FocusManager.instance.primaryFocus?.unfocus();
               final email = forgotEmailController.text.trim();
-              if (email.isNotEmpty) {
-                ref.read(authProvider.notifier).forgotPassword(email);
+
+              if (email.isEmpty) {
+                AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
+                return;
+              }
+
+              // 💡 1. Gọi API nhận mã lỗi (Error Key) thay vì chuỗi Text thô
+              final errorKey = await ref
+                  .read(authProvider.notifier)
+                  .forgotPassword(email);
+
+              if (!context.mounted) return;
+
+              // 💡 2. Xử lý logic hiển thị dựa trên Error Key nhận về
+              if (errorKey == null) {
+                // THÀNH CÔNG -> Đóng dialog và hiện toast thành công đa ngôn ngữ
                 Navigator.pop(context);
-                // 💡 Đợi kết quả từ provider
-                final errorMessage = await ref
-                    .read(authProvider.notifier)
-                    .forgotPassword(email);
-                if (!context.mounted) return;
-                if (errorMessage == null) {
-                  AppToast.showSuccess(
-                    context,
-                    '${l10n.sendCodeSuccess} $email',
-                    appColors,
-                  );
-                } else {
-                  // Hiện lỗi thật sự từ Backend
-                  AppToast.showError(context, errorMessage, appColors);
-                }
+                AppToast.showSuccess(
+                  context,
+                  '${l10n.sendCodeSuccess} $email',
+                  appColors,
+                );
+              } else {
+                // THẤT BẠI -> Giữ nguyên form, dịch mã lỗi và hiện Toast lỗi tương ứng
+                final localizedError = _translateErrorMessage(errorKey, l10n);
+                AppToast.showError(context, localizedError, appColors);
               }
             },
             child: Text(
@@ -482,38 +489,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             onPressed: () async {
-              // 💡 THÊM async
               FocusManager.instance.primaryFocus?.unfocus();
               final email = emailController.text.trim();
               final otp = otpController.text.trim();
               final newPw = newPasswordController.text.trim();
 
-              if (email.isNotEmpty && otp.isNotEmpty && newPw.isNotEmpty) {
-                // Đóng dialog trước
-                Navigator.pop(context);
-
-                // 💡 Đợi kết quả từ backend xác nhận OTP
-                final errorMessage = await ref
-                    .read(authProvider.notifier)
-                    .resetPasswordWithOtp(email, otp, newPw);
-
-                if (!context.mounted) return;
-
-                if (errorMessage == null) {
-                  // Nếu null nghĩa là thành công
-                  AppToast.showSuccess(
-                    context,
-                    l10n.resetPasswordSuccess,
-                    appColors,
-                  );
-                } else {
-                  // Hiện lỗi sai OTP hoặc hết hạn
-                  AppToast.showError(context, errorMessage, appColors);
-                  // Có thể tự động gọi lại _showResetPasswordDialog(context) ở đây nếu muốn họ thử lại
-                }
-              } else {
-                // Nếu người dùng không nhập đủ thông tin
+              if (email.isEmpty || otp.isEmpty || newPw.isEmpty) {
                 AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
+                return;
+              }
+
+              // 💡 1. Gọi API nhận mã lỗi (Error Key)
+              final errorKey = await ref
+                  .read(authProvider.notifier)
+                  .resetPasswordWithOtp(email, otp, newPw);
+
+              if (!context.mounted) return;
+
+              // 💡 2. Xử lý logic hiển thị
+              if (errorKey == null) {
+                // THÀNH CÔNG -> Đóng dialog, báo thành công
+                Navigator.pop(context);
+                AppToast.showSuccess(
+                  context,
+                  l10n.resetPasswordSuccess,
+                  appColors,
+                );
+              } else {
+                // THẤT BẠI -> Dịch mã lỗi linh hoạt và hiện lỗi lên màn hình mà không tắt dialog
+                final localizedError = _translateErrorMessage(errorKey, l10n);
+                AppToast.showError(context, localizedError, appColors);
               }
             },
             child: Text(

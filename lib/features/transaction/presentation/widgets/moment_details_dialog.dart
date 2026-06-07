@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/screens/full_screen_image_viewer.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/number_format_util.dart';
@@ -362,6 +363,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                 currentImageUrl: _currentImageUrl,
                 emoji: _selectedEmoji,
                 isImageUploading: _isImageUploading,
+                moment: widget.moment,
                 onCameraTap: () => _changePhoto(ImageSource.camera),
                 onGalleryTap: () => _changePhoto(ImageSource.gallery),
                 onToggleEdit: _toggleEditMode,
@@ -435,6 +437,8 @@ class _ImageHeader extends ConsumerWidget {
   final VoidCallback onGalleryTap;
   final VoidCallback onToggleEdit;
   final VoidCallback onCloseTap;
+  final Map<String, dynamic>
+  moment; // Bắt buộc truyền moment vào để lấy ID cho Hero tag
 
   const _ImageHeader({
     required this.isEditing,
@@ -446,13 +450,18 @@ class _ImageHeader extends ConsumerWidget {
     required this.onGalleryTap,
     required this.onToggleEdit,
     required this.onCloseTap,
+    required this.moment,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
+
     final bool hasImage = localImagePath != null || currentImageUrl.isNotEmpty;
+    final String momentId =
+        moment['id']?.toString() ?? moment['_id']?.toString() ?? 'default_id';
+    final String heroTag = 'moment-detail-pic-$momentId';
 
     return SizedBox(
       height: 240,
@@ -463,9 +472,33 @@ class _ImageHeader extends ConsumerWidget {
           if (hasImage)
             localImagePath != null
                 ? Image.file(File(localImagePath!), fit: BoxFit.cover)
-                : Image.network(
-                    CloudinaryHelper.getOptimizedOriginalUrl(currentImageUrl),
-                    fit: BoxFit.cover,
+                : GestureDetector(
+                    // Vô hiệu hóa phóng to nếu đang ở chế độ chỉnh sửa ảnh
+                    onTap: isEditing
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FullScreenImageViewer(
+                                  imageUrl:
+                                      CloudinaryHelper.getOptimizedOriginalUrl(
+                                        currentImageUrl,
+                                      ),
+                                  heroTag: heroTag,
+                                ),
+                              ),
+                            );
+                          },
+                    child: Hero(
+                      tag: heroTag,
+                      child: Image.network(
+                        CloudinaryHelper.getOptimizedOriginalUrl(
+                          currentImageUrl,
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   )
           else
             Container(
@@ -516,18 +549,20 @@ class _ImageHeader extends ConsumerWidget {
 
           // LỚP PHỦ MỜ DẦN
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(isEditing ? 0.4 : 0.05),
-                    Colors.transparent,
-                    appColors.cardBackground.withOpacity(0.0),
-                    appColors.cardBackground,
-                  ],
-                  stops: const [0.0, 0.3, 0.8, 1.0],
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(isEditing ? 0.4 : 0.05),
+                      Colors.transparent,
+                      appColors.cardBackground.withOpacity(0.0),
+                      appColors.cardBackground,
+                    ],
+                    stops: const [0.0, 0.3, 0.8, 1.0],
+                  ),
                 ),
               ),
             ),

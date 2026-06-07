@@ -1332,4 +1332,42 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get registerFailedError =>
       'Đăng ký thất bại! Vui lòng kiểm tra kết nối mạng 😢';
+
+  @override
+  String get errorEmailNotFound =>
+      'Email này chưa được đăng ký tài khoản rùi! 😢';
+
+  @override
+  String get errorInvalidAccount =>
+      'Thông tin xác thực tài khoản không hợp lệ! ❌';
+
+  @override
+  String get errorInvalidOtp =>
+      'Mã OTP không chính xác hoặc đã hết hạn mất rồi! ❌';
+
+  @override
+  String get errorMissingPassword => 'Vui lòng cung cấp mật khẩu mới!';
+
+  @override
+  String get errorDefault => 'Đã có lỗi xảy ra. Vui lòng thử lại sau!';
+
+  @override
+  String get errorIncorrectOldPassword =>
+      'Ơ kìa, mật khẩu cũ chưa đúng rồi nè! Kiểm tra lại xíu nha! 🧐';
+
+  @override
+  String get errorUserNotFound =>
+      'Tìm mãi không thấy tài khoản này đâu cả, bạn kiểm tra lại email xem đúng chưa nhen! 🕵️‍♀️';
+
+  @override
+  String get errorEmailAlreadyExists =>
+      'Email này có chủ nhân rồi nè, thử cái khác hoặc đăng nhập đi bạn ơi! 🌸';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Sai mật khẩu hoặc email rồi, làm lại lần nữa là đúng nè! 🐾';
+
+  @override
+  String get errorGoogleLinked =>
+      'Tài khoản này đang dùng Google rồi, đăng nhập bằng Google cho nhanh nè! 🚀';
 }

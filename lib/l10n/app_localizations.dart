@@ -2441,6 +2441,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Registration failed! Please check your network connection 😢'**
   String get registerFailedError;
+
+  /// No description provided for @errorEmailNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This email isn\'t registered yet! 😢'**
+  String get errorEmailNotFound;
+
+  /// No description provided for @errorInvalidAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid account credentials! ❌'**
+  String get errorInvalidAccount;
+
+  /// No description provided for @errorInvalidOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'The OTP code is incorrect or has expired! ❌'**
+  String get errorInvalidOtp;
+
+  /// No description provided for @errorMissingPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a new password!'**
+  String get errorMissingPassword;
+
+  /// No description provided for @errorDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred. Please try again later!'**
+  String get errorDefault;
+
+  /// No description provided for @errorIncorrectOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops! That\'s not your old password. Double-check it! 🧐'**
+  String get errorIncorrectOldPassword;
+
+  /// No description provided for @errorUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find this account. Are you sure the email is correct? 🕵️‍♀️'**
+  String get errorUserNotFound;
+
+  /// No description provided for @errorEmailAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already taken! Try another one or log in instead. 🌸'**
+  String get errorEmailAlreadyExists;
+
+  /// No description provided for @errorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password. Give it another try! 🐾'**
+  String get errorInvalidCredentials;
+
+  /// No description provided for @errorGoogleLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is linked with Google. Just sign in with Google! 🚀'**
+  String get errorGoogleLinked;
 }
 
 class _AppLocalizationsDelegate
