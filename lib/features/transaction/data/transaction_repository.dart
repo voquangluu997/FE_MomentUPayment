@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/utils/app_logger.dart';
 
@@ -173,13 +174,17 @@ class TransactionRepository {
     required DateTime endDate,
   }) async {
     try {
-      final DateFormat df = DateFormat('yyyy-MM-dd');
+      // 🚀 Sử dụng Helper để lấy timezone chuẩn xác
+      final String timezoneParam = DateTimeHelper.getTimezoneOffsetString();
 
       final response = await _dio.get(
         '/transactions/analytics',
         queryParameters: {
-          'startDate': df.format(startDate),
-          'endDate': df.format(endDate),
+          // Ép chuỗi ISO8601 để giữ nguyên thông tin giờ phút giây
+          'startDate': startDate.toIso8601String(),
+          'endDate': endDate.toIso8601String(),
+          // Gửi thêm Múi giờ để DB của backend Group By không bị lệch ngày
+          'timezone': timezoneParam,
         },
       );
 

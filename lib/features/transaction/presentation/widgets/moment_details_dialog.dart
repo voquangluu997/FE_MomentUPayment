@@ -16,6 +16,8 @@ import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
+// 🚀 Thêm import DateTimeHelper
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 
 class MomentDetailsDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
@@ -98,7 +100,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     super.dispose();
   }
 
-  // 🧹 HÀM DỌN RÁC
   Future<void> _cleanupUnsavedImage() async {
     if (!_isSaved && _tempUploadedUrl != null) {
       try {
@@ -169,12 +170,11 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           ? await _mediaService.takePhoto()
           : await _picker.pickImage(
               source: ImageSource.gallery,
-              imageQuality: 70, // Đã bóp chất lượng
+              imageQuality: 70,
               maxWidth: 800,
             );
 
       if (photo != null) {
-        // Dọn rác ảnh cũ nếu user cứ đổi ảnh liên tục
         if (_tempUploadedUrl != null) {
           _cleanupUnsavedImage();
           _tempUploadedUrl = null;
@@ -185,7 +185,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           _isImageUploading = true;
         });
 
-        // Kích hoạt upload ngầm
         _uploadImageBackground(File(photo.path));
       }
     } catch (e) {
@@ -193,7 +192,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     }
   }
 
-  // 🚀 TẢI ẢNH NGẦM LÊN CLOUD
   Future<void> _uploadImageBackground(File file) async {
     try {
       final url = await ref
@@ -222,7 +220,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   void _toggleEditMode() {
     setState(() {
       if (_isEditing) {
-        // Nếu thoát edit mode, dọn rác luôn
         _cleanupUnsavedImage();
         _localImagePath = null;
         _tempUploadedUrl = null;
@@ -249,7 +246,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     final appColors = ref.read(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    // Chặn không cho lưu nếu ảnh chưa đẩy xong
     if (_isImageUploading) {
       AppToast.showError(
         context,
@@ -266,7 +262,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     if (_isCustomCategory) {
       finalCategory = _customCategoryController.text.trim().isNotEmpty
           ? _customCategoryController.text.trim()
-          : 'Khác';
+          : l10n.categoryOther ?? 'Khác';
     }
 
     final String momentId =
@@ -280,18 +276,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     }
 
     try {
-      final now = DateTime.now();
-      final spentAtLocal = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        now.hour,
-        now.minute,
-        now.second,
-      );
-      final spentAtWithCurrentTime = spentAtLocal.toUtc();
+      // 🚀 TỐI ƯU: Sử dụng DateTimeHelper để đồng bộ logic với toàn App
+      final spentAtWithCurrentTime =
+          DateTimeHelper.combineDateWithCurrentTimeUtc(_selectedDate);
 
-      // 🚀 CHỈ GỌI UPDATE, TRUYỀN URL ĐÃ UPLOAD NGẦM
       await ref
           .read(transactionProvider.notifier)
           .updateTransaction(
@@ -300,13 +288,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
             category: finalCategory,
             emoji: _selectedEmoji,
             note: _noteController.text.trim(),
-            imageUrl: _tempUploadedUrl, // Truyền trực tiếp Link Cloud
-            localImagePath: null, // Bỏ trống file vật lý
+            imageUrl: _tempUploadedUrl,
+            localImagePath: null,
             spentAt: spentAtWithCurrentTime,
           );
 
       if (mounted) {
-        _isSaved = true; // Khóa lại, không dọn rác ảnh này
+        _isSaved = true;
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         ref.read(notificationProvider.notifier).fetchUnreadCount();
@@ -330,10 +318,8 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     final String compactAmount =
         '-${CurrencyHelper.formatCompactAmount(currentAmount)}$currencySymbol';
 
-    // ✨ BAO BỌC BẰNG POPSCOPE
     return PopScope(
-      canPop:
-          !_isImageUploading, // Chặn đóng Dialog bằng nút Back nếu đang tải ảnh
+      canPop: !_isImageUploading,
       onPopInvoked: (didPop) {
         if (!didPop && _isImageUploading) {
           AppToast.showError(

@@ -703,6 +703,64 @@
       "example": "5"
     }
   }
-}
+},
+
+"survivalStateNotSetTitle": "Hệ thống radar",
+  "survivalStateNotSetBadge": "Chưa kích hoạt",
+  "survivalStateNotSetHeading": "Chưa thiết lập ví?",
+  "survivalStateNotSetPunchline": "Hãy cho ví một mục tiêu sinh tồn để kích hoạt đồng hồ đếm ngược bảo vệ tài chính của bạn! 🛡️",
+
+  "survivalStateGodModeTitle": "Radar sinh tồn: An Toàn",
+  "survivalStateGodModeBadge": "Chi Tiêu Đẹp ✨",
+  "survivalStateGodModeHeading": "Sống sót qua tháng: Rất Dễ!",
+  "survivalStateGodModePunchline": "Với tốc độ này, bạn dư sức sống thảnh thơi đến hết tháng. Thần tài đang mỉm cười với bạn đó! 😎",
+
+  "survivalStateDangerTitle": "Cảnh báo tốc độ",
+  "survivalStateDangerBadge": "Đốt Hơi Nhanh ⚠️",
+  "survivalStateDangerHeading": "Dự kiến cạn ví trong {days} ngày",
+  "@survivalStateDangerHeading": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "survivalStateDangerPunchline": "Nhịp tim ví đang tăng! Bạn sẽ 'hết máu' trước khi tháng kết thúc {days} ngày nếu không giảm ga chi tiêu nhé! 🏎️💨",
+  "@survivalStateDangerPunchline": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+
+  "survivalStateApocalypseTitle": "Báo động đỏ nguy kịch",
+  "survivalStateApocalypseBadge": "CHẠY BẰNG OXY! 🚨",
+  "survivalStateApocalypseHeading": "Ví sẽ ĐÓNG BĂNG sau {days} ngày!",
+  "@survivalStateApocalypseHeading": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "survivalStateApocalypsePunchline": "🚨 SOS! Tốc độ đốt tiền chạm ngưỡng hủy diệt! Chế độ húp mì tôm đã tự động kích hoạt, bóp phanh ngay lập tức!",
+
+  "survivalStateWastedTitle": "Hệ thống sập nguồn",
+  "survivalStateWastedBadge": "WASTED 💀",
+  "survivalStateWastedHeading": "Bạn đã cạn sạch ví! 💸",
+  "survivalStateWastedPunchline": "Nhiệm vụ thất bại! Bạn đã tiêu quá hạn mức tháng này. Hãy bấm icon cây bút phía trên để hồi sinh/cấp cứu lại chiếc ví nhé! 🕊️",
+
+  "setupRadarNow": "Thiết lập ngay để kích hoạt radar",
+  "spentOutOffLimit": "Đã tiêu: {spent} / {limit}",
+  "@spentOutOffLimit": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  },
+  "budgetCardCosmicMessage": "Thông điệp vũ trụ:",
+  "budgetCardTapToView": "Nhấn để xem lời nhắc...",
+  "budgetHeaderSubtitle": "Thiết lập tấm khiên bảo vệ hầu bao thông minh của bạn.",
+  "budgetDailySafeLimitTitle": "Hạn mức tiêu mỗi ngày",
+  "budgetRemainingLabel": "Đánh giá trạng thái",
+  "budgetStatusSafe": "An toàn lý tưởng ✨",
+  "budgetStatusWarning": "Vùng nguy hiểm! 🚨",
+  "invalidAmountMessage": "Vui lòng nhập số tiền hợp lệ nha! 💸",
+  "categoryOther": "Khác"
 
 }

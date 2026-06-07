@@ -145,7 +145,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catEntertainment => 'Entertainment 🎮';
 
   @override
-  String get categoryOther => 'Uncategorized';
+  String get categoryOther => 'Other';
 
   @override
   String get catCustom => 'Custom... 📝';
@@ -274,7 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your spending this month is very reasonable! 👍';
 
   @override
-  String get budgetStatusWarning => 'S.O.S!';
+  String get budgetStatusWarning => 'Danger Zone! 🚨';
 
   @override
   String get budgetStatusOver =>
@@ -836,7 +836,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetOverspentLabel => 'Overspent';
 
   @override
-  String get budgetRemainingLabel => 'Remaining';
+  String get budgetRemainingLabel => 'Status Review';
 
   @override
   String get budgetLastDay => 'Today is the final day!';
@@ -1401,4 +1401,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String journeyDuration(String count) {
     return '$count days journey 🚀';
   }
+
+  @override
+  String get survivalStateNotSetTitle => 'Radar System';
+
+  @override
+  String get survivalStateNotSetBadge => 'Inactive';
+
+  @override
+  String get survivalStateNotSetHeading => 'Wallet Not Set?';
+
+  @override
+  String get survivalStateNotSetPunchline =>
+      'Give your wallet a survival goal to activate the financial countdown! 🛡️';
+
+  @override
+  String get survivalStateGodModeTitle => 'Survival Radar: Safe';
+
+  @override
+  String get survivalStateGodModeBadge => 'Nice Spending ✨';
+
+  @override
+  String get survivalStateGodModeHeading => 'Survive the month: Easy!';
+
+  @override
+  String get survivalStateGodModePunchline =>
+      'At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎';
+
+  @override
+  String get survivalStateDangerTitle => 'Speed Warning';
+
+  @override
+  String get survivalStateDangerBadge => 'Burning Fast ⚠️';
+
+  @override
+  String survivalStateDangerHeading(String days) {
+    return 'Wallet empty in $days days';
+  }
+
+  @override
+  String survivalStateDangerPunchline(String days) {
+    return 'Wallet heart rate is rising! You\'ll run out of \'blood\' $days days early if you don\'t slow down! 🏎️💨';
+  }
+
+  @override
+  String get survivalStateApocalypseTitle => 'Red Alert Critical';
+
+  @override
+  String get survivalStateApocalypseBadge => 'ON OXYGEN! 🚨';
+
+  @override
+  String survivalStateApocalypseHeading(String days) {
+    return 'Wallet FREEZES in $days days!';
+  }
+
+  @override
+  String get survivalStateApocalypsePunchline =>
+      '🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!';
+
+  @override
+  String get survivalStateWastedTitle => 'System Shut Down';
+
+  @override
+  String get survivalStateWastedBadge => 'WASTED 💀';
+
+  @override
+  String get survivalStateWastedHeading => 'You are out of cash! 💸';
+
+  @override
+  String get survivalStateWastedPunchline =>
+      'Mission failed! You exceeded this month\'s limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️';
+
+  @override
+  String get setupRadarNow => 'Set up now to activate radar';
+
+  @override
+  String spentOutOffLimit(String spent, String limit) {
+    return 'Spent: $spent / $limit';
+  }
+
+  @override
+  String get budgetCardCosmicMessage => 'Cosmic message:';
+
+  @override
+  String get budgetCardTapToView => 'Tap to view reminder...';
+
+  @override
+  String get budgetHeaderSubtitle =>
+      'Set up your financial shield to keep your wallet safe.';
+
+  @override
+  String get budgetDailySafeLimitTitle => 'Daily Safe Limit';
+
+  @override
+  String get budgetStatusSafe => 'Perfect Safe ✨';
+
+  @override
+  String get invalidAmountMessage => 'Please enter a valid amount! 💸';
 }

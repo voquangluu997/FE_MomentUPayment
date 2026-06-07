@@ -144,7 +144,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get catEntertainment => 'Giải trí 🎮';
 
   @override
-  String get categoryOther => 'Chưa phân loại';
+  String get categoryOther => 'Khác';
 
   @override
   String get catCustom => 'Khác nè... 📝';
@@ -275,7 +275,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tình hình chi tiêu tháng này rất hợp lý luôn! 👍';
 
   @override
-  String get budgetStatusWarning => 'Ét ô ét!';
+  String get budgetStatusWarning => 'Vùng nguy hiểm! 🚨';
 
   @override
   String get budgetStatusOver =>
@@ -843,7 +843,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get budgetOverspentLabel => 'Vượt mức';
 
   @override
-  String get budgetRemainingLabel => 'Còn lại';
+  String get budgetRemainingLabel => 'Đánh giá trạng thái';
 
   @override
   String get budgetLastDay => 'Hôm nay là ngày cuối!';
@@ -1414,4 +1414,101 @@ class AppLocalizationsVi extends AppLocalizations {
   String journeyDuration(String count) {
     return 'Hành trình $count ngày 🚀';
   }
+
+  @override
+  String get survivalStateNotSetTitle => 'Hệ thống radar';
+
+  @override
+  String get survivalStateNotSetBadge => 'Chưa kích hoạt';
+
+  @override
+  String get survivalStateNotSetHeading => 'Chưa thiết lập ví?';
+
+  @override
+  String get survivalStateNotSetPunchline =>
+      'Hãy cho ví một mục tiêu sinh tồn để kích hoạt đồng hồ đếm ngược bảo vệ tài chính của bạn! 🛡️';
+
+  @override
+  String get survivalStateGodModeTitle => 'Radar sinh tồn: An Toàn';
+
+  @override
+  String get survivalStateGodModeBadge => 'Chi Tiêu Đẹp ✨';
+
+  @override
+  String get survivalStateGodModeHeading => 'Sống sót qua tháng: Rất Dễ!';
+
+  @override
+  String get survivalStateGodModePunchline =>
+      'Với tốc độ này, bạn dư sức sống thảnh thơi đến hết tháng. Thần tài đang mỉm cười với bạn đó! 😎';
+
+  @override
+  String get survivalStateDangerTitle => 'Cảnh báo tốc độ';
+
+  @override
+  String get survivalStateDangerBadge => 'Đốt Hơi Nhanh ⚠️';
+
+  @override
+  String survivalStateDangerHeading(String days) {
+    return 'Dự kiến cạn ví trong $days ngày';
+  }
+
+  @override
+  String survivalStateDangerPunchline(String days) {
+    return 'Nhịp tim ví đang tăng! Bạn sẽ \'hết máu\' trước khi tháng kết thúc $days ngày nếu không giảm ga chi tiêu nhé! 🏎️💨';
+  }
+
+  @override
+  String get survivalStateApocalypseTitle => 'Báo động đỏ nguy kịch';
+
+  @override
+  String get survivalStateApocalypseBadge => 'CHẠY BẰNG OXY! 🚨';
+
+  @override
+  String survivalStateApocalypseHeading(String days) {
+    return 'Ví sẽ ĐÓNG BĂNG sau $days ngày!';
+  }
+
+  @override
+  String get survivalStateApocalypsePunchline =>
+      '🚨 SOS! Tốc độ đốt tiền chạm ngưỡng hủy diệt! Chế độ húp mì tôm đã tự động kích hoạt, bóp phanh ngay lập tức!';
+
+  @override
+  String get survivalStateWastedTitle => 'Hệ thống sập nguồn';
+
+  @override
+  String get survivalStateWastedBadge => 'WASTED 💀';
+
+  @override
+  String get survivalStateWastedHeading => 'Bạn đã cạn sạch ví! 💸';
+
+  @override
+  String get survivalStateWastedPunchline =>
+      'Nhiệm vụ thất bại! Bạn đã tiêu quá hạn mức tháng này. Hãy bấm icon cây bút phía trên để hồi sinh/cấp cứu lại chiếc ví nhé! 🕊️';
+
+  @override
+  String get setupRadarNow => 'Thiết lập ngay để kích hoạt radar';
+
+  @override
+  String spentOutOffLimit(String spent, String limit) {
+    return 'Đã tiêu: $spent / $limit';
+  }
+
+  @override
+  String get budgetCardCosmicMessage => 'Thông điệp vũ trụ:';
+
+  @override
+  String get budgetCardTapToView => 'Nhấn để xem lời nhắc...';
+
+  @override
+  String get budgetHeaderSubtitle =>
+      'Thiết lập tấm khiên bảo vệ hầu bao thông minh của bạn.';
+
+  @override
+  String get budgetDailySafeLimitTitle => 'Hạn mức tiêu mỗi ngày';
+
+  @override
+  String get budgetStatusSafe => 'An toàn lý tưởng ✨';
+
+  @override
+  String get invalidAmountMessage => 'Vui lòng nhập số tiền hợp lệ nha! 💸';
 }

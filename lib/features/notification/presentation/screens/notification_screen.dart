@@ -42,14 +42,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     String? route;
 
     switch (noti.type) {
-      // 💡 CẬP NHẬT CHÍNH XÁC TỪ SERVER
       case 'badge_unlocked':
-        icon = CupertinoIcons.rosette; // Icon cúp/huy chương
+        icon = CupertinoIcons.rosette;
         color = Colors.amber;
         route = '/badge_gallery';
         break;
       case 'badge_reset':
-        icon = CupertinoIcons.arrow_2_squarepath; // Icon xoay vòng/reset
+        icon = CupertinoIcons.arrow_2_squarepath;
         color = Colors.blueGrey;
         route = '/badge_gallery';
         break;
@@ -221,18 +220,39 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     final primaryNoti = group.first;
     final content = _parseNotificationContent(primaryNoti, appColors, l10n);
 
-    return Container(
+    // Kiểm tra xem cả cụm/nhóm này có thông báo nào chưa đọc không
+    final bool isGroupUnread = group.any((noti) => !noti.isRead);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: appColors.cardBackground,
+        // Thông báo chưa đọc sẽ có màu nền nguyên bản, đã đọc sẽ hơi mờ nhẹ đi
+        color: isGroupUnread
+            ? appColors.cardBackground
+            : appColors.cardBackground.withOpacity(0.65),
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: isGroupUnread
+              ? appColors.primary.withOpacity(0.12)
+              : Colors.transparent,
+          width: 1,
+        ),
+        boxShadow: isGroupUnread
+            ? [
+                BoxShadow(
+                  color: appColors.primary.withOpacity(0.06),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.015),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
@@ -242,7 +262,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildNotificationIcon(content),
+              _buildNotificationIcon(content, isGroupUnread, appColors),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -253,21 +273,24 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       group,
                       index,
                       isExpanded,
+                      isGroupUnread,
                       appColors,
                     ),
                     const SizedBox(height: 6),
-
                     _ResizableText(
                       text: content['body'] as String,
                       style: TextStyle(
                         fontSize: 13,
-                        color: appColors.primaryDark.withOpacity(0.7),
+                        fontWeight: isGroupUnread
+                            ? FontWeight.w500
+                            : FontWeight.normal,
+                        color: isGroupUnread
+                            ? appColors.primaryDark.withOpacity(0.85)
+                            : appColors.primaryDark.withOpacity(0.45),
                         height: 1.4,
                       ),
                     ),
-
                     const SizedBox(height: 8),
-                    // 💡 SỬA LỖI 2: Truyền group.length vào hàm _buildFooterRow
                     _buildFooterRow(
                       primaryNoti,
                       isExpanded,
@@ -291,37 +314,67 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     AppLocalizations l10n,
   ) {
     final content = _parseNotificationContent(noti, appColors, l10n);
+    final bool isUnread = !noti.isRead;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
       margin: const EdgeInsets.only(left: 45, bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: noti.isRead
-            ? appColors.cardBackground.withOpacity(0.6)
-            : appColors.cardBackground,
+        color: isUnread
+            ? appColors.primary.withOpacity(0.04)
+            : appColors.cardBackground.withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: appColors.primary.withOpacity(0.05)),
+        border: Border.all(
+          color: isUnread
+              ? appColors.primary.withOpacity(0.1)
+              : appColors.primary.withOpacity(0.02),
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () => _handleNotificationClick(noti, content['route']),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ResizableText(
-              text: content['body'] as String,
-              style: TextStyle(
-                fontSize: 12,
-                color: appColors.primaryDark.withOpacity(0.8),
-                height: 1.4,
+            if (isUnread)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, right: 8),
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: appColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              intl.DateFormat('HH:mm').format(noti.createdAt),
-              style: TextStyle(
-                fontSize: 9,
-                color: appColors.primaryDark.withOpacity(0.3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ResizableText(
+                    text: content['body'] as String,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isUnread
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      color: isUnread
+                          ? appColors.primaryDark
+                          : appColors.primaryDark.withOpacity(0.5),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    intl.DateFormat('HH:mm').format(noti.createdAt),
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: appColors.primaryDark.withOpacity(0.3),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -330,18 +383,45 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     );
   }
 
-  Widget _buildNotificationIcon(Map<String, dynamic> content) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: (content['color'] as Color).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Icon(
-        content['icon'] as IconData,
-        color: content['color'] as Color,
-        size: 20,
-      ),
+  Widget _buildNotificationIcon(
+    Map<String, dynamic> content,
+    bool isUnread,
+    AppColorTheme appColors,
+  ) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 250),
+          opacity: isUnread ? 1.0 : 0.5,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: (content['color'] as Color).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              content['icon'] as IconData,
+              color: content['color'] as Color,
+              size: 20,
+            ),
+          ),
+        ),
+        if (isUnread)
+          Positioned(
+            top: -2,
+            right: -2,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: appColors.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: appColors.cardBackground, width: 1.8),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -350,6 +430,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     List<InAppNotification> group,
     int index,
     bool isExpanded,
+    bool isUnread,
     AppColorTheme appColors,
   ) {
     return Row(
@@ -358,9 +439,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           child: Text(
             content['title'] as String,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: isUnread ? FontWeight.w900 : FontWeight.bold,
               fontSize: 14,
-              color: appColors.primaryDark,
+              color: isUnread
+                  ? appColors.primaryDark
+                  : appColors.primaryDark.withOpacity(0.6),
             ),
           ),
         ),
@@ -394,7 +477,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     );
   }
 
-  // 💡 SỬA LỖI 2: Thêm groupLength và bọc Icon bằng GestureDetector
   Widget _buildFooterRow(
     InAppNotification noti,
     bool isExpanded,
@@ -414,7 +496,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         ),
         if (groupLength > 1)
           GestureDetector(
-            behavior: HitTestBehavior.opaque, // Giúp vùng bấm dễ nhận diện hơn
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               setState(() {
                 if (isExpanded) {
@@ -425,9 +507,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               });
             },
             child: Padding(
-              padding: const EdgeInsets.all(
-                4.0,
-              ), // Mở rộng vùng bấm của ngón tay
+              padding: const EdgeInsets.all(4.0),
               child: Icon(
                 isExpanded
                     ? CupertinoIcons.chevron_up
@@ -509,9 +589,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 }
 
-// ==========================================
-// WIDGET TỰ ĐỘNG ĐO ĐỘ DÀI & ĐA NGÔN NGỮ
-// ==========================================
 class _ResizableText extends ConsumerStatefulWidget {
   final String text;
   final TextStyle style;

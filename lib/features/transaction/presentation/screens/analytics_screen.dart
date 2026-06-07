@@ -8,6 +8,8 @@ import 'package:moment_u_payment/features/transaction/presentation/controllers/t
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
+// 🚀 Thêm import DateTimeHelper
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 
 // ==========================================
 // MÀN HÌNH CHÍNH (ANALYTICS SCREEN)
@@ -34,12 +36,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     if (now.day == 1) {
       _activeFilterType = 'MonthlySummary';
       _currentMonthSummary = DateTime(now.year, now.month - 1);
-      _startDate = DateTime(now.year, now.month - 1, 1);
-      _endDate = DateTime(now.year, now.month, 0, 23, 59, 59);
+
+      // 🚀 TỐI ƯU: Gọi DateTimeHelper
+      _startDate = DateTimeHelper.getLocalStartOfDay(
+        DateTime(now.year, now.month - 1, 1),
+      );
+      _endDate = DateTimeHelper.getLocalEndOfDay(
+        DateTime(now.year, now.month, 0),
+      );
     } else {
       _activeFilterType = 'Period';
-      _endDate = now;
-      _startDate = DateTime(now.year, now.month - 1, now.day);
+
+      // 🚀 TỐI ƯU: Gọi DateTimeHelper
+      _endDate = DateTimeHelper.getLocalEndOfDay(now);
+      _startDate = DateTimeHelper.getLocalStartOfDay(
+        DateTime(now.year, now.month - 1, now.day),
+      );
       _currentMonthSummary = DateTime(now.year, now.month);
     }
   }
@@ -57,34 +69,31 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       _selectedTimeFrame = period;
 
       final now = DateTime.now();
-      _endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+      // 🚀 TỐI ƯU
+      _endDate = DateTimeHelper.getLocalEndOfDay(now);
 
       switch (period) {
         case '1D':
-          _startDate = DateTime(now.year, now.month, now.day);
+          _startDate = DateTimeHelper.getLocalStartOfDay(now);
           break;
         case '1W':
-          _startDate = _endDate.subtract(const Duration(days: 7));
+          _startDate = DateTimeHelper.getLocalStartOfDay(
+            _endDate.subtract(const Duration(days: 7)),
+          );
           break;
         case '1M':
-          _startDate = DateTime(
-            _endDate.year,
-            _endDate.month - 1,
-            _endDate.day,
+          _startDate = DateTimeHelper.getLocalStartOfDay(
+            DateTime(_endDate.year, _endDate.month - 1, _endDate.day),
           );
           break;
         case '3M':
-          _startDate = DateTime(
-            _endDate.year,
-            _endDate.month - 3,
-            _endDate.day,
+          _startDate = DateTimeHelper.getLocalStartOfDay(
+            DateTime(_endDate.year, _endDate.month - 3, _endDate.day),
           );
           break;
         case '6M':
-          _startDate = DateTime(
-            _endDate.year,
-            _endDate.month - 6,
-            _endDate.day,
+          _startDate = DateTimeHelper.getLocalStartOfDay(
+            DateTime(_endDate.year, _endDate.month - 6, _endDate.day),
           );
           break;
       }
@@ -179,25 +188,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       HapticFeedback.mediumImpact();
                       setState(() {
                         if (isStart) {
-                          _startDate = DateTime(
-                            tempDate.year,
-                            tempDate.month,
-                            tempDate.day,
+                          // 🚀 TỐI ƯU: Đảm bảo giờ phút giây luôn là 00:00:00
+                          _startDate = DateTimeHelper.getLocalStartOfDay(
+                            tempDate,
                           );
                           if (_startDate.isAfter(_endDate)) {
-                            _endDate = _startDate;
+                            _endDate = DateTimeHelper.getLocalEndOfDay(
+                              _startDate,
+                            );
                           }
                         } else {
-                          _endDate = DateTime(
-                            tempDate.year,
-                            tempDate.month,
-                            tempDate.day,
-                            23,
-                            59,
-                            59,
-                          );
+                          // 🚀 TỐI ƯU: Đảm bảo giờ phút giây luôn là 23:59:59
+                          _endDate = DateTimeHelper.getLocalEndOfDay(tempDate);
                           if (_endDate.isBefore(_startDate)) {
-                            _startDate = tempDate;
+                            _startDate = DateTimeHelper.getLocalStartOfDay(
+                              tempDate,
+                            );
                           }
                         }
                         _selectedTimeFrame = 'Custom';
@@ -465,14 +471,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               tempYear,
                               tempMonth,
                             );
-                            _startDate = DateTime(tempYear, tempMonth, 1);
-                            _endDate = DateTime(
-                              tempYear,
-                              tempMonth + 1,
-                              0,
-                              23,
-                              59,
-                              59,
+                            // 🚀 TỐI ƯU: Tự tính đầu và cuối tháng thông qua Helper
+                            _startDate = DateTimeHelper.getLocalStartOfDay(
+                              DateTime(tempYear, tempMonth, 1),
+                            );
+                            _endDate = DateTimeHelper.getLocalEndOfDay(
+                              DateTime(tempYear, tempMonth + 1, 0),
                             );
                           });
                           _fetchData();

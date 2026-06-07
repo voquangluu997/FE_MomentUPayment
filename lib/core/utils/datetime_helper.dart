@@ -1,6 +1,59 @@
+import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
 class DateTimeHelper {
+  // =========================================================
+  // 🔥 NHÓM HÀM MỚI: XỬ LÝ TIMEZONE & BOUNDARY (RANH GIỚI NGÀY)
+  // =========================================================
+
+  /// Lấy mốc 00:00:00 của một ngày theo giờ Local và chuyển thẳng sang UTC
+  static DateTime getStartOfDayUtc(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 0, 0, 0).toUtc();
+  }
+
+  /// Lấy mốc 23:59:59 của một ngày theo giờ Local và chuyển thẳng sang UTC
+  static DateTime getEndOfDayUtc(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 23, 59, 59, 999).toUtc();
+  }
+
+  /// Lấy mốc 00:00:00 của một ngày theo giờ Local
+  static DateTime getLocalStartOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 0, 0, 0);
+  }
+
+  /// Lấy mốc 23:59:59 của một ngày theo giờ Local
+  static DateTime getLocalEndOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+  }
+
+  /// Trộn ngày được chọn (Date) với giờ hiện tại của thiết bị (Time) và xuất ra UTC
+  static DateTime combineDateWithCurrentTimeUtc(DateTime selectedDate) {
+    final now = DateTime.now();
+    return DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      now.hour,
+      now.minute,
+      now.second,
+    ).toUtc();
+  }
+
+  /// 🌐 Tự động tính toán Timezone Offset của thiết bị (Ví dụ: Việt Nam sẽ là "+07:00")
+  static String getTimezoneOffsetString() {
+    final Duration offset = DateTime.now().timeZoneOffset;
+    final String hours = offset.inHours.toString().padLeft(2, '0');
+    final String minutes = (offset.inMinutes % 60).abs().toString().padLeft(
+      2,
+      '0',
+    );
+    return '${offset.isNegative ? "-" : "+"}$hours:$minutes';
+  }
+
+  // =========================================================
+  // NHÓM HÀM CŨ ĐÃ ĐƯỢC BẠN TỐI ƯU
+  // =========================================================
+
   /// 📦 Nhóm danh sách phẳng thành Map<String, List> dựa trên ngày (yyyy-MM-dd) local
   static Map<String, List<Map<String, dynamic>>> groupTransactionsByDate(
     List<Map<String, dynamic>> transactions,
@@ -9,7 +62,6 @@ class DateTimeHelper {
 
     final sortedList = List<Map<String, dynamic>>.from(transactions);
     sortedList.sort((a, b) {
-      // Ép kiểu về local để so sánh chính xác theo múi giờ user
       final DateTime dateA = DateTime.parse(a['spentAt'].toString()).toLocal();
       final DateTime dateB = DateTime.parse(b['spentAt'].toString()).toLocal();
       return dateB.compareTo(dateA);
@@ -18,7 +70,6 @@ class DateTimeHelper {
     for (var tx in sortedList) {
       if (tx['spentAt'] == null) continue;
       try {
-        // 🔥 CHỐT HẠ: Chuyển chuỗi UTC từ server về múi giờ thiết bị (ví dụ: +7)
         final DateTime parsedDate = DateTime.parse(
           tx['spentAt'].toString(),
         ).toLocal();
@@ -35,9 +86,8 @@ class DateTimeHelper {
     return grouped;
   }
 
-  /// 📝 Chuyển đổi key ngày thành nhãn hiển thị thân thiện (Đã tích hợp đa ngôn ngữ)
+  /// 📝 Chuyển đổi key ngày thành nhãn hiển thị thân thiện
   static String getFriendlyDateLabel(String dateKey, AppLocalizations l10n) {
-    // 🔑 Bổ sung tham số l10n
     try {
       final List<String> parts = dateKey.split('-');
       final DateTime txDate = DateTime(
@@ -51,7 +101,6 @@ class DateTimeHelper {
       final DateTime yesterday = today.subtract(const Duration(days: 1));
 
       if (txDate == today) {
-        // 🔑 Lấy từ l10n và viết hoa toàn bộ để giữ nguyên thiết kế gốc
         return l10n.today.toUpperCase();
       } else if (txDate == yesterday) {
         return l10n.yesterday.toUpperCase();
@@ -105,7 +154,6 @@ class DateTimeHelper {
   /// 🗓️ Lấy số lượng ngày của tháng hiện tại
   static int getDaysInCurrentMonth() {
     final now = DateTime.now();
-    // DateTime(year, month + 1, 0) sẽ trả về ngày cuối cùng của tháng hiện tại
     return DateTime(now.year, now.month + 1, 0).day;
   }
 }

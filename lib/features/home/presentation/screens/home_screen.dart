@@ -78,17 +78,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ) {
     if (_selectedDateRange == null) return transactions;
 
-    final DateTime startOfDay = DateTime(
-      _selectedDateRange!.start.year,
-      _selectedDateRange!.start.month,
-      _selectedDateRange!.start.day,
+    // 🚀 Dùng Helper để khoá chặt ranh giới 00:00:00 -> 23:59:59 theo Local
+    final DateTime startOfDay = DateTimeHelper.getLocalStartOfDay(
+      _selectedDateRange!.start,
     );
-
-    final DateTime endOfDay = DateTime(
-      _selectedDateRange!.end.year,
-      _selectedDateRange!.end.month,
-      _selectedDateRange!.end.day,
-    ).add(const Duration(days: 1));
+    final DateTime endOfDay = DateTimeHelper.getLocalEndOfDay(
+      _selectedDateRange!.end,
+    );
 
     return transactions.where((tx) {
       final dynamic rawDate = tx['spentAt'];
@@ -100,8 +96,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (txDate == null) return false;
 
-      return txDate.isAfter(startOfDay.subtract(const Duration(seconds: 1))) &&
-          txDate.isBefore(endOfDay);
+      // 🚀 Kiểm tra khoảng (Đã bao gồm khoảnh khắc trùng 00:00:00 và 23:59:59)
+      return txDate.isAfter(
+            startOfDay.subtract(const Duration(milliseconds: 1)),
+          ) &&
+          txDate.isBefore(endOfDay.add(const Duration(milliseconds: 1)));
     }).toList();
   }
 

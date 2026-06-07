@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
@@ -156,40 +157,31 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   void _handleSaveTransaction() {
     final amountText = _amountController.text.replaceAll('.', '').trim();
     final appColors = ref.read(appColorsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (amountText.isEmpty) {
-      HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ cảnh báo lỗi
+      HapticFeedback.lightImpact();
       AppToast.showError(
         context,
-        'Vui lòng nhập số tiền hợp lệ nha! 💸',
+        l10n.invalidAmountMessage,
         appColors,
       );
       return;
     }
 
-    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi bấm Lưu
+    HapticFeedback.lightImpact();
 
     String finalCategory = _selectedCategory;
     if (_isCustomCategory) {
       finalCategory = _customCategoryController.text.trim().isNotEmpty
           ? _customCategoryController.text.trim()
-          : 'Khác';
+          : l10n.categoryOther;
     }
 
-    // 1. Lấy giờ, phút, giây hiện tại của máy user
-    final now = DateTime.now();
-
-    // 2. Tạo đối tượng DateTime Local kết hợp giữa ngày được chọn và giờ hiện tại
-    final localDateTime = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      now.hour,
-      now.minute,
-      now.second,
+    // 🚀 Dùng DateTimeHelper để tự động ghép ngày user chọn + giờ phút giây hiện tại (chuẩn UTC)
+    final finalDateTimeUtc = DateTimeHelper.combineDateWithCurrentTimeUtc(
+      _selectedDate,
     );
-
-    final finalDateTimeUtc = localDateTime.toUtc();
 
     ref
         .read(transactionProvider.notifier)
@@ -976,7 +968,7 @@ class _SaveButton extends ConsumerWidget {
               CupertinoIcons.paperplane_fill,
               color: Colors.white,
               size: 14,
-            ),  
+            ),
           ],
         ),
       ),

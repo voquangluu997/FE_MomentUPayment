@@ -697,6 +697,63 @@
       "example": "5"
     }
   }
-} 
+},
 
+"survivalStateNotSetTitle": "Radar System",
+  "survivalStateNotSetBadge": "Inactive",
+  "survivalStateNotSetHeading": "Wallet Not Set?",
+  "survivalStateNotSetPunchline": "Give your wallet a survival goal to activate the financial countdown! 🛡️",
+
+  "survivalStateGodModeTitle": "Survival Radar: Safe",
+  "survivalStateGodModeBadge": "Nice Spending ✨",
+  "survivalStateGodModeHeading": "Survive the month: Easy!",
+  "survivalStateGodModePunchline": "At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎",
+
+  "survivalStateDangerTitle": "Speed Warning",
+  "survivalStateDangerBadge": "Burning Fast ⚠️",
+  "survivalStateDangerHeading": "Wallet empty in {days} days",
+  "@survivalStateDangerHeading": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "survivalStateDangerPunchline": "Wallet heart rate is rising! You'll run out of 'blood' {days} days early if you don't slow down! 🏎️💨",
+  "@survivalStateDangerPunchline": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+
+  "survivalStateApocalypseTitle": "Red Alert Critical",
+  "survivalStateApocalypseBadge": "ON OXYGEN! 🚨",
+  "survivalStateApocalypseHeading": "Wallet FREEZES in {days} days!",
+  "@survivalStateApocalypseHeading": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "survivalStateApocalypsePunchline": "🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!",
+
+  "survivalStateWastedTitle": "System Shut Down",
+  "survivalStateWastedBadge": "WASTED 💀",
+  "survivalStateWastedHeading": "You are out of cash! 💸",
+  "survivalStateWastedPunchline": "Mission failed! You exceeded this month's limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️",
+
+  "setupRadarNow": "Set up now to activate radar",
+  "spentOutOffLimit": "Spent: {spent} / {limit}",
+  "@spentOutOffLimit": {
+    "placeholders": {
+      "spent": { "type": "String" },
+      "limit": { "type": "String" }
+    }
+  },
+  "budgetCardCosmicMessage": "Cosmic message:",
+  "budgetCardTapToView": "Tap to view reminder...",
+  "budgetHeaderSubtitle": "Set up your financial shield to keep your wallet safe.",
+  "budgetDailySafeLimitTitle": "Daily Safe Limit",
+  "budgetRemainingLabel": "Status Review",
+  "budgetStatusSafe": "Perfect Safe ✨",
+  "budgetStatusWarning": "Danger Zone! 🚨",
+  "invalidAmountMessage": "Please enter a valid amount! 💸",
+  "categoryOther": "Other"
 }

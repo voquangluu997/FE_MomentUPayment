@@ -359,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @categoryOther.
   ///
   /// In en, this message translates to:
-  /// **'Uncategorized'**
+  /// **'Other'**
   String get categoryOther;
 
   /// No description provided for @catCustom.
@@ -593,7 +593,7 @@ abstract class AppLocalizations {
   /// No description provided for @budgetStatusWarning.
   ///
   /// In en, this message translates to:
-  /// **'S.O.S!'**
+  /// **'Danger Zone! 🚨'**
   String get budgetStatusWarning;
 
   /// No description provided for @budgetStatusOver.
@@ -1611,7 +1611,7 @@ abstract class AppLocalizations {
   /// No description provided for @budgetRemainingLabel.
   ///
   /// In en, this message translates to:
-  /// **'Remaining'**
+  /// **'Status Review'**
   String get budgetRemainingLabel;
 
   /// No description provided for @budgetLastDay.
@@ -2585,6 +2585,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} days journey 🚀'**
   String journeyDuration(String count);
+
+  /// No description provided for @survivalStateNotSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Radar System'**
+  String get survivalStateNotSetTitle;
+
+  /// No description provided for @survivalStateNotSetBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get survivalStateNotSetBadge;
+
+  /// No description provided for @survivalStateNotSetHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Not Set?'**
+  String get survivalStateNotSetHeading;
+
+  /// No description provided for @survivalStateNotSetPunchline.
+  ///
+  /// In en, this message translates to:
+  /// **'Give your wallet a survival goal to activate the financial countdown! 🛡️'**
+  String get survivalStateNotSetPunchline;
+
+  /// No description provided for @survivalStateGodModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Survival Radar: Safe'**
+  String get survivalStateGodModeTitle;
+
+  /// No description provided for @survivalStateGodModeBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice Spending ✨'**
+  String get survivalStateGodModeBadge;
+
+  /// No description provided for @survivalStateGodModeHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Survive the month: Easy!'**
+  String get survivalStateGodModeHeading;
+
+  /// No description provided for @survivalStateGodModePunchline.
+  ///
+  /// In en, this message translates to:
+  /// **'At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎'**
+  String get survivalStateGodModePunchline;
+
+  /// No description provided for @survivalStateDangerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Warning'**
+  String get survivalStateDangerTitle;
+
+  /// No description provided for @survivalStateDangerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Burning Fast ⚠️'**
+  String get survivalStateDangerBadge;
+
+  /// No description provided for @survivalStateDangerHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet empty in {days} days'**
+  String survivalStateDangerHeading(String days);
+
+  /// No description provided for @survivalStateDangerPunchline.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet heart rate is rising! You\'ll run out of \'blood\' {days} days early if you don\'t slow down! 🏎️💨'**
+  String survivalStateDangerPunchline(String days);
+
+  /// No description provided for @survivalStateApocalypseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Alert Critical'**
+  String get survivalStateApocalypseTitle;
+
+  /// No description provided for @survivalStateApocalypseBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'ON OXYGEN! 🚨'**
+  String get survivalStateApocalypseBadge;
+
+  /// No description provided for @survivalStateApocalypseHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet FREEZES in {days} days!'**
+  String survivalStateApocalypseHeading(String days);
+
+  /// No description provided for @survivalStateApocalypsePunchline.
+  ///
+  /// In en, this message translates to:
+  /// **'🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!'**
+  String get survivalStateApocalypsePunchline;
+
+  /// No description provided for @survivalStateWastedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System Shut Down'**
+  String get survivalStateWastedTitle;
+
+  /// No description provided for @survivalStateWastedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WASTED 💀'**
+  String get survivalStateWastedBadge;
+
+  /// No description provided for @survivalStateWastedHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'You are out of cash! 💸'**
+  String get survivalStateWastedHeading;
+
+  /// No description provided for @survivalStateWastedPunchline.
+  ///
+  /// In en, this message translates to:
+  /// **'Mission failed! You exceeded this month\'s limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️'**
+  String get survivalStateWastedPunchline;
+
+  /// No description provided for @setupRadarNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up now to activate radar'**
+  String get setupRadarNow;
+
+  /// No description provided for @spentOutOffLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent: {spent} / {limit}'**
+  String spentOutOffLimit(String spent, String limit);
+
+  /// No description provided for @budgetCardCosmicMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosmic message:'**
+  String get budgetCardCosmicMessage;
+
+  /// No description provided for @budgetCardTapToView.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view reminder...'**
+  String get budgetCardTapToView;
+
+  /// No description provided for @budgetHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your financial shield to keep your wallet safe.'**
+  String get budgetHeaderSubtitle;
+
+  /// No description provided for @budgetDailySafeLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Safe Limit'**
+  String get budgetDailySafeLimitTitle;
+
+  /// No description provided for @budgetStatusSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Safe ✨'**
+  String get budgetStatusSafe;
+
+  /// No description provided for @invalidAmountMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid amount! 💸'**
+  String get invalidAmountMessage;
 }
 
 class _AppLocalizationsDelegate
