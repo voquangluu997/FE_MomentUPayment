@@ -47,11 +47,15 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   late String _currentImageUrl;
   bool _isCustomCategory = false;
 
+  // ✨ STATE TỐI ƯU UPLOAD
+  bool _isImageUploading = false;
+  String? _tempUploadedUrl;
+  bool _isSaved = false;
+
   @override
   void initState() {
     super.initState();
     _currentImageUrl = widget.moment['imageUrl'] ?? '';
-
     final originalCategory = widget.moment['category'] ?? '';
     _selectedEmoji = widget.moment['emoji'] ?? '📝';
 
@@ -59,7 +63,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     _amountController = TextEditingController(
       text: NumberFormatUtil.formatNumber(rawAmount.toInt().toString()),
     );
-
     _noteController = TextEditingController(text: widget.moment['note'] ?? '');
 
     final standardCategories = [
@@ -94,10 +97,23 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     super.dispose();
   }
 
+  // 🧹 HÀM DỌN RÁC
+  Future<void> _cleanupUnsavedImage() async {
+    if (!_isSaved && _tempUploadedUrl != null) {
+      try {
+        debugPrint("🗑 Dọn rác Cloudinary ảnh không lưu: $_tempUploadedUrl");
+        await ref
+            .read(transactionProvider.notifier)
+            .deleteImage(_tempUploadedUrl!);
+      } catch (e) {
+        debugPrint("Lỗi dọn rác: $e");
+      }
+    }
+  }
+
   Future<void> _pickDate() async {
     final now = DateTime.now();
     DateTime initialDateToShow = _selectedDate;
-
     if (initialDateToShow.isAfter(now)) {
       initialDateToShow = now;
     }
@@ -152,22 +168,64 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
           ? await _mediaService.takePhoto()
           : await _picker.pickImage(
               source: ImageSource.gallery,
-              imageQuality: 75,
-              maxWidth: 1080,
+              imageQuality: 70, // Đã bóp chất lượng
+              maxWidth: 800,
             );
 
       if (photo != null) {
-        setState(() => _localImagePath = photo.path);
+        // Dọn rác ảnh cũ nếu user cứ đổi ảnh liên tục
+        if (_tempUploadedUrl != null) {
+          _cleanupUnsavedImage();
+          _tempUploadedUrl = null;
+        }
+
+        setState(() {
+          _localImagePath = photo.path;
+          _isImageUploading = true;
+        });
+
+        // Kích hoạt upload ngầm
+        _uploadImageBackground(File(photo.path));
       }
     } catch (e) {
       debugPrint("Lỗi chọn ảnh: $e");
     }
   }
 
+  // 🚀 TẢI ẢNH NGẦM LÊN CLOUD
+  Future<void> _uploadImageBackground(File file) async {
+    try {
+      final url = await ref
+          .read(transactionProvider.notifier)
+          .uploadImageOnly(file.path);
+      if (mounted) {
+        setState(() {
+          if (url != null) {
+            _tempUploadedUrl = url;
+          }
+          _isImageUploading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isImageUploading = false);
+        AppToast.showError(
+          context,
+          "Lỗi tải ảnh lên",
+          ref.read(appColorsProvider),
+        );
+      }
+    }
+  }
+
   void _toggleEditMode() {
     setState(() {
       if (_isEditing) {
+        // Nếu thoát edit mode, dọn rác luôn
+        _cleanupUnsavedImage();
         _localImagePath = null;
+        _tempUploadedUrl = null;
+
         _selectedCategory = widget.moment['category'] ?? '';
         final double rawAmount = (widget.moment['amount'] ?? 0).toDouble();
         _amountController.text = NumberFormatUtil.formatNumber(
@@ -187,10 +245,20 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   }
 
   Future<void> _handleUpdateTransaction() async {
-    final amountText = _amountController.text.replaceAll('.', '').trim();
     final appColors = ref.read(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
+    // Chặn không cho lưu nếu ảnh chưa đẩy xong
+    if (_isImageUploading) {
+      AppToast.showError(
+        context,
+        "Đang xử lý ảnh mượt mà, chờ chút xíu nhé!",
+        appColors,
+      );
+      return;
+    }
+
+    final amountText = _amountController.text.replaceAll('.', '').trim();
     if (amountText.isEmpty) return;
 
     String finalCategory = _selectedCategory;
@@ -222,6 +290,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
       );
       final spentAtWithCurrentTime = spentAtLocal.toUtc();
 
+      // 🚀 CHỈ GỌI UPDATE, TRUYỀN URL ĐÃ UPLOAD NGẦM
       await ref
           .read(transactionProvider.notifier)
           .updateTransaction(
@@ -230,11 +299,13 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
             category: finalCategory,
             emoji: _selectedEmoji,
             note: _noteController.text.trim(),
-            localImagePath: _localImagePath,
+            imageUrl: _tempUploadedUrl, // Truyền trực tiếp Link Cloud
+            localImagePath: null, // Bỏ trống file vật lý
             spentAt: spentAtWithCurrentTime,
           );
 
       if (mounted) {
+        _isSaved = true; // Khóa lại, không dọn rác ảnh này
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         ref.read(notificationProvider.notifier).fetchUnreadCount();
@@ -244,7 +315,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
       if (mounted) {
         AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
-      debugPrint("$e");
     }
   }
 
@@ -259,65 +329,93 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     final String compactAmount =
         '-${CurrencyHelper.formatCompactAmount(currentAmount)}$currencySymbol';
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      backgroundColor: appColors.cardBackground,
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _ImageHeader(
-              isEditing: _isEditing,
-              localImagePath: _localImagePath,
-              currentImageUrl: _currentImageUrl,
-              emoji: _selectedEmoji,
-              onCameraTap: () => _changePhoto(ImageSource.camera),
-              onGalleryTap: () => _changePhoto(ImageSource.gallery),
-              onToggleEdit: _toggleEditMode,
-              onCloseTap: () => Navigator.of(context).pop(false),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                switchInCurve: Curves.easeOutBack,
-                switchOutCurve: Curves.easeIn,
-                child: !_isEditing
-                    ? _ViewModeContent(
-                        selectedCategory: _selectedCategory,
-                        selectedEmoji: _selectedEmoji,
-                        selectedDate: _selectedDate,
-                        compactAmount: compactAmount,
-                        note: _noteController.text,
-                      )
-                    : _EditModeContent(
-                        selectedCategory: _selectedCategory,
-                        isCustomCategory: _isCustomCategory,
-                        selectedDate: _selectedDate,
-                        amountController: _amountController,
-                        noteController: _noteController,
-                        customCategoryController: _customCategoryController,
-                        isLoading: txState == TransactionState.loading,
-                        onCategorySelect: (id, emoji, isCustom) {
-                          setState(() {
-                            _selectedCategory = id;
-                            _selectedEmoji = emoji;
-                            _isCustomCategory = isCustom;
-                          });
-                        },
-                        onDateTap: _pickDate,
-                        onAmountChanged: _onAmountChanged,
-                        onAppendZeros: _appendZeros,
-                        onSaveTap: () => _handleUpdateTransaction(),
-                      ),
+    // ✨ BAO BỌC BẰNG POPSCOPE
+    return PopScope(
+      canPop:
+          !_isImageUploading, // Chặn đóng Dialog bằng nút Back nếu đang tải ảnh
+      onPopInvoked: (didPop) {
+        if (!didPop && _isImageUploading) {
+          AppToast.showError(
+            context,
+            "Chờ xíu, ảnh đang được tải lên nhé!",
+            appColors,
+          );
+          return;
+        }
+        if (didPop) _cleanupUnsavedImage();
+      },
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        backgroundColor: appColors.cardBackground,
+        elevation: 0,
+        clipBehavior: Clip.antiAlias,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ImageHeader(
+                isEditing: _isEditing,
+                localImagePath: _localImagePath,
+                currentImageUrl: _currentImageUrl,
+                emoji: _selectedEmoji,
+                isImageUploading: _isImageUploading,
+                onCameraTap: () => _changePhoto(ImageSource.camera),
+                onGalleryTap: () => _changePhoto(ImageSource.gallery),
+                onToggleEdit: _toggleEditMode,
+                onCloseTap: () {
+                  if (_isImageUploading) {
+                    AppToast.showError(
+                      context,
+                      "Chờ xíu, ảnh đang được tải lên nhé!",
+                      appColors,
+                    );
+                    return;
+                  }
+                  _cleanupUnsavedImage();
+                  Navigator.of(context).pop(false);
+                },
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  switchInCurve: Curves.easeOutBack,
+                  switchOutCurve: Curves.easeIn,
+                  child: !_isEditing
+                      ? _ViewModeContent(
+                          selectedCategory: _selectedCategory,
+                          selectedEmoji: _selectedEmoji,
+                          selectedDate: _selectedDate,
+                          compactAmount: compactAmount,
+                          note: _noteController.text,
+                        )
+                      : _EditModeContent(
+                          selectedCategory: _selectedCategory,
+                          isCustomCategory: _isCustomCategory,
+                          selectedDate: _selectedDate,
+                          amountController: _amountController,
+                          noteController: _noteController,
+                          customCategoryController: _customCategoryController,
+                          isLoading: txState == TransactionState.loading,
+                          onCategorySelect: (id, emoji, isCustom) {
+                            setState(() {
+                              _selectedCategory = id;
+                              _selectedEmoji = emoji;
+                              _isCustomCategory = isCustom;
+                            });
+                          },
+                          onDateTap: _pickDate,
+                          onAmountChanged: _onAmountChanged,
+                          onAppendZeros: _appendZeros,
+                          onSaveTap: () => _handleUpdateTransaction(),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -325,13 +423,14 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 }
 
 // =============================================================================
-// HEADER MỚI CỰC KỲ PREMIUM
+// HEADER TÍCH HỢP LOADING UPLOAD
 // =============================================================================
 class _ImageHeader extends ConsumerWidget {
   final bool isEditing;
   final String? localImagePath;
   final String currentImageUrl;
   final String emoji;
+  final bool isImageUploading;
   final VoidCallback onCameraTap;
   final VoidCallback onGalleryTap;
   final VoidCallback onToggleEdit;
@@ -342,6 +441,7 @@ class _ImageHeader extends ConsumerWidget {
     this.localImagePath,
     required this.currentImageUrl,
     required this.emoji,
+    this.isImageUploading = false,
     required this.onCameraTap,
     required this.onGalleryTap,
     required this.onToggleEdit,
@@ -355,11 +455,11 @@ class _ImageHeader extends ConsumerWidget {
     final bool hasImage = localImagePath != null || currentImageUrl.isNotEmpty;
 
     return SizedBox(
-      height: 240, // Tăng chiều cao để ảnh đẹp hơn
+      height: 240,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // NỀN: Nếu có ảnh thì hiển thị ảnh, nếu không thì hiển thị Memo Pad Style
+          // NỀN
           if (hasImage)
             localImagePath != null
                 ? Image.file(File(localImagePath!), fit: BoxFit.cover)
@@ -414,7 +514,7 @@ class _ImageHeader extends ConsumerWidget {
               ),
             ),
 
-          // LỚP PHỦ MỜ DẦN (Fade out to bottom)
+          // LỚP PHỦ MỜ DẦN
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -425,13 +525,52 @@ class _ImageHeader extends ConsumerWidget {
                     Colors.black.withOpacity(isEditing ? 0.4 : 0.05),
                     Colors.transparent,
                     appColors.cardBackground.withOpacity(0.0),
-                    appColors.cardBackground, // Mờ dần tiệp màu với Card
+                    appColors.cardBackground,
                   ],
                   stops: const [0.0, 0.3, 0.8, 1.0],
                 ),
               ),
             ),
           ),
+
+          // ✨ HIỂN THỊ LOADING NGAY TRÊN ẢNH
+          if (isImageUploading)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Đang tải lên...",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // CỤM NÚT ĐỔI ẢNH KHI EDITING
           if (isEditing)
@@ -446,21 +585,23 @@ class _ImageHeader extends ConsumerWidget {
                     _buildEditBtn(
                       icon: CupertinoIcons.camera,
                       label: l10n.cameraPickActionShort,
-                      onTap: onCameraTap,
+                      onTap: isImageUploading ? () {} : onCameraTap,
                       appColors: appColors,
+                      isDisabled: isImageUploading,
                     ),
                     _buildEditBtn(
                       icon: CupertinoIcons.photo_on_rectangle,
                       label: l10n.galleryChangeActionShort,
-                      onTap: onGalleryTap,
+                      onTap: isImageUploading ? () {} : onGalleryTap,
                       appColors: appColors,
+                      isDisabled: isImageUploading,
                     ),
                   ],
                 ),
               ),
             ),
 
-          // NÚT ĐÓNG VÀ EDIT TRÊN CÙNG (GLASSMORPHISM)
+          // NÚT ĐÓNG VÀ EDIT
           Positioned(
             top: 16,
             left: 16,
@@ -522,6 +663,7 @@ class _ImageHeader extends ConsumerWidget {
     required String label,
     required VoidCallback onTap,
     required AppColorTheme appColors,
+    bool isDisabled = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -529,23 +671,30 @@ class _ImageHeader extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
+              color: isDisabled
+                  ? Colors.white.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.85),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 16, color: appColors.primary),
+                Icon(
+                  icon,
+                  size: 16,
+                  color: isDisabled ? Colors.grey : appColors.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   label,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: appColors.primary,
+                    color: isDisabled ? Colors.grey : appColors.primary,
                   ),
                 ),
               ],
@@ -558,7 +707,7 @@ class _ImageHeader extends ConsumerWidget {
 }
 
 // =============================================================================
-// GIAO DIỆN VIEW CAO CẤP
+// GIAO DIỆN VIEW (Giữ Nguyên)
 // =============================================================================
 class _ViewModeContent extends ConsumerWidget {
   final String selectedCategory;
@@ -585,7 +734,6 @@ class _ViewModeContent extends ConsumerWidget {
     return Column(
       key: const ValueKey('ViewMode'),
       children: [
-        // SỐ TIỀN KHỔNG LỒ Ở GIỮA
         Text(
           compactAmount,
           style: TextStyle(
@@ -596,8 +744,6 @@ class _ViewModeContent extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 20),
-
-        // HÀNG TAGS (CHIPS) CATEGORY & DATE
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -656,8 +802,6 @@ class _ViewModeContent extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 28),
-
-        // QUOTE BOX CHO GHI CHÚ
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -693,7 +837,7 @@ class _ViewModeContent extends ConsumerWidget {
 }
 
 // =============================================================================
-// GIAO DIỆN EDIT GỌN GÀNG, BO GÓC MƯỢT MÀ
+// GIAO DIỆN EDIT (Giữ nguyên)
 // =============================================================================
 class _EditModeContent extends ConsumerWidget {
   final String selectedCategory;

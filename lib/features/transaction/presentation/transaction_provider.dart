@@ -14,6 +14,28 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
   TransactionRepository get _repository =>
       _ref.read(transactionRepositoryProvider);
 
+  /// 🚀 HÀM MỚI: TẢI ẢNH LÊN NGẦM (BACKGROUND UPLOAD)
+  Future<String?> uploadImageOnly(String localImagePath) async {
+    try {
+      // Gọi repository để đẩy file lên Cloudinary
+      return await _repository.uploadInvoiceImage(localImagePath);
+    } catch (error, stackTrace) {
+      AppLogger.e('TransactionNotifier.uploadImageOnly', error, stackTrace);
+      return null;
+    }
+  }
+
+  /// 🚀 HÀM MỚI: XÓA ẢNH RÁC TRÊN CLOUD NẾU USER HỦY
+  Future<void> deleteImage(String imageUrl) async {
+    try {
+      // *Lưu ý: Bạn cần thêm hàm deleteImage vào transaction_repository.dart
+      // để gọi API gọi lên backend (UploadService.deleteImage)
+      await _repository.deleteImage(imageUrl);
+    } catch (error, stackTrace) {
+      AppLogger.e('TransactionNotifier.deleteImage', error, stackTrace);
+    }
+  }
+
   /// 🌸 HÀM 1: GHI LẠI KHOẢNH KHẮC CHI TIÊU MỚI
   Future<void> addTransaction({
     required double amount,
@@ -21,14 +43,18 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
     required String emoji,
     required String note,
     String? localImagePath,
+    String? imageUrl, // ✨ Thêm tham số imageUrl (link đã upload ngầm)
     DateTime? spentAt,
   }) async {
     state = TransactionState.loading;
     try {
-      String? uploadedImageUrl;
+      String? finalImageUrl = imageUrl;
 
-      if (localImagePath != null && localImagePath.isNotEmpty) {
-        uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
+      // Nếu chưa có link ảnh ngầm, mà lại có ảnh local thì mới upload lại (Fallback an toàn)
+      if (finalImageUrl == null &&
+          localImagePath != null &&
+          localImagePath.isNotEmpty) {
+        finalImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
 
       await _repository.createTransaction(
@@ -36,12 +62,11 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         category: category,
         note: note,
         emoji: emoji,
-        imageUrl: uploadedImageUrl,
+        imageUrl: finalImageUrl, // Truyền link ảnh cuối cùng
         spentAt: spentAt,
       );
 
       // 🔄 Làm mới dòng thời gian
-      // (Lưu ý: Hàm refreshTimeline này đã được tích hợp sẵn HomeWidgetService để cập nhật ra màn hình chính)
       _ref.read(transactionTimelineProvider.notifier).refreshTimeline();
 
       // 🔄 Ép ví ngoan tính lại tiền
@@ -66,14 +91,18 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
     required String emoji,
     required String note,
     String? localImagePath,
+    String? imageUrl, // ✨ Thêm tham số imageUrl
     DateTime? spentAt,
   }) async {
     state = TransactionState.loading;
     try {
-      String? uploadedImageUrl;
+      String? finalImageUrl = imageUrl;
 
-      if (localImagePath != null && localImagePath.isNotEmpty) {
-        uploadedImageUrl = await _repository.uploadInvoiceImage(localImagePath);
+      // Tương tự, dùng làm fallback
+      if (finalImageUrl == null &&
+          localImagePath != null &&
+          localImagePath.isNotEmpty) {
+        finalImageUrl = await _repository.uploadInvoiceImage(localImagePath);
       }
 
       await _repository.updateTransaction(
@@ -82,7 +111,7 @@ class TransactionNotifier extends StateNotifier<TransactionState> {
         category: category,
         note: note,
         emoji: emoji,
-        imageUrl: uploadedImageUrl,
+        imageUrl: finalImageUrl,
         spentAt: spentAt,
       );
 
@@ -110,7 +139,7 @@ final transactionProvider =
     });
 
 // =========================================================
-// 🚀 PROVIDER DÀNH RIÊNG CHO ANALYTICS
+// 🚀 PROVIDER DÀNH RIÊNG CHO ANALYTICS (Giữ nguyên)
 // =========================================================
 
 class TransactionAnalyticsNotifier
@@ -146,9 +175,7 @@ class TransactionAnalyticsNotifier
     }
   }
 
-  /// 🌸 Kéo xuống để làm mới hoặc cập nhật ngầm từ các màn hình khác đẩy qua
   Future<void> refreshAnalytics() async {
-    // Chỉ thực hiện tải nếu state hiện tại không ở trạng thái lỗi nghiêm trọng
     try {
       final data = await _repository.getTransactionAnalytics(
         startDate: _currentStart,

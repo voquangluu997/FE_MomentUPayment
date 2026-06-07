@@ -256,6 +256,8 @@
   "currentlyUsing": "Currently using",
   "darkMode": "Night owl mode",
   "lightTheme": "Light Theme",
+  "darkTheme": "Dark Theme",
+
   "notificationSettingsSubtitle": "Manage alerts & expenses",
   "changePasswordSubtitle": "Change current account password",
   "helpCenter": "Help Center",
@@ -624,6 +626,7 @@
   "placeholders": {
     "badgeTitle": { "type": "String" }
   }
-}
+},
+"shareAppPromoMessageSubTitle": "I've been using Moment U to track my moments and spending. Thought you might like it too."
 
 }

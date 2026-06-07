@@ -586,9 +586,8 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
-        var ImageFilter;
         return BackdropFilter(
-          filter: ImageFilter.blur(
+          filter: ui.ImageFilter.blur(
             sigmaX: 16 * anim1.value,
             sigmaY: 16 * anim1.value,
           ),

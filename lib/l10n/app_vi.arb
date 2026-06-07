@@ -255,7 +255,9 @@
   "currencyUnit": "Đơn vị tiền tệ",
   "currentlyUsing": "Đang dùng",
   "darkMode": "Bật chế độ cú đêm",
-  "lightTheme": "Giao diện sáng",
+  "lightTheme": "Chế độ sáng",
+  "darkTheme": "Chế độ tối",
+
   "notificationSettingsSubtitle": "Quản lý cảnh báo & chi tiêu",
   "changePasswordSubtitle": "Thay đổi mật khẩu tài khoản hiện tại",
   "helpCenter": "Cần mình giúp gì hông? 🎧",
@@ -630,6 +632,7 @@
   "placeholders": {
     "badgeTitle": { "type": "String" }
   }
-}
+},
+"shareAppPromoMessageSubTitle": "trải nghiệm quản lý chi tiêu nhẹ nhàng hơn với Moments U Payment nè"
 
 }

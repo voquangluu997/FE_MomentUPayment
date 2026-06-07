@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/utils/app_logger.dart';
-import 'package:moment_u_payment/core/network/api_client.dart';
 
 class TransactionRepository {
   final Dio _dio;
@@ -34,6 +33,33 @@ class TransactionRepository {
     } on DioException catch (e) {
       AppLogger.e('TransactionRepo.upload', e, e.stackTrace);
       rethrow;
+    }
+  }
+
+  /// 🧹 BƯỚC MỚI: Xóa ảnh rác trên Cloudinary khi người dùng Hủy
+  Future<void> deleteImage(String imageUrl) async {
+    try {
+      // Gọi lên backend để xóa ảnh (Giả định backend của bạn cấu hình DELETE /upload)
+      final response = await _dio.delete(
+        '/upload',
+        data: {
+          'imageUrl': imageUrl, // Truyền URL của ảnh cần xóa vào body
+        },
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+          "Xóa ảnh rác thất bại với status: ${response.statusCode}",
+        );
+      }
+
+      AppLogger.i(
+        'TransactionRepo.deleteImage',
+        'Đã dọn dẹp thành công ảnh rác $imageUrl',
+      );
+    } on DioException catch (e) {
+      AppLogger.e('TransactionRepo.deleteImage', e, e.stackTrace);
+      // Cố ý KHÔNG rethrow lỗi ở đây để tránh làm gián đoạn luồng đóng giao diện của người dùng
     }
   }
 

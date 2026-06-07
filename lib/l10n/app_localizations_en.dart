@@ -477,6 +477,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lightTheme => 'Light Theme';
 
   @override
+  String get darkTheme => 'Dark Theme';
+
+  @override
   String get notificationSettingsSubtitle => 'Manage alerts & expenses';
 
   @override
@@ -1303,4 +1306,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String shareAppPromoMessage(String badgeTitle) {
     return 'Awesome! I just unlocked the \'$badgeTitle\' badge on Moments U Payment! 🏆✨\n\nTracking expenses has never been this fun. Download the app and let\'s set new records together! 🚀\n#MomentsUPayment #Achievement';
   }
+
+  @override
+  String get shareAppPromoMessageSubTitle =>
+      'I\'ve been using Moment U to track my moments and spending. Thought you might like it too.';
 }

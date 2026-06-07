@@ -476,7 +476,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get darkMode => 'Bật chế độ cú đêm';
 
   @override
-  String get lightTheme => 'Giao diện sáng';
+  String get lightTheme => 'Chế độ sáng';
+
+  @override
+  String get darkTheme => 'Chế độ tối';
 
   @override
   String get notificationSettingsSubtitle => 'Quản lý cảnh báo & chi tiêu';
@@ -1313,4 +1316,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String shareAppPromoMessage(String badgeTitle) {
     return 'Tuyệt đỉnh! Tôi vừa mở khoá huy hiệu \'$badgeTitle\' trên ứng dụng Moments U Payment! 🏆✨\n\nQuản lý chi tiêu chưa bao giờ thú vị đến thế. Cùng tải app và thiết lập kỷ lục mới nhé! 🚀\n#MomentsUPayment #Achievement';
   }
+
+  @override
+  String get shareAppPromoMessageSubTitle =>
+      'trải nghiệm quản lý chi tiêu nhẹ nhàng hơn với Moments U Payment nè';
 }

@@ -918,6 +918,12 @@ abstract class AppLocalizations {
   /// **'Light Theme'**
   String get lightTheme;
 
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Theme'**
+  String get darkTheme;
+
   /// No description provided for @notificationSettingsSubtitle.
   ///
   /// In en, this message translates to:
@@ -2411,6 +2417,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Awesome! I just unlocked the \'{badgeTitle}\' badge on Moments U Payment! 🏆✨\n\nTracking expenses has never been this fun. Download the app and let\'s set new records together! 🚀\n#MomentsUPayment #Achievement'**
   String shareAppPromoMessage(String badgeTitle);
+
+  /// No description provided for @shareAppPromoMessageSubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve been using Moment U to track my moments and spending. Thought you might like it too.'**
+  String get shareAppPromoMessageSubTitle;
 }
 
 class _AppLocalizationsDelegate
