@@ -319,7 +319,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState.unauthenticated;
   }
 
-  Future<bool> forgotPassword(String email) async {
+  Future<String?> forgotPassword(String email) async {
     state = AuthState.loading;
     try {
       final response = await http.post(
@@ -328,14 +328,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         body: jsonEncode({'email': email}),
       );
       state = AuthState.initial;
-      return response.statusCode == 200;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return null; // Thành công
+      } else {
+        // Lấy thông báo lỗi từ NestJS gửi về (ví dụ: "Email này chưa được đăng ký...")
+        final data = jsonDecode(response.body);
+        return data['message'] ?? "Lỗi gửi yêu cầu";
+      }
     } catch (e) {
       state = AuthState.initial;
-      return false;
+      return "Lỗi kết nối mạng";
     }
   }
 
-  Future<bool> resetPasswordWithOtp(
+  // 💡 SỬA ĐỔI: Trả về String? (null nếu thành công, chuỗi thông báo nếu có lỗi)
+  Future<String?> resetPasswordWithOtp(
     String email,
     String otp,
     String newPassword,
@@ -348,14 +356,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
         body: jsonEncode({
           'email': email,
           'otp': otp,
-          'newPassword': newPassword,
+          'newPassword':
+              newPassword, // 💡 Đảm bảo biến này trùng khớp với DTO bên NestJS
         }),
       );
       state = AuthState.initial;
-      return response.statusCode == 200;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return null; // Thành công
+      } else {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? "Mã OTP không hợp lệ";
+      }
     } catch (e) {
       state = AuthState.initial;
-      return false;
+      return "Lỗi kết nối mạng";
     }
   }
 

@@ -627,6 +627,10 @@
     "badgeTitle": { "type": "String" }
   }
 },
-"shareAppPromoMessageSubTitle": "I've been using Moment U to track my moments and spending. Thought you might like it too."
+"shareAppPromoMessageSubTitle": "I've been using Moment U to track my moments and spending. Thought you might like it too.",
+
+"registerSuccessMsg": "Registration successful! Time to log in and start! 💕",
+"emailExistsError": "This email has already been registered, friend! 🌸",
+"registerFailedError": "Registration failed! Please check your network connection 😢"
 
 }

@@ -2423,6 +2423,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I\'ve been using Moment U to track my moments and spending. Thought you might like it too.'**
   String get shareAppPromoMessageSubTitle;
+
+  /// No description provided for @registerSuccessMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration successful! Time to log in and start! 💕'**
+  String get registerSuccessMsg;
+
+  /// No description provided for @emailExistsError.
+  ///
+  /// In en, this message translates to:
+  /// **'This email has already been registered, friend! 🌸'**
+  String get emailExistsError;
+
+  /// No description provided for @registerFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration failed! Please check your network connection 😢'**
+  String get registerFailedError;
 }
 
 class _AppLocalizationsDelegate

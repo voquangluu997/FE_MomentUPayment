@@ -633,6 +633,10 @@
     "badgeTitle": { "type": "String" }
   }
 },
-"shareAppPromoMessageSubTitle": "trải nghiệm quản lý chi tiêu nhẹ nhàng hơn với Moments U Payment nè"
+"shareAppPromoMessageSubTitle": "trải nghiệm quản lý chi tiêu nhẹ nhàng hơn với Moments U Payment nè",
+
+"registerSuccessMsg": "Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕",
+"emailExistsError": "Email này đã được đăng ký trước đó rồi bạn ơi! 🌸",
+"registerFailedError": "Đăng ký thất bại! Vui lòng kiểm tra kết nối mạng 😢"
 
 }

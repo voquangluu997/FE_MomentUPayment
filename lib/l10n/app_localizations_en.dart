@@ -1310,4 +1310,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareAppPromoMessageSubTitle =>
       'I\'ve been using Moment U to track my moments and spending. Thought you might like it too.';
+
+  @override
+  String get registerSuccessMsg =>
+      'Registration successful! Time to log in and start! 💕';
+
+  @override
+  String get emailExistsError =>
+      'This email has already been registered, friend! 🌸';
+
+  @override
+  String get registerFailedError =>
+      'Registration failed! Please check your network connection 😢';
 }

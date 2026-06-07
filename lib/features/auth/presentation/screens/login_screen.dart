@@ -377,18 +377,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
+            onPressed: () async {
               FocusManager.instance.primaryFocus?.unfocus();
               final email = forgotEmailController.text.trim();
               if (email.isNotEmpty) {
                 ref.read(authProvider.notifier).forgotPassword(email);
                 Navigator.pop(context);
-
-                AppToast.showSuccess(
-                  context,
-                  '${l10n.sendCodeSuccess} $email',
-                  appColors,
-                );
+                // 💡 Đợi kết quả từ provider
+                final errorMessage = await ref
+                    .read(authProvider.notifier)
+                    .forgotPassword(email);
+                if (!context.mounted) return;
+                if (errorMessage == null) {
+                  AppToast.showSuccess(
+                    context,
+                    '${l10n.sendCodeSuccess} $email',
+                    appColors,
+                  );
+                } else {
+                  // Hiện lỗi thật sự từ Backend
+                  AppToast.showError(context, errorMessage, appColors);
+                }
               }
             },
             child: Text(
@@ -472,23 +481,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
+            onPressed: () async {
+              // 💡 THÊM async
               FocusManager.instance.primaryFocus?.unfocus();
               final email = emailController.text.trim();
               final otp = otpController.text.trim();
               final newPw = newPasswordController.text.trim();
 
               if (email.isNotEmpty && otp.isNotEmpty && newPw.isNotEmpty) {
-                ref
-                    .read(authProvider.notifier)
-                    .resetPasswordWithOtp(email, otp, newPw);
+                // Đóng dialog trước
                 Navigator.pop(context);
 
-                AppToast.showSuccess(
-                  context,
-                  l10n.resetPasswordSuccess,
-                  appColors,
-                );
+                // 💡 Đợi kết quả từ backend xác nhận OTP
+                final errorMessage = await ref
+                    .read(authProvider.notifier)
+                    .resetPasswordWithOtp(email, otp, newPw);
+
+                if (!context.mounted) return;
+
+                if (errorMessage == null) {
+                  // Nếu null nghĩa là thành công
+                  AppToast.showSuccess(
+                    context,
+                    l10n.resetPasswordSuccess,
+                    appColors,
+                  );
+                } else {
+                  // Hiện lỗi sai OTP hoặc hết hạn
+                  AppToast.showError(context, errorMessage, appColors);
+                  // Có thể tự động gọi lại _showResetPasswordDialog(context) ở đây nếu muốn họ thử lại
+                }
+              } else {
+                // Nếu người dùng không nhập đủ thông tin
+                AppToast.showError(context, l10n.emptyFieldsWarning, appColors);
               }
             },
             child: Text(

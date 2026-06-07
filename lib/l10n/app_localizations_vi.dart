@@ -1320,4 +1320,16 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get shareAppPromoMessageSubTitle =>
       'trải nghiệm quản lý chi tiêu nhẹ nhàng hơn với Moments U Payment nè';
+
+  @override
+  String get registerSuccessMsg =>
+      'Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕';
+
+  @override
+  String get emailExistsError =>
+      'Email này đã được đăng ký trước đó rồi bạn ơi! 🌸';
+
+  @override
+  String get registerFailedError =>
+      'Đăng ký thất bại! Vui lòng kiểm tra kết nối mạng 😢';
 }

@@ -56,27 +56,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.registerSuccess) {
-        // ✨ Toast ngôi sao lấp lánh khi đăng ký thành công tài khoản mới
         AppToast.showSuccess(
           context,
-          'Đăng ký tài khoản thành công rùi! Đăng nhập thui nào 💕',
+          l10n.registerSuccessMsg, // 💡 Sử dụng đa ngôn ngữ
           appColors,
         );
         ref.read(authProvider.notifier).resetState();
         Navigator.of(context).pop();
       } else if (next == AuthState.emailAlreadyExists) {
-        // ✨ Toast trái tim tan vỡ kèm icon cute khi trùng email
         AppToast.showError(
           context,
-          'Email này đã được đăng ký trước đó rồi bạn ơi! 🌸',
+          l10n.emailExistsError, // 💡 Sử dụng đa ngôn ngữ
           appColors,
         );
         ref.read(authProvider.notifier).resetState();
       } else if (next == AuthState.registerError) {
-        // ✨ Toast trái tim vỡ báo lỗi hệ thống / lỗi kết nối BE
         AppToast.showError(
           context,
-          'Đăng ký thất bại! Vui lòng kiểm tra lại kết nối BE hoặc log hệ thống 😢',
+          l10n.registerFailedError, // 💡 Sử dụng đa ngôn ngữ
           appColors,
         );
         ref.read(authProvider.notifier).resetState();
