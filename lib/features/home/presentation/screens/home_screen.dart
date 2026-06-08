@@ -1,27 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart'; // 🚀 IMPORT THƯ VIỆN ANIMATION
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
+import 'package:moment_u_payment/features/budget/providers/view_mode_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_badge_carousel.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/home_grid_group.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_header_section.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/home_list_group.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_list_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/photo_calendar_cell.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
-
-enum ViewMode { list, grid, calendar }
-
-final viewModeProvider = StateProvider<ViewMode>((ref) => ViewMode.list);
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -43,9 +44,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 150) {
-        ref.read(transactionTimelineProvider.notifier).loadNextPage();
+      final position = _scrollController.position;
+      final timelineNotifier = ref.read(transactionTimelineProvider.notifier);
+
+      if (position.pixels > 0 &&
+          position.pixels >= position.maxScrollExtent - 150) {
+        if (!timelineNotifier.isLoadingMore && timelineNotifier.hasMore) {
+          timelineNotifier.loadNextPage();
+        }
       }
     });
   }
@@ -78,7 +84,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ) {
     if (_selectedDateRange == null) return transactions;
 
-    // 🚀 Dùng Helper để khoá chặt ranh giới 00:00:00 -> 23:59:59 theo Local
     final DateTime startOfDay = DateTimeHelper.getLocalStartOfDay(
       _selectedDateRange!.start,
     );
@@ -96,7 +101,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (txDate == null) return false;
 
-      // 🚀 Kiểm tra khoảng (Đã bao gồm khoảnh khắc trùng 00:00:00 và 23:59:59)
       return txDate.isAfter(
             startOfDay.subtract(const Duration(milliseconds: 1)),
           ) &&
@@ -271,7 +275,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final timelineState = ref.watch(transactionTimelineProvider);
-    final viewMode = ref.watch(viewModeProvider);
+    final viewModeAsync = ref.watch(viewModeProvider);
+    final currentViewMode = viewModeAsync.value ?? ViewMode.list;
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
     final isLoadingMore = timelineNotifier.isLoadingMore;
     final hasMore = timelineNotifier.hasMore;
@@ -290,7 +295,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         },
         child: timelineState.when(
           skipLoadingOnRefresh: true,
-          loading: () => _buildSkeletonLoading(appColors, viewMode, l10n),
+          loading: () =>
+              _buildSkeletonLoading(appColors, currentViewMode, l10n),
           error: (error, stack) => Center(
             child: Text(
               l10n.errorLoadData,
@@ -301,7 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             final filteredTransactions = _applyDateFilter(allTransactions);
 
             if (filteredTransactions.isEmpty && timelineState.isLoading) {
-              return _buildSkeletonLoading(appColors, viewMode, l10n);
+              return _buildSkeletonLoading(appColors, currentViewMode, l10n);
             }
 
             final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
@@ -312,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Map<DateTime, List<Map<String, dynamic>>> monthlyGrouped = {};
             List<DateTime> monthlyKeys = [];
 
-            if (viewMode == ViewMode.calendar) {
+            if (currentViewMode == ViewMode.calendar) {
               for (var tx in filteredTransactions) {
                 final date =
                     DateTime.tryParse(
@@ -335,7 +341,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   _buildBudgetCardWithNavigation(l10n),
                   _buildControlHeaderRow(
                     appColors,
-                    viewMode,
+                    currentViewMode,
                     filteredTransactions,
                   ),
                   _buildEmptyState(appColors, l10n),
@@ -343,68 +349,96 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             }
 
-            final listLength = viewMode == ViewMode.calendar
-                ? monthlyKeys.length
-                : dailyKeys.length;
+            // 🚀 UPDATE: Bọc CustomScrollView bằng AnimationLimiter
+            return AnimationLimiter(
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  // 1. Phần Budget Card phía trên cùng
+                  SliverToBoxAdapter(
+                    child: _buildBudgetCardWithNavigation(l10n),
+                  ),
 
-            return ListView.builder(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              itemCount: 2 + listLength + (isLoadingMore && hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == 0) return _buildBudgetCardWithNavigation(l10n);
-                if (index == 1)
-                  return _buildControlHeaderRow(
-                    appColors,
-                    viewMode,
-                    filteredTransactions,
-                  );
+                  // 2. Phần thanh điều khiển chuyển chế độ (List/Grid/Calendar)
+                  SliverToBoxAdapter(
+                    child: _buildControlHeaderRow(
+                      appColors,
+                      currentViewMode,
+                      filteredTransactions,
+                    ),
+                  ),
 
-                if (index == 2 + listLength) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: appColors.primary,
-                        strokeWidth: 2.5,
+                  // 3. Nội dung chính dựa theo ViewMode hiện tại
+                  if (currentViewMode == ViewMode.calendar)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, dataIndex) => _buildMonthlyCalendar(
+                          monthlyKeys[dataIndex],
+                          monthlyGrouped[monthlyKeys[dataIndex]]!,
+                          l10n,
+                          ref,
+                          context,
+                          appColors,
+                        ),
+                        childCount: monthlyKeys.length,
+                      ),
+                    )
+                  else if (currentViewMode == ViewMode.grid) ...[
+                    // 🚀 Sử dụng HomeGridGroup đã tách
+                    for (final dateKey in dailyKeys)
+                      HomeGridGroup(
+                        dateKey: dateKey,
+                        txList: dailyGrouped[dateKey]!,
+                        l10n: l10n,
+                        appColors: appColors,
+                        onTapItem: (tx) => _openMomentDetails(tx, l10n),
+                        onLongPress: (tx) => _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          tx,
+                          l10n,
+                          appColors,
+                        ),
+                      ),
+                  ] else ...[
+                    // 🚀 Sử dụng HomeListGroup
+                    for (final dateKey in dailyKeys)
+                      HomeListGroup(
+                        dateKey: dateKey,
+                        txList: dailyGrouped[dateKey]!,
+                        l10n: l10n,
+                        appColors: appColors,
+                        onTapItem: (tx) => _openMomentDetails(tx, l10n),
+                        onConfirmDelete: (tx) async {
+                          await _showDeleteConfirmDialog(
+                            context,
+                            ref,
+                            tx,
+                            l10n,
+                            appColors,
+                          );
+                          return false;
+                        },
+                      ),
+                  ],
+                  // 4. Loading indicator khi cuộn xuống đáy để tải thêm trang mới
+                  if (isLoadingMore && hasMore)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: appColors.primary,
+                            strokeWidth: 2.5,
+                          ),
+                        ),
                       ),
                     ),
-                  );
-                }
-
-                final dataIndex = index - 2;
-
-                if (viewMode == ViewMode.calendar) {
-                  return _buildMonthlyCalendar(
-                    monthlyKeys[dataIndex],
-                    monthlyGrouped[monthlyKeys[dataIndex]]!,
-                    l10n,
-                    ref,
-                    context,
-                    appColors,
-                  );
-                } else if (viewMode == ViewMode.grid) {
-                  return _buildMasonryGridGroup(
-                    dailyKeys[dataIndex],
-                    dailyGrouped[dailyKeys[dataIndex]]!,
-                    l10n,
-                    ref,
-                    context,
-                    appColors,
-                  );
-                } else {
-                  return _buildListGroup(
-                    dailyKeys[dataIndex],
-                    dailyGrouped[dailyKeys[dataIndex]]!,
-                    l10n,
-                    ref,
-                    context,
-                    appColors,
-                  );
-                }
-              },
+                ],
+              ),
             );
           },
         ),
@@ -426,9 +460,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onSelectStart: () {},
       onSelectEnd: () {},
       onToggleView: () {
-        ref.read(viewModeProvider.notifier).state = currentMode == ViewMode.grid
+        final newMode = currentMode == ViewMode.grid
             ? ViewMode.list
             : ViewMode.grid;
+        ref.read(viewModeProvider.notifier).updateViewMode(newMode);
       },
       onFilterTap: () {
         AppCalendarSheet.show(
@@ -442,11 +477,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
       },
       onCalendarTap: () {
-        ref
-            .read(viewModeProvider.notifier)
-            .state = currentMode == ViewMode.calendar
+        final newMode = currentMode == ViewMode.calendar
             ? ViewMode.list
             : ViewMode.calendar;
+        ref.read(viewModeProvider.notifier).updateViewMode(newMode);
       },
     );
   }
@@ -485,25 +519,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildListGroup(
-    String dateKey,
-    List<Map<String, dynamic>> txList,
-    AppLocalizations l10n,
-    WidgetRef ref,
-    BuildContext context,
-    AppColorTheme appColors,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildDateHeaderPill(dateKey, l10n, appColors),
-        ...txList.map(
-          (tx) => _buildDismissibleCard(context, ref, tx, l10n, appColors),
-        ),
-      ],
-    );
-  }
-
   Widget _buildMasonryGridGroup(
     String dateKey,
     List<Map<String, dynamic>> txList,
@@ -518,12 +533,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _buildDateHeaderPill(dateKey, l10n, appColors),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: MasonryGridView.count(
+          child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.65,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemCount: txList.length,
             itemBuilder: (context, gridIdx) => MomentGridItem(
               moment: txList[gridIdx],
@@ -579,6 +597,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final firstWeekday = DateTime(monthKey.year, monthKey.month, 1).weekday;
     final emptyDays = firstWeekday - 1;
     final totalCells = emptyDays + daysInMonth;
+    final String langCode = Localizations.localeOf(context).languageCode;
+    String monthYearDisplay = DateFormat.yMMMM(langCode).format(monthKey);
+    if (monthYearDisplay.isNotEmpty) {
+      monthYearDisplay =
+          monthYearDisplay[0].toUpperCase() + monthYearDisplay.substring(1);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,7 +610,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 20, top: 24, bottom: 16),
           child: Text(
-            '${l10n.month} ${monthKey.month}, ${monthKey.year}',
+            monthYearDisplay,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -671,7 +695,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     return;
                   }
 
-                  // 🚀 UPDATE: Await kết quả trả về từ màn hình thêm giao dịch
                   final bool? isAdded = await Navigator.of(context).push<bool>(
                     CupertinoPageRoute(
                       builder: (_) =>
@@ -679,8 +702,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   );
 
-                  // 🚀 Kích hoạt load lại dữ liệu & tính toán huy hiệu ngầm
-                  // nếu người dùng đã thêm thành công
                   if (isAdded == true && mounted) {
                     ref
                         .read(transactionTimelineProvider.notifier)
@@ -792,56 +813,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDismissibleCard(
-    BuildContext context,
-    WidgetRef ref,
-    Map<String, dynamic> tx,
-    AppLocalizations l10n,
-    AppColorTheme appColors,
-  ) {
-    return Dismissible(
-      key: Key(tx['id'].toString()),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) async {
-        await _showDeleteConfirmDialog(context, ref, tx, l10n, appColors);
-        return false;
-      },
-      background: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFF4B4B).withOpacity(0.15),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              l10n.deleteActionLabel,
-              style: const TextStyle(
-                color: Color(0xFFFF4B4B),
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              CupertinoIcons.trash,
-              color: Color(0xFFFF4B4B),
-              size: 24,
-            ),
-          ],
-        ),
-      ),
-      child: TransactionCard(
-        transaction: tx,
-        onTap: () => _openMomentDetails(tx, l10n),
-        l10n: l10n,
-      ),
-    );
-  }
-
   Future<void> _showDeleteConfirmDialog(
     BuildContext context,
     WidgetRef ref,
@@ -942,10 +913,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await ref
             .read(transactionTimelineProvider.notifier)
             .deleteTransaction(tx['id'].toString());
-
-        // 🚀 UPDATE: Đã gỡ bỏ hàm removeMomentLocally thừa thãi ở đây
-        // vì hàm deleteTransaction của Controller ĐÃ BAO GỒM logic xóa dữ liệu khỏi State
-        // VÀ nó cũng đã chạy ngầm hàm _evaluateBadges() cho ta luôn rồi.
 
         if (mounted) {
           AppToast.showSuccess(context, l10n.deleteSuccessMessage, appColors);

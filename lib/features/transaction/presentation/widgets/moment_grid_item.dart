@@ -1,14 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
-import 'package:moment_u_payment/core/screens/full_screen_image_viewer.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
-class MomentGridItem extends ConsumerWidget {
+class MomentGridItem extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
   final AppLocalizations l10n;
   final VoidCallback onLongPress;
@@ -23,60 +23,112 @@ class MomentGridItem extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final String imageUrl = moment['imageUrl'] ?? '';
-    final String note = moment['note'] ?? '';
-    final String category = moment['category'] ?? l10n.categoryOther;
-    final String emoji = moment['emoji'] ?? '✨';
+  ConsumerState<MomentGridItem> createState() => _MomentGridItemState();
+}
+
+class _MomentGridItemState extends ConsumerState<MomentGridItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // 💡 UX Nâng cao: Hiệu ứng lún xuống khi chạm (Tương tự Instagram/Facebook)
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.94).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String imageUrl = widget.moment['imageUrl'] ?? '';
+    final String note = widget.moment['note'] ?? '';
+    final String emoji = widget.moment['emoji'] ?? '✨';
     final bool hasImage = imageUrl.isNotEmpty;
 
     final currencySymbol = ref.watch(currencyProvider);
     final appColors = ref.watch(appColorsProvider);
-
     final String compactAmount =
-        '-${CurrencyHelper.formatCompactAmount(moment['amount'])}$currencySymbol';
+        '-${CurrencyHelper.formatCompactAmount(widget.moment['amount'])}$currencySymbol';
 
-    // 🌟 ĐỒNG NHẤT TỶ LỆ Ở ĐÂY: Tất cả các card đều chung tỷ lệ 0.82 (dáng dọc Polaroid)
-    return AspectRatio(
-      aspectRatio: 0.82,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: appColors.primary.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            onLongPress: onLongPress,
-            // Hiệu ứng chạm mềm mại
-            splashColor: appColors.primary.withOpacity(0.2),
-            highlightColor: appColors.primary.withOpacity(0.1),
-            child: hasImage
-                ? _buildImageContent(
-                    imageUrl,
-                    compactAmount,
-                    note,
-                    emoji,
-                    category,
-                    appColors,
-                    context,
-                  )
-                : _buildCuteMemoPad(
-                    emoji,
-                    category,
-                    appColors,
-                    compactAmount,
-                    note,
+    // 🌟 ĐỔI TỶ LỆ: 0.65 tạo dáng dọc chuẩn Story/Highlight cho lưới 3 cột
+    return GestureDetector(
+      onTapDown: (_) => _animationController.forward(),
+      onTapUp: (_) {
+        _animationController.reverse();
+        if (widget.onTap != null) {
+          HapticFeedback.selectionClick(); // Rung nhẹ tạo cảm giác premium
+          widget.onTap!();
+        }
+      },
+      onTapCancel: () => _animationController.reverse(),
+      onLongPress: () {
+        HapticFeedback.heavyImpact();
+        widget.onLongPress();
+      },
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: AspectRatio(
+            aspectRatio: 0.65,
+            child: Container(
+              // 💡 THE STORY RING: Vòng sáng Gradient bao quanh như FB Highlight
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    appColors.primary.withOpacity(0.8),
+                    appColors.primary.withOpacity(0.2),
+                    appColors.primary.withOpacity(0.6),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: appColors.primary.withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
+                ],
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: appColors.background,
+                  borderRadius: BorderRadius.circular(
+                    21.5,
+                  ), // Trừ đi padding của viền
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: hasImage
+                    ? _buildHighlightImage(
+                        imageUrl,
+                        compactAmount,
+                        note,
+                        emoji,
+                        appColors,
+                      )
+                    : _buildHighlightGradient(
+                        emoji,
+                        compactAmount,
+                        note,
+                        appColors,
+                      ),
+              ),
+            ),
           ),
         ),
       ),
@@ -84,51 +136,39 @@ class MomentGridItem extends ConsumerWidget {
   }
 
   // ===========================================================================
-  // 1. UI KHI CÓ ẢNH: Kính mờ (Glassmorphism) tinh tế hơn
+  // 1. KHI CÓ ẢNH: Chuẩn phong cách FB/IG Story Cover
   // ===========================================================================
-  Widget _buildImageContent(
+  Widget _buildHighlightImage(
     String imageUrl,
     String compactAmount,
     String note,
     String emoji,
-    String category,
     AppColorTheme appColors,
-    BuildContext
-    context, // Bắt buộc thêm BuildContext vào tham số để chuyển trang
   ) {
-    // Tạo ID duy nhất cho Hero Animation
     final String momentId =
-        moment['id']?.toString() ??
-        moment['_id']?.toString() ??
-        DateTime.now().millisecondsSinceEpoch.toString();
+        widget.moment['id']?.toString() ??
+        widget.moment['_id']?.toString() ??
+        '';
     final String heroTag = 'moment-pic-$momentId';
-
-    // Giả sử bạn có CloudinaryHelper để tối ưu URL.
-    // Nếu có thể, hãy truyền thêm tham số c_fill,g_auto để lấy trung tâm khuôn mặt.
     final String optimizedUrl = CloudinaryHelper.getOptimizedOriginalUrl(
       imageUrl,
     );
 
     return Stack(
+      fit: StackFit.expand,
       children: [
-        Positioned.fill(
-          child: Hero(
-            tag: heroTag,
-            child: Image.network(
-              optimizedUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => _buildCuteMemoPad(
-                emoji,
-                category,
-                appColors,
-                compactAmount,
-                note,
-              ),
-            ),
+        // Ảnh nền Full Cover
+        Hero(
+          tag: heroTag,
+          child: Image.network(
+            optimizedUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                _buildHighlightGradient(emoji, compactAmount, note, appColors),
           ),
         ),
 
-        // Lớp phủ Gradient tối dần về đáy để chữ luôn nổi bật
+        // Lớp phủ Gradient đen dưới đáy để hiển thị chữ rõ nét (Đẹp hơn viền trắng kính mờ)
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
@@ -137,77 +177,76 @@ class MomentGridItem extends ConsumerWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.1),
-                  Colors.black.withOpacity(0.75),
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.85), // Đen sâu ở đáy
                 ],
-                stops: const [0.4, 0.7, 1.0],
+                stops: const [0.0, 0.5, 1.0],
               ),
             ),
           ),
         ),
 
-        // Washi Tape Góc trên trái
-        _buildWashiTape(category, appColors),
-
-        // Khối Kính Mờ cao cấp ở góc dưới
+        // Thẻ Emoji kính mờ (Glassmorphism) siêu nhỏ ở góc trái trên
         Positioned(
-          bottom: 8,
+          top: 8,
           left: 8,
-          right: 8,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 0.8,
+                    color: Colors.white.withOpacity(0.4),
+                    width: 0.5,
                   ),
-                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Text(emoji, style: const TextStyle(fontSize: 12)),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            note.isNotEmpty ? note : l10n.emptyTransactionNote,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      compactAmount,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                child: Text(emoji, style: const TextStyle(fontSize: 12)),
+              ),
+            ),
+          ),
+        ),
+
+        // Nội dung rút gọn ở đáy
+        Positioned(
+          bottom: 12,
+          left: 10,
+          right: 10,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                compactAmount,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black45,
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(
+                note.isNotEmpty ? note : widget.l10n.emptyTransactionNote,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.85),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -215,14 +254,13 @@ class MomentGridItem extends ConsumerWidget {
   }
 
   // ===========================================================================
-  // 2. UI KHÔNG CÓ ẢNH: Nhật ký / Card Gradient Pastel (Sang trọng & Cute)
+  // 2. KHI KHÔNG CÓ ẢNH: Nền Gradient mượt mà, rực rỡ
   // ===========================================================================
-  Widget _buildCuteMemoPad(
+  Widget _buildHighlightGradient(
     String emoji,
-    String category,
-    AppColorTheme appColors,
     String compactAmount,
     String note,
+    AppColorTheme appColors,
   ) {
     return Container(
       decoration: BoxDecoration(
@@ -230,53 +268,45 @@ class MomentGridItem extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            appColors.background,
-            appColors.primary.withOpacity(0.08),
             appColors.primary.withOpacity(0.15),
+            appColors.primary.withOpacity(
+              0.35,
+            ), // Màu đậm hơn một chút so với trước
           ],
         ),
-        border: Border.all(color: appColors.primary.withOpacity(0.1), width: 1),
       ),
       child: Stack(
         children: [
-          // Lưới nền mờ (Tạo cảm giác sổ tay)
-          Positioned.fill(
+          // Emoji khổng lồ mờ nhạt làm nền
+          Positioned(
+            right: -20,
+            bottom: -10,
             child: Opacity(
-              opacity: 0.04,
-              child: GridPaper(
-                color: appColors.primaryDark,
-                divisions: 1,
-                subdivisions: 1,
-                interval: 20,
-              ),
+              opacity: 0.1,
+              child: Text(emoji, style: const TextStyle(fontSize: 80)),
             ),
           ),
 
-          // Vẫn giữ chiếc Washi Tape để đồng bộ với thẻ có ảnh
-          _buildWashiTape(category, appColors),
-
-          // Icon Emoji nổi bật ở giữa thay cho ảnh
+          // Icon Emoji nổi bật ở giữa
           Center(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: appColors.primary.withOpacity(0.1),
+            child: Text(
+              emoji,
+              style: const TextStyle(
+                fontSize: 36,
+                shadows: [
+                  Shadow(
+                    color: Colors.black12,
                     blurRadius: 10,
-                    spreadRadius: 2,
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
-              child: Text(emoji, style: const TextStyle(fontSize: 32)),
             ),
           ),
 
-          // Thông tin ở góc dưới
+          // Thông tin góc dưới (Màu tối để tương phản với nền sáng)
           Positioned(
-            bottom: 10,
+            bottom: 12,
             left: 10,
             right: 10,
             child: Column(
@@ -284,64 +314,28 @@ class MomentGridItem extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  note.isNotEmpty ? note : l10n.emptyTransactionNote,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: appColors.text,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
                   compactAmount,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: appColors.errorAccent, // Giữ màu cảnh báo chi tiêu
+                    color: appColors.primaryDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  note.isNotEmpty ? note : widget.l10n.emptyTransactionNote,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: appColors.primaryDark.withOpacity(0.7),
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // ===========================================================================
-  // Widget dùng chung: Washi Tape
-  // ===========================================================================
-  Widget _buildWashiTape(String category, AppColorTheme appColors) {
-    return Positioned(
-      top: 10,
-      left: 10,
-      child: Transform.rotate(
-        angle: -0.06,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: appColors.primary,
-            borderRadius: BorderRadius.circular(3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 4,
-                offset: const Offset(1, 2),
-              ),
-            ],
-          ),
-          child: Text(
-            category.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: 0.8,
-            ),
-          ),
-        ),
       ),
     );
   }

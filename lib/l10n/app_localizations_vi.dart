@@ -399,14 +399,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get notiFirstTxnBody =>
-      'Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của cậu ngay hôm nay nhé. Chạm vào đây nào! 👇💸';
+      'Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của bạn ngay hôm nay nhé. Chạm vào đây nào! 👇💸';
 
   @override
   String get notiSetBudgetTitle => 'Lập khiên bảo vệ ví! 🛡️';
 
   @override
   String get notiSetBudgetBody =>
-      'Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ \'vung tay quá trán\' nha. Chạm để thiết lập! 🎯💖';
+      'Cài đặt hạn mức ngay để tớ nhắc bạn mỗi khi lỡ \'vung tay quá trán\' nha. Chạm để thiết lập! 🎯💖';
 
   @override
   String get forgotPasswordDialogTitle => 'Khôi phục mật khẩu';
@@ -958,7 +958,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String budgetWarningLow(String amountSpent) {
-    return 'Úi úi, hạn mức mới này còn thấp hơn cả số tiền cậu đã vung tay trong tháng ($amountSpent) đó nha! 🚨🥺';
+    return 'Úi úi, hạn mức mới này còn thấp hơn cả số tiền bạn đã vung tay trong tháng ($amountSpent) đó nha! 🚨🥺';
   }
 
   @override

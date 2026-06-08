@@ -220,10 +220,10 @@
     }
   },
   "notiFirstTxnTitle": "Chạm ngõ Moment đầu tiên! 🪄",
-  "notiFirstTxnBody": "Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của cậu ngay hôm nay nhé. Chạm vào đây nào! 👇💸",
+  "notiFirstTxnBody": "Ví đã sẵn sàng! Cùng ghi lại khoản chi tiêu (Moment) đầu tiên của bạn ngay hôm nay nhé. Chạm vào đây nào! 👇💸",
 
   "notiSetBudgetTitle": "Lập khiên bảo vệ ví! 🛡️",
-  "notiSetBudgetBody": "Cài đặt hạn mức ngay để tớ nhắc cậu mỗi khi lỡ 'vung tay quá trán' nha. Chạm để thiết lập! 🎯💖",
+  "notiSetBudgetBody": "Cài đặt hạn mức ngay để tớ nhắc bạn mỗi khi lỡ 'vung tay quá trán' nha. Chạm để thiết lập! 🎯💖",
 
   "forgotPasswordDialogTitle": "Khôi phục mật khẩu",
   "forgotPasswordDialogDesc": "Hệ thống sẽ gửi một mã xác thực (OTP) hoặc liên kết đặt lại vào Email của bạn.",
@@ -472,7 +472,7 @@
 
   "dayLabel": "ngày",
   "spentLabel": "Đã tiêu",
-  "budgetWarningLow": "Úi úi, hạn mức mới này còn thấp hơn cả số tiền cậu đã vung tay trong tháng ({amountSpent}) đó nha! 🚨🥺",
+  "budgetWarningLow": "Úi úi, hạn mức mới này còn thấp hơn cả số tiền bạn đã vung tay trong tháng ({amountSpent}) đó nha! 🚨🥺",
   "@budgetWarningLow": {
     "placeholders": {
       "amountSpent": {

@@ -169,6 +169,7 @@ class TransactionTimelineController
 
     _isLoadingMore = true;
 
+    // Kích hoạt UI hiển thị vòng xoay
     if (state.hasValue) {
       state = AsyncValue.data([...state.value!]);
     }
@@ -204,6 +205,12 @@ class TransactionTimelineController
       );
     } finally {
       _isLoadingMore = false;
+
+      // 🚀 BƯỚC QUYẾT ĐỊNH: Bắt buộc ép Riverpod cập nhật lại state một lần nữa
+      // để UI nhận diện được `_isLoadingMore` đã biến thành false và giấu vòng xoay đi.
+      if (state.hasValue) {
+        state = AsyncValue.data([...state.value!]);
+      }
     }
   }
 
