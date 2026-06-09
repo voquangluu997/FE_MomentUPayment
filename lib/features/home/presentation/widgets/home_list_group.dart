@@ -70,7 +70,7 @@ class HomeListGroup extends ConsumerWidget {
                   child: FadeInAnimation(
                     curve: Curves.easeOut,
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.only(bottom: 0),
                       child: MomentListItem(
                         transaction: tx,
                         l10n: l10n,

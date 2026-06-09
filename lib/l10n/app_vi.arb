@@ -763,6 +763,38 @@
   "currencyVND": "Việt Nam Đồng",
 
   "budgetUpdateSuccess": "Cập nhật ngân sách thành công!",
-  "budgetUpdateError": "Cập nhật thất bại, vui lòng thử lại!"
+  "budgetUpdateError": "Cập nhật thất bại, vui lòng thử lại!",
+
+"momentCreatorTitle": "MOMENT CREATOR",
+"editPhotoDone": "Xong",
+"editPhotoCancel": "Hủy",
+"editPhotoApply": "Áp dụng",
+"editPhotoFilter": "Bộ lọc",
+"editPhotoCrop": "Cắt ảnh",
+"editPhotoBeauty": "Chỉnh da",
+"editPhotoSticker": "Nhãn dán",
+"filterPortrait": "👤 CHÂN DUNG",
+"filterFood": "🍳 ẨM THỰC",
+"cropInstruction": "Kéo các chấm tròn ở 4 góc để điều chỉnh khung.\nBấm 'Áp dụng' để cắt ảnh.",
+"beautyGlow": "✨ Sáng da",
+"beautySmooth": "🧼 Mịn da",
+"beautyPop": "💥 Tươi màu",
+"stickerCute": "🧸 ICON CUTE",
+"stickerText": "✍️ NHẬP CHỮ",
+"stickerSize": "📐 Cỡ:",
+"editStickerTitle": "Nội dung nhãn dán",
+"save": "Lưu",
+"cancel": "Hủy",
+"filterOriginal": "Gốc",
+"filterCreamy": "Mịn Kem",
+"filterPink": "Hồng Phấn",
+"filterVintage": "Cổ Điển",
+"filterPoetic": "Nắng Thơ",
+"filterFoodFresh": "Tươi Ngon",
+"filterFoodJuicy": "Mọng Nước",
+"filterFoodSweet": "Bánh Ngọt",
+"filterFoodGold": "Chroma Gold",
+"filterFoodForest": "Forest Xanh"
+
 
 }

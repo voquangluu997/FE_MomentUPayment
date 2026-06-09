@@ -1,14 +1,18 @@
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:moment_u_payment/core/features/badges/screens/custom_camera_screen.dart';
+import 'package:moment_u_payment/core/features/badges/screens/edit_photo_screen.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_image_picker.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/media_service.dart';
@@ -139,14 +143,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
   final _customCategoryController = TextEditingController();
-  final _mediaService = MediaService();
-  final ImagePicker _picker = ImagePicker();
 
   String _selectedCategory = 'Food';
   String _selectedEmoji = '🍰';
-  String? _localImagePath;
   bool _isCustomCategory = false;
   late DateTime _selectedDate;
+
+  // 🚀 CHỈ CẦN GIỮ LẠI BIẾN NÀY ĐỂ NHẬN KẾT QUẢ
+  String? _finalImagePath;
 
   @override
   void initState() {
@@ -184,30 +188,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     if (pickedDate != null) {
       setState(() => _selectedDate = pickedDate);
-    }
-  }
-
-  Future<void> _openCamera() async {
-    HapticFeedback.lightImpact();
-    try {
-      final photo = await _mediaService.takePhoto();
-      if (photo != null) setState(() => _localImagePath = photo.path);
-    } catch (e) {
-      debugPrint("Lỗi khi mở camera: $e");
-    }
-  }
-
-  Future<void> _openGallery() async {
-    HapticFeedback.lightImpact();
-    try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 75,
-        maxWidth: 1080,
-      );
-      if (photo != null) setState(() => _localImagePath = photo.path);
-    } catch (e) {
-      debugPrint("Lỗi khi chọn ảnh: $e");
     }
   }
 
@@ -313,7 +293,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           category: finalCategory,
           emoji: _selectedEmoji,
           note: _noteController.text.trim(),
-          localImagePath: _localImagePath,
+          localImagePath: _finalImagePath,
           spentAt: finalDateTimeUtc,
         );
   }
@@ -390,10 +370,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _ImageSelector(
-                  imagePath: _localImagePath,
-                  onCameraTap: _openCamera,
-                  onGalleryTap: _openGallery,
+                // 🚀 GỌI WIDGET MỚI TẠO Ở ĐÂY LÀ XONG! GỌN GÀNG VÀ SẠCH SẼ
+                TransactionImagePicker(
+                  initialImagePath: _finalImagePath,
+                  onImageChanged: (newPath) {
+                    setState(() {
+                      _finalImagePath = newPath;
+                    });
+                  },
                 ),
                 const SizedBox(height: 14),
 
@@ -446,146 +430,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 // ==========================================
 // 🧩 WIDGETS
 // ==========================================
-
-class _ImageSelector extends ConsumerWidget {
-  final String? imagePath;
-  final VoidCallback onCameraTap;
-  final VoidCallback onGalleryTap;
-
-  const _ImageSelector({
-    this.imagePath,
-    required this.onCameraTap,
-    required this.onGalleryTap,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appColors = ref.watch(appColorsProvider);
-    final l10n = AppLocalizations.of(context)!;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: onCameraTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: 245,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: imagePath != null
-                  ? appColors.cardBackground
-                  : appColors.primary.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: imagePath != null
-                    ? Colors.transparent
-                    : appColors.primary.withOpacity(0.15),
-                width: 1.5,
-              ),
-            ),
-            child: imagePath != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.file(File(imagePath!), fit: BoxFit.cover),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: 40,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withOpacity(0.25),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Transform.rotate(
-                        angle: -math.pi / 15,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            CupertinoIcons.camera_fill,
-                            size: 32,
-                            color: appColors.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          l10n.cameraTapInstruction,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: appColors.primaryDark,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: onGalleryTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: appColors.cardBackground,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: appColors.primary.withOpacity(0.1)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  CupertinoIcons.photo_on_rectangle,
-                  color: appColors.primary,
-                  size: 14,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  imagePath != null
-                      ? l10n.galleryChangeAction
-                      : l10n.galleryPickAction,
-                  style: TextStyle(
-                    color: appColors.primary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _CategorySelector extends ConsumerWidget {
   final String selectedCategory;
   final Function(String id, String emoji, bool isCustom) onSelect;

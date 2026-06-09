@@ -756,5 +756,37 @@
   "currencyVND": "Vietnam Dong (VND)",
 
   "budgetUpdateSuccess": "Budget updated successfully!",
-  "budgetUpdateError": "Update failed, please try again!"
+  "budgetUpdateError": "Update failed, please try again!",
+
+  "momentCreatorTitle": "MOMENT CREATOR",
+  "editPhotoDone": "Done",
+  "editPhotoCancel": "Cancel",
+  "editPhotoApply": "Apply",
+  "editPhotoFilter": "Filter",
+  "editPhotoCrop": "Crop",
+  "editPhotoBeauty": "Beauty",
+  "editPhotoSticker": "Sticker",
+  "filterPortrait": "👤 PORTRAIT",
+  "filterFood": "🍳 FOODIE",
+  "cropInstruction": "Drag the corners to adjust the frame.\nTap 'Apply' to crop the image.",
+  "beautyGlow": "✨ Brighten",
+  "beautySmooth": "🧼 Smooth",
+  "beautyPop": "💥 Vivid",
+  "stickerCute": "🧸 ICONS",
+  "stickerText": "✍️ TEXT",
+  "stickerSize": "📐 Size:",
+  "editStickerTitle": "Edit Sticker Text",
+  "save": "Save",
+  "cancel": "Cancel",
+  "filterOriginal": "Original",
+"filterCreamy": "Creamy",
+"filterPink": "Pinkish",
+"filterVintage": "Vintage",
+"filterPoetic": "Poetic",
+"filterFoodFresh": "Fresh",
+"filterFoodJuicy": "Juicy",
+"filterFoodSweet": "Sweet",
+"filterFoodGold": "Gold",
+"filterFoodForest": "Forest"
+
 }

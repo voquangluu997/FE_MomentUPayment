@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  camera: ^0.10.5
   flutter_localizations: # ✨ để hỗ trợ các component hệ thống (DatePicker, v.v.)
     sdk: flutter
   intl: ^0.20.2 # ✨ để xử lý định dạng ngôn ngữ/ngày tháng

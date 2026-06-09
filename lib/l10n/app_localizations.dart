@@ -1353,7 +1353,7 @@ abstract class AppLocalizations {
   /// No description provided for @save.
   ///
   /// In en, this message translates to:
-  /// **'Save it!'**
+  /// **'Save'**
   String get save;
 
   /// No description provided for @changePassword.
@@ -2789,6 +2789,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update failed, please try again!'**
   String get budgetUpdateError;
+
+  /// No description provided for @momentCreatorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MOMENT CREATOR'**
+  String get momentCreatorTitle;
+
+  /// No description provided for @editPhotoDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get editPhotoDone;
+
+  /// No description provided for @editPhotoCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get editPhotoCancel;
+
+  /// No description provided for @editPhotoApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get editPhotoApply;
+
+  /// No description provided for @editPhotoFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get editPhotoFilter;
+
+  /// No description provided for @editPhotoCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get editPhotoCrop;
+
+  /// No description provided for @editPhotoBeauty.
+  ///
+  /// In en, this message translates to:
+  /// **'Beauty'**
+  String get editPhotoBeauty;
+
+  /// No description provided for @editPhotoSticker.
+  ///
+  /// In en, this message translates to:
+  /// **'Sticker'**
+  String get editPhotoSticker;
+
+  /// No description provided for @filterPortrait.
+  ///
+  /// In en, this message translates to:
+  /// **'👤 PORTRAIT'**
+  String get filterPortrait;
+
+  /// No description provided for @filterFood.
+  ///
+  /// In en, this message translates to:
+  /// **'🍳 FOODIE'**
+  String get filterFood;
+
+  /// No description provided for @cropInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the corners to adjust the frame.\nTap \'Apply\' to crop the image.'**
+  String get cropInstruction;
+
+  /// No description provided for @beautyGlow.
+  ///
+  /// In en, this message translates to:
+  /// **'✨ Brighten'**
+  String get beautyGlow;
+
+  /// No description provided for @beautySmooth.
+  ///
+  /// In en, this message translates to:
+  /// **'🧼 Smooth'**
+  String get beautySmooth;
+
+  /// No description provided for @beautyPop.
+  ///
+  /// In en, this message translates to:
+  /// **'💥 Vivid'**
+  String get beautyPop;
+
+  /// No description provided for @stickerCute.
+  ///
+  /// In en, this message translates to:
+  /// **'🧸 ICONS'**
+  String get stickerCute;
+
+  /// No description provided for @stickerText.
+  ///
+  /// In en, this message translates to:
+  /// **'✍️ TEXT'**
+  String get stickerText;
+
+  /// No description provided for @stickerSize.
+  ///
+  /// In en, this message translates to:
+  /// **'📐 Size:'**
+  String get stickerSize;
+
+  /// No description provided for @editStickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Sticker Text'**
+  String get editStickerTitle;
+
+  /// No description provided for @filterOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get filterOriginal;
+
+  /// No description provided for @filterCreamy.
+  ///
+  /// In en, this message translates to:
+  /// **'Creamy'**
+  String get filterCreamy;
+
+  /// No description provided for @filterPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinkish'**
+  String get filterPink;
+
+  /// No description provided for @filterVintage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vintage'**
+  String get filterVintage;
+
+  /// No description provided for @filterPoetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Poetic'**
+  String get filterPoetic;
+
+  /// No description provided for @filterFoodFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh'**
+  String get filterFoodFresh;
+
+  /// No description provided for @filterFoodJuicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Juicy'**
+  String get filterFoodJuicy;
+
+  /// No description provided for @filterFoodSweet.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweet'**
+  String get filterFoodSweet;
+
+  /// No description provided for @filterFoodGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get filterFoodGold;
+
+  /// No description provided for @filterFoodForest.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest'**
+  String get filterFoodForest;
 }
 
 class _AppLocalizationsDelegate

@@ -706,7 +706,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get fullName => 'Tên \'xịn\' của bạn';
 
   @override
-  String get save => 'Lưu lẹ đi nè!';
+  String get save => 'Lưu';
 
   @override
   String get changePassword => 'Đổi mật khẩu';
@@ -1529,4 +1529,89 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get budgetUpdateError => 'Cập nhật thất bại, vui lòng thử lại!';
+
+  @override
+  String get momentCreatorTitle => 'MOMENT CREATOR';
+
+  @override
+  String get editPhotoDone => 'Xong';
+
+  @override
+  String get editPhotoCancel => 'Hủy';
+
+  @override
+  String get editPhotoApply => 'Áp dụng';
+
+  @override
+  String get editPhotoFilter => 'Bộ lọc';
+
+  @override
+  String get editPhotoCrop => 'Cắt ảnh';
+
+  @override
+  String get editPhotoBeauty => 'Chỉnh da';
+
+  @override
+  String get editPhotoSticker => 'Nhãn dán';
+
+  @override
+  String get filterPortrait => '👤 CHÂN DUNG';
+
+  @override
+  String get filterFood => '🍳 ẨM THỰC';
+
+  @override
+  String get cropInstruction =>
+      'Kéo các chấm tròn ở 4 góc để điều chỉnh khung.\nBấm \'Áp dụng\' để cắt ảnh.';
+
+  @override
+  String get beautyGlow => '✨ Sáng da';
+
+  @override
+  String get beautySmooth => '🧼 Mịn da';
+
+  @override
+  String get beautyPop => '💥 Tươi màu';
+
+  @override
+  String get stickerCute => '🧸 ICON CUTE';
+
+  @override
+  String get stickerText => '✍️ NHẬP CHỮ';
+
+  @override
+  String get stickerSize => '📐 Cỡ:';
+
+  @override
+  String get editStickerTitle => 'Nội dung nhãn dán';
+
+  @override
+  String get filterOriginal => 'Gốc';
+
+  @override
+  String get filterCreamy => 'Mịn Kem';
+
+  @override
+  String get filterPink => 'Hồng Phấn';
+
+  @override
+  String get filterVintage => 'Cổ Điển';
+
+  @override
+  String get filterPoetic => 'Nắng Thơ';
+
+  @override
+  String get filterFoodFresh => 'Tươi Ngon';
+
+  @override
+  String get filterFoodJuicy => 'Mọng Nước';
+
+  @override
+  String get filterFoodSweet => 'Bánh Ngọt';
+
+  @override
+  String get filterFoodGold => 'Chroma Gold';
+
+  @override
+  String get filterFoodForest => 'Forest Xanh';
 }

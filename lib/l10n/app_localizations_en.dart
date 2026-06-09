@@ -702,7 +702,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullName => 'Your cool name';
 
   @override
-  String get save => 'Save it!';
+  String get save => 'Save';
 
   @override
   String get changePassword => 'Change Password';
@@ -1517,4 +1517,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get budgetUpdateError => 'Update failed, please try again!';
+
+  @override
+  String get momentCreatorTitle => 'MOMENT CREATOR';
+
+  @override
+  String get editPhotoDone => 'Done';
+
+  @override
+  String get editPhotoCancel => 'Cancel';
+
+  @override
+  String get editPhotoApply => 'Apply';
+
+  @override
+  String get editPhotoFilter => 'Filter';
+
+  @override
+  String get editPhotoCrop => 'Crop';
+
+  @override
+  String get editPhotoBeauty => 'Beauty';
+
+  @override
+  String get editPhotoSticker => 'Sticker';
+
+  @override
+  String get filterPortrait => '👤 PORTRAIT';
+
+  @override
+  String get filterFood => '🍳 FOODIE';
+
+  @override
+  String get cropInstruction =>
+      'Drag the corners to adjust the frame.\nTap \'Apply\' to crop the image.';
+
+  @override
+  String get beautyGlow => '✨ Brighten';
+
+  @override
+  String get beautySmooth => '🧼 Smooth';
+
+  @override
+  String get beautyPop => '💥 Vivid';
+
+  @override
+  String get stickerCute => '🧸 ICONS';
+
+  @override
+  String get stickerText => '✍️ TEXT';
+
+  @override
+  String get stickerSize => '📐 Size:';
+
+  @override
+  String get editStickerTitle => 'Edit Sticker Text';
+
+  @override
+  String get filterOriginal => 'Original';
+
+  @override
+  String get filterCreamy => 'Creamy';
+
+  @override
+  String get filterPink => 'Pinkish';
+
+  @override
+  String get filterVintage => 'Vintage';
+
+  @override
+  String get filterPoetic => 'Poetic';
+
+  @override
+  String get filterFoodFresh => 'Fresh';
+
+  @override
+  String get filterFoodJuicy => 'Juicy';
+
+  @override
+  String get filterFoodSweet => 'Sweet';
+
+  @override
+  String get filterFoodGold => 'Gold';
+
+  @override
+  String get filterFoodForest => 'Forest';
 }
