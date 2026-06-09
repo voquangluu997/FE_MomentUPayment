@@ -3,84 +3,81 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/theme_provider.dart';
 
 class AppColors {
-  // --- ☀️ LIGHT MODE (Pop-Art & Crisp Modern Vibe) ---
+  // --- ☀️ LIGHT MODE (Cyber Tangerine & Dynamic Energy Vibe) ---
   static const Color background = Color(
-    0xFFF4F6F8,
-  ); // Xám khói cực nhạt, làm nổi bật lớp kính mờ
+    0xFFF8F9FA,
+  ); // Trắng ngọc trai siêu sạch, tôn lớp kính mờ đổ bóng
   static const Color primary = Color(
-    0xFFFF3366,
-  ); // Hồng Coral / Đỏ Neon cực cháy, trẻ trung
+    0xFFFF5A00,
+  ); // Cyber Tangerine (Cam Neon Điện Tử) - Cực cháy, ấn tượng mạnh ban ngày
   static const Color primaryDark = Color(
-    0xFF14171F,
-  ); // Đen nhám sâu thẳm dành cho tiêu đề bùng nổ
+    0xFF0A0E1A,
+  ); // Đen cực sâu (Deep Space) cho tiêu đề bùng nổ
   static const Color cardBackground =
-      Colors.white; // Trắng tinh khiết làm nền phôi thẻ cao cấp
+      Colors.white; // Trắng tinh khiết làm phôi thẻ cứng cao cấp
   static const Color text = Color(
-    0xFF2D3142,
-  ); // Chữ chính: Xanh Navy ngả đen sắc nét, hiện đại
+    0xFF1E2229,
+  ); // Chữ chính: Xám đen carbon sắc nét
   static const Color textMuted = Color(
-    0xFF8A94A6,
-  ); // Chữ phụ: Xám bạc dịu mắt, phân cấp thông tin tốt
+    0xFF6C7A89,
+  ); // Chữ phụ: Xám kim loại dịu mắt
 
-  // Hệ màu trạng thái tài chính hệ Light (Vivid & Punchy)
+  // Hệ màu trạng thái tài chính hệ Light (Punchy Neo-Semantic)
   static const Color success = Color(
-    0xFF1DD1A1,
-  ); // Xanh Mint rực rỡ (Trạng thái God Mode)
+    0xFF00D68F,
+  ); // Xanh lục bảo Aurora phát sáng (God Mode)
   static const Color warning = Color(
-    0xFFF59E0B,
-  ); // Vàng hổ phách (Trạng thái Danger)
+    0xFFFFB300,
+  ); // Vàng hổ phách Cyber (Danger)
   static const Color error = Color(
-    0xFFFF4757,
-  ); // Đỏ Watermelon (Trạng thái Apocalypse)
+    0xFFFF3838,
+  ); // Đỏ Laser nguyên bản (Apocalypse)
   static const Color errorAccent = Color(
-    0xFFFF6B81,
-  ); // Hồng đỏ rực dành cho các lỗi cần highlight
-  static const Color slate = Color(
-    0xFF64748B,
-  ); // Xám đá Slate (Trạng thái Wasted / Hết tiền)
+    0xFFFF5252,
+  ); // Đỏ Neon highlight vùng lỗi
+  static const Color slate = Color(0xFF788896); // Xám Titan (Wasted)
 
-  // --- 🌙 DARK MODE (Cyberpunk, Night Life & Neon Vibe) ---
+  // --- 🌙 DARK MODE (Electric Periwinkle & Luxury Tech Vibe) ---
   static const Color darkBackground = Color(
-    0xFF090A0F,
-  ); // Đen thẳm tuyệt đối (Deep OLED Black) tạo độ sâu 3D
+    0xFF090611,
+  ); // Đen Tím Velvet tuyệt đối (Deep Obsidian Plum) - Giữ nguyên nền sâu thẳm cực sang
   static const Color darkPrimary = Color(
-    0xFF00E0FF,
-  ); // Cyan Neon phát sáng trong đêm, đậm chất công nghệ
+    0xFF849FFF,
+  ); // Electric Periwinkle (Xanh Lam Ánh Tím) - Dịu mắt, thanh lịch, tạo cảm giác công nghệ cao và hài hòa tuyệt đối với nền tím
   static const Color darkPrimaryDark = Color(
-    0xFFF1F2F6,
-  ); // Trắng sáng phản quang trên nền tối cho tiêu đề lớn
+    0xFFE2E7FF,
+  ); // Trắng khói ánh xanh phản quang nhẹ cho tiêu đề lớn
   static const Color darkCardBackground = Color(
-    0xFF181A20,
-  ); // Xám than chì cao cấp tạo khối mờ đổ bóng
+    0xFF151122,
+  ); // Xám Tím Midnight đúc khối, giảm độ tương phản gắt, êm dịu cho mắt
   static const Color darkText = Color(
     0xFFFFFFFF,
-  ); // Trắng tinh khôi tương phản tuyệt đối
+  ); // Trắng tinh khôi tương phản rõ nét
   static const Color darkTextMuted = Color(
-    0xFFA4B0BE,
-  ); // Xám sáng tinh tế, đọc đêm không mỏi mắt
+    0xFF8F9BB3,
+  ); // Xám xanh sương mù (Slate Blue Muted), đọc ban đêm cực kỳ dễ chịu, không mỏi mắt
 
-  // Hệ màu trạng thái tài chính hệ Dark (Phản quang Neon dịu hơn)
+  // Hệ màu trạng thái tài chính hệ Dark (Đã tinh chỉnh để hòa hợp với tông Lam Tím)
   static const Color darkSuccess = Color(
-    0xFF34D399,
-  ); // Xanh ngọc lục bảo phát sáng nhẹ
-  static const Color darkWarning = Color(
-    0xFFFBBF24,
-  ); // Vàng chanh Neon cảnh báo
-  static const Color darkError = Color(0xFFF87171); // Đỏ Cyber táo bạo báo động
-  static const Color darkSlate = Color(
-    0xFF94A3B8,
-  ); // Xám Slate mờ (Xịt keo tối giản)
+    0xFF2ECC71,
+  ); // Xanh Emerald dịu (Mềm mại hơn màu Electric Mint cũ)
+  static const Color darkWarning = Color(0xFFF1C40F); // Vàng hướng dương ấm áp
+  static const Color darkError = Color(
+    0xFFE74C3C,
+  ); // Đỏ Alizarin mềm (Không bị chói gắt trong tối)
+  static const Color darkSlate = Color(0xFF524B61); // Xám mờ ánh tím tối giản
 
-  // --- 🌈 BẢNG MÀU POP-ART CHO BIỂU ĐỒ CHI TIÊU (CHART PALETTE) ---
+  // --- 🌈 BẢNG MÀU CHUYÊN NGHIỆP CHO BIỂU ĐỒ (HARMONIOUS PALETTE) ---
+  // Thay thế màu hồng chói bằng các tông màu chuyển tiếp mượt mà giữa Cam và Lam Tím
   static const List<Color> chartPalette = [
-    Color(0xFFFF3366), // Đỏ Neon
-    Color(0xFF00D2D3), // Xanh Aqua/Cyan
-    Color(0xFF54A0FF), // Xanh Sky Blue
-    Color(0xFF1DD1A1), // Xanh Mint
-    Color(0xFFFECA57), // Vàng chanh rực rỡ
-    Color(0xFF5F27CD), // Tím Electric
-    Color(0xFFFF9F43), // Cam sặc sỡ
-    Color(0xFFF368E0), // Hồng Magenta
+    Color(0xFF849FFF), // Xanh Lam Ánh Tím (Dark Primary)
+    Color(0xFFFF5A00), // Cam Cyber Tangerine (Light Primary)
+    Color(0xFF2ECC71), // Xanh Ngọc dịu
+    Color(0xFF00D8F6), // Xanh Băng (Ice Blue)
+    Color(0xFF9B5DE5), // Tím Thạch Anh (Amethyst)
+    Color(0xFFF1C40F), // Vàng Ấm
+    Color(0xFFFF6B6B), // Đỏ San Hô mềm
+    Color(0xFF34495E), // Xám Xanh Kim Loại
   ];
 
   static Color getCategoryColor(int index) {
@@ -88,20 +85,18 @@ class AppColors {
   }
 }
 
-// --- ⚙️ LỚP CHỨA BỘ MÀU ĐƯỢC PHÂN PHÁT CHO TOÀN APP ---
+// --- ⚙️ LỚP CHỨA BỘ MÀU ĐƯỢC PHÂN PHÁT CHO TOÀN APP (Giữ nguyên cấu trúc) ---
 class AppColorTheme {
   final Color primary;
   final Color primaryDark;
   final Color background;
   final Color cardBackground;
 
-  // Hỗ trợ đồng bộ cả 2 cách gọi token chữ (text / textPrimary) để tránh lỗi build
   final Color text;
   final Color textPrimary;
   final Color textMuted;
   final Color textSecondary;
 
-  // Hệ màu semantic trạng thái chuẩn UX ngân sách
   final Color success;
   final Color warning;
   final Color error;
@@ -125,7 +120,7 @@ class AppColorTheme {
   });
 }
 
-// --- ⚡ PROVIDER TỰ ĐỘNG ĐỔI MÀU THÔNG MINH THEO THEME MODE ---
+// --- ⚡ PROVIDER TỰ ĐỘNG ĐỔI MÀU THÔNG MINH THEO THEME MODE (Giữ nguyên logic) ---
 final appColorsProvider = Provider<AppColorTheme>((ref) {
   final themeMode = ref.watch(themeModeProvider);
   final isDark = themeMode == ThemeMode.dark;
@@ -138,18 +133,15 @@ final appColorsProvider = Provider<AppColorTheme>((ref) {
         ? AppColors.darkCardBackground
         : AppColors.cardBackground,
 
-    // Ánh xạ linh hoạt hệ chữ
     text: isDark ? AppColors.darkText : AppColors.text,
     textPrimary: isDark ? AppColors.darkText : AppColors.text,
     textMuted: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
     textSecondary: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
 
-    // Ánh xạ trạng thái tài chính theo tầng nhận diện
     success: isDark ? AppColors.darkSuccess : AppColors.success,
     warning: isDark ? AppColors.darkWarning : AppColors.warning,
     error: isDark ? AppColors.darkError : AppColors.error,
-    errorAccent:
-        AppColors.errorAccent, // Giữ nguyên accent tươi sáng cho nút highlight
+    errorAccent: AppColors.errorAccent,
     slate: isDark ? AppColors.darkSlate : AppColors.slate,
   );
 });
