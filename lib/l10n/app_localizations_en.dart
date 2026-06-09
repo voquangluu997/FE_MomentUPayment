@@ -1602,4 +1602,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterFoodForest => 'Forest';
+
+  @override
+  String get tapToCapture => 'Tap to capture';
+
+  @override
+  String get exit => 'Exit';
+
+  @override
+  String get editPhotoTitle => 'Edit';
+
+  @override
+  String get filterNameOriginal => 'ORIGINAL';
+
+  @override
+  String get filterNameCream => 'CREAMY VINTAGE';
+
+  @override
+  String get filterNameAesthetic => 'SOFT AESTHETIC';
+
+  @override
+  String get filterNameMoody => 'MOODY CINEMA';
+
+  @override
+  String get filterNameNoir => 'NOIR ELEGANCE (B&W)';
+
+  @override
+  String get filterNameGourmet => 'GOURMET VIVID';
+
+  @override
+  String get filterNameWarm => 'WARM CAFE';
+
+  @override
+  String get filterNameFresh => 'FRESH ORGANIC';
+
+  @override
+  String get stickerAddText => 'Text Sticker';
+
+  @override
+  String get stickerInstruction =>
+      'Tap text on the image to edit\nUse two fingers to rotate & zoom';
+
+  @override
+  String get stickerTextHint => 'Type something cute...';
+
+  @override
+  String get filterFashionPortrait => 'Fashion Portrait';
+
+  @override
+  String get filterMomentFood => 'Moment Food';
+
+  @override
+  String get cropRotate90 => 'Rotate 90°';
+
+  @override
+  String get cropReset => 'Reset';
+
+  @override
+  String get stickerDeleteDrag => 'Drag here to delete 🗑️';
+
+  @override
+  String get stickerDeleteDrop => 'Release to delete 🔥';
 }

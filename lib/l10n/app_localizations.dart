@@ -2957,6 +2957,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forest'**
   String get filterFoodForest;
+
+  /// No description provided for @tapToCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to capture'**
+  String get tapToCapture;
+
+  /// No description provided for @exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get exit;
+
+  /// No description provided for @editPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editPhotoTitle;
+
+  /// No description provided for @filterNameOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'ORIGINAL'**
+  String get filterNameOriginal;
+
+  /// No description provided for @filterNameCream.
+  ///
+  /// In en, this message translates to:
+  /// **'CREAMY VINTAGE'**
+  String get filterNameCream;
+
+  /// No description provided for @filterNameAesthetic.
+  ///
+  /// In en, this message translates to:
+  /// **'SOFT AESTHETIC'**
+  String get filterNameAesthetic;
+
+  /// No description provided for @filterNameMoody.
+  ///
+  /// In en, this message translates to:
+  /// **'MOODY CINEMA'**
+  String get filterNameMoody;
+
+  /// No description provided for @filterNameNoir.
+  ///
+  /// In en, this message translates to:
+  /// **'NOIR ELEGANCE (B&W)'**
+  String get filterNameNoir;
+
+  /// No description provided for @filterNameGourmet.
+  ///
+  /// In en, this message translates to:
+  /// **'GOURMET VIVID'**
+  String get filterNameGourmet;
+
+  /// No description provided for @filterNameWarm.
+  ///
+  /// In en, this message translates to:
+  /// **'WARM CAFE'**
+  String get filterNameWarm;
+
+  /// No description provided for @filterNameFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'FRESH ORGANIC'**
+  String get filterNameFresh;
+
+  /// Tab or button to switch to text sticker mode
+  ///
+  /// In en, this message translates to:
+  /// **'Text Sticker'**
+  String get stickerAddText;
+
+  /// Instruction for editing and transforming stickers using gestures
+  ///
+  /// In en, this message translates to:
+  /// **'Tap text on the image to edit\nUse two fingers to rotate & zoom'**
+  String get stickerInstruction;
+
+  /// Hint text inside the text input field for custom text stickers
+  ///
+  /// In en, this message translates to:
+  /// **'Type something cute...'**
+  String get stickerTextHint;
+
+  /// Sub-tab label for fashion portrait filters
+  ///
+  /// In en, this message translates to:
+  /// **'Fashion Portrait'**
+  String get filterFashionPortrait;
+
+  /// Sub-tab label for food filters
+  ///
+  /// In en, this message translates to:
+  /// **'Moment Food'**
+  String get filterMomentFood;
+
+  /// Button to rotate image by 90 degrees
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate 90°'**
+  String get cropRotate90;
+
+  /// Button to reset crop or rotation settings
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get cropReset;
+
+  /// Text showing instructions to drag a sticker to the delete zone
+  ///
+  /// In en, this message translates to:
+  /// **'Drag here to delete 🗑️'**
+  String get stickerDeleteDrag;
+
+  /// Text showing instructions when a sticker is hovering right over the delete zone
+  ///
+  /// In en, this message translates to:
+  /// **'Release to delete 🔥'**
+  String get stickerDeleteDrop;
 }
 
 class _AppLocalizationsDelegate

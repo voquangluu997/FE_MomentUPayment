@@ -1614,4 +1614,65 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get filterFoodForest => 'Forest Xanh';
+
+  @override
+  String get tapToCapture => 'Chạm để chụp ảnh';
+
+  @override
+  String get exit => 'Exit';
+
+  @override
+  String get editPhotoTitle => 'Edit';
+
+  @override
+  String get filterNameOriginal => 'GỐC';
+
+  @override
+  String get filterNameCream => 'CREAMY VINTAGE';
+
+  @override
+  String get filterNameAesthetic => 'SOFT AESTHETIC';
+
+  @override
+  String get filterNameMoody => 'MOODY CINEMA';
+
+  @override
+  String get filterNameNoir => 'NOIR ELEGANCE (B&W)';
+
+  @override
+  String get filterNameGourmet => 'GOURMET VIVID';
+
+  @override
+  String get filterNameWarm => 'WARM CAFE';
+
+  @override
+  String get filterNameFresh => 'FRESH ORGANIC';
+
+  @override
+  String get stickerAddText => 'Add Text';
+
+  @override
+  String get stickerInstruction =>
+      'Chạm vào chữ trên ảnh để sửa\nDùng 2 ngón tay để xoay & thu phóng';
+
+  @override
+  String get stickerTextHint => 'Nhập lời gì đó dễ thương... ✨';
+
+  @override
+  String get filterFashionPortrait => 'CHÂN DUNG FASHION';
+
+  @override
+  String get filterMomentFood => 'KHOẢNH KHẮC ẨM THỰC';
+
+  @override
+  String get cropRotate90 => 'XOAY 90°';
+
+  @override
+  String get cropReset => 'KHÔI PHỤC';
+
+  @override
+  String get stickerDeleteDrag => 'Kéo vào đây để xóa 🗑️';
+
+  @override
+  String get stickerDeleteDrop => 'Buông tay để xóa liền 🔥';
 }

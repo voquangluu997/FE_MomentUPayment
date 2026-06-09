@@ -787,6 +787,55 @@
 "filterFoodJuicy": "Juicy",
 "filterFoodSweet": "Sweet",
 "filterFoodGold": "Gold",
-"filterFoodForest": "Forest"
+"filterFoodForest": "Forest",
+"tapToCapture": "Tap to capture",
+"exit": "Exit",
+"editPhotoTitle": "Edit",
+
+"filterNameOriginal": "ORIGINAL",
+  "filterNameCream": "CREAMY VINTAGE",
+  "filterNameAesthetic": "SOFT AESTHETIC",
+  "filterNameMoody": "MOODY CINEMA",
+  "filterNameNoir": "NOIR ELEGANCE (B&W)",
+  "filterNameGourmet": "GOURMET VIVID",
+  "filterNameWarm": "WARM CAFE",
+  "filterNameFresh": "FRESH ORGANIC",
+  "stickerAddText": "Text Sticker",
+"@stickerAddText": {
+  "description": "Tab or button to switch to text sticker mode"
+},
+"stickerInstruction": "Tap text on the image to edit\nUse two fingers to rotate & zoom",
+"@stickerInstruction": {
+  "description": "Instruction for editing and transforming stickers using gestures"
+},
+"stickerTextHint": "Type something cute...",
+"@stickerTextHint": {
+  "description": "Hint text inside the text input field for custom text stickers"
+},
+"filterFashionPortrait": "Fashion Portrait",
+  "@filterFashionPortrait": {
+    "description": "Sub-tab label for fashion portrait filters"
+  },
+  "filterMomentFood": "Moment Food",
+  "@filterMomentFood": {
+    "description": "Sub-tab label for food filters"
+  },
+  "cropRotate90": "Rotate 90°",
+  "@cropRotate90": {
+    "description": "Button to rotate image by 90 degrees"
+  },
+  "cropReset": "Reset",
+  "@cropReset": {
+    "description": "Button to reset crop or rotation settings"
+  },
+
+  "stickerDeleteDrag": "Drag here to delete 🗑️",
+  "@stickerDeleteDrag": {
+    "description": "Text showing instructions to drag a sticker to the delete zone"
+  },
+  "stickerDeleteDrop": "Release to delete 🔥",
+  "@stickerDeleteDrop": {
+    "description": "Text showing instructions when a sticker is hovering right over the delete zone"
+  }
 
 }

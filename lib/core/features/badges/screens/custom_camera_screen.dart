@@ -1,12 +1,12 @@
-import 'dart:ui';
 import 'dart:io';
+import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:moment_u_payment/core/constants/app_colors.dart'; // Đảm bảo đường dẫn này đúng với project của bạn
+import 'package:image/image.dart' as img;
 
 class CustomCameraScreen extends ConsumerStatefulWidget {
   const CustomCameraScreen({super.key});
@@ -23,9 +23,10 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
   bool _isFrontCamera = false;
   FlashMode _flashMode = FlashMode.off;
 
-  final ImagePicker _picker = ImagePicker();
+  // Tiêu cự thực tế đang chọn
+  int _selectedFocalLength = 24;
 
-  // Animation cho nút chụp
+  final ImagePicker _picker = ImagePicker();
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -38,7 +39,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
   }
@@ -65,13 +66,43 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
     try {
       await _controller!.initialize();
       await _controller!.setFlashMode(_flashMode);
+
+      // Reset tiêu cự về 24mm (1.0x) khi khởi động camera mới
       if (mounted) {
         setState(() {
           _isCameraInitialized = true;
+          _selectedFocalLength = 24;
         });
       }
     } catch (e) {
       debugPrint("Lỗi khi start camera: $e");
+    }
+  }
+
+  // HÀM ĐIỀU CHỈNH TIÊU CỰ THẬT QUA ZOOM CỦA PHẦN CỨNG CAMERA
+  Future<void> _changeFocalLength(int mm) async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
+    HapticFeedback.selectionClick();
+
+    // Tính toán Zoom Level dựa trên tiêu cự chuẩn 24mm
+    double targetZoom = 1.0;
+    if (mm == 35) targetZoom = 1.45;
+    if (mm == 50) targetZoom = 2.08;
+
+    try {
+      // Lấy giới hạn Zoom phần cứng của thiết bị để tránh crash mạng
+      final double minZoom = await _controller!.getMinZoomLevel();
+      final double maxZoom = await _controller!.getMaxZoomLevel();
+
+      // Ép mức zoom mục tiêu nằm trong khoảng phần cứng cho phép
+      final double safeZoom = targetZoom.clamp(minZoom, maxZoom);
+
+      await _controller!.setZoomLevel(safeZoom);
+      setState(() {
+        _selectedFocalLength = mm;
+      });
+    } catch (e) {
+      debugPrint("Không thể chỉnh tiêu cự thật: $e");
     }
   }
 
@@ -114,6 +145,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
     });
   }
 
+  // 3. CẬP NHẬT LẠI HÀM _TAKEPICTURE KHỚP VỚI HÀM CẮT ẢNH TRÊN
   Future<void> _takePicture() async {
     if (_controller == null || !_controller!.value.isInitialized) return;
     if (_controller!.value.isTakingPicture) return;
@@ -123,12 +155,19 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
     await _animationController.reverse();
 
     try {
+      // Chụp ảnh gốc từ phần cứng
       final XFile picture = await _controller!.takePicture();
+
+      // Hiển thị trạng thái loading nhẹ trong lúc xử lý cắt ảnh (nếu cần)
+      // Tiến hành cắt ảnh về chuẩn 4:5 thời trang
+      final File croppedFile = await _cropImageTo45(picture.path);
+
       if (mounted) {
-        Navigator.pop(context, picture.path);
+        // Trả về đường dẫn ảnh ĐÃ ĐƯỢC CẮT ĐÚNG TỶ LỆ khung app
+        Navigator.pop(context, croppedFile.path);
       }
     } catch (e) {
-      debugPrint("Lỗi chụp ảnh: $e");
+      debugPrint("Lỗi khi chụp hoặc crop ảnh: $e");
     }
   }
 
@@ -162,11 +201,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Gọi appColors từ Provider để đồng bộ toàn app
-    final appColors = ref.watch(appColorsProvider);
-
     return Scaffold(
-      backgroundColor: appColors.background, // Dùng màu nền chuẩn của App
+      backgroundColor: const Color(0xFF09090B), // Matte Black Zinc 950
       body: SafeArea(
         child: Column(
           children: [
@@ -174,50 +210,54 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
-                vertical: 16,
+                vertical: 12,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNavButton(
+                  _buildHeaderButton(
                     icon: CupertinoIcons.xmark,
                     onTap: () => Navigator.pop(context),
-                    appColors: appColors,
                   ),
-                  _buildNavButton(
+                  Text(
+                    "RAW  •  4:5  •  16-BIT",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.35),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.5,
+                    ),
+                  ),
+                  _buildHeaderButton(
                     icon: _getFlashIcon(),
                     onTap: _toggleFlash,
-                    appColors: appColors,
                   ),
                 ],
               ),
             ),
 
-            // 2. KHUNG KÍNH NGẮM (VIEWFINDER) - STYLE POLAROID NHỎ XINH
+            // 2. VIEW_FINDER FRAME (Tỷ lệ 4:5 thời trang cao cấp)
             Expanded(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: AspectRatio(
-                    aspectRatio: 3 / 4, // Tỷ lệ chuẩn ảnh chân dung/Polaroid
+                    aspectRatio: 4 / 5,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: appColors.cardBackground,
-                        borderRadius: BorderRadius.circular(36),
-                        boxShadow: [
-                          BoxShadow(
-                            color: appColors.primary.withOpacity(0.15),
-                            blurRadius: 40,
-                            offset: const Offset(0, 20),
-                          ),
-                        ],
+                        color: const Color(0xFF18181B),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.06),
+                          width: 1,
+                        ),
                       ),
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // Luồng Camera
+                          // Luồng camera preview thực tế
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(36),
+                            borderRadius: BorderRadius.circular(27),
                             child: _isCameraInitialized && _controller != null
                                 ? FittedBox(
                                     fit: BoxFit.cover,
@@ -231,40 +271,35 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                                       child: CameraPreview(_controller!),
                                     ),
                                   )
-                                : Container(
-                                    color: appColors.textMuted.withOpacity(0.1),
-                                    child: const Center(
-                                      child: CupertinoActivityIndicator(),
+                                : const Center(
+                                    child: CupertinoActivityIndicator(
+                                      color: Colors.white24,
                                     ),
                                   ),
                           ),
 
-                          // SIGNATURE "M" ĐẬM CHẤT THƯƠNG HIỆU
+                          // Bốn góc khung ngắm cơ khí hoài cổ
+                          _buildFrameCorners(),
+
+                          // CHỮ "MOMENT U PAYMENT" SIÊU TINH TẾ - KHÔNG CHIẾM DIỆN TÍCH
                           Positioned(
-                            bottom: 20,
-                            right: 20,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: appColors.primary.withOpacity(0.9),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: const Text(
-                                "M",
+                            bottom: 14,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: Text(
+                                "MOMENT U PAYMENT",
                                 style: TextStyle(
                                   fontFamily:
-                                      'Times New Roman', // Hoặc font Serif tùy chỉnh của bạn
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
+                                      'Georgia', // Font Serif thanh lịch
+                                  fontSize: 9, // Kích thước Micro cực nhỏ gọn
+                                  fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.italic,
+                                  letterSpacing:
+                                      4.5, // Giãn khoảng cách tạo cảm giác tối giản kiểu tạp chí thời trang
+                                  color: Colors.white.withOpacity(
+                                    0.3,
+                                  ), // Trong suốt, tiệp vào khung hình
                                 ),
                               ),
                             ),
@@ -277,26 +312,59 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
               ),
             ),
 
-            // 3. BOTTOM BAR (CÁC NÚT ĐIỀU KHIỂN)
+            // 3. THANH ĐIỀU CHỈNH TIÊU CỰ THẬT (24mm, 35mm, 50mm)
             Padding(
-              padding: const EdgeInsets.only(
-                bottom: 40.0,
-                top: 20.0,
-                left: 40,
-                right: 40,
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [24, 35, 50].map((mm) {
+                  final isSelected = _selectedFocalLength == mm;
+                  return GestureDetector(
+                    onTap: () =>
+                        _changeFocalLength(mm), // Gọi hàm zoom phần cứng thật
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        "${mm}mm",
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.black
+                              : Colors.white.withOpacity(0.4),
+                          fontSize: 11,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
+            ),
+
+            // 4. BOTTOM CONTROLS BAR (Trong suốt quanh nút bấm)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 32.0, left: 40, right: 40),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Nút Chọn Thư Viện
-                  _buildNavButton(
+                  _buildBottomActionOverlayButton(
                     icon: CupertinoIcons.photo_on_rectangle,
                     onTap: _openGallery,
-                    appColors: appColors,
                   ),
 
-                  // Nút Shutter "Khổng Lồ" có hiệu ứng nảy
+                  // NÚT CHỤP SANG TRỌNG PURE CAMERA
                   GestureDetector(
                     onTap: _takePicture,
                     child: AnimatedBuilder(
@@ -305,26 +373,23 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                         return Transform.scale(
                           scale: _scaleAnimation.value,
                           child: Container(
-                            width: 76,
-                            height: 76,
-                            padding: const EdgeInsets.all(4),
+                            width: 82,
+                            height: 82,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: appColors.primary.withOpacity(0.3),
-                                width: 3,
+                                color: Colors.white.withOpacity(0.4),
+                                width: 2,
                               ),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: appColors.primary,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: appColors.primary.withOpacity(0.4),
-                                    blurRadius: 15,
-                                  ),
-                                ],
+                            child: Center(
+                              child: Container(
+                                width: 68,
+                                height: 68,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
                           ),
@@ -333,11 +398,9 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                     ),
                   ),
 
-                  // Nút Lật Camera
-                  _buildNavButton(
-                    icon: CupertinoIcons.switch_camera_solid,
+                  _buildBottomActionOverlayButton(
+                    icon: CupertinoIcons.arrow_2_circlepath,
                     onTap: _toggleCamera,
-                    appColors: appColors,
                   ),
                 ],
               ),
@@ -348,30 +411,159 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
     );
   }
 
-  // Nút bấm viền tròn tệp với tone màu của App
-  Widget _buildNavButton({
+  Widget _buildFrameCorners() {
+    const double cornerSize = 14.0;
+    const double strokeWidth = 1.2;
+    final color = Colors.white.withOpacity(0.25);
+
+    return Stack(
+      children: [
+        Positioned(
+          top: 16,
+          left: 16,
+          child: Container(
+            width: cornerSize,
+            height: cornerSize,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: color, width: strokeWidth),
+                left: BorderSide(color: color, width: strokeWidth),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 16,
+          right: 16,
+          child: Container(
+            width: cornerSize,
+            height: cornerSize,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: color, width: strokeWidth),
+                right: BorderSide(color: color, width: strokeWidth),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          child: Container(
+            width: cornerSize,
+            height: cornerSize,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: color, width: strokeWidth),
+                left: BorderSide(color: color, width: strokeWidth),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Container(
+            width: cornerSize,
+            height: cornerSize,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: color, width: strokeWidth),
+                right: BorderSide(color: color, width: strokeWidth),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeaderButton({
     required IconData icon,
     required VoidCallback onTap,
-    required AppColorTheme appColors,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: appColors.cardBackground,
+          color: Colors.white.withOpacity(0.04),
           shape: BoxShape.circle,
-          border: Border.all(color: appColors.primary.withOpacity(0.1)),
-          boxShadow: [
-            BoxShadow(
-              color: appColors.text.withOpacity(0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
-        child: Icon(icon, color: appColors.text, size: 22),
+        child: Icon(icon, color: Colors.white.withOpacity(0.7), size: 18),
       ),
     );
+  }
+
+  Widget _buildBottomActionOverlayButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.06),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.08),
+                width: 1,
+              ),
+            ),
+            child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<File> _cropImageTo45(String path) async {
+    // Đọc bytes từ file ảnh vừa chụp
+    final bytes = await File(path).readAsBytes();
+
+    // Giải mã ảnh (Thư viện tự động xử lý xoay ảnh theo EXIF)
+    img.Image? originalImage = img.decodeImage(bytes);
+    if (originalImage == null) return File(path);
+
+    int width = originalImage.width;
+    int height = originalImage.height;
+
+    int targetWidth, targetHeight;
+
+    // Tính toán kích thước cắt theo tỷ lệ chân dung 4:5 (0.8)
+    if (width / height > 4 / 5) {
+      // Nếu ảnh gốc quá rộng (ví dụ tỷ lệ 4:3), giữ nguyên chiều cao, cắt bớt chiều rộng
+      targetHeight = height;
+      targetWidth = (height * 4) ~/ 5;
+    } else {
+      // Nếu ảnh gốc quá dài, giữ nguyên chiều rộng, cắt bớt chiều cao
+      targetWidth = width;
+      targetHeight = (width * 5) ~/ 4;
+    }
+
+    // Xác định tọa độ X, Y tại tâm để bắt đầu cắt
+    int x = (width - targetWidth) ~/ 2;
+    int y = (height - targetHeight) ~/ 2;
+
+    // Tiến hành crop ảnh từ vị trí tâm
+    img.Image croppedImage = img.copyCrop(
+      originalImage,
+      x: x,
+      y: y,
+      width: targetWidth,
+      height: targetHeight,
+    );
+
+    // Ghi đè file ảnh đã cắt với chất lượng cao (90%)
+    final croppedFile = File(path);
+    await croppedFile.writeAsBytes(img.encodeJpg(croppedImage, quality: 90));
+
+    return croppedFile;
   }
 }

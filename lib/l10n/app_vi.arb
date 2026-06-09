@@ -794,7 +794,29 @@
 "filterFoodJuicy": "Mọng Nước",
 "filterFoodSweet": "Bánh Ngọt",
 "filterFoodGold": "Chroma Gold",
-"filterFoodForest": "Forest Xanh"
+"filterFoodForest": "Forest Xanh",
+"tapToCapture": "Chạm để chụp ảnh",
+"editPhotoTitle": "Edit",
 
-
+"filterNameOriginal": "GỐC",
+  "filterNameCream": "CREAMY VINTAGE",
+  "filterNameAesthetic": "SOFT AESTHETIC",
+  "filterNameMoody": "MOODY CINEMA",
+  "filterNameNoir": "NOIR ELEGANCE (B&W)",
+  "filterNameGourmet": "GOURMET VIVID",
+  "filterNameWarm": "WARM CAFE",
+  "filterNameFresh": "FRESH ORGANIC",
+  "stickerAddText": "Add Text",
+  "@stickerAddText": {
+    "description": "Nút bấm hoặc nhãn để thêm chữ vào nhãn dán"
+  },
+  "stickerInstruction": "Chạm vào chữ trên ảnh để sửa\nDùng 2 ngón tay để xoay & thu phóng",
+  "editPhotoTitle": "Edit", 
+  "stickerTextHint": "Nhập lời gì đó dễ thương... ✨",
+  "filterFashionPortrait": "CHÂN DUNG FASHION",
+  "filterMomentFood": "KHOẢNH KHẮC ẨM THỰC",
+  "cropRotate90": "XOAY 90°",
+  "cropReset": "KHÔI PHỤC",
+  "stickerDeleteDrag": "Kéo vào đây để xóa 🗑️",
+  "stickerDeleteDrop": "Buông tay để xóa liền 🔥"
 }

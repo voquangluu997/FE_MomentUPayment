@@ -1,24 +1,21 @@
 import 'dart:io';
-import 'dart:math' as math;
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/features/badges/screens/custom_camera_screen.dart';
 import 'package:moment_u_payment/core/features/badges/screens/edit_photo_screen.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class TransactionImagePicker extends ConsumerStatefulWidget {
   final String? initialImagePath;
-  final ValueChanged<String?>
-  onImageChanged; // Callback trả đường dẫn ảnh về cho màn hình chính
+  final ValueChanged<String?> onImageChanged;
 
   const TransactionImagePicker({
     super.key,
-    this.initialImagePath,
+    required this.initialImagePath,
     required this.onImageChanged,
   });
 
@@ -29,73 +26,35 @@ class TransactionImagePicker extends ConsumerStatefulWidget {
 
 class _TransactionImagePickerState
     extends ConsumerState<TransactionImagePicker> {
-  String? _localImagePath;
-  final ImagePicker _picker = ImagePicker();
+  /// 📸 LUỒNG CHỤP ẢNH: Chạm vào ảnh để mở lại camera
+  Future<void> _openCameraFlow() async {
+    HapticFeedback.mediumImpact();
 
-  @override
-  void initState() {
-    super.initState();
-    _localImagePath = widget.initialImagePath;
-  }
+    final String? capturedPath = await Navigator.push(
+      context,
+      CupertinoPageRoute(builder: (context) => const CustomCameraScreen()),
+    );
 
-  // Cập nhật state nội bộ và báo cho màn hình chính biết
-  void _updateImage(String? newPath) {
-    setState(() {
-      _localImagePath = newPath;
-    });
-    widget.onImageChanged(newPath);
-  }
-
-  // 📸 MỞ CAMERA CUSTOM
-  Future<void> _openCamera() async {
-    HapticFeedback.lightImpact();
-    try {
-      final String? capturedImagePath = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const CustomCameraScreen(),
-          fullscreenDialog: true,
-        ),
-      );
-      if (capturedImagePath != null && mounted) {
-        _updateImage(capturedImagePath);
-      }
-    } catch (e) {
-      debugPrint("Lỗi khi mở custom camera: $e");
+    if (capturedPath != null && mounted) {
+      widget.onImageChanged(capturedPath);
     }
   }
 
-  // 🖼️ MỞ THƯ VIỆN ẢNH
-  Future<void> _openGallery() async {
-    HapticFeedback.lightImpact();
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-      );
-      if (image != null && mounted) {
-        _updateImage(image.path);
-      }
-    } catch (e) {
-      debugPrint("Lỗi khi mở thư viện: $e");
-    }
-  }
-
-  // ✨ MỞ MÀN HÌNH EDITOR
-  Future<void> _openEditor() async {
-    if (_localImagePath == null) return;
+  /// 🎨 LUỒNG EDIT CHỦ ĐỘNG: Chạm vào icon nhỏ góc dưới bên phải
+  Future<void> _openEditFlow() async {
+    if (widget.initialImagePath == null) return;
     HapticFeedback.lightImpact();
 
     final String? editedPath = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditPhotoScreen(imagePath: _localImagePath!),
-        fullscreenDialog: true,
+      CupertinoPageRoute(
+        builder: (context) =>
+            EditPhotoScreen(imagePath: widget.initialImagePath!),
       ),
     );
 
     if (editedPath != null && mounted) {
-      _updateImage(editedPath);
+      widget.onImageChanged(editedPath);
     }
   }
 
@@ -104,171 +63,145 @@ class _TransactionImagePickerState
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: _localImagePath == null ? _openCamera : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: 245,
-            width: double.infinity,
+    return Center(
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 340),
+        child: AspectRatio(
+          aspectRatio: 1.0, // Tỉ lệ khung hình 1:1 thời thượng
+          child: Container(
             decoration: BoxDecoration(
-              color: _localImagePath != null
-                  ? appColors.cardBackground
-                  : appColors.primary.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: _localImagePath != null
-                    ? Colors.transparent
-                    : appColors.primary.withOpacity(0.15),
-                width: 1.5,
-              ),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            child: _localImagePath != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.file(File(_localImagePath!), fit: BoxFit.cover),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: 40,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withOpacity(0.25),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Nút Edit ✨
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: GestureDetector(
-                            onTap: _openEditor,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 10,
-                                  sigmaY: 10,
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.2),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.wand_stars,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        "Edit",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Transform.rotate(
-                        angle: -math.pi / 15,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            CupertinoIcons.camera_fill,
-                            size: 32,
-                            color: appColors.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          l10n.cameraTapInstruction,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: appColors.primaryDark,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: widget.initialImagePath == null
+                  ? _buildEmptyCameraState(appColors, l10n)
+                  : _buildPhotoPreviewState(),
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _openGallery,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: appColors.cardBackground,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: appColors.primary.withOpacity(0.1)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  CupertinoIcons.photo_on_rectangle,
-                  color: appColors.primary,
-                  size: 14,
+      ),
+    );
+  }
+
+  // 📸 VÙNG CAMERA TRỐNG (CHƯA CHỤP)
+  Widget _buildEmptyCameraState(dynamic appColors, AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: _openCameraFlow,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        color: appColors.cardBackground,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.02,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: appColors.primary, width: 2),
+                    borderRadius: BorderRadius.circular(28),
+                  ),
                 ),
-                const SizedBox(width: 6),
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(22),
+                  decoration: BoxDecoration(
+                    color: appColors.primary.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.camera_fill,
+                    color: appColors.primary,
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 14),
                 Text(
-                  _localImagePath != null
-                      ? l10n.galleryChangeAction
-                      : l10n.galleryPickAction,
+                  l10n.tapToCapture?.toUpperCase() ?? "CHẠM ĐỂ CHỤP ẢNH",
                   style: TextStyle(
                     color: appColors.primary,
-                    fontWeight: FontWeight.w700,
                     fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Locket & Instagram Aesthetic",
+                  style: TextStyle(
+                    color: appColors.textMuted.withOpacity(0.5),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 🖼️ KHUNG PREVIEW ĐÃ CÓ ẢNH: Siêu tối giản, tập trung 100% vào bức ảnh
+  Widget _buildPhotoPreviewState() {
+    return Stack(
+      children: [
+        // ⚡ CHẠM VÀO ẢNH ĐỂ CHỤP LẠI (Vùng cảm ứng toàn màn hình)
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: _openCameraFlow,
+            child: Image.file(
+              File(widget.initialImagePath!),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+
+        // 🎨 NÚT EDIT: Biến thành icon kính mờ nhỏ nhắn ở góc phải, cực kỳ sang trọng
+        Positioned(
+          bottom: 12,
+          right: 12,
+          child: GestureDetector(
+            onTap: _openEditFlow,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50), // Hình tròn hoàn toàn
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.all(
+                    10,
+                  ), // Kích thước nút được thu nhỏ
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3), // Mờ đen nhẹ nhàng
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(
+                        0.2,
+                      ), // Viền trắng mờ để tách biệt với nền ảnh
+                      width: 1.0,
+                    ),
+                  ),
+                  child: const Icon(
+                    CupertinoIcons
+                        .slider_horizontal_3, // Hoặc CupertinoIcons.wand_stars nếu bạn thích phong cách lấp lánh
+                    color: Colors.white,
+                    size: 18, // Icon nhỏ gọn không chắn tầm nhìn
+                  ),
+                ),
+              ),
             ),
           ),
         ),
