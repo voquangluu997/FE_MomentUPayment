@@ -111,7 +111,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get txErrorMessage => 'Không lưu được khoảnh khắc này rồi bạn ơi! 😢';
 
   @override
-  String get emptyTransactionNote => 'Khoảnh khắc chi tiêu không tên...';
+  String get emptyTransactionNote => 'Chỉ là một khoảnh khắc...';
 
   @override
   String get homeSubGreeting => 'Hôm nay tình hình chi tiêu thế nào?';
@@ -275,7 +275,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tình hình chi tiêu tháng này rất hợp lý luôn! 👍';
 
   @override
-  String get budgetStatusWarning => 'Vùng nguy hiểm! 🚨';
+  String get budgetStatusWarning => 'Vùng nguy hiểm!🚨';
 
   @override
   String get budgetStatusOver =>
@@ -287,12 +287,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String remainingAmount(String amount) {
-    return 'Còn lại: $amountđ';
+    return 'Còn lại: $amount';
   }
 
   @override
   String dailySuggestion(String money) {
-    return '💡 Gợi ý: Hôm nay bạn chỉ nên chi tiêu tối đa $moneyđ để giữ an toàn nha.';
+    return '💡 Gợi ý: Hôm nay bạn chỉ nên chi tiêu tối đa $money để giữ an toàn nha.';
   }
 
   @override
@@ -921,25 +921,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get allReadSuccess => 'Đã đánh dấu tất cả thông báo!';
 
   @override
-  String get obTitle1 => 'Ghi chép thông minh';
+  String get obTitle1 => 'Lưu giữ khoảnh khắc thanh toán.';
 
   @override
   String get obDesc1 =>
-      'Lưu lại mọi khoảnh khắc chi tiêu chỉ trong vài giây với giao diện trực quan, dễ thương.';
+      'Ghi nhận mọi khoản chi bằng hình ảnh. Tinh giản, nhanh chóng, không lưu luyến văn bản!';
 
   @override
-  String get obTitle2 => 'Quản lý ngân sách';
+  String get obTitle2 => 'Nhìn thấu ví tiền.';
 
   @override
   String get obDesc2 =>
-      'Không lo rỗng ví vào cuối tháng. Đặt mục tiêu và theo dõi tiến độ chi tiêu cực dễ.';
+      'Báo cáo đẹp mắt, dễ hiểu. Biết ngay tiền \'bốc hơi\' vì đâu.';
 
   @override
-  String get obTitle3 => 'Bảo mật tuyệt đối';
+  String get obTitle3 => 'Két sắt an toàn';
 
   @override
-  String get obDesc3 =>
-      'Dữ liệu của bạn là của bạn. Đồng bộ đám mây an toàn và riêng tư 100%.';
+  String get obDesc3 => 'Bảo mật tuyệt đối, chỉ mình bạn biết bí mật chi tiêu.';
 
   @override
   String get obSkip => 'Bỏ qua';
@@ -1416,74 +1415,60 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get survivalStateNotSetTitle => 'Hệ thống radar';
+  String get survivalStateNotSetBadge => 'CHƯA THIẾT LẬP';
 
   @override
-  String get survivalStateNotSetBadge => 'Chưa kích hoạt';
-
-  @override
-  String get survivalStateNotSetHeading => 'Chưa thiết lập ví?';
+  String get survivalStateNotSetHeading => 'Bạn chưa đặt ngân sách';
 
   @override
   String get survivalStateNotSetPunchline =>
-      'Hãy cho ví một mục tiêu sinh tồn để kích hoạt đồng hồ đếm ngược bảo vệ tài chính của bạn! 🛡️';
+      'Hãy thiết lập ngân sách để Moment u Payment giúp bạn theo dõi chi tiêu nhé!';
 
   @override
-  String get survivalStateGodModeTitle => 'Radar sinh tồn: An Toàn';
+  String get survivalStateGodModeBadge => 'DƯ DẢ';
 
   @override
-  String get survivalStateGodModeBadge => 'Chi Tiêu Đẹp ✨';
-
-  @override
-  String get survivalStateGodModeHeading => 'Sống sót qua tháng: Rất Dễ!';
+  String survivalStateGodModeHeading(String amount) {
+    return 'Có thể tiêu $amount/ngày';
+  }
 
   @override
   String get survivalStateGodModePunchline =>
-      'Với tốc độ này, bạn dư sức sống thảnh thơi đến hết tháng. Thần tài đang mỉm cười với bạn đó! 😎';
+      'Tốc độ tiêu đang rất lý tưởng. Cứ giữ phong độ tuyệt vời này nhé!';
 
   @override
-  String get survivalStateDangerTitle => 'Cảnh báo tốc độ';
+  String get survivalStateDangerBadge => 'BÁO ĐỘNG VÀNG';
 
   @override
-  String get survivalStateDangerBadge => 'Đốt Hơi Nhanh ⚠️';
-
-  @override
-  String survivalStateDangerHeading(String days) {
-    return 'Dự kiến cạn ví trong $days ngày';
+  String survivalStateDangerHeading(String amount) {
+    return 'Giới hạn $amount/ngày';
   }
 
   @override
-  String survivalStateDangerPunchline(String days) {
-    return 'Nhịp tim ví đang tăng! Bạn sẽ \'hết máu\' trước khi tháng kết thúc $days ngày nếu không giảm ga chi tiêu nhé! 🏎️💨';
-  }
+  String get survivalStateDangerPunchline =>
+      'Ngân sách đang cạn dần. Giữ mức chi tiêu này để an toàn đến cuối tháng!';
 
   @override
-  String get survivalStateApocalypseTitle => 'Báo động đỏ nguy kịch';
+  String get survivalStateApocalypseBadge => 'BÁO ĐỘNG ĐỎ';
 
   @override
-  String get survivalStateApocalypseBadge => 'CHẠY BẰNG OXY! 🚨';
-
-  @override
-  String survivalStateApocalypseHeading(String days) {
-    return 'Ví sẽ ĐÓNG BĂNG sau $days ngày!';
+  String survivalStateApocalypseHeading(String amount) {
+    return 'Sống sót với $amount/ngày';
   }
 
   @override
   String get survivalStateApocalypsePunchline =>
-      '🚨 SOS! Tốc độ đốt tiền chạm ngưỡng hủy diệt! Chế độ húp mì tôm đã tự động kích hoạt, bóp phanh ngay lập tức!';
+      'SOS! Ví của bạn đang kêu cứu. Hãy bật chế độ thắt lưng buộc bụng ngay!';
 
   @override
-  String get survivalStateWastedTitle => 'Hệ thống sập nguồn';
+  String get survivalStateWastedBadge => 'ÂM QUỸ';
 
   @override
-  String get survivalStateWastedBadge => 'WASTED 💀';
-
-  @override
-  String get survivalStateWastedHeading => 'Bạn đã cạn sạch ví! 💸';
+  String get survivalStateWastedHeading => 'Ngân sách đã cạn kiệt';
 
   @override
   String get survivalStateWastedPunchline =>
-      'Nhiệm vụ thất bại! Bạn đã tiêu quá hạn mức tháng này. Hãy bấm icon cây bút phía trên để hồi sinh/cấp cứu lại chiếc ví nhé! 🕊️';
+      'Bạn đã vượt quá ngân sách tháng này. Hạn mức an toàn hiện tại là 0/ngày!';
 
   @override
   String get setupRadarNow => 'Thiết lập ngay để kích hoạt radar';
@@ -1507,8 +1492,41 @@ class AppLocalizationsVi extends AppLocalizations {
   String get budgetDailySafeLimitTitle => 'Hạn mức tiêu mỗi ngày';
 
   @override
-  String get budgetStatusSafe => 'An toàn lý tưởng ✨';
+  String get budgetStatusSafe => 'An toàn lý tưởng✨';
 
   @override
   String get invalidAmountMessage => 'Vui lòng nhập số tiền hợp lệ nha! 💸';
+
+  @override
+  String get budgetLifestyleTitle => 'Lối sống ngày';
+
+  @override
+  String get budgetLifestyleStart => 'Bắt đầu kế hoạch thôi! 🎯';
+
+  @override
+  String get budgetLifestyleBread => 'Cỡ 1 ổ bánh mì thịt 🥖';
+
+  @override
+  String get budgetLifestyleMilkTea => 'Bằng 1 ly trà sữa Full Topping 🧋';
+
+  @override
+  String get budgetLifestyleDinner => 'Một bữa tối lãng mạn nhẹ 🥂';
+
+  @override
+  String get budgetLifestyleRich => 'Sống chuẩn \'Rich Kid\' rồi đấy! 👑';
+
+  @override
+  String get budgetLifestyleActive => 'Tận hưởng cuộc sống năng động! ✨';
+
+  @override
+  String get chooseCurrencyTitle => 'Chọn đơn vị tiền tệ';
+
+  @override
+  String get currencyVND => 'Việt Nam Đồng';
+
+  @override
+  String get budgetUpdateSuccess => 'Cập nhật ngân sách thành công!';
+
+  @override
+  String get budgetUpdateError => 'Cập nhật thất bại, vui lòng thử lại!';
 }

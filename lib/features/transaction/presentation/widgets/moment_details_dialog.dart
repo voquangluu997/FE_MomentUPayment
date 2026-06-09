@@ -310,13 +310,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   @override
   Widget build(BuildContext context) {
     final appColors = ref.watch(appColorsProvider);
-    final currencySymbol = ref.watch(currencyProvider);
     final txState = ref.watch(transactionProvider);
 
     final double currentAmount =
         double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
     final String compactAmount =
-        '-${CurrencyHelper.formatCompactAmount(currentAmount)}$currencySymbol';
+        '-${CurrencyHelper.formatCompactAmount(currentAmount)}';
 
     return PopScope(
       canPop: !_isImageUploading,

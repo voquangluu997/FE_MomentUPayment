@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/widgets/analytics_components.dart';
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_analytics_controller.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
-// 🚀 Thêm import DateTimeHelper
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 
 // ==========================================
@@ -28,6 +28,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   late DateTime _endDate;
   late DateTime _currentMonthSummary;
 
+  // 🌟 FIX LỖI TRÀN NGÀY CỦA DART (Vd: 31/03 lùi 1 tháng thành 31/02 -> bị nhảy sang 03/03)
+  DateTime _subtractMonths(DateTime date, int months) {
+    int newYear = date.year;
+    int newMonth = date.month - months;
+    while (newMonth <= 0) {
+      newYear--;
+      newMonth += 12;
+    }
+    int newDay = date.day;
+    int maxDaysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
+    if (newDay > maxDaysInNewMonth) {
+      newDay = maxDaysInNewMonth;
+    }
+    return DateTime(newYear, newMonth, newDay);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +53,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       _activeFilterType = 'MonthlySummary';
       _currentMonthSummary = DateTime(now.year, now.month - 1);
 
-      // 🚀 TỐI ƯU: Gọi DateTimeHelper
       _startDate = DateTimeHelper.getLocalStartOfDay(
         DateTime(now.year, now.month - 1, 1),
       );
@@ -47,19 +62,24 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     } else {
       _activeFilterType = 'Period';
 
-      // 🚀 TỐI ƯU: Gọi DateTimeHelper
       _endDate = DateTimeHelper.getLocalEndOfDay(now);
       _startDate = DateTimeHelper.getLocalStartOfDay(
-        DateTime(now.year, now.month - 1, now.day),
+        _subtractMonths(now, 1), // Sử dụng hàm trừ tháng chuẩn
       );
       _currentMonthSummary = DateTime(now.year, now.month);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchData();
+    });
   }
 
   void _fetchData() {
+    // 🌟 Ép kiểu toLocal() một lần nữa trước khi gửi cho Controller
+    // để đề phòng các lỗi parse ngầm định về UTC ở dưới nền.
     ref
         .read(transactionAnalyticsProvider.notifier)
-        .updateDateRange(_startDate, _endDate);
+        .updateDateRange(_startDate.toLocal(), _endDate.toLocal());
   }
 
   void _onPeriodChanged(String period) {
@@ -69,7 +89,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       _selectedTimeFrame = period;
 
       final now = DateTime.now();
-      // 🚀 TỐI ƯU
       _endDate = DateTimeHelper.getLocalEndOfDay(now);
 
       switch (period) {
@@ -78,22 +97,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           break;
         case '1W':
           _startDate = DateTimeHelper.getLocalStartOfDay(
-            _endDate.subtract(const Duration(days: 7)),
+            now.subtract(const Duration(days: 6)),
           );
           break;
         case '1M':
           _startDate = DateTimeHelper.getLocalStartOfDay(
-            DateTime(_endDate.year, _endDate.month - 1, _endDate.day),
+            _subtractMonths(now, 1),
           );
           break;
         case '3M':
           _startDate = DateTimeHelper.getLocalStartOfDay(
-            DateTime(_endDate.year, _endDate.month - 3, _endDate.day),
+            _subtractMonths(now, 3),
           );
           break;
         case '6M':
           _startDate = DateTimeHelper.getLocalStartOfDay(
-            DateTime(_endDate.year, _endDate.month - 6, _endDate.day),
+            _subtractMonths(now, 6),
           );
           break;
       }
@@ -161,8 +180,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                   child: CupertinoDatePicker(
                     mode: CupertinoDatePickerMode.date,
                     initialDateTime: tempDate,
-                    minimumDate: DateTime(2020),
-                    maximumDate: DateTime.now(),
+                    minimumDate: isStart ? DateTime(2020) : _startDate,
+                    maximumDate: DateTimeHelper.getLocalEndOfDay(
+                      DateTime.now(),
+                    ),
                     onDateTimeChanged: (DateTime newDate) {
                       HapticFeedback.selectionClick();
                       tempDate = newDate;
@@ -188,7 +209,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       HapticFeedback.mediumImpact();
                       setState(() {
                         if (isStart) {
-                          // 🚀 TỐI ƯU: Đảm bảo giờ phút giây luôn là 00:00:00
                           _startDate = DateTimeHelper.getLocalStartOfDay(
                             tempDate,
                           );
@@ -198,7 +218,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             );
                           }
                         } else {
-                          // 🚀 TỐI ƯU: Đảm bảo giờ phút giây luôn là 23:59:59
                           _endDate = DateTimeHelper.getLocalEndOfDay(tempDate);
                           if (_endDate.isBefore(_startDate)) {
                             _startDate = DateTimeHelper.getLocalStartOfDay(
@@ -296,7 +315,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Tiêu đề chọn Năm
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
@@ -355,7 +373,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                       : FontWeight.w600,
                                   color: isSelected
                                       ? Colors.white
-                                      : appColors.text.withOpacity(0.8),
+                                      : appColors.text.withOpacity(0.85),
                                 ),
                               ),
                             ),
@@ -365,7 +383,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Tiêu đề chọn Tháng
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
@@ -385,13 +402,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:
-                            3, // Chuyển thành 3 cột để không gian chữ rộng rãi và thoáng hơn
-                        childAspectRatio: 2.1,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 2.1,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
                       itemCount: 12,
                       itemBuilder: (context, index) {
                         final month = index + 1;
@@ -471,7 +488,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               tempYear,
                               tempMonth,
                             );
-                            // 🚀 TỐI ƯU: Tự tính đầu và cuối tháng thông qua Helper
                             _startDate = DateTimeHelper.getLocalStartOfDay(
                               DateTime(tempYear, tempMonth, 1),
                             );
@@ -696,6 +712,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         ((item['totalAmount'] as num?)?.toDouble() ?? 0.0),
                   );
 
+                  final currencySymbol = ref.watch(currencyProvider);
+
                   if (analyticsData.isEmpty) {
                     return EmptyAnalyticsWidget(
                       l10n: l10n,
@@ -713,12 +731,14 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             .clamp(1, 365),
                         appColors: appColors,
                         l10n: l10n,
+                        currencySymbol: currencySymbol,
                       ),
                       AnalyticsContentWidget(
                         analyticsData: analyticsData,
                         totalSpending: totalSpending,
                         appColors: appColors,
                         l10n: l10n,
+                        currencySymbol: currencySymbol,
                       ),
                       const SizedBox(height: 40),
                     ],

@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyTransactionNote.
   ///
   /// In en, this message translates to:
-  /// **'Nameless payment moment...'**
+  /// **'Just a small thing...'**
   String get emptyTransactionNote;
 
   /// No description provided for @homeSubGreeting.
@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @spendingMomentsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Moments U Payment'**
+  /// **'My Lovely Moments'**
   String get spendingMomentsTitle;
 
   /// No description provided for @loadingData.
@@ -611,13 +611,13 @@ abstract class AppLocalizations {
   /// No description provided for @remainingAmount.
   ///
   /// In en, this message translates to:
-  /// **'Remaining: {amount}đ'**
+  /// **'Remaining: {amount}'**
   String remainingAmount(String amount);
 
   /// No description provided for @dailySuggestion.
   ///
   /// In en, this message translates to:
-  /// **'💡 Suggestion: You should spend a maximum of {money}đ today to stay safe.'**
+  /// **'💡 Suggestion: You should spend a maximum of {money} today to stay safe.'**
   String dailySuggestion(String money);
 
   /// No description provided for @budgetOverspentStatus.
@@ -1749,37 +1749,37 @@ abstract class AppLocalizations {
   /// No description provided for @obTitle1.
   ///
   /// In en, this message translates to:
-  /// **'Smart Tracking'**
+  /// **'Capture your spending moments.'**
   String get obTitle1;
 
   /// No description provided for @obDesc1.
   ///
   /// In en, this message translates to:
-  /// **'Log your daily expenses in seconds with an intuitive and cute interface.'**
+  /// **'Log every expense through photos. Streamlined, fast, and delightfully text-free!'**
   String get obDesc1;
 
   /// No description provided for @obTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Budget Management'**
+  /// **'See through your wallet.'**
   String get obTitle2;
 
   /// No description provided for @obDesc2.
   ///
   /// In en, this message translates to:
-  /// **'No more empty wallets. Set goals and effortlessly track your spending progress.'**
+  /// **'Beautiful and intuitive reports. Instantly know where your cash vanished.'**
   String get obDesc2;
 
   /// No description provided for @obTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Absolute Privacy'**
+  /// **'Your secure vault.'**
   String get obTitle3;
 
   /// No description provided for @obDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Your data belongs to you. 100% private and secure cloud synchronization.'**
+  /// **'Absolute privacy. Your spending secrets are for your eyes only.'**
   String get obDesc3;
 
   /// No description provided for @obSkip.
@@ -2586,124 +2586,94 @@ abstract class AppLocalizations {
   /// **'{count} days journey 🚀'**
   String journeyDuration(String count);
 
-  /// No description provided for @survivalStateNotSetTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Radar System'**
-  String get survivalStateNotSetTitle;
-
   /// No description provided for @survivalStateNotSetBadge.
   ///
   /// In en, this message translates to:
-  /// **'Inactive'**
+  /// **'NOT SET'**
   String get survivalStateNotSetBadge;
 
   /// No description provided for @survivalStateNotSetHeading.
   ///
   /// In en, this message translates to:
-  /// **'Wallet Not Set?'**
+  /// **'Budget not set'**
   String get survivalStateNotSetHeading;
 
   /// No description provided for @survivalStateNotSetPunchline.
   ///
   /// In en, this message translates to:
-  /// **'Give your wallet a survival goal to activate the financial countdown! 🛡️'**
+  /// **'Set up a budget so Moment u Payment can help you track your spending!'**
   String get survivalStateNotSetPunchline;
-
-  /// No description provided for @survivalStateGodModeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Survival Radar: Safe'**
-  String get survivalStateGodModeTitle;
 
   /// No description provided for @survivalStateGodModeBadge.
   ///
   /// In en, this message translates to:
-  /// **'Nice Spending ✨'**
+  /// **'COMFORTABLE'**
   String get survivalStateGodModeBadge;
 
   /// No description provided for @survivalStateGodModeHeading.
   ///
   /// In en, this message translates to:
-  /// **'Survive the month: Easy!'**
-  String get survivalStateGodModeHeading;
+  /// **'Up to {amount}/day'**
+  String survivalStateGodModeHeading(String amount);
 
   /// No description provided for @survivalStateGodModePunchline.
   ///
   /// In en, this message translates to:
-  /// **'At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎'**
+  /// **'Your spending pace is perfect. Keep up this great form!'**
   String get survivalStateGodModePunchline;
-
-  /// No description provided for @survivalStateDangerTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Speed Warning'**
-  String get survivalStateDangerTitle;
 
   /// No description provided for @survivalStateDangerBadge.
   ///
   /// In en, this message translates to:
-  /// **'Burning Fast ⚠️'**
+  /// **'YELLOW ALERT'**
   String get survivalStateDangerBadge;
 
   /// No description provided for @survivalStateDangerHeading.
   ///
   /// In en, this message translates to:
-  /// **'Wallet empty in {days} days'**
-  String survivalStateDangerHeading(String days);
+  /// **'Limit {amount}/day'**
+  String survivalStateDangerHeading(String amount);
 
   /// No description provided for @survivalStateDangerPunchline.
   ///
   /// In en, this message translates to:
-  /// **'Wallet heart rate is rising! You\'ll run out of \'blood\' {days} days early if you don\'t slow down! 🏎️💨'**
-  String survivalStateDangerPunchline(String days);
-
-  /// No description provided for @survivalStateApocalypseTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Red Alert Critical'**
-  String get survivalStateApocalypseTitle;
+  /// **'Budget is draining. Stick to this daily limit to survive the month!'**
+  String get survivalStateDangerPunchline;
 
   /// No description provided for @survivalStateApocalypseBadge.
   ///
   /// In en, this message translates to:
-  /// **'ON OXYGEN! 🚨'**
+  /// **'RED ALERT'**
   String get survivalStateApocalypseBadge;
 
   /// No description provided for @survivalStateApocalypseHeading.
   ///
   /// In en, this message translates to:
-  /// **'Wallet FREEZES in {days} days!'**
-  String survivalStateApocalypseHeading(String days);
+  /// **'Survive on {amount}/day'**
+  String survivalStateApocalypseHeading(String amount);
 
   /// No description provided for @survivalStateApocalypsePunchline.
   ///
   /// In en, this message translates to:
-  /// **'🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!'**
+  /// **'SOS! Your wallet is crying for help. Activate austerity mode immediately!'**
   String get survivalStateApocalypsePunchline;
-
-  /// No description provided for @survivalStateWastedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'System Shut Down'**
-  String get survivalStateWastedTitle;
 
   /// No description provided for @survivalStateWastedBadge.
   ///
   /// In en, this message translates to:
-  /// **'WASTED 💀'**
+  /// **'OVERSPENT'**
   String get survivalStateWastedBadge;
 
   /// No description provided for @survivalStateWastedHeading.
   ///
   /// In en, this message translates to:
-  /// **'You are out of cash! 💸'**
+  /// **'Budget Depleted'**
   String get survivalStateWastedHeading;
 
   /// No description provided for @survivalStateWastedPunchline.
   ///
   /// In en, this message translates to:
-  /// **'Mission failed! You exceeded this month\'s limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️'**
+  /// **'You have exceeded this month\'s budget. Safe daily limit is 0!'**
   String get survivalStateWastedPunchline;
 
   /// No description provided for @setupRadarNow.
@@ -2753,6 +2723,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid amount! 💸'**
   String get invalidAmountMessage;
+
+  /// No description provided for @budgetLifestyleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Lifestyle'**
+  String get budgetLifestyleTitle;
+
+  /// No description provided for @budgetLifestyleStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s start planning! 🎯'**
+  String get budgetLifestyleStart;
+
+  /// No description provided for @budgetLifestyleBread.
+  ///
+  /// In en, this message translates to:
+  /// **'About a sandwich 🥖'**
+  String get budgetLifestyleBread;
+
+  /// No description provided for @budgetLifestyleMilkTea.
+  ///
+  /// In en, this message translates to:
+  /// **'Equals a full-topping boba 🧋'**
+  String get budgetLifestyleMilkTea;
+
+  /// No description provided for @budgetLifestyleDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'A light romantic dinner 🥂'**
+  String get budgetLifestyleDinner;
+
+  /// No description provided for @budgetLifestyleRich.
+  ///
+  /// In en, this message translates to:
+  /// **'Living that \'Rich Kid\' life! 👑'**
+  String get budgetLifestyleRich;
+
+  /// No description provided for @budgetLifestyleActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoy your active life! ✨'**
+  String get budgetLifestyleActive;
+
+  /// No description provided for @chooseCurrencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Currency'**
+  String get chooseCurrencyTitle;
+
+  /// No description provided for @currencyVND.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnam Dong (VND)'**
+  String get currencyVND;
+
+  /// No description provided for @budgetUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget updated successfully!'**
+  String get budgetUpdateSuccess;
+
+  /// No description provided for @budgetUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Update failed, please try again!'**
+  String get budgetUpdateError;
 }
 
 class _AppLocalizationsDelegate

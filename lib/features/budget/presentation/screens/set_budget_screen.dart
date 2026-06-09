@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,147 @@ import '../../../../core/constants/app_colors.dart';
 import '../../providers/budget_provider.dart';
 import 'package:flutter/cupertino.dart';
 
+// ==========================================
+// 🛠️ REUSABLE UTILITIES - ĐỒNG NHẤT HÓA TIỀN TỆ
+// ==========================================
+class CurrencyPickerUtil {
+  /// Hiển thị BottomSheet chọn tiền tệ sang xịn mịn chuẩn phong cách Cozy Hàn Quốc
+  static void showCurrencyBottomSheet({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppColorTheme appColors,
+    required String currentSymbol,
+    required ValueChanged<String> onCurrencyChanged,
+  }) {
+    HapticFeedback.mediumImpact();
+    final List<Map<String, String>> currencyList = [
+      {'symbol': '₫', 'name': 'Việt Nam Đồng (VND)'},
+      {'symbol': '\$', 'name': 'Đô la Mỹ (USD)'},
+      {'symbol': '€', 'name': 'Euro (EUR)'},
+      {'symbol': '¥', 'name': 'Yên Nhật (JPY)'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: appColors.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4.5,
+                    decoration: BoxDecoration(
+                      color: appColors.textMuted.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  "Đơn vị tiền tệ".toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: appColors.primaryDark.withOpacity(0.6),
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Column(
+                  children: currencyList.map((currency) {
+                    final isSelected = currentSymbol == currency['symbol'];
+                    return InkWell(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.pop(context);
+                        onCurrencyChanged(currency['symbol']!);
+                      },
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? appColors.primary.withOpacity(0.06)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isSelected
+                                ? appColors.primary.withOpacity(0.15)
+                                : Colors.transparent,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? appColors.primary
+                                    : appColors.primary.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                currency['symbol']!,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : appColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Text(
+                              currency['name']!,
+                              style: TextStyle(
+                                color: appColors.text,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (isSelected)
+                              Icon(
+                                CupertinoIcons.checkmark_alt_circle_fill,
+                                color: appColors.primary,
+                                size: 20,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ==========================================
+// 📱 MÀN HÌNH CHÍNH
+// ==========================================
 class SetBudgetScreen extends ConsumerStatefulWidget {
   const SetBudgetScreen({super.key});
 
@@ -17,13 +159,20 @@ class SetBudgetScreen extends ConsumerStatefulWidget {
   ConsumerState<SetBudgetScreen> createState() => _SetBudgetScreenState();
 }
 
-class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
+class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
+    with SingleTickerProviderStateMixin {
   final _budgetController = TextEditingController();
   double _currentAmount = 0.0;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
     final currentSummary = ref.read(homeBudgetProvider).valueOrNull;
     if (currentSummary != null && currentSummary.budgetLimit > 0) {
       _currentAmount = currentSummary.budgetLimit;
@@ -34,6 +183,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   @override
   void dispose() {
     _budgetController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -43,12 +193,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
   String _formatNumber(String s) {
     String digits = s.replaceAll('.', '');
     if (digits.isEmpty) return '';
-
     final buffer = StringBuffer();
     for (int i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) {
-        buffer.write('.');
-      }
+      if (i > 0 && (digits.length - i) % 3 == 0) buffer.write('.');
       buffer.write(digits[i]);
     }
     return buffer.toString();
@@ -63,13 +210,10 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
       });
       return;
     }
-
     if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
       cleanValue = cleanValue.replaceFirst(RegExp(r'^0+'), '');
     }
-
     String formatted = _formatNumber(cleanValue);
-
     setState(() {
       _currentAmount = double.tryParse(cleanValue) ?? 0.0;
       _budgetController.value = TextEditingValue(
@@ -88,109 +232,19 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     _onBudgetChanged(newText);
   }
 
-  void _setQuickBudget(String amountStr) {
-    HapticFeedback.selectionClick();
-    _onBudgetChanged(amountStr);
-  }
-
-  List<Map<String, String>> _getQuickSuggestions(String currency) {
-    if (currency == '₫') {
-      return [
-        {'value': '3000000', 'label': '3M ☕'},
-        {'value': '5000000', 'label': '5M 🛍️'},
-        {'value': '10000000', 'label': '10M 🛫'},
-        {'value': '20000000', 'label': '20M 👑'},
-      ];
-    } else {
-      return [
-        {'value': '200', 'label': '200 ☕'},
-        {'value': '500', 'label': '500 🛍️'},
-        {'value': '1000', 'label': '1K 🛫'},
-        {'value': '3000', 'label': '3K 👑'},
-      ];
+  String _getLifestyleAdvice(
+    double daily,
+    String symbol,
+    AppLocalizations l10n,
+  ) {
+    if (daily <= 0) return l10n.budgetLifestyleStart;
+    if (symbol == '₫' || symbol == 'đ') {
+      if (daily < 30000) return l10n.budgetLifestyleBread;
+      if (daily < 60000) return l10n.budgetLifestyleMilkTea;
+      if (daily < 200000) return l10n.budgetLifestyleDinner;
+      return l10n.budgetLifestyleRich;
     }
-  }
-
-  // 🛠️ THAY THẾ POPUP MENU BẰNG BOTTOM SHEET CHUẨN PREMIUM APP
-  void _showCurrencyPicker(BuildContext context, String currentSymbol) {
-    HapticFeedback.mediumImpact();
-    final appColors = ref.read(appColorsProvider);
-    final currencies = [
-      {'symbol': '₫', 'name': 'Vietnam Dong (VND)'},
-      {'symbol': '\$', 'name': 'US Dollar (USD)'},
-      {'symbol': '€', 'name': 'Euro (EUR)'},
-      {'symbol': '¥', 'name': 'Yen / Yuan (JPY/CNY)'},
-    ];
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: appColors.cardBackground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 5,
-              decoration: BoxDecoration(
-                color: appColors.textMuted.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ...currencies.map((c) {
-              final isSelected = c['symbol'] == currentSymbol;
-              return ListTile(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  ref.read(currencyProvider.notifier).setCurrency(c['symbol']!);
-                  Navigator.pop(context);
-                },
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? appColors.primary.withOpacity(0.1)
-                        : appColors.background,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      c['symbol']!,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: isSelected ? appColors.primary : appColors.text,
-                      ),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  c['name']!,
-                  style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? appColors.primary : appColors.text,
-                  ),
-                ),
-                trailing: isSelected
-                    ? Icon(
-                        CupertinoIcons.checkmark_alt_circle_fill,
-                        color: appColors.primary,
-                      )
-                    : null,
-              );
-            }),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-    );
+    return l10n.budgetLifestyleActive;
   }
 
   @override
@@ -199,660 +253,571 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen> {
     final budgetState = ref.watch(budgetProvider);
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
-
     final budgetSummary = ref.watch(homeBudgetProvider).valueOrNull;
     final double totalSpent = budgetSummary?.totalSpent ?? 0.0;
-    final bool isBudgetTooLow =
-        _currentAmount > 0 && _currentAmount < totalSpent;
-
-    final double initialProgress = _currentAmount > 0
-        ? (totalSpent / _currentAmount).clamp(0.0, 1.0)
-        : 0.0;
+    final bool isBudgetLow = _currentAmount > 0 && _currentAmount < totalSpent;
 
     ref.listen<BudgetState>(budgetProvider, (previous, next) {
-      if (next == BudgetState.success) {
-        HapticFeedback.mediumImpact();
-        AppToast.showSuccess(context, l10n.budgetSuccessMessage, appColors);
-        ref.read(homeBudgetProvider.notifier).refreshSummary();
-        ref.read(budgetProvider.notifier).resetState();
-        Navigator.of(context).pop();
+      if (next == BudgetState.success) { // Trạng thái thành công
+        // 1. Ép Riverpod làm mới lại provider của HomeScreen
+        ref.invalidate(homeBudgetProvider); 
+        
+        // 2. Hiện Toast thông báo mượt mà
+        AppToast.showSuccess(context, l10n.budgetUpdateSuccess, appColors);
+        
+        // 3. Đóng màn hình hiện tại để quay về Home
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
       } else if (next == BudgetState.error) {
-        HapticFeedback.heavyImpact();
-        AppToast.showError(context, l10n.budgetErrorMessage, appColors);
+        AppToast.showError(context, l10n.budgetUpdateError, appColors);
       }
     });
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(
+        context,
+      ).unfocus(), // 🚀 GIÚP ĐÓNG BÀN PHÍM KHI CHẠM NGOÀI MÀN HÌNH
       child: Scaffold(
         backgroundColor: appColors.background,
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          title: Text(
-            l10n.budgetTitle,
-            style: TextStyle(
-              color: appColors.text,
-              fontWeight: FontWeight.w900,
-              fontSize: 18,
+        body: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              right: -50,
+              child: _buildBlurBlob(200, appColors.primary.withOpacity(0.15)),
             ),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              color: appColors.cardBackground,
-              borderRadius: BorderRadius.circular(14),
-              child: Icon(
-                CupertinoIcons.chevron_back,
-                color: appColors.text,
-                size: 20,
-              ),
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                Navigator.of(context).pop();
-              },
+            Positioned(
+              bottom: 100,
+              left: -50,
+              child: _buildBlurBlob(150, Colors.blue.withOpacity(0.1)),
             ),
-          ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 12.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // SUBTITLE TRUYỀN CẢM HỨNG
-                Text(
-                  l10n.budgetHeaderSubtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: appColors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
 
-                // TIÊU ĐỀ KHU VỰC VÀ PHÍM TẮT THÊM SỐ 0
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l10n.budgetSectionTitle.toUpperCase(),
+            CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 120,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(
+                      CupertinoIcons.chevron_left_circle_fill,
+                      size: 32,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    color: appColors.text.withOpacity(0.3),
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: Text(
+                      l10n.budgetTitle,
                       style: TextStyle(
-                        fontSize: 11,
+                        color: appColors.text,
                         fontWeight: FontWeight.w900,
-                        color: appColors.text.withOpacity(0.5),
-                        letterSpacing: 1.0,
+                        fontSize: 20,
                       ),
                     ),
-                    Row(
+                  ),
+                ),
+
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
                       children: [
-                        _buildShortcutButton(
-                          '.000',
-                          () => _appendZeros('000'),
-                          appColors,
+                        _buildCoachEmoji(isBudgetLow, _currentAmount),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.budgetHeaderSubtitle,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: appColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        const SizedBox(width: 6),
-                        _buildShortcutButton(
-                          '.000.000',
-                          () => _appendZeros('000000'),
-                          appColors,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
 
-                // 🌟 Ô NHẬP TIỀN HOÀN TOÀN MỚI (INTERACTIVE CARD)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: appColors.cardBackground,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            (isBudgetTooLow
-                                    ? appColors.error
-                                    : appColors.primary)
-                                .withOpacity(0.06),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                    border: Border.all(
-                      color: isBudgetTooLow
-                          ? appColors.error.withOpacity(0.6)
-                          : _currentAmount > 0
-                          ? appColors.primary.withOpacity(0.3)
-                          : appColors.textMuted.withOpacity(0.15),
-                      width: _currentAmount > 0 ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextField(
-                              controller: _budgetController,
-                              autofocus: true,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.done,
-                              onChanged: _onBudgetChanged,
-                              style: TextStyle(
-                                fontSize: _budgetController.text.length > 10
-                                    ? 26
-                                    : 34,
-                                fontWeight: FontWeight.w900,
-                                color: isBudgetTooLow
-                                    ? appColors.error
-                                    : appColors.text,
-                                letterSpacing: -0.5,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: '0',
-                                hintStyle: TextStyle(
-                                  color: appColors.textMuted.withOpacity(0.3),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
-                                isDense: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // NÚT CHỌN TIỀN TỆ ĐƯỢC CHUỐT LẠI ĐẸP MẮT
-                      InkWell(
-                        onTap: () =>
-                            _showCurrencyPicker(context, currencySymbol),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Ink(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: appColors.primary.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                currencySymbol,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  color: appColors.primary,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                CupertinoIcons.chevron_down,
-                                color: appColors.primary,
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                        const SizedBox(height: 32),
 
-                // 🚨 BANNER CẢNH BÁO NẾU NGÂN SÁCH QUÁ THẤP (ANIMATED SIZE)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  child: isBudgetTooLow
-                      ? Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: appColors.error.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: appColors.error.withOpacity(0.2),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.exclamationmark_triangle_fill,
-                                color: appColors.error,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  l10n.budgetWarningLow(
-                                    '${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol',
-                                  ),
-                                  style: TextStyle(
-                                    color: appColors.error,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                        // Ô NHẬP LIỆU CHÍNH ĐÃ ĐƯỢC THAY ĐỔI THEO CHUẨN MỚI
+                        _buildMainInput(currencySymbol, appColors, isBudgetLow),
 
-                // 📊 🌟 THỂ HIỆN PHÂN TÍCH THÔNG MINH SONG SONG (SMART MICRO CARDS)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  child: _currentAmount > 0
-                      ? Column(
-                          children: [
-                            Row(
+                        const SizedBox(height: 24),
+
+                        if (_currentAmount > 0) ...[
+                          IntrinsicHeight(
+                            child: Row(
                               children: [
-                                // THẺ 1: HẠN MỨC NGÀY AN TOÀN
                                 Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          (isBudgetTooLow
-                                                  ? appColors.error
-                                                  : appColors.success)
-                                              .withOpacity(0.06),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color:
-                                            (isBudgetTooLow
-                                                    ? appColors.error
-                                                    : appColors.success)
-                                                .withOpacity(0.12),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          l10n.budgetDailySafeLimitTitle,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: appColors.textMuted,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${_formatNumber(_dailyAmount.toStringAsFixed(0))} $currencySymbol',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w900,
-                                            color: isBudgetTooLow
-                                                ? appColors.error
-                                                : appColors.success,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  child: _buildGlassCard(
+                                    l10n.budgetDailySafeLimitTitle,
+                                    '${_formatNumber(_dailyAmount.toStringAsFixed(0))} $currencySymbol',
+                                    isBudgetLow
+                                        ? appColors.error
+                                        : appColors.success,
+                                    appColors,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
-                                // THẺ 2: TRẠNG THÁI KHẢ DỤNG
+                                const SizedBox(width: 12),
                                 Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          (isBudgetTooLow
-                                                  ? appColors.error
-                                                  : appColors.primary)
-                                              .withOpacity(0.06),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color:
-                                            (isBudgetTooLow
-                                                    ? appColors.error
-                                                    : appColors.primary)
-                                                .withOpacity(0.12),
-                                      ),
+                                  child: _buildGlassCard(
+                                    l10n.budgetLifestyleTitle,
+                                    _getLifestyleAdvice(
+                                      _dailyAmount,
+                                      currencySymbol,
+                                      l10n,
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          l10n.budgetRemainingLabel,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: appColors.textMuted,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          isBudgetTooLow
-                                              ? l10n.budgetStatusWarning
-                                              : l10n.budgetStatusSafe,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w900,
-                                            color: isBudgetTooLow
-                                                ? appColors.error
-                                                : appColors.primary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    appColors.primary,
+                                    appColors,
                                   ),
                                 ),
                               ],
                             ),
-                            if (totalSpent > 0) ...[
-                              const SizedBox(height: 16),
-                              // DẢI ĐỒ THỊ TIẾN ĐỘ TINH TẾ (PREMIUM PROGRESS BAR)
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: appColors.cardBackground,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '${l10n.spentLabel}: ${_formatNumber(totalSpent.toStringAsFixed(0))} $currencySymbol',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: appColors.textMuted,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${(initialProgress * 100).toStringAsFixed(0)}%',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: isBudgetTooLow
-                                                ? appColors.error
-                                                : appColors.primary,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Stack(
-                                      children: [
-                                        Container(
-                                          height: 8,
-                                          decoration: BoxDecoration(
-                                            color: appColors.textMuted
-                                                .withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(
-                                              100,
-                                            ),
-                                          ),
-                                        ),
-                                        AnimatedFractionallySizedBox(
-                                          duration: const Duration(
-                                            milliseconds: 600,
-                                          ),
-                                          curve: Curves.easeOutCubic,
-                                          widthFactor: initialProgress,
-                                          child: Container(
-                                            height: 8,
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: isBudgetTooLow
-                                                    ? [
-                                                        appColors.error
-                                                            .withOpacity(0.6),
-                                                        appColors.error,
-                                                      ]
-                                                    : [
-                                                        appColors.primary
-                                                            .withOpacity(0.6),
-                                                        appColors.primary,
-                                                      ],
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                const SizedBox(height: 24),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildProgressSection(
+                            totalSpent,
+                            _currentAmount,
+                            currencySymbol,
+                            appColors,
+                            isBudgetLow,
+                            l10n,
+                          ),
+                        ],
 
-                // KHU VỰC GỢI Ý NHANH (QUICK CHIPS)
-                Text(
-                  l10n.quickSuggestions,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                    color: appColors.text,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _getQuickSuggestions(currencySymbol).map((
-                    suggestion,
-                  ) {
-                    return _buildQuickSelectChip(
-                      suggestion['value']!,
-                      suggestion['label']!,
-                      appColors,
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 24),
+                        const SizedBox(height: 32),
 
-                // KHU VỰC LỜI KHUYÊN MẸO TIẾT KIỆM (TIPS CARD ĐƯỢC CHUỐT LẠI)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: appColors.cardBackground,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.shade50,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          CupertinoIcons.lightbulb_fill,
-                          color: Colors.amber.shade700,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          l10n.budgetTip,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: appColors.textMuted,
-                            height: 1.5,
-                            fontWeight: FontWeight.w500,
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            l10n.quickSuggestions,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: appColors.text,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        _buildQuickChips(currencySymbol, appColors),
+
+                        const SizedBox(height: 40),
+
+                        _buildBigSaveButton(budgetState, appColors, l10n),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 16 : 24,
-            top: 12,
-          ),
-          decoration: BoxDecoration(
-            color: appColors.background,
-            boxShadow: [
-              BoxShadow(
-                color: appColors.background.withOpacity(0.8),
-                blurRadius: 10,
-                offset: const Offset(0, -10),
-              ),
-            ],
-          ),
-          child: budgetState == BudgetState.loading
-              ? const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [CupertinoActivityIndicator()],
-                )
-              : CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _currentAmount > 0
-                      ? () {
-                          HapticFeedback.mediumImpact();
-                          final budgetText = _budgetController.text
-                              .replaceAll('.', '')
-                              .trim();
-                          ref
-                              .read(budgetProvider.notifier)
-                              .updateBudgetLimit(double.parse(budgetText));
-                        }
-                      : null,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 52,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: _currentAmount > 0
-                          ? appColors.primary
-                          : appColors.textMuted.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: _currentAmount > 0
-                          ? [
-                              BoxShadow(
-                                color: appColors.primary.withOpacity(0.25),
-                                blurRadius: 16,
-                                offset: const Offset(0, 6),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Text(
-                      l10n.budgetSaveButton.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: _currentAmount > 0
-                            ? Colors.white
-                            : appColors.textMuted,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
+          ],
         ),
       ),
     );
   }
 
+  Widget _buildBlurBlob(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+        child: Container(),
+      ),
+    );
+  }
+
+  Widget _buildCoachEmoji(bool isLow, double amount) {
+    String emoji = "🎯";
+    if (amount <= 0)
+      emoji = "🤔";
+    else if (isLow)
+      emoji = "😰";
+    else if (amount > 10000000)
+      emoji = "👑";
+    else
+      emoji = "✨";
+
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: 1.0 + (_pulseController.value * 0.1),
+          child: Text(emoji, style: const TextStyle(fontSize: 50)),
+        );
+      },
+    );
+  }
+
+  // 🚀 NÂNG CẤP TOÀN DIỆN Ô INPUT THEO CHUẨN ADD_TRANSACTION_SCREEN
+  Widget _buildMainInput(String symbol, AppColorTheme appColors, bool isLow) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Thanh phím tắt .000 ở góc trên bên phải thanh tiêu đề đầu vào dữ liệu ngân sách
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            _buildShortcutButton('.000', () => _appendZeros('000'), appColors),
+            const SizedBox(width: 6),
+            _buildShortcutButton(
+              '.000.000',
+              () => _appendZeros('000000'),
+              appColors,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: appColors.cardBackground,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: (isLow ? appColors.error : appColors.primary).withOpacity(
+                0.25,
+              ),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: (isLow ? appColors.error : appColors.primary)
+                    .withOpacity(0.15),
+                blurRadius: 40,
+                offset: const Offset(0, 15),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _budgetController,
+                  keyboardType: TextInputType.number,
+                  onChanged: _onBudgetChanged,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: isLow ? appColors.error : appColors.primaryDark,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: '0',
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+
+              // 🚀 DẤU X ĐÃ ĐƯỢC ĐƯA VÀO NẰM NGANG HÀNG ĐỒNG NHẤT VỚI Ô TEXTFIELD
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _budgetController,
+                builder: (context, value, child) {
+                  if (value.text.isEmpty) return const SizedBox.shrink();
+                  return GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _budgetController.clear();
+                      _onBudgetChanged('');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Icon(
+                        CupertinoIcons.clear_thick_circled,
+                        color: appColors.primary.withOpacity(0.4),
+                        size: 18,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // NÚT CHỌN ĐƠN VỊ TIỀN TỆ ĐỒNG BỘ PHONG CÁCH MỚI MƯỢT MÀ
+              InkWell(
+                onTap: () => CurrencyPickerUtil.showCurrencyBottomSheet(
+                  context: context,
+                  ref: ref,
+                  appColors: appColors,
+                  currentSymbol: symbol,
+                  onCurrencyChanged: (newSymbol) {
+                    ref.read(currencyProvider.notifier).setCurrency(newSymbol);
+                  },
+                ),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [appColors.primary, appColors.primaryDark],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        symbol,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        CupertinoIcons.chevron_down,
+                        color: Colors.white,
+                        size: 11,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 🚀 ĐỒNG BỘ THIẾT KẾ PHÍM TẮT MÀU HỒNG MỜ (PRIMARY TRANSLUCENT)
   Widget _buildShortcutButton(
     String label,
     VoidCallback onTap,
     AppColorTheme appColors,
   ) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      minSize: 0,
-      onPressed: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: appColors.textMuted.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: appColors.text.withOpacity(0.7),
+    return Material(
+      color: appColors.primary.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: appColors.primary,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildQuickSelectChip(
-    String amountStr,
+  Widget _buildGlassCard(
     String label,
+    String value,
+    Color accent,
     AppColorTheme appColors,
   ) {
-    final isSelected =
-        _currentAmount.toString() == amountStr ||
-        _currentAmount.toStringAsFixed(0) == amountStr;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: appColors.cardBackground.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: appColors.textMuted,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: accent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    return GestureDetector(
-      onTap: () => _setQuickBudget(amountStr),
+  Widget _buildProgressSection(
+    double spent,
+    double limit,
+    String symbol,
+    AppColorTheme appColors,
+    bool isLow,
+    AppLocalizations l10n,
+  ) {
+    double progress = (spent / limit).clamp(0.0, 1.0);
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "${l10n.spentLabel}: ${_formatNumber(spent.toStringAsFixed(0))} $symbol",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: appColors.textMuted,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              "${(progress * 100).toInt()}%",
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: isLow ? appColors.error : appColors.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: 12,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: appColors.textMuted.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Stack(
+            children: [
+              AnimatedFractionallySizedBox(
+                duration: const Duration(seconds: 1),
+                widthFactor: progress,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isLow
+                          ? [appColors.error.withOpacity(0.5), appColors.error]
+                          : [
+                              appColors.primary.withOpacity(0.5),
+                              appColors.primary,
+                            ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickChips(String symbol, AppColorTheme appColors) {
+    final suggestions = symbol == '₫'
+        ? ["1000000", "3000000", "5000000", "10000000"]
+        : ["100", "500", "1000", "2000"];
+    final labels = symbol == '₫'
+        ? ["1M ☕", "3M 🛍️", "5M 🛫", "10M 👑"]
+        : ["100 ☕", "500 🛍️", "1K 🛫", "2K 👑"];
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: List.generate(suggestions.length, (index) {
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            _onBudgetChanged(suggestions[index]);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: _currentAmount.toStringAsFixed(0) == suggestions[index]
+                  ? appColors.primary
+                  : appColors.cardBackground,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                if (_currentAmount.toStringAsFixed(0) == suggestions[index])
+                  BoxShadow(
+                    color: appColors.primary.withOpacity(0.3),
+                    blurRadius: 10,
+                  ),
+              ],
+            ),
+            child: Text(
+              labels[index],
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: _currentAmount.toStringAsFixed(0) == suggestions[index]
+                    ? Colors.white
+                    : appColors.text,
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildBigSaveButton(
+    BudgetState state,
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    bool isEnabled = _currentAmount > 0 && state != BudgetState.loading;
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: isEnabled
+          ? () {
+              HapticFeedback.heavyImpact();
+              ref
+                  .read(budgetProvider.notifier)
+                  .updateBudgetLimit(_currentAmount);
+            }
+          : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        height: 64,
+        width: double.infinity,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? appColors.primary : appColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? appColors.primary
-                : appColors.textMuted.withOpacity(0.1),
-            width: 1,
-          ),
-          boxShadow: isSelected
+          borderRadius: BorderRadius.circular(24),
+          gradient: isEnabled
+              ? LinearGradient(
+                  colors: [appColors.primary, appColors.primaryDark],
+                )
+              : null,
+          color: isEnabled ? null : appColors.textMuted.withOpacity(0.1),
+          boxShadow: isEnabled
               ? [
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: appColors.primary.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ]
-              : null,
+              : [],
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-            color: isSelected ? Colors.white : appColors.text,
-          ),
-        ),
+        child: state == BudgetState.loading
+            ? const CupertinoActivityIndicator(color: Colors.white)
+            : Text(
+                l10n.budgetSaveButton.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  letterSpacing: 2,
+                ),
+              ),
       ),
     );
   }

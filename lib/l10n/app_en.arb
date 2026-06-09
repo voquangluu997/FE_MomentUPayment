@@ -39,9 +39,9 @@
   "saveMomentButton": "Save Expense Moment ✨",
   "txSuccessMessage": "Recorded this cute expense moment! 🌸",
   "txErrorMessage": "Could not save your moment, please try again! 😢",
-  "emptyTransactionNote": "Nameless payment moment...",
+  "emptyTransactionNote": "Just a small thing...",
   "homeSubGreeting": "How is your payment status today?",
-  "spendingMomentsTitle": "Moments U Payment",
+  "spendingMomentsTitle": "My Lovely Moments",
   "loadingData": "Loading payment moments...",
   "errorLoadData": "Failed to load data. Please try again!",
   "retryButton": "Retry",
@@ -103,13 +103,13 @@
   "budgetStatusOver": "Oh no! You have exceeded your budget limit! 🚨",
   "budgetStatusHalf": "You've spent more than half, be a bit more careful! ⏳",
   
-  "remainingAmount": "Remaining: {amount}đ",
+  "remainingAmount": "Remaining: {amount}",
   "@remainingAmount": {
     "placeholders": {
       "amount": { "type": "String" }
     }
   },
-  "dailySuggestion": "💡 Suggestion: You should spend a maximum of {money}đ today to stay safe.",
+  "dailySuggestion": "💡 Suggestion: You should spend a maximum of {money} today to stay safe.",
   "@dailySuggestion": {
     "placeholders": {
       "money": { "type": "String" }
@@ -453,12 +453,12 @@
   "markAllAsRead": "Mark all as read",
   "allReadSuccess": "All notifications marked as read!",
 
-  "obTitle1": "Smart Tracking",
-  "obDesc1": "Log your daily expenses in seconds with an intuitive and cute interface.",
-  "obTitle2": "Budget Management",
-  "obDesc2": "No more empty wallets. Set goals and effortlessly track your spending progress.",
-  "obTitle3": "Absolute Privacy",
-  "obDesc3": "Your data belongs to you. 100% private and secure cloud synchronization.",
+  "obTitle1": "Capture your spending moments.",
+  "obDesc1": "Log every expense through photos. Streamlined, fast, and delightfully text-free!",
+  "obTitle2": "See through your wallet.",
+  "obDesc2": "Beautiful and intuitive reports. Instantly know where your cash vanished.",
+  "obTitle3": "Your secure vault.",
+  "obDesc3": "Absolute privacy. Your spending secrets are for your eyes only.",
   "obSkip": "Skip",
   "obNext": "Next",
   "obStart": "Get Started",
@@ -699,46 +699,34 @@
   }
 },
 
-"survivalStateNotSetTitle": "Radar System",
-  "survivalStateNotSetBadge": "Inactive",
-  "survivalStateNotSetHeading": "Wallet Not Set?",
-  "survivalStateNotSetPunchline": "Give your wallet a survival goal to activate the financial countdown! 🛡️",
+"survivalStateNotSetBadge": "NOT SET",
+"survivalStateNotSetHeading": "Budget not set",
+"survivalStateNotSetPunchline": "Set up a budget so Moment u Payment can help you track your spending!",
 
-  "survivalStateGodModeTitle": "Survival Radar: Safe",
-  "survivalStateGodModeBadge": "Nice Spending ✨",
-  "survivalStateGodModeHeading": "Survive the month: Easy!",
-  "survivalStateGodModePunchline": "At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎",
+"survivalStateGodModeBadge": "COMFORTABLE",
+"survivalStateGodModeHeading": "Up to {amount}/day",
+"@survivalStateGodModeHeading": {
+  "placeholders": { "amount": { "type": "String" } }
+},
+"survivalStateGodModePunchline": "Your spending pace is perfect. Keep up this great form!",
 
-  "survivalStateDangerTitle": "Speed Warning",
-  "survivalStateDangerBadge": "Burning Fast ⚠️",
-  "survivalStateDangerHeading": "Wallet empty in {days} days",
-  "@survivalStateDangerHeading": {
-    "placeholders": {
-      "days": { "type": "String" }
-    }
-  },
-  "survivalStateDangerPunchline": "Wallet heart rate is rising! You'll run out of 'blood' {days} days early if you don't slow down! 🏎️💨",
-  "@survivalStateDangerPunchline": {
-    "placeholders": {
-      "days": { "type": "String" }
-    }
-  },
+"survivalStateDangerBadge": "YELLOW ALERT",
+"survivalStateDangerHeading": "Limit {amount}/day",
+"@survivalStateDangerHeading": {
+  "placeholders": { "amount": { "type": "String" } }
+},
+"survivalStateDangerPunchline": "Budget is draining. Stick to this daily limit to survive the month!",
 
-  "survivalStateApocalypseTitle": "Red Alert Critical",
-  "survivalStateApocalypseBadge": "ON OXYGEN! 🚨",
-  "survivalStateApocalypseHeading": "Wallet FREEZES in {days} days!",
-  "@survivalStateApocalypseHeading": {
-    "placeholders": {
-      "days": { "type": "String" }
-    }
-  },
-  "survivalStateApocalypsePunchline": "🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!",
+"survivalStateApocalypseBadge": "RED ALERT",
+"survivalStateApocalypseHeading": "Survive on {amount}/day",
+"@survivalStateApocalypseHeading": {
+  "placeholders": { "amount": { "type": "String" } }
+},
+"survivalStateApocalypsePunchline": "SOS! Your wallet is crying for help. Activate austerity mode immediately!",
 
-  "survivalStateWastedTitle": "System Shut Down",
-  "survivalStateWastedBadge": "WASTED 💀",
-  "survivalStateWastedHeading": "You are out of cash! 💸",
-  "survivalStateWastedPunchline": "Mission failed! You exceeded this month's limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️",
-
+"survivalStateWastedBadge": "OVERSPENT",
+"survivalStateWastedHeading": "Budget Depleted",
+"survivalStateWastedPunchline": "You have exceeded this month's budget. Safe daily limit is 0!",
   "setupRadarNow": "Set up now to activate radar",
   "spentOutOffLimit": "Spent: {spent} / {limit}",
   "@spentOutOffLimit": {
@@ -755,5 +743,18 @@
   "budgetStatusSafe": "Perfect Safe ✨",
   "budgetStatusWarning": "Danger Zone! 🚨",
   "invalidAmountMessage": "Please enter a valid amount! 💸",
-  "categoryOther": "Other"
+  "categoryOther": "Other",
+
+  "budgetLifestyleTitle": "Daily Lifestyle",
+  "budgetLifestyleStart": "Let's start planning! 🎯",
+  "budgetLifestyleBread": "About a sandwich 🥖",
+  "budgetLifestyleMilkTea": "Equals a full-topping boba 🧋",
+  "budgetLifestyleDinner": "A light romantic dinner 🥂",
+  "budgetLifestyleRich": "Living that 'Rich Kid' life! 👑",
+  "budgetLifestyleActive": "Enjoy your active life! ✨",
+  "chooseCurrencyTitle": "Select Currency",
+  "currencyVND": "Vietnam Dong (VND)",
+
+  "budgetUpdateSuccess": "Budget updated successfully!",
+  "budgetUpdateError": "Update failed, please try again!"
 }

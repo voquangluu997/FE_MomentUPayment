@@ -1,8 +1,9 @@
+import 'dart:ui'; // 🚀 QUAN TRỌNG: Import để dùng hiệu ứng ImageFilter (Kính mờ)
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart'; // 🚀 IMPORT THƯ VIỆN ANIMATION
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
@@ -18,7 +19,6 @@ import 'package:moment_u_payment/features/transaction/presentation/screens/add_t
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_list_item.dart';
-import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_card.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/photo_calendar_cell.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
@@ -285,163 +285,199 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: appColors.background,
       appBar: const HomeAppBar(),
-      body: RefreshIndicator(
-        color: appColors.primary,
-        backgroundColor: appColors.cardBackground,
-        strokeWidth: 3,
-        onRefresh: () async {
-          ref.read(transactionTimelineProvider.notifier).refreshTimeline();
-          ref.read(notificationProvider.notifier).fetchUnreadCount();
-        },
-        child: timelineState.when(
-          skipLoadingOnRefresh: true,
-          loading: () =>
-              _buildSkeletonLoading(appColors, currentViewMode, l10n),
-          error: (error, stack) => Center(
-            child: Text(
-              l10n.errorLoadData,
-              style: TextStyle(color: appColors.errorAccent),
+      body: Stack(
+        children: [
+          // 🌟 1. BLOB MÀU GÓC TRÊN TRÁI (Tạo độ sâu 3D)
+          Positioned(
+            top: -80,
+            left: -80,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: appColors.primary.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
             ),
           ),
-          data: (allTransactions) {
-            final filteredTransactions = _applyDateFilter(allTransactions);
 
-            if (filteredTransactions.isEmpty && timelineState.isLoading) {
-              return _buildSkeletonLoading(appColors, currentViewMode, l10n);
-            }
+          // 🌟 2. BLOB MÀU GÓC DƯỚI PHẢI (Gradient đa sắc)
+          Positioned(
+            bottom: -50,
+            right: -100,
+            child: Container(
+              width: 280,
+              height: 280,
+              decoration: BoxDecoration(
+                color: appColors.errorAccent.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
 
-            final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
-              filteredTransactions,
-            );
-            final dailyKeys = dailyGrouped.keys.toList();
+          // 🌟 3. LỚP KÍNH MỜ (BACKDROP FILTER) PHỦ LÊN CÁC BLOBS
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
 
-            Map<DateTime, List<Map<String, dynamic>>> monthlyGrouped = {};
-            List<DateTime> monthlyKeys = [];
-
-            if (currentViewMode == ViewMode.calendar) {
-              for (var tx in filteredTransactions) {
-                final date =
-                    DateTime.tryParse(
-                      tx['spentAt']?.toString() ?? '',
-                    )?.toLocal() ??
-                    DateTime.now();
-                final monthKey = DateTime(date.year, date.month, 1);
-                monthlyGrouped.putIfAbsent(monthKey, () => []).add(tx);
-              }
-              monthlyKeys = monthlyGrouped.keys.toList()
-                ..sort((a, b) => b.compareTo(a));
-            }
-
-            if (filteredTransactions.isEmpty) {
-              return ListView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
+          // 🌟 4. NỘI DUNG CHÍNH (Đã được nâng lên khỏi lớp nền mờ)
+          RefreshIndicator(
+            color: appColors.primary,
+            backgroundColor: appColors.cardBackground,
+            strokeWidth: 3,
+            onRefresh: () async {
+              ref.read(transactionTimelineProvider.notifier).refreshTimeline();
+              ref.read(notificationProvider.notifier).fetchUnreadCount();
+            },
+            child: timelineState.when(
+              skipLoadingOnRefresh: true,
+              loading: () =>
+                  _buildSkeletonLoading(appColors, currentViewMode, l10n),
+              error: (error, stack) => Center(
+                child: Text(
+                  l10n.errorLoadData,
+                  style: TextStyle(color: appColors.errorAccent),
                 ),
-                children: [
-                  _buildBudgetCardWithNavigation(l10n),
-                  _buildControlHeaderRow(
+              ),
+              data: (allTransactions) {
+                final filteredTransactions = _applyDateFilter(allTransactions);
+
+                if (filteredTransactions.isEmpty && timelineState.isLoading) {
+                  return _buildSkeletonLoading(
                     appColors,
                     currentViewMode,
-                    filteredTransactions,
-                  ),
-                  _buildEmptyState(appColors, l10n),
-                ],
-              );
-            }
+                    l10n,
+                  );
+                }
 
-            // 🚀 UPDATE: Bọc CustomScrollView bằng AnimationLimiter
-            return AnimationLimiter(
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                slivers: [
-                  // 1. Phần Budget Card phía trên cùng
-                  SliverToBoxAdapter(
-                    child: _buildBudgetCardWithNavigation(l10n),
-                  ),
+                final dailyGrouped = DateTimeHelper.groupTransactionsByDate(
+                  filteredTransactions,
+                );
+                final dailyKeys = dailyGrouped.keys.toList();
 
-                  // 2. Phần thanh điều khiển chuyển chế độ (List/Grid/Calendar)
-                  SliverToBoxAdapter(
-                    child: _buildControlHeaderRow(
-                      appColors,
-                      currentViewMode,
-                      filteredTransactions,
+                Map<DateTime, List<Map<String, dynamic>>> monthlyGrouped = {};
+                List<DateTime> monthlyKeys = [];
+
+                if (currentViewMode == ViewMode.calendar) {
+                  for (var tx in filteredTransactions) {
+                    final date =
+                        DateTime.tryParse(
+                          tx['spentAt']?.toString() ?? '',
+                        )?.toLocal() ??
+                        DateTime.now();
+                    final monthKey = DateTime(date.year, date.month, 1);
+                    monthlyGrouped.putIfAbsent(monthKey, () => []).add(tx);
+                  }
+                  monthlyKeys = monthlyGrouped.keys.toList()
+                    ..sort((a, b) => b.compareTo(a));
+                }
+
+                if (filteredTransactions.isEmpty) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
                     ),
-                  ),
+                    children: [
+                      _buildBudgetCardWithNavigation(l10n),
+                      _buildControlHeaderRow(
+                        appColors,
+                        currentViewMode,
+                        filteredTransactions,
+                      ),
+                      _buildEmptyState(appColors, l10n),
+                    ],
+                  );
+                }
 
-                  // 3. Nội dung chính dựa theo ViewMode hiện tại
-                  if (currentViewMode == ViewMode.calendar)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, dataIndex) => _buildMonthlyCalendar(
-                          monthlyKeys[dataIndex],
-                          monthlyGrouped[monthlyKeys[dataIndex]]!,
-                          l10n,
-                          ref,
-                          context,
-                          appColors,
-                        ),
-                        childCount: monthlyKeys.length,
+                return AnimationLimiter(
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _buildBudgetCardWithNavigation(l10n),
                       ),
-                    )
-                  else if (currentViewMode == ViewMode.grid) ...[
-                    // 🚀 Sử dụng HomeGridGroup đã tách
-                    for (final dateKey in dailyKeys)
-                      HomeGridGroup(
-                        dateKey: dateKey,
-                        txList: dailyGrouped[dateKey]!,
-                        l10n: l10n,
-                        appColors: appColors,
-                        onTapItem: (tx) => _openMomentDetails(tx, l10n),
-                        onLongPress: (tx) => _showDeleteConfirmDialog(
-                          context,
-                          ref,
-                          tx,
-                          l10n,
+                      SliverToBoxAdapter(
+                        child: _buildControlHeaderRow(
                           appColors,
+                          currentViewMode,
+                          filteredTransactions,
                         ),
                       ),
-                  ] else ...[
-                    // 🚀 Sử dụng HomeListGroup
-                    for (final dateKey in dailyKeys)
-                      HomeListGroup(
-                        dateKey: dateKey,
-                        txList: dailyGrouped[dateKey]!,
-                        l10n: l10n,
-                        appColors: appColors,
-                        onTapItem: (tx) => _openMomentDetails(tx, l10n),
-                        onConfirmDelete: (tx) async {
-                          await _showDeleteConfirmDialog(
-                            context,
-                            ref,
-                            tx,
-                            l10n,
-                            appColors,
-                          );
-                          return false;
-                        },
-                      ),
-                  ],
-                  // 4. Loading indicator khi cuộn xuống đáy để tải thêm trang mới
-                  if (isLoadingMore && hasMore)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: appColors.primary,
-                            strokeWidth: 2.5,
+                      if (currentViewMode == ViewMode.calendar)
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, dataIndex) => _buildMonthlyCalendar(
+                              monthlyKeys[dataIndex],
+                              monthlyGrouped[monthlyKeys[dataIndex]]!,
+                              l10n,
+                              ref,
+                              context,
+                              appColors,
+                            ),
+                            childCount: monthlyKeys.length,
+                          ),
+                        )
+                      else if (currentViewMode == ViewMode.grid) ...[
+                        for (final dateKey in dailyKeys)
+                          HomeGridGroup(
+                            dateKey: dateKey,
+                            txList: dailyGrouped[dateKey]!,
+                            l10n: l10n,
+                            appColors: appColors,
+                            onTapItem: (tx) => _openMomentDetails(tx, l10n),
+                            onLongPress: (tx) => _showDeleteConfirmDialog(
+                              context,
+                              ref,
+                              tx,
+                              l10n,
+                              appColors,
+                            ),
+                          ),
+                      ] else ...[
+                        for (final dateKey in dailyKeys)
+                          HomeListGroup(
+                            dateKey: dateKey,
+                            txList: dailyGrouped[dateKey]!,
+                            l10n: l10n,
+                            appColors: appColors,
+                            onTapItem: (tx) => _openMomentDetails(tx, l10n),
+                            onConfirmDelete: (tx) async {
+                              await _showDeleteConfirmDialog(
+                                context,
+                                ref,
+                                tx,
+                                l10n,
+                                appColors,
+                              );
+                              return false;
+                            },
+                          ),
+                      ],
+                      if (isLoadingMore && hasMore)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: appColors.primary,
+                                strokeWidth: 2.5,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                ],
-              ),
-            );
-          },
-        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -795,13 +831,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   itemCount: txList.length,
                   itemBuilder: (context, index) {
                     final tx = txList[index];
-                    return TransactionCard(
+                    return MomentListItem(
                       transaction: tx,
+                      l10n: l10n,
+                      appColors: appColors,
                       onTap: () {
                         Navigator.pop(context);
                         _openMomentDetails(tx, l10n);
                       },
-                      l10n: l10n,
                     );
                   },
                 ),

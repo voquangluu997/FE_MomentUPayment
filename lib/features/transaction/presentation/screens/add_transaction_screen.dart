@@ -2,11 +2,12 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart'; // 📳 Import thư viện Haptic của Flutter
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -17,34 +18,112 @@ import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 
 // ==========================================
-// 🛠️ UTILS LOGIC
+// 🛠️ UTILS LOGIC - ĐÃ NÂNG CẤP HỖ TRỢ THẬP PHÂN & ĐA TIỀN TỆ
 // ==========================================
 class NumberFormatUtil {
-  static String formatNumber(String s) {
-    String digits = s.replaceAll('.', '');
-    if (digits.isEmpty) return '';
+  /// Định dạng số linh hoạt dựa trên loại tiền tệ được chọn
+  static String formatByCurrency(String input, String symbol) {
+    bool isVnd = symbol == '₫' || symbol == 'đ';
 
-    final buffer = StringBuffer();
-    for (int i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) {
-        buffer.write('.');
+    if (isVnd) {
+      // 🇻🇳 Logic Tiền Việt: Chỉ giữ lại số nguyên, không có thập phân
+      String digits = input.replaceAll(RegExp(r'\D'), '');
+      if (digits.isEmpty) return '';
+
+      if (digits.length > 1 && digits.startsWith('0')) {
+        digits = digits.replaceFirst(RegExp(r'^0+'), '');
       }
-      buffer.write(digits[i]);
+      if (digits.isEmpty) return '0';
+
+      final buffer = StringBuffer();
+      for (int i = 0; i < digits.length; i++) {
+        if (i > 0 && (digits.length - i) % 3 == 0) {
+          buffer.write('.');
+        }
+        buffer.write(digits[i]);
+      }
+      return buffer.toString();
+    } else {
+      // 🌍 Logic Ngoại tệ (USD, EUR...): Cho phép 1 dấu chấm thập phân và tối đa 2 số sau dấu chấm
+
+      // 🚀 KHẮC PHỤC LỖI BÀN PHÍM TIẾNG VIỆT: Chuẩn hóa dấu phẩy thập phân thành dấu chấm
+      String normalizedInput = input;
+      if (normalizedInput.endsWith(',')) {
+        // Nếu người dùng vừa gõ dấu phẩy ở cuối (ví dụ: "1," -> "1.")
+        normalizedInput =
+            normalizedInput.substring(0, normalizedInput.length - 1) + '.';
+      } else if (!normalizedInput.contains('.') &&
+          normalizedInput.contains(',')) {
+        // Hỗ trợ trường hợp sao chép (paste) hoặc nhập nhanh chuỗi chứa dấu phẩy thập phân (ví dụ: "1,25")
+        // Nếu cụm chữ số sau dấu phẩy cuối cùng ít hơn 3 ký tự, đó chắc chắn là số thập phân chứ không phải hàng nghìn
+        int lastComma = normalizedInput.lastIndexOf(',');
+        if (lastComma != -1) {
+          String afterComma = normalizedInput.substring(lastComma + 1);
+          if (afterComma.length < 3) {
+            normalizedInput =
+                normalizedInput.substring(0, lastComma) + '.' + afterComma;
+          }
+        }
+      }
+
+      // Tiến hành lọc sạch ký tự sau khi đã chuẩn hóa thành dấu chấm '.'
+      String clean = normalizedInput.replaceAll(RegExp(r'[^0-9.]'), '');
+
+      // Chặn trường hợp gõ nhiều dấu chấm liên tiếp
+      List<String> parts = clean.split('.');
+      if (parts.length > 2) {
+        clean = '${parts[0]}.${parts[1]}';
+        parts = [parts[0], parts[1]];
+      }
+
+      String integerPart = parts[0];
+      if (integerPart.length > 1 && integerPart.startsWith('0')) {
+        integerPart = integerPart.replaceFirst(RegExp(r'^0+'), '');
+        if (integerPart.isEmpty) integerPart = '0';
+      }
+
+      String decimalPart = parts.length > 1 ? parts[1] : '';
+      if (decimalPart.length > 2) {
+        decimalPart = decimalPart.substring(
+          0,
+          2,
+        ); // Giới hạn xu xu (cents) tối đa 2 chữ số
+      }
+
+      if (integerPart.isEmpty) integerPart = '0';
+
+      // Thêm dấu phẩy phân tách hàng nghìn cho phần nguyên chuẩn quốc tế
+      final buffer = StringBuffer();
+      for (int i = 0; i < integerPart.length; i++) {
+        if (i > 0 && (integerPart.length - i) % 3 == 0) {
+          buffer.write(',');
+        }
+        buffer.write(integerPart[i]);
+      }
+
+      if (clean.contains('.')) {
+        return '${buffer.toString()}.$decimalPart';
+      }
+      return buffer.toString();
     }
-    return buffer.toString();
   }
 
-  static String cleanValue(String value) {
-    String clean = value.replaceAll('.', '');
-    if (clean.length > 1 && clean.startsWith('0')) {
-      clean = clean.replaceFirst(RegExp(r'^0+'), '');
-    }
-    return clean;
+  /// Chuyển đổi chuỗi hiển thị thành dạng số double để lưu vào DB dữ liệu một cách chính xác
+  static double parseToDouble(String value, String symbol) {
+    if (value.isEmpty) return 0.0;
+    bool isVnd = symbol == '₫' || symbol == 'đ';
+    String clean = isVnd
+        ? value.replaceAll('.', '')
+        : value.replaceAll(
+            ',',
+            '',
+          ); // Giữ lại dấu "." thập phân để parse double chuẩn xác
+    return double.tryParse(clean) ?? 0.0;
   }
 }
 
 // ==========================================
-// 📱 MÀN HÌNH CHÍNH - SIZE CHUẨN NỀN NÃ
+// 📱 MÀN HÌNH CHÍNH
 // ==========================================
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final DateTime? initialDate;
@@ -84,7 +163,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _pickDate() async {
-    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi mở DatePicker
+    HapticFeedback.lightImpact();
 
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -109,7 +188,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _openCamera() async {
-    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ
+    HapticFeedback.lightImpact();
     try {
       final photo = await _mediaService.takePhoto();
       if (photo != null) setState(() => _localImagePath = photo.path);
@@ -119,7 +198,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _openGallery() async {
-    HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ
+    HapticFeedback.lightImpact();
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -133,14 +212,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _onAmountChanged(String value) {
-    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gõ số tiền
+    HapticFeedback.lightImpact();
+    final currencySymbol = ref.read(currencyProvider);
+    String formatted = NumberFormatUtil.formatByCurrency(value, currencySymbol);
 
-    String cleanStr = NumberFormatUtil.cleanValue(value);
-    if (cleanStr.isEmpty) {
+    if (formatted.isEmpty) {
       _amountController.text = '';
       return;
     }
-    String formatted = NumberFormatUtil.formatNumber(cleanStr);
     _amountController.value = TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),
@@ -148,24 +227,69 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _appendZeros(String zeros) {
-    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi bấm nút ".000"
-    final text = _amountController.text.replaceAll('.', '').trim();
+    HapticFeedback.lightImpact();
+    final currencySymbol = ref.read(currencyProvider);
+    bool isVnd = currencySymbol == '₫' || currencySymbol == 'đ';
+
+    String text = _amountController.text;
+    if (!isVnd) {
+      text = text.replaceAll(',', '');
+      if (text.contains('.'))
+        return; // Nếu đã có phần thập phân thì không append shortcut nghìn tránh lỗi dữ liệu số
+    } else {
+      text = text.replaceAll('.', '');
+    }
+
     if (text.isEmpty || text == '0') return;
     _onAmountChanged(text + zeros);
   }
 
+  /// Xử lý logic khi chuyển đổi tiền tệ trực tiếp ngay tại Input
+  void _handleCurrencyChanged(String newSymbol) {
+    final oldSymbol = ref.read(currencyProvider);
+    if (oldSymbol == newSymbol) return;
+
+    final currentText = _amountController.text;
+    ref.read(currencyProvider.notifier).setCurrency(newSymbol);
+
+    if (currentText.isNotEmpty) {
+      bool wasVnd = oldSymbol == '₫' || oldSymbol == 'đ';
+      String cleanDigits = wasVnd
+          ? currentText.replaceAll('.', '')
+          : currentText.replaceAll(',', '');
+
+      // Nếu chuyển từ ngoại tệ về VND thì tiến hành làm tròn bỏ phần số thập phân
+      bool isNewVnd = newSymbol == '₫' || newSymbol == 'đ';
+      if (isNewVnd && cleanDigits.contains('.')) {
+        double? parsed = double.tryParse(cleanDigits);
+        cleanDigits = parsed != null
+            ? parsed.round().toString()
+            : cleanDigits.split('.')[0];
+      }
+
+      String formatted = NumberFormatUtil.formatByCurrency(
+        cleanDigits,
+        newSymbol,
+      );
+      _amountController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    }
+  }
+
   void _handleSaveTransaction() {
-    final amountText = _amountController.text.replaceAll('.', '').trim();
+    final currencySymbol = ref.read(currencyProvider);
+    final amountValue = NumberFormatUtil.parseToDouble(
+      _amountController.text,
+      currencySymbol,
+    );
     final appColors = ref.read(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    if (amountText.isEmpty) {
+    if (amountValue <= 0) {
       HapticFeedback.lightImpact();
-      AppToast.showError(
-        context,
-        l10n.invalidAmountMessage,
-        appColors,
-      );
+      AppToast.showError(context, l10n.invalidAmountMessage, appColors);
       return;
     }
 
@@ -178,7 +302,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           : l10n.categoryOther;
     }
 
-    // 🚀 Dùng DateTimeHelper để tự động ghép ngày user chọn + giờ phút giây hiện tại (chuẩn UTC)
     final finalDateTimeUtc = DateTimeHelper.combineDateWithCurrentTimeUtc(
       _selectedDate,
     );
@@ -186,7 +309,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     ref
         .read(transactionProvider.notifier)
         .addTransaction(
-          amount: double.parse(amountText),
+          amount: amountValue,
           category: finalCategory,
           emoji: _selectedEmoji,
           note: _noteController.text.trim(),
@@ -201,16 +324,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final txState = ref.watch(transactionProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    // 📳 Xử lý rung khi nhận kết quả từ API/State
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
       if (next == TransactionState.success) {
-        HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi thành công
+        HapticFeedback.lightImpact();
         AppToast.showSuccess(context, l10n.txSuccessMessage, appColors);
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         ref.read(notificationProvider.notifier).fetchUnreadCount();
         Navigator.of(context).pop();
       } else if (next == TransactionState.error) {
-        HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi có lỗi
+        HapticFeedback.lightImpact();
         AppToast.showError(context, l10n.txErrorMessage, appColors);
       }
     });
@@ -253,7 +375,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
             ),
             onPressed: () {
-              HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi bấm Back
+              HapticFeedback.lightImpact();
               Navigator.of(context).pop();
             },
           ),
@@ -281,7 +403,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 _CategorySelector(
                   selectedCategory: _selectedCategory,
                   onSelect: (id, emoji, isCustom) {
-                    HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chọn danh mục
+                    HapticFeedback.lightImpact();
                     setState(() {
                       _selectedCategory = id;
                       _selectedEmoji = emoji;
@@ -300,6 +422,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   controller: _amountController,
                   onChanged: _onAmountChanged,
                   onAppendZeros: _appendZeros,
+                  onCurrencyChanged: _handleCurrencyChanged,
                 ),
                 const SizedBox(height: 16),
 
@@ -674,11 +797,15 @@ class _AmountInput extends ConsumerWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final ValueChanged<String> onAppendZeros;
+  final ValueChanged<String>
+  onCurrencyChanged; // 🚀 KHẮC PHỤC: Thêm dòng khai báo biến này để hết lỗi compiler
 
   const _AmountInput({
+    super.key,
     required this.controller,
     required this.onChanged,
     required this.onAppendZeros,
+    required this.onCurrencyChanged,
   });
 
   @override
@@ -753,7 +880,9 @@ class _AmountInput extends ConsumerWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   onChanged: onChanged,
                   style: TextStyle(
                     fontSize: 28,
@@ -778,7 +907,7 @@ class _AmountInput extends ConsumerWidget {
                   if (value.text.isEmpty) return const SizedBox.shrink();
                   return GestureDetector(
                     onTap: () {
-                      HapticFeedback.lightImpact(); // 📳 Đổi thành rung nhẹ khi bấm xoá
+                      HapticFeedback.lightImpact();
                       controller.clear();
                       onChanged('');
                     },
@@ -793,23 +922,46 @@ class _AmountInput extends ConsumerWidget {
                   );
                 },
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
+
+              // 🚀 ĐÃ CẬP NHẬT: Xoá bỏ hàm BottomSheet nội bộ thừa, gọi trực tiếp từ CurrencyPickerUtil dùng chung
+              InkWell(
+                onTap: () => CurrencyPickerUtil.showCurrencyBottomSheet(
+                  context: context,
+                  ref: ref,
+                  appColors: appColors,
+                  currentSymbol: currencySymbol,
+                  onCurrencyChanged: onCurrencyChanged,
                 ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [appColors.primary, appColors.primaryDark],
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
                   ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  currencySymbol,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [appColors.primary, appColors.primaryDark],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        currencySymbol,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        CupertinoIcons.chevron_down,
+                        color: Colors.white,
+                        size: 11,
+                      ),
+                    ],
                   ),
                 ),
               ),

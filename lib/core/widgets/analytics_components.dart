@@ -162,9 +162,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                     Text(
                       durationInDays == 0
                           ? (l10n.todayOnly)
-                          : (l10n.journeyDuration(
-                                    durationInDays.toString(),
-                                  )),
+                          : (l10n.journeyDuration(durationInDays.toString())),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -282,7 +280,7 @@ class DateRangeSelectorCard extends StatelessWidget {
 }
 
 // ==========================================
-// 2B. BỘ CHỌN THÁNG NĂM CHO PHẦN MONTHLY (🔥 UPDATE ĐỒNG BỘ UI & ĐA NGÔN NGỮ)
+// 2B. BỘ CHỌN THÁNG NĂM CHO PHẦN MONTHLY
 // ==========================================
 class MonthSelectorCard extends StatelessWidget {
   final DateTime selectedMonth;
@@ -300,7 +298,6 @@ class MonthSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🌍 Tự động lấy định dạng cấu hình ngôn ngữ hệ thống qua intl
     final DateFormat mf = DateFormat.yMMMM(l10n.localeName);
 
     return Container(
@@ -357,7 +354,7 @@ class MonthSelectorCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // --- VÙNG CHỌN THÁNG NĂM CHÍNH GIỮA (ĐỒNG BỘ TYPOGRAPHY VỚI 2A) ---
+          // --- VÙNG CHỌN THÁNG NĂM CHÍNH GIỮA ---
           Row(
             children: [
               Expanded(
@@ -370,8 +367,7 @@ class MonthSelectorCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center, // 🎯 Căn giữa tuyệt đối giống 2A
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           (l10n.selectMonthLabel ?? 'Thời gian tổng kết')
@@ -394,7 +390,7 @@ class MonthSelectorCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w900,
-                                color: appColors.text, // Đồng bộ màu sắc 2A
+                                color: appColors.text,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -434,6 +430,7 @@ class CuteOverviewCard extends StatelessWidget {
   final int totalDays;
   final AppColorTheme appColors;
   final AppLocalizations l10n;
+  final String currencySymbol;
 
   const CuteOverviewCard({
     super.key,
@@ -441,16 +438,22 @@ class CuteOverviewCard extends StatelessWidget {
     required this.totalDays,
     required this.appColors,
     required this.l10n,
+    required this.currencySymbol,
   });
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat.currency(
-      locale: 'vi_VN',
-      symbol: '₫',
-      decimalDigits: 0,
+    // 🌟 Sử dụng Helper rút gọn số tiền đồng bộ theo Đơn vị tiền tệ động
+    final String formattedTotal = CurrencyHelper.formatFullAmount(
+      total,
+      symbol: currencySymbol,
     );
+
     final double avgPerDay = total / (totalDays == 0 ? 1 : totalDays);
+    final String formattedAvg = CurrencyHelper.formatFullAmount(
+      avgPerDay,
+      symbol: currencySymbol,
+    );
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -485,7 +488,7 @@ class CuteOverviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              currencyFormatter.format(total),
+              formattedTotal,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 30,
@@ -504,7 +507,7 @@ class CuteOverviewCard extends StatelessWidget {
                 children: [
                   _buildSubInfo(
                     l10n.avgPerDay ?? "Trung bình/ngày",
-                    currencyFormatter.format(avgPerDay),
+                    formattedAvg,
                   ),
                   _buildSubInfo(
                     l10n.repeatCycle ?? "Chu kỳ",
@@ -548,6 +551,7 @@ class AnalyticsContentWidget extends StatefulWidget {
   final double totalSpending;
   final AppColorTheme appColors;
   final AppLocalizations l10n;
+  final String currencySymbol;
 
   const AnalyticsContentWidget({
     super.key,
@@ -555,6 +559,7 @@ class AnalyticsContentWidget extends StatefulWidget {
     required this.totalSpending,
     required this.appColors,
     required this.l10n,
+    required this.currencySymbol,
   });
 
   @override
@@ -563,11 +568,18 @@ class AnalyticsContentWidget extends StatefulWidget {
 
 class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
   int touchedIndex = -1;
-  final currencyFormatter = NumberFormat.currency(
-    locale: 'vi_VN',
-    symbol: '₫',
-    decimalDigits: 0,
-  );
+
+  // 🌍 Định dạng tiền tệ chi tiết tự động thích ứng theo Đơn vị tiền tệ động
+  NumberFormat get currencyFormatter {
+    final isVnd =
+        widget.currencySymbol == '₫' ||
+        widget.currencySymbol.toUpperCase() == 'VND';
+    return NumberFormat.currency(
+      locale: isVnd ? 'vi_VN' : 'en_US',
+      symbol: widget.currencySymbol,
+      decimalDigits: isVnd ? 0 : 2,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -592,7 +604,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
               SizedBox(height: 220, child: _buildDonutChart()),
               const SizedBox(height: 16),
               Text(
-                widget.l10n.spendingStructure ?? "Cơ cấu chi tiêu",
+                widget.l10n.spendingStructure,
                 style: TextStyle(
                   color: widget.appColors.textMuted,
                   fontSize: 14,
@@ -673,7 +685,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
             Text(
               touchedIndex != -1
                   ? widget.analyticsData[touchedIndex]['category']
-                  : (widget.l10n.totalLabel ?? "TỔNG"),
+                  : (widget.l10n.totalLabel),
               style: TextStyle(
                 color: widget.appColors.textMuted,
                 fontSize: 12,
@@ -682,7 +694,10 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
             ),
             const SizedBox(height: 4),
             Text(
-              '${CurrencyHelper.formatCompactAmount(activeAmount)}₫',
+              CurrencyHelper.formatCompactAmount(
+                (activeAmount as num).toDouble(),
+                symbol: widget.currencySymbol,
+              ),
               style: TextStyle(
                 color: widget.appColors.text,
                 fontSize: 18,
@@ -819,7 +834,7 @@ class EmptyAnalyticsWidget extends StatelessWidget {
             const Text("🐥✨☁️", style: TextStyle(fontSize: 36)),
             const SizedBox(height: 16),
             Text(
-              l10n.emptyAnalyticsData ?? "Chưa có dữ liệu phân tích nào 🐥",
+              l10n.emptyAnalyticsData,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: appColors.textMuted,
@@ -856,8 +871,7 @@ class ErrorAnalyticsWidget extends StatelessWidget {
           const Text("🥺🔧", style: TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(
-            l10n.errorLoadData ??
-                "Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺",
+            l10n.errorLoadData,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: appColors.errorAccent,
@@ -876,7 +890,7 @@ class ErrorAnalyticsWidget extends StatelessWidget {
             ),
             onPressed: onRetry,
             child: Text(
-              l10n.retryButton ?? "Lấy đà thử lại nghen 🚀",
+              l10n.retryButton,
               style: TextStyle(
                 color: appColors.primary,
                 fontWeight: FontWeight.bold,

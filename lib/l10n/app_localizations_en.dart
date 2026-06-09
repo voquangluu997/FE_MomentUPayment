@@ -112,13 +112,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not save your moment, please try again! 😢';
 
   @override
-  String get emptyTransactionNote => 'Nameless payment moment...';
+  String get emptyTransactionNote => 'Just a small thing...';
 
   @override
   String get homeSubGreeting => 'How is your payment status today?';
 
   @override
-  String get spendingMomentsTitle => 'Moments U Payment';
+  String get spendingMomentsTitle => 'My Lovely Moments';
 
   @override
   String get loadingData => 'Loading payment moments...';
@@ -286,12 +286,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String remainingAmount(String amount) {
-    return 'Remaining: $amountđ';
+    return 'Remaining: $amount';
   }
 
   @override
   String dailySuggestion(String money) {
-    return '💡 Suggestion: You should spend a maximum of $moneyđ today to stay safe.';
+    return '💡 Suggestion: You should spend a maximum of $money today to stay safe.';
   }
 
   @override
@@ -913,25 +913,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allReadSuccess => 'All notifications marked as read!';
 
   @override
-  String get obTitle1 => 'Smart Tracking';
+  String get obTitle1 => 'Capture your spending moments.';
 
   @override
   String get obDesc1 =>
-      'Log your daily expenses in seconds with an intuitive and cute interface.';
+      'Log every expense through photos. Streamlined, fast, and delightfully text-free!';
 
   @override
-  String get obTitle2 => 'Budget Management';
+  String get obTitle2 => 'See through your wallet.';
 
   @override
   String get obDesc2 =>
-      'No more empty wallets. Set goals and effortlessly track your spending progress.';
+      'Beautiful and intuitive reports. Instantly know where your cash vanished.';
 
   @override
-  String get obTitle3 => 'Absolute Privacy';
+  String get obTitle3 => 'Your secure vault.';
 
   @override
   String get obDesc3 =>
-      'Your data belongs to you. 100% private and secure cloud synchronization.';
+      'Absolute privacy. Your spending secrets are for your eyes only.';
 
   @override
   String get obSkip => 'Skip';
@@ -1403,74 +1403,60 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get survivalStateNotSetTitle => 'Radar System';
+  String get survivalStateNotSetBadge => 'NOT SET';
 
   @override
-  String get survivalStateNotSetBadge => 'Inactive';
-
-  @override
-  String get survivalStateNotSetHeading => 'Wallet Not Set?';
+  String get survivalStateNotSetHeading => 'Budget not set';
 
   @override
   String get survivalStateNotSetPunchline =>
-      'Give your wallet a survival goal to activate the financial countdown! 🛡️';
+      'Set up a budget so Moment u Payment can help you track your spending!';
 
   @override
-  String get survivalStateGodModeTitle => 'Survival Radar: Safe';
+  String get survivalStateGodModeBadge => 'COMFORTABLE';
 
   @override
-  String get survivalStateGodModeBadge => 'Nice Spending ✨';
-
-  @override
-  String get survivalStateGodModeHeading => 'Survive the month: Easy!';
+  String survivalStateGodModeHeading(String amount) {
+    return 'Up to $amount/day';
+  }
 
   @override
   String get survivalStateGodModePunchline =>
-      'At this rate, you can comfortably survive until the end of the month. The God of Wealth is smiling at you! 😎';
+      'Your spending pace is perfect. Keep up this great form!';
 
   @override
-  String get survivalStateDangerTitle => 'Speed Warning';
+  String get survivalStateDangerBadge => 'YELLOW ALERT';
 
   @override
-  String get survivalStateDangerBadge => 'Burning Fast ⚠️';
-
-  @override
-  String survivalStateDangerHeading(String days) {
-    return 'Wallet empty in $days days';
+  String survivalStateDangerHeading(String amount) {
+    return 'Limit $amount/day';
   }
 
   @override
-  String survivalStateDangerPunchline(String days) {
-    return 'Wallet heart rate is rising! You\'ll run out of \'blood\' $days days early if you don\'t slow down! 🏎️💨';
-  }
+  String get survivalStateDangerPunchline =>
+      'Budget is draining. Stick to this daily limit to survive the month!';
 
   @override
-  String get survivalStateApocalypseTitle => 'Red Alert Critical';
+  String get survivalStateApocalypseBadge => 'RED ALERT';
 
   @override
-  String get survivalStateApocalypseBadge => 'ON OXYGEN! 🚨';
-
-  @override
-  String survivalStateApocalypseHeading(String days) {
-    return 'Wallet FREEZES in $days days!';
+  String survivalStateApocalypseHeading(String amount) {
+    return 'Survive on $amount/day';
   }
 
   @override
   String get survivalStateApocalypsePunchline =>
-      '🚨 SOS! Cash burn rate is destructive! Instant noodle mode auto-activated, hit the brakes now!';
+      'SOS! Your wallet is crying for help. Activate austerity mode immediately!';
 
   @override
-  String get survivalStateWastedTitle => 'System Shut Down';
+  String get survivalStateWastedBadge => 'OVERSPENT';
 
   @override
-  String get survivalStateWastedBadge => 'WASTED 💀';
-
-  @override
-  String get survivalStateWastedHeading => 'You are out of cash! 💸';
+  String get survivalStateWastedHeading => 'Budget Depleted';
 
   @override
   String get survivalStateWastedPunchline =>
-      'Mission failed! You exceeded this month\'s limit. Tap the pen icon above to revive/resuscitate your wallet! 🕊️';
+      'You have exceeded this month\'s budget. Safe daily limit is 0!';
 
   @override
   String get setupRadarNow => 'Set up now to activate radar';
@@ -1498,4 +1484,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidAmountMessage => 'Please enter a valid amount! 💸';
+
+  @override
+  String get budgetLifestyleTitle => 'Daily Lifestyle';
+
+  @override
+  String get budgetLifestyleStart => 'Let\'s start planning! 🎯';
+
+  @override
+  String get budgetLifestyleBread => 'About a sandwich 🥖';
+
+  @override
+  String get budgetLifestyleMilkTea => 'Equals a full-topping boba 🧋';
+
+  @override
+  String get budgetLifestyleDinner => 'A light romantic dinner 🥂';
+
+  @override
+  String get budgetLifestyleRich => 'Living that \'Rich Kid\' life! 👑';
+
+  @override
+  String get budgetLifestyleActive => 'Enjoy your active life! ✨';
+
+  @override
+  String get chooseCurrencyTitle => 'Select Currency';
+
+  @override
+  String get currencyVND => 'Vietnam Dong (VND)';
+
+  @override
+  String get budgetUpdateSuccess => 'Budget updated successfully!';
+
+  @override
+  String get budgetUpdateError => 'Update failed, please try again!';
 }
