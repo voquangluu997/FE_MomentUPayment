@@ -122,7 +122,7 @@
       "limit": { "type": "String" }
     }
   },
-  "budgetSpentStatus": "Đã tiêu {spent} trong tổng số {limit}",
+  "budgetSpentStatus": "Đã tiêu {spent} trong tổng {limit}",
   "@budgetSpentStatus": {
     "placeholders": {
       "spent": { "type": "String" },

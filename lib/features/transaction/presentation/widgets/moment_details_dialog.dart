@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
-import 'package:moment_u_payment/core/screens/full_screen_image_viewer.dart';
+import 'package:moment_u_payment/features/camera/screens/full_screen_image_viewer.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/number_format_util.dart';

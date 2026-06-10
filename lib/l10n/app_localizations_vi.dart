@@ -302,7 +302,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String budgetSpentStatus(String spent, String limit) {
-    return 'Đã tiêu $spent trong tổng số $limit';
+    return 'Đã tiêu $spent trong tổng $limit';
   }
 
   @override

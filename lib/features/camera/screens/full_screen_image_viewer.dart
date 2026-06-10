@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:gal/gal.dart';
-// Đảm bảo import đúng đường dẫn AppColors và AppToast của bạn
-// import '../../../../core/constants/app_colors.dart';
-// import '../../../../core/utils/app_toast.dart';
 
 class FullScreenImageViewer extends StatefulWidget {
   final String imageUrl;

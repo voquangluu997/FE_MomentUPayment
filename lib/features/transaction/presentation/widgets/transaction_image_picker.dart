@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
-import 'package:moment_u_payment/core/features/badges/screens/custom_camera_screen.dart';
-import 'package:moment_u_payment/core/features/badges/screens/edit_photo_screen.dart';
+import 'package:moment_u_payment/features/camera/screens/custom_camera_screen.dart';
+import 'package:moment_u_payment/features/camera/screens/edit_photo_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class TransactionImagePicker extends ConsumerStatefulWidget {

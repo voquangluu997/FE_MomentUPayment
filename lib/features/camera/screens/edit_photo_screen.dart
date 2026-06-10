@@ -1,113 +1,16 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:moment_u_payment/features/camera/models/editor_models.dart';
+import 'package:moment_u_payment/features/camera/widgets/editor_painters.dart';
+import 'package:moment_u_payment/features/camera/widgets/sticker_widget.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
-
-// ─── MODEL STICKER ───
-enum StickerType { icon, text }
-
-class StickerModel {
-  final String id;
-  final StickerType type;
-  String value;
-  Offset offset;
-  double scale;
-  double rotation;
-
-  Color textColor;
-  Color backgroundColor;
-  bool hasBackground;
-
-  StickerModel({
-    required this.id,
-    required this.type,
-    required this.value,
-    this.offset = const Offset(100, 100),
-    this.scale = 1.0,
-    this.rotation = 0.0,
-    this.textColor = Colors.white,
-    this.backgroundColor = Colors.black,
-    this.hasBackground = false,
-  });
-
-  StickerModel copy() {
-    return StickerModel(
-      id: id,
-      type: type,
-      value: value,
-      offset: offset,
-      scale: scale,
-      rotation: rotation,
-      textColor: textColor,
-      backgroundColor: backgroundColor,
-      hasBackground: hasBackground,
-    );
-  }
-}
-
-// ─── MODEL DRAWING ───
-enum PaintingMode { none, free, circle, rect, eraser }
-
-class DrawingPath {
-  final List<Offset?> points;
-  final Paint paint;
-  final PaintingMode mode;
-  final Rect? rect;
-
-  DrawingPath({
-    required this.points,
-    required this.paint,
-    required this.mode,
-    this.rect,
-  });
-
-  DrawingPath copy() {
-    final newPaint = Paint()
-      ..color = paint.color
-      ..strokeWidth = paint.strokeWidth
-      ..style = paint.style
-      ..strokeCap = paint.strokeCap
-      ..strokeJoin = paint.strokeJoin
-      ..blendMode = paint.blendMode;
-
-    return DrawingPath(
-      points: List.from(points),
-      paint: newPaint,
-      mode: mode,
-      rect: rect,
-    );
-  }
-}
-
-// ─── QUẢN LÝ LỊCH SỬ CHỈNH SỬA ───
-class EditorState {
-  final String imagePath;
-  final int rotationTurns;
-  final double glow;
-  final double smooth;
-  final double pop;
-  final int filterIndex;
-  final int filterSubTab;
-  final List<StickerModel> stickers;
-  final List<DrawingPath> drawingPaths;
-
-  EditorState({
-    required this.imagePath,
-    required this.rotationTurns,
-    required this.glow,
-    required this.smooth,
-    required this.pop,
-    required this.filterIndex,
-    required this.filterSubTab,
-    required this.stickers,
-    required this.drawingPaths,
-  });
-}
 
 class EditPhotoScreen extends StatefulWidget {
   final String imagePath;
@@ -131,10 +34,11 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
   bool _isEditingText = false;
   String? _editingStickerId;
 
-  int _currentTab =
-      0; // 0: Filter, 1: Transform, 2: Beauty, 3: Sticker, 4: Draw
+  // Tabs: 0: Filter, 1: Crop, 2: Beauty, 3: Emojis/Badges, 4: Ghi chú (Draw, Shapes, Text, v.v)
+  int _currentTab = 0;
   bool _isPanelVisible = true;
-  final double _panelHeight = 280.0;
+  final double _panelHeight =
+      220.0; // Thu gọn Panel lại vì các nút vẽ đã chuyển lên trên
 
   int _rotationTurns = 0;
   double _cropLeft = 0.0;
@@ -158,16 +62,15 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
   late TextEditingController _textStickerController;
   final FocusNode _textStickerFocusNode = FocusNode();
 
-  // STATE DRAWING
   List<DrawingPath> _drawingPaths = [];
-  PaintingMode _currentDrawingMode = PaintingMode.none;
+  PaintingMode _currentDrawingMode =
+      PaintingMode.none; // Khi = none là chế độ chọn/di chuyển
   Color _currentPaintColor = Colors.redAccent;
   double _currentStopWidth = 5.0;
   Offset? _drawStartPoint;
 
   List<EditorState> _history = [];
   int _historyIndex = -1;
-
   int _selectedFilterIndex = 0;
   int _currentFilterSubTab = 0;
 
@@ -215,6 +118,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     _filterNames = {
       0: ["ORIGINAL", "NOSTALGIA", "PORTRA", "CHROME", "NOIR"],
       1: ["NATURAL", "VIVID", "COZY", "MINIMAL"],
+      2: ["FILM ORIG", "C-CHROME", "K-GOLD", "VELVIA"],
     };
     WidgetsBinding.instance.addPostFrameCallback((_) => _saveStateToHistory());
   }
@@ -282,19 +186,25 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
   }
 
   Paint _getCurrentPaint() {
-    final isEraser = _currentDrawingMode == PaintingMode.eraser;
     return Paint()
-      ..color = isEraser ? Colors.white : _currentPaintColor
-      ..strokeWidth = _currentStopWidth
+      ..color = _currentDrawingMode == PaintingMode.eraser
+          ? Colors.white
+          : (_currentDrawingMode == PaintingMode.blur
+                ? Colors.white24
+                : _currentPaintColor)
+      ..strokeWidth = _currentDrawingMode == PaintingMode.blur
+          ? _currentStopWidth * 2
+          : _currentStopWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..blendMode = isEraser ? BlendMode.clear : BlendMode.srcOver;
+      ..blendMode = _currentDrawingMode == PaintingMode.eraser
+          ? BlendMode.clear
+          : BlendMode.srcOver;
   }
 
   void _onPanStart(DragStartDetails details) {
     if (_currentTab != 4 || _currentDrawingMode == PaintingMode.none) return;
-
     HapticFeedback.lightImpact();
     final RenderBox renderBox =
         _paintKey.currentContext!.findRenderObject() as RenderBox;
@@ -302,25 +212,15 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     _drawStartPoint = localPosition;
 
     setState(() {
-      if (_currentDrawingMode == PaintingMode.free ||
-          _currentDrawingMode == PaintingMode.eraser) {
-        _drawingPaths.add(
-          DrawingPath(
-            points: [localPosition],
-            paint: _getCurrentPaint(),
-            mode: _currentDrawingMode,
-          ),
-        );
-      } else {
-        _drawingPaths.add(
-          DrawingPath(
-            points: [],
-            paint: _getCurrentPaint(),
-            mode: _currentDrawingMode,
-            rect: Rect.fromPoints(localPosition, localPosition),
-          ),
-        );
-      }
+      _drawingPaths.add(
+        DrawingPath(
+          points: [localPosition],
+          paint: _getCurrentPaint(),
+          mode: _currentDrawingMode,
+          startPoint: localPosition,
+          endPoint: localPosition,
+        ),
+      );
     });
   }
 
@@ -329,7 +229,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
         _currentDrawingMode == PaintingMode.none ||
         _drawStartPoint == null)
       return;
-
     final RenderBox renderBox =
         _paintKey.currentContext!.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.globalPosition);
@@ -339,12 +238,12 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
           _currentDrawingMode == PaintingMode.eraser) {
         _drawingPaths.last.points.add(localPosition);
       } else {
-        final lastPath = _drawingPaths.last;
-        _drawingPaths[_drawingPaths.length - 1] = DrawingPath(
+        _drawingPaths.last = DrawingPath(
           points: [],
-          paint: lastPath.paint,
-          mode: lastPath.mode,
-          rect: Rect.fromPoints(_drawStartPoint!, localPosition),
+          paint: _drawingPaths.last.paint,
+          mode: _currentDrawingMode,
+          startPoint: _drawStartPoint,
+          endPoint: localPosition,
         );
       }
     });
@@ -357,10 +256,72 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       if (_currentDrawingMode == PaintingMode.free ||
           _currentDrawingMode == PaintingMode.eraser) {
         _drawingPaths.last.points.add(null);
+      } else if (_drawingPaths.isNotEmpty) {
+        final path = _drawingPaths.removeLast();
+        if (path.startPoint != null && path.endPoint != null) {
+          final A = path.startPoint!;
+          final B = path.endPoint!;
+          final length = (B - A).distance;
+
+          if (length > 10) {
+            if (_currentDrawingMode == PaintingMode.arrow) {
+              final center = Offset((A.dx + B.dx) / 2, (A.dy + B.dy) / 2);
+              final size = Size(length, _currentStopWidth * 6);
+              final offset = Offset(
+                center.dx - size.width / 2,
+                center.dy - size.height / 2,
+              );
+              final angle = math.atan2(B.dy - A.dy, B.dx - A.dx);
+
+              _stickers.add(
+                StickerModel(
+                  id: DateTime.now().toString(),
+                  type: StickerType.arrow,
+                  value: "",
+                  offset: offset,
+                  size: size,
+                  rotation: angle,
+                  textColor: _currentPaintColor,
+                  strokeWidth: _currentStopWidth,
+                ),
+              );
+            } else {
+              final rect = Rect.fromPoints(A, B);
+              StickerType type = StickerType.rect;
+              if (_currentDrawingMode == PaintingMode.circle)
+                type = StickerType.circle;
+              if (_currentDrawingMode == PaintingMode.blur)
+                type = StickerType.blur;
+
+              _stickers.add(
+                StickerModel(
+                  id: DateTime.now().toString(),
+                  type: type,
+                  value: "",
+                  offset: rect.topLeft,
+                  size: rect.size,
+                  textColor: _currentPaintColor,
+                  strokeWidth: _currentStopWidth,
+                ),
+              );
+            }
+            _selectedStickerId = _stickers.last.id;
+          }
+        }
+        // ĐÃ XÓA _currentDrawingMode = none Ở ĐÂY ĐỂ GIỮ NGUYÊN CÔNG CỤ VẼ
       }
       _drawStartPoint = null;
     });
     _saveStateToHistory();
+  }
+
+  void _openTab(int tabIndex, PaintingMode mode) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _currentTab = tabIndex;
+      _currentDrawingMode = mode;
+      _selectedStickerId = null;
+    });
   }
 
   @override
@@ -372,9 +333,8 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
 
     final List<List<double>> currentFilters = _currentFilterSubTab == 0
         ? _leicaMatrices
-        : _hasselbladMatrices;
+        : (_currentFilterSubTab == 1 ? _hasselbladMatrices : _fujifilmMatrices);
     final List<String> currentNames = _filterNames[_currentFilterSubTab]!;
-
     final double currentGlow = _isCapturingRaw ? 0.0 : _glowBrightness;
     final double currentContrast = _isCapturingRaw ? 1.0 : _skinSmoothContrast;
     final double currentSat = _isCapturingRaw ? 1.0 : _popSaturation;
@@ -388,21 +348,20 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        if (_selectedStickerId != null && !_isEditingText) {
+        if (_selectedStickerId != null && !_isEditingText)
           setState(() => _selectedStickerId = null);
-        }
       },
       child: Scaffold(
         backgroundColor: studioBg,
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // CANVAS CHÍNH
+            // CANVAS
             Positioned(
               top: topPadding + 60,
               left: 0,
               right: 0,
-              bottom: bottomPadding + (_isPanelVisible ? _panelHeight : 50),
+              bottom: bottomPadding + (_isPanelVisible ? _panelHeight : 60),
               child: _buildMainCanvasStudio(
                 currentGlow,
                 currentContrast,
@@ -420,10 +379,30 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
               child: _buildPremiumHeader(l10n, champagneAccent),
             ),
 
-            // THÙNG RÁC THÔNG MINH TOÀN CHIỀU NGANG PHÍA TRÊN ĐẦU
+            // TRASH ZONE
             if (_isDraggingSticker) _buildTopTrashZone(l10n, topPadding),
 
-            // CONTROL PANEL
+            // ─── TOOLBAR DỌC BÊN PHẢI (CHỈ HIỆN Ở TAB GHI CHÚ) ───
+            if (_currentTab == 4 && !_isCapturingRaw)
+              Positioned(
+                top: topPadding + 80,
+                right: 12,
+                child: _buildVerticalToolbar(champagneAccent),
+              ),
+
+            // ─── CÀI ĐẶT MÀU SẮC & CỌ (CHỈ HIỆN KHI ĐANG CHỌN CÔNG CỤ VẼ) ───
+            if (_currentTab == 4 &&
+                !_isCapturingRaw &&
+                _currentDrawingMode != PaintingMode.none)
+              Positioned(
+                bottom:
+                    bottomPadding + (_isPanelVisible ? _panelHeight + 10 : 80),
+                left: 16,
+                right: 50, // Tránh đè lên toolbar dọc
+                child: _buildDrawingSettings(champagneAccent),
+              ),
+
+            // CONTROL PANEL (MỚI - GỌN GÀNG HƠN)
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.fastOutSlowIn,
@@ -441,22 +420,260 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
               ),
             ),
 
-            // NÚT ĐÓNG/MỞ PANEL
+            // NÚT ĐÓNG MỞ PANEL
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.fastOutSlowIn,
               bottom:
-                  bottomPadding + (_isPanelVisible ? _panelHeight - 16 : 15),
+                  bottomPadding + (_isPanelVisible ? _panelHeight - 16 : 25),
               right: 20,
               child: _buildPanelToggleButton(champagneAccent, panelObsidian),
             ),
 
+            // OVERLAY CHỮ
             if (_isEditingText) _buildStoryEditorOverlay(champagneAccent),
           ],
         ),
       ),
     );
   }
+
+  // ─── THANH CÔNG CỤ DỌC BÊN PHẢI (MỚI) ───
+  Widget _buildVerticalToolbar(Color accent) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white12),
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildVerticalToolBtn(
+            CupertinoIcons.hand_draw,
+            PaintingMode.none,
+            "CHỌN",
+            accent,
+          ),
+          _buildVerticalDivider(),
+          _buildVerticalToolBtn(
+            CupertinoIcons.pencil,
+            PaintingMode.free,
+            "VẼ",
+            accent,
+          ),
+          _buildVerticalToolBtn(
+            CupertinoIcons.arrow_up_right,
+            PaintingMode.arrow,
+            "MŨI TÊN",
+            accent,
+          ),
+          _buildVerticalToolBtn(
+            CupertinoIcons.square,
+            PaintingMode.rect,
+            "VUÔNG",
+            accent,
+          ),
+          _buildVerticalToolBtn(
+            CupertinoIcons.circle,
+            PaintingMode.circle,
+            "TRÒN",
+            accent,
+          ),
+          _buildVerticalToolBtn(
+            CupertinoIcons.drop_fill,
+            PaintingMode.blur,
+            "CHE MỜ",
+            accent,
+          ),
+          _buildVerticalDivider(),
+          // Các tính năng add liền (Text, Kính Lúp)
+          _buildActionToolBtn(CupertinoIcons.textformat, "CHỮ", accent, () {
+            setState(
+              () => _currentDrawingMode = PaintingMode.none,
+            ); // Chuyển về con trỏ
+            _openTextEditor();
+          }),
+          _buildActionToolBtn(
+            CupertinoIcons.search_circle,
+            "KÍNH LÚP",
+            accent,
+            () {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _stickers.add(
+                  StickerModel(
+                    id: DateTime.now().toString(),
+                    type: StickerType.magnifier,
+                    value: "",
+                  ),
+                );
+                _selectedStickerId = _stickers.last.id;
+                _currentDrawingMode =
+                    PaintingMode.none; // Trở về con trỏ để di chuyển ngay
+              });
+            },
+          ),
+          _buildVerticalDivider(),
+          _buildVerticalToolBtn(
+            CupertinoIcons.xmark_circle,
+            PaintingMode.eraser,
+            "TẨY NÉT",
+            accent,
+          ),
+          // Nút Xóa tất cả nét vẽ tự do
+          if (_drawingPaths.isNotEmpty) ...[
+            _buildVerticalDivider(),
+            _buildActionToolBtn(
+              CupertinoIcons.trash,
+              "XÓA HẾT",
+              Colors.redAccent,
+              () {
+                HapticFeedback.warningNotification();
+                setState(() => _drawingPaths.clear());
+                _saveStateToHistory();
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalToolBtn(
+    IconData icon,
+    PaintingMode mode,
+    String label,
+    Color accent,
+  ) {
+    bool isActive = _currentDrawingMode == mode;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() {
+          _currentDrawingMode = mode;
+          _selectedStickerId = null;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Icon(icon, color: isActive ? accent : Colors.white54, size: 24),
+      ),
+    );
+  }
+
+  Widget _buildActionToolBtn(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Icon(icon, color: color.withOpacity(0.8), size: 24),
+      ),
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(
+      width: 20,
+      height: 1,
+      color: Colors.white12,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+    );
+  }
+
+  // ─── CÀI ĐẶT CỌ VẼ NỔI Ở ĐÁY ẢNH (MỚI) ───
+  Widget _buildDrawingSettings(Color accent) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Slider kích cỡ
+          Row(
+            children: [
+              Icon(CupertinoIcons.circle_fill, color: Colors.white24, size: 8),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 2,
+                    activeTrackColor: accent,
+                    inactiveTrackColor: Colors.white12,
+                    thumbColor: Colors.white,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6.0,
+                    ),
+                    overlayShape: SliderComponentShape.noOverlay,
+                  ),
+                  child: Slider(
+                    value: _currentStopWidth,
+                    min: 1.0,
+                    max: 20.0,
+                    onChanged: (v) => setState(() => _currentStopWidth = v),
+                  ),
+                ),
+              ),
+              Icon(CupertinoIcons.circle_fill, color: Colors.white24, size: 16),
+            ],
+          ),
+          // Bảng màu (Ẩn đi nếu dùng Tẩy hoặc Che mờ)
+          if (_currentDrawingMode != PaintingMode.eraser &&
+              _currentDrawingMode != PaintingMode.blur) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 25,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _paintColors.length,
+                itemBuilder: (context, idx) {
+                  final color = _paintColors[idx];
+                  final isSel = _currentPaintColor == color;
+                  return GestureDetector(
+                    onTap: () => setState(() => _currentPaintColor = color),
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSel ? Colors.white : Colors.white24,
+                          width: isSel ? 2 : 1,
+                        ),
+                        boxShadow: isSel
+                            ? [
+                                BoxShadow(
+                                  color: color.withOpacity(0.5),
+                                  blurRadius: 5,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // --- CÁC HÀM XÂY DỰNG UI CÒN LẠI ---
 
   Widget _buildPremiumHeader(AppLocalizations l10n, Color accent) {
     return Container(
@@ -525,7 +742,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     );
   }
 
-  // ─── UI THÙNG RÁC MỚI (CHẮN HOÀN TOÀN TOP BAR - TRÁNH LỖI UX) ───
   Widget _buildTopTrashZone(AppLocalizations l10n, double topPadding) {
     return Positioned(
       top: topPadding,
@@ -621,8 +837,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                           ),
                         ),
                       ),
-
-                      // LAYER ĐƯỜNG VẼ
                       Positioned.fill(
                         child: LayoutBuilder(
                           builder: (context, pConstraints) {
@@ -642,21 +856,81 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                           },
                         ),
                       ),
-
-                      // LAYER STICKERS
                       if (!_isCapturingRaw && _currentTab != 1)
                         Positioned.fill(
                           child: Stack(
-                            children: _stickers
-                                .map((stk) => _buildStickerWidget(stk))
-                                .toList(),
+                            children: _stickers.map((stk) {
+                              return StickerWidget(
+                                sticker: stk,
+                                isSelected: stk.id == _selectedStickerId,
+                                isDraggingSticker: _isDraggingSticker,
+                                currentDrawingMode:
+                                    _currentDrawingMode, // GỬI MODE VẼ THAY VÌ TAB
+                                onTap: () =>
+                                    setState(() => _selectedStickerId = stk.id),
+                                onDoubleTap: () =>
+                                    _openTextEditor(existingSticker: stk),
+                                onScaleStart: (details) {
+                                  setState(() {
+                                    _selectedStickerId = stk.id;
+                                    _isDraggingSticker = true;
+                                    _initialStickerScale = stk.scale;
+                                    _initialStickerRotation = stk.rotation;
+                                    _initialStickerOffset = stk.offset;
+                                    _initialFocalPoint = details.focalPoint;
+                                  });
+                                },
+                                onScaleUpdate: (details) {
+                                  if (!_isDraggingSticker) return;
+                                  setState(() {
+                                    stk.offset =
+                                        _initialStickerOffset +
+                                        (details.focalPoint -
+                                            _initialFocalPoint);
+                                    if (details.scale != 1.0)
+                                      stk.scale =
+                                          (_initialStickerScale * details.scale)
+                                              .clamp(0.3, 5.0);
+                                    if (details.rotation != 0.0)
+                                      stk.rotation =
+                                          _initialStickerRotation +
+                                          details.rotation;
+                                  });
+                                  final topPadding = MediaQuery.of(
+                                    context,
+                                  ).padding.top;
+                                  bool isInTrashZone =
+                                      details.focalPoint.dy < (topPadding + 70);
+                                  if (isInTrashZone != _isOverDeleteArea) {
+                                    setState(
+                                      () => _isOverDeleteArea = isInTrashZone,
+                                    );
+                                    if (isInTrashZone) HapticFeedback.vibrate();
+                                  }
+                                },
+                                onScaleEnd: (details) {
+                                  if (!_isDraggingSticker) return;
+                                  setState(() => _isDraggingSticker = false);
+                                  if (_isOverDeleteArea) {
+                                    HapticFeedback.heavyImpact();
+                                    setState(() {
+                                      _stickers.removeWhere(
+                                        (s) => s.id == stk.id,
+                                      );
+                                      _selectedStickerId = null;
+                                      _isOverDeleteArea = false;
+                                    });
+                                  }
+                                  _saveStateToHistory();
+                                },
+                              );
+                            }).toList(),
                           ),
                         ),
                     ],
                   ),
                 ),
-
-                // LAYER GESTURE ĐỂ VẼ TRÊN KHU VỰC ẢNH
+                // LỚP CHẶN SỰ KIỆN VẼ CHỈ HOẠT ĐỘNG KHI ĐÃ CHỌN CÔNG CỤ VẼ
                 if (_currentTab == 4 &&
                     _currentDrawingMode != PaintingMode.none)
                   Positioned.fill(
@@ -667,7 +941,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                       onPanEnd: _onPanEnd,
                     ),
                   ),
-
                 if (_currentTab == 1)
                   Positioned.fill(
                     child: LayoutBuilder(
@@ -697,178 +970,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     );
   }
 
-  Widget _buildStickerWidget(StickerModel sticker) {
-    final isSelected = sticker.id == _selectedStickerId;
-
-    return Positioned(
-      left: sticker.offset.dx,
-      top: sticker.offset.dy,
-      child: Transform.rotate(
-        angle: sticker.rotation,
-        child: Transform.scale(
-          scale: sticker.scale,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              if (_currentTab == 4) return;
-              HapticFeedback.selectionClick();
-              setState(() => _selectedStickerId = sticker.id);
-            },
-            onDoubleTap: () {
-              if (_currentTab == 4) return;
-              if (sticker.type == StickerType.text)
-                _openTextEditor(existingSticker: sticker);
-            },
-            onScaleStart: (details) {
-              if (_currentTab == 4) return;
-              setState(() {
-                _selectedStickerId = sticker.id;
-                _isDraggingSticker = true;
-                _initialStickerScale = sticker.scale;
-                _initialStickerRotation = sticker.rotation;
-                _initialStickerOffset = sticker.offset;
-                _initialFocalPoint = details.focalPoint;
-              });
-            },
-            onScaleUpdate: (details) {
-              if (!_isDraggingSticker) return;
-
-              setState(() {
-                sticker.offset =
-                    _initialStickerOffset +
-                    (details.focalPoint - _initialFocalPoint);
-                if (details.scale != 1.0)
-                  sticker.scale = (_initialStickerScale * details.scale).clamp(
-                    0.3,
-                    5.0,
-                  );
-                if (details.rotation != 0.0)
-                  sticker.rotation = _initialStickerRotation + details.rotation;
-              });
-
-              // KIỂM TRA THÙNG RÁC TOP BAR (Nếu kéo sát vùng topPadding + 60px)
-              final topPadding = MediaQuery.of(context).padding.top;
-              bool isInTrashZone =
-                  details.focalPoint.dy < (topPadding + 70); // <--- Lỗi ở đây
-
-              if (isInTrashZone != _isOverDeleteArea) {
-                setState(() => _isOverDeleteArea = isInTrashZone);
-                if (isInTrashZone) HapticFeedback.vibrate();
-              }
-            },
-            onScaleEnd: (details) {
-              if (!_isDraggingSticker) return;
-              setState(() => _isDraggingSticker = false);
-              if (_isOverDeleteArea) {
-                HapticFeedback.heavyImpact();
-                setState(() {
-                  _stickers.removeWhere((s) => s.id == sticker.id);
-                  _selectedStickerId = null;
-                  _isOverDeleteArea = false;
-                });
-              }
-              _saveStateToHistory();
-            },
-            child: IntrinsicWidth(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                color: Colors.transparent,
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (sticker.type == StickerType.icon)
-                      Text(
-                        sticker.value,
-                        style: const TextStyle(
-                          fontSize: 45,
-                          decoration: TextDecoration.none,
-                        ),
-                      )
-                    else
-                      Stack(
-                        children: [
-                          if (sticker.hasBackground)
-                            Text(
-                              sticker.value,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                height: 1.2,
-                                background: Paint()
-                                  ..color = sticker.backgroundColor.withOpacity(
-                                    0.6,
-                                  )
-                                  ..strokeWidth = 20
-                                  ..strokeJoin = StrokeJoin.round
-                                  ..strokeCap = StrokeCap.round
-                                  ..style = PaintingStyle.stroke,
-                                decoration: TextDecoration.none,
-                              ),
-                            ),
-                          Text(
-                            sticker.value,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                              color: sticker.textColor,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    if (isSelected &&
-                        !_isDraggingSticker &&
-                        _currentTab != 4) ...[
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white70, width: 1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      Positioned(top: -5, left: -5, child: _buildDotHandle()),
-                      Positioned(top: -5, right: -5, child: _buildDotHandle()),
-                      Positioned(
-                        bottom: -5,
-                        left: -5,
-                        child: _buildDotHandle(),
-                      ),
-                      Positioned(
-                        bottom: -5,
-                        right: -5,
-                        child: _buildDotHandle(),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDotHandle() {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.24), blurRadius: 2),
-        ],
-      ),
-    );
-  }
-
   Widget _buildObsidianControlPanel(
     Color bg,
     AppLocalizations l10n,
@@ -893,37 +994,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_currentTab == 4)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (_drawingPaths.isEmpty) return;
-                      HapticFeedback.warningNotification();
-                      setState(() => _drawingPaths.clear());
-                      _saveStateToHistory();
-                    },
-                    child: Text(
-                      "XÓA TẤT CẢ",
-                      style: TextStyle(
-                        color: _drawingPaths.isNotEmpty
-                            ? accent
-                            : Colors.white24,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            const SizedBox(height: 20),
-
           Expanded(
             child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
@@ -970,12 +1040,25 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       case 3:
         return _buildStickerTab(accent);
       case 4:
-        return _buildDrawTab(accent);
+        // Khi ở Tab Ghi chú, Nội dung ở Bottom Panel được thu gọn vì đã chuyển lên Toolbar dọc
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 30),
+          child: Text(
+            "HÃY SỬ DỤNG THANH CÔNG CỤ BÊN CẠNH ẢNH",
+            style: TextStyle(
+              color: Colors.white30,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        );
       default:
         return const SizedBox.shrink();
     }
   }
 
+  // --- FILTER, CROP, BEAUTY TABS ---
   Widget _buildFilterTab(
     Color accent,
     List<List<double>> filters,
@@ -987,8 +1070,10 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildStudioSubTab(0, "PORTRAIT", accent),
-            const SizedBox(width: 30),
+            const SizedBox(width: 25),
             _buildStudioSubTab(1, "AESTHETIC", accent),
+            const SizedBox(width: 25),
+            _buildStudioSubTab(2, "FILM GRAIN", accent),
           ],
         ),
         const SizedBox(height: 15),
@@ -1138,38 +1223,78 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
   }
 
   Widget _buildStickerTab(Color accent) {
+    final List<String> badges = [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "✓",
+      "✗",
+      "!",
+    ];
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: GestureDetector(
-            onTap: () => _openTextEditor(),
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.textformat, color: accent, size: 16),
-                  const SizedBox(width: 8),
-                  const Text(
-                    "THÊM VĂN BẢN",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+        const Padding(
+          padding: EdgeInsets.only(bottom: 15),
+          child: Text(
+            "CHỌN STICKER ĐỂ CHÈN NHANH",
+            style: TextStyle(
+              color: Colors.white30,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: badges.length,
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _stickers.add(
+                    StickerModel(
+                      id: DateTime.now().toString(),
+                      type: StickerType.badge,
+                      value: badges[index],
+                      backgroundColor: accent,
+                      textColor: Colors.black,
                     ),
+                  );
+                });
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  badges[index],
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 15),
         SizedBox(
           height: 50,
           child: ListView.builder(
@@ -1178,7 +1303,20 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _iconsStorage.length,
             itemBuilder: (context, index) => GestureDetector(
-              onTap: () => _addIconSticker(_iconsStorage[index]),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _stickers.add(
+                    StickerModel(
+                      id: DateTime.now().toString(),
+                      type: StickerType.icon,
+                      value: _iconsStorage[index],
+                    ),
+                  );
+                  _selectedStickerId = _stickers.last.id;
+                });
+                _saveStateToHistory();
+              },
               child: Container(
                 width: 50,
                 height: 50,
@@ -1196,182 +1334,93 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     );
   }
 
-  // ─── UI DRAW TAB HOÀN CHỈNH ───
-  Widget _buildDrawTab(Color accent) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+  // --- TIỆN ÍCH DƯỚI ĐÁY TỐI GIẢN CHỈ CÒN CÁC TAB CHÍNH ---
+  Widget _buildBottomTabBar(AppLocalizations l10n, Color accent) {
+    if (_currentTab == 1) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildDrawToolsBtn(
-              PaintingMode.free,
-              CupertinoIcons.pencil,
-              "CỌ VẼ",
-              accent,
+            GestureDetector(
+              onTap: () => setState(() {
+                _currentTab = 0;
+                _cropWidth = 0;
+              }),
+              child: const Text(
+                "HỦY",
+                style: TextStyle(
+                  color: Colors.white38,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.0,
+                ),
+              ),
             ),
-            const SizedBox(width: 15),
-            _buildDrawToolsBtn(
-              PaintingMode.rect,
-              CupertinoIcons.square,
-              "KHUNG VUÔNG",
-              accent,
-            ),
-            const SizedBox(width: 15),
-            _buildDrawToolsBtn(
-              PaintingMode.circle,
-              CupertinoIcons.circle,
-              "KHANH TRÒN",
-              accent,
-            ),
-            const SizedBox(width: 15),
-            _buildDrawToolsBtn(
-              PaintingMode.eraser,
-              CupertinoIcons.xmark_circle,
-              "CỤC TẨY",
-              accent,
+            GestureDetector(
+              onTap: _applyCrop,
+              child: Text(
+                "CẮT ẢNH",
+                style: TextStyle(
+                  color: accent,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 11,
+                  letterSpacing: 1.0,
+                ),
+              ),
             ),
           ],
         ),
+      );
+    }
 
-        const SizedBox(height: 15),
-
-        if (_currentDrawingMode != PaintingMode.none)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.circle_fill,
-                      color: Colors.white24,
-                      size: _currentStopWidth.clamp(6.0, 20.0),
-                    ),
-                    Expanded(
-                      child: SliderTheme(
-                        data: SliderThemeData(
-                          trackHeight: 2,
-                          activeTrackColor: accent,
-                          inactiveTrackColor: Colors.white12,
-                          thumbColor: Colors.white,
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 7.0,
-                          ),
-                        ),
-                        child: Slider(
-                          value: _currentStopWidth,
-                          min: 1.0,
-                          max: 20.0,
-                          onChanged: (v) =>
-                              setState(() => _currentStopWidth = v),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "${_currentStopWidth.toInt()}px",
-                      style: const TextStyle(
-                        color: Colors.white30,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                if (_currentDrawingMode != PaintingMode.eraser)
-                  SizedBox(
-                    height: 35,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _paintColors.length,
-                      itemBuilder: (context, idx) {
-                        final color = _paintColors[idx];
-                        final isSel = _currentPaintColor == color;
-                        return GestureDetector(
-                          onTap: () =>
-                              setState(() => _currentPaintColor = color),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isSel ? Colors.white : Colors.white24,
-                                width: isSel ? 2 : 1,
-                              ),
-                              boxShadow: isSel
-                                  ? [
-                                      BoxShadow(
-                                        color: color.withOpacity(0.5),
-                                        blurRadius: 5,
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          )
-        else
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              "CHỌN CÔNG CỤ ĐỂ BẮT ĐẦU VẼ",
-              style: TextStyle(
-                color: Colors.white24,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1,
-              ),
-            ),
+    return Container(
+      height: 65,
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildMainTabItem(0, "BỘ LỌC", CupertinoIcons.color_filter, accent),
+          _buildMainTabItem(1, "CẮT ẢNH", CupertinoIcons.crop, accent),
+          _buildMainTabItem(
+            2,
+            "LÀM ĐẸP",
+            CupertinoIcons.slider_horizontal_3,
+            accent,
           ),
-      ],
+          _buildMainTabItem(3, "STICKER", CupertinoIcons.smiley, accent),
+          _buildMainTabItem(
+            4,
+            "GHI CHÚ",
+            CupertinoIcons.pencil_outline,
+            accent,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildDrawToolsBtn(
-    PaintingMode mode,
-    IconData icon,
+  Widget _buildMainTabItem(
+    int index,
     String label,
+    IconData icon,
     Color accent,
   ) {
-    final bool isSel = _currentDrawingMode == mode;
+    bool isSel = _currentTab == index;
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        setState(() => _currentDrawingMode = mode);
-      },
+      onTap: () => _openTab(index, PaintingMode.none),
+      behavior: HitTestBehavior.opaque,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isSel ? accent : Colors.white.withOpacity(0.03),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSel ? Colors.white24 : Colors.transparent,
-              ),
-            ),
-            child: Icon(
-              icon,
-              color: isSel ? Colors.black : Colors.white,
-              size: 18,
-            ),
-          ),
-          const SizedBox(height: 5),
+          Icon(icon, color: isSel ? accent : Colors.white54, size: 22),
+          const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSel ? accent : Colors.white54,
-              fontSize: 8,
-              fontWeight: FontWeight.w600,
+              color: isSel ? accent : Colors.white30,
+              fontSize: 9,
+              fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
               letterSpacing: 0.5,
             ),
           ),
@@ -1380,6 +1429,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     );
   }
 
+  // CÁC HÀM TIỆN ÍCH KHÁC GIỮ NGUYÊN
   Widget _buildStudioSubTab(int index, String title, Color accent) {
     final bool active = _currentFilterSubTab == index;
     return GestureDetector(
@@ -1491,132 +1541,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomTabBar(AppLocalizations l10n, Color accent) {
-    if (_currentTab == 1) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            GestureDetector(
-              onTap: () => setState(() {
-                _currentTab = 0;
-                _cropWidth = 0;
-              }),
-              child: const Text(
-                "HỦY",
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: _applyCrop,
-              child: Text(
-                "CẮT ẢNH",
-                style: TextStyle(
-                  color: accent,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 11,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_currentTab == 4 && _currentDrawingMode != PaintingMode.none) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () => setState(() {
-                _currentDrawingMode = PaintingMode.none;
-              }),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: accent,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const Text(
-                  "HOÀN THÀNH VẼ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 10,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildMainTabItem(0, "BỘ LỌC", accent),
-          _buildMainTabItem(1, "CẮT & XOAY", accent),
-          _buildMainTabItem(2, "TINH CHỈNH", accent),
-          _buildMainTabItem(3, "STICKER", accent),
-          _buildMainTabItem(4, "VẼ / NOTES", accent),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainTabItem(int index, String label, Color accent) {
-    final isSel = _currentTab == index;
-    return GestureDetector(
-      onTap: () => setState(() {
-        _currentTab = index;
-        if (index != 3) _selectedStickerId = null;
-        if (index != 4) _currentDrawingMode = PaintingMode.none;
-      }),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: isSel ? Colors.white : Colors.white30,
-                fontSize: 9,
-                fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
-                letterSpacing: 1.0,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Container(
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSel ? accent : Colors.transparent,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -1797,10 +1721,11 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                             : (_currentTextColor == color);
                         return GestureDetector(
                           onTap: () => setState(() {
-                            if (_currentTextHasBg)
+                            if (_currentTextHasBg) {
                               _currentTextBgColor = color;
-                            else
+                            } else {
                               _currentTextColor = color;
+                            }
                           }),
                           child: Container(
                             width: 30,
@@ -1824,21 +1749,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
         ),
       ),
     );
-  }
-
-  void _addIconSticker(String icon) {
-    HapticFeedback.lightImpact();
-    setState(() {
-      _stickers.add(
-        StickerModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          type: StickerType.icon,
-          value: icon,
-        ),
-      );
-      _selectedStickerId = _stickers.last.id;
-    });
-    _saveStateToHistory();
   }
 
   Widget _buildCleanCropGrid(double maxWidth, double maxHeight) {
@@ -1995,39 +1905,32 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     HapticFeedback.heavyImpact();
     setState(() => _isCapturingRaw = true);
     await Future.delayed(const Duration(milliseconds: 100));
-
     try {
       RenderRepaintBoundary boundary =
           _globalKey.currentContext!.findRenderObject()
               as RenderRepaintBoundary;
       ui.Image fullImage = await boundary.toImage(pixelRatio: 3.0);
-
       double scaleX = fullImage.width / boundary.size.width;
       double scaleY = fullImage.height / boundary.size.height;
-
       Rect cropRectPixel = Rect.fromLTWH(
         _cropLeft * scaleX,
         _cropTop * scaleY,
         _cropWidth * scaleX,
         _cropHeight * scaleY,
       );
-
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
       final paint = Paint()..filterQuality = ui.FilterQuality.high;
-
       canvas.drawImageRect(
         fullImage,
         cropRectPixel,
         Rect.fromLTWH(0, 0, cropRectPixel.width, cropRectPixel.height),
         paint,
       );
-
       final croppedUiImage = await recorder.endRecording().toImage(
         cropRectPixel.width.toInt(),
         cropRectPixel.height.toInt(),
       );
-
       ByteData? byteData = await croppedUiImage.toByteData(
         format: ui.ImageByteFormat.png,
       );
@@ -2036,10 +1939,8 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
         '${tempDir.path}/crop_${DateTime.now().millisecondsSinceEpoch}.png',
       ).create();
       await file.writeAsBytes(byteData!.buffer.asUint8List());
-
       fullImage.dispose();
       croppedUiImage.dispose();
-
       setState(() {
         _currentImagePath = file.path;
         _cropWidth = 0;
@@ -2060,18 +1961,15 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     HapticFeedback.heavyImpact();
     setState(() {
       _selectedStickerId = null;
-      _isCapturingRaw = true;
       _currentDrawingMode = PaintingMode.none;
     });
     FocusManager.instance.primaryFocus?.unfocus();
     await Future.delayed(const Duration(milliseconds: 150));
-
     try {
       RenderRepaintBoundary boundary =
           _globalKey.currentContext!.findRenderObject()
               as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-
       ByteData? byteData = await image.toByteData(
         format: ui.ImageByteFormat.png,
       );
@@ -2080,9 +1978,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
         '${tempDir.path}/final_${DateTime.now().millisecondsSinceEpoch}.png',
       ).create();
       await file.writeAsBytes(byteData!.buffer.asUint8List());
-
       image.dispose();
-
       if (mounted) Navigator.pop(context, file.path);
     } catch (e) {
       setState(() => _isCapturingRaw = false);
@@ -2160,7 +2056,6 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       0,
     ],
   ];
-
   final List<List<double>> _hasselbladMatrices = [
     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
     [
@@ -2209,7 +2104,75 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       0,
     ],
   ];
-
+  final List<List<double>> _fujifilmMatrices = [
+    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    [
+      1.1,
+      0.1,
+      -0.1,
+      0,
+      10,
+      -0.1,
+      1.2,
+      0.1,
+      0,
+      5,
+      -0.1,
+      -0.1,
+      1.1,
+      0,
+      -5,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ],
+    [
+      1.2,
+      0.05,
+      -0.05,
+      0,
+      15,
+      0.05,
+      1.1,
+      -0.05,
+      0,
+      10,
+      -0.05,
+      0.05,
+      0.9,
+      0,
+      -10,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ],
+    [
+      1.0,
+      0.2,
+      0.0,
+      0,
+      5,
+      0.0,
+      1.3,
+      0.0,
+      0,
+      20,
+      0.0,
+      0.0,
+      1.1,
+      0,
+      5,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ],
+  ];
   List<double> _getBrightnessMatrix(double value) => [
     1,
     0,
@@ -2286,66 +2249,4 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       0,
     ];
   }
-}
-
-// ─── CUSTOM PAINTERS ───
-class DrawingPainter extends CustomPainter {
-  final List<DrawingPath> paths;
-  DrawingPainter({required this.paths});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // saveLayer giúp tách biệt hiệu ứng tẩy (BlendMode.clear) không ăn ra nền đen của App
-    canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
-
-    for (var path in paths) {
-      if (path.mode == PaintingMode.free || path.mode == PaintingMode.eraser) {
-        if (path.points.isEmpty) continue;
-        final drawPath = Path();
-        bool firstPoint = true;
-
-        for (int i = 0; i < path.points.length; i++) {
-          final point = path.points[i];
-          if (point == null) {
-            // Kết thúc nét vẽ
-          } else if (firstPoint) {
-            drawPath.moveTo(point.dx, point.dy);
-            firstPoint = false;
-          } else {
-            drawPath.lineTo(point.dx, point.dy);
-          }
-        }
-        canvas.drawPath(drawPath, path.paint);
-      } else if (path.mode == PaintingMode.rect && path.rect != null) {
-        canvas.drawRect(path.rect!, path.paint);
-      } else if (path.mode == PaintingMode.circle && path.rect != null) {
-        canvas.drawOval(path.rect!, path.paint);
-      }
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant DrawingPainter old) => true;
-}
-
-class CropOverlayPainter extends CustomPainter {
-  final Rect cropRect;
-  CropOverlayPainter({required this.cropRect});
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withOpacity(0.8);
-    final bgPath = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    final holePath = Path()..addRect(cropRect);
-    canvas.drawPath(
-      Path.combine(PathOperation.difference, bgPath, holePath),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CropOverlayPainter old) =>
-      old.cropRect != cropRect;
 }
