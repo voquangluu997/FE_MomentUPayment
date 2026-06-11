@@ -1,4 +1,4 @@
-import 'dart:ui'; // 🚀 QUAN TRỌNG: Import để dùng hiệu ứng ImageFilter (Kính mờ)
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +9,8 @@ import 'package:moment_u_payment/core/utils/app_calendar_sheet.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/budget/presentation/widgets/home_budget_card.dart';
 import 'package:moment_u_payment/features/budget/providers/view_mode_provider.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/category_filter_bar.dart';
+import 'package:moment_u_payment/features/home/presentation/widgets/category_filter_provider.dart'; // 🚀 IMPORT PROVIDER LỌC MỚI
 import 'package:moment_u_payment/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_badge_carousel.dart';
 import 'package:moment_u_payment/features/home/presentation/widgets/home_grid_group.dart';
@@ -122,6 +124,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 8),
         ],
         const Stack(children: [HomeBudgetCard()]),
+
+        const SizedBox(height: 18),
+
+        const CategoryFilterBar(), // 🎯 THANH LỌC CATEGORY ĐÃ ĐƯỢC CHÈN Ở ĐÂY
+
+        const SizedBox(height: 14),
       ],
     );
   }
@@ -274,7 +282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final timelineState = ref.watch(transactionTimelineProvider);
+    final timelineState = ref.watch(filteredTransactionsProvider);
     final viewModeAsync = ref.watch(viewModeProvider);
     final currentViewMode = viewModeAsync.value ?? ViewMode.list;
     final timelineNotifier = ref.watch(transactionTimelineProvider.notifier);
@@ -287,7 +295,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: const HomeAppBar(),
       body: Stack(
         children: [
-          // 🌟 1. BLOB MÀU GÓC TRÊN TRÁI (Tạo độ sâu 3D)
           Positioned(
             top: -80,
             left: -80,
@@ -300,8 +307,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-
-          // 🌟 2. BLOB MÀU GÓC DƯỚI PHẢI (Gradient đa sắc)
           Positioned(
             bottom: -50,
             right: -100,
@@ -314,16 +319,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-
-          // 🌟 3. LỚP KÍNH MỜ (BACKDROP FILTER) PHỦ LÊN CÁC BLOBS
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
               child: Container(color: Colors.transparent),
             ),
           ),
-
-          // 🌟 4. NỘI DUNG CHÍNH (Đã được nâng lên khỏi lớp nền mờ)
           RefreshIndicator(
             color: appColors.primary,
             backgroundColor: appColors.cardBackground,
@@ -343,6 +344,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               data: (allTransactions) {
+                // Lọc theo ngày
                 final filteredTransactions = _applyDateFilter(allTransactions);
 
                 if (filteredTransactions.isEmpty && timelineState.isLoading) {
@@ -385,7 +387,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       _buildControlHeaderRow(
                         appColors,
                         currentViewMode,
-                        filteredTransactions,
+                        filteredTransactions, // Sẽ update count thành 0
                       ),
                       _buildEmptyState(appColors, l10n),
                     ],
@@ -489,10 +491,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ) {
     return HomeHeaderSection(
       isGridView: currentMode == ViewMode.grid,
-      isFiltered: _selectedDateRange != null,
+      isFiltered:
+          _selectedDateRange != null ||
+          ref.watch(selectedCategoryProvider) !=
+              null, // Update trạng thái Filtered nếu có chọn danh mục
       isCalendarView: currentMode == ViewMode.calendar,
       selectedDateRange: _selectedDateRange,
-      onClearFilter: () => setState(() => _selectedDateRange = null),
+      onClearFilter: () {
+        setState(() => _selectedDateRange = null);
+        ref.read(selectedCategoryProvider.notifier).state =
+            null; // Xoá filter danh mục
+      },
       onSelectStart: () {},
       onSelectEnd: () {},
       onToggleView: () {

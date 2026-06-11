@@ -217,7 +217,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get budgetTitle => 'Ví Ngoan Đặt Mục Tiêu 🎯';
+  String get budgetTitle => 'Đặt ngưỡng chi tiêu 🎯';
 
   @override
   String get budgetSectionTitle => 'HẠN MỨC CHI TIÊU THÁNG NÀY 🌟';
@@ -557,7 +557,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Mật khẩu của bạn đã đổi thành công! Vui lòng đăng nhập.';
 
   @override
-  String get analyticsTitle => 'Thống kê';
+  String get analyticsTitle => 'Thống kê chi tiêu';
 
   @override
   String get spendingTrend => 'Xu hướng';
@@ -1441,7 +1441,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String survivalStateDangerHeading(String amount) {
-    return 'Giới hạn $amount/ngày';
+    return 'Chi tiêu $amount/ngày';
   }
 
   @override
@@ -1489,7 +1489,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thiết lập tấm khiên bảo vệ hầu bao thông minh của bạn.';
 
   @override
-  String get budgetDailySafeLimitTitle => 'Hạn mức tiêu mỗi ngày';
+  String get budgetDailySafeLimitTitle => 'Hạn mức mỗi ngày';
 
   @override
   String get budgetStatusSafe => 'An toàn lý tưởng✨';
@@ -1498,22 +1498,22 @@ class AppLocalizationsVi extends AppLocalizations {
   String get invalidAmountMessage => 'Vui lòng nhập số tiền hợp lệ nha! 💸';
 
   @override
-  String get budgetLifestyleTitle => 'Lối sống ngày';
+  String get budgetLifestyleTitle => 'Level chi tiêu ';
 
   @override
   String get budgetLifestyleStart => 'Bắt đầu kế hoạch thôi! 🎯';
 
   @override
-  String get budgetLifestyleBread => 'Cỡ 1 ổ bánh mì thịt 🥖';
+  String get blessingMessage => 'Chúa phù hộ bạn 🫨';
 
   @override
-  String get budgetLifestyleMilkTea => 'Bằng 1 ly trà sữa Full Topping 🧋';
+  String get budgetLifestyleLow => 'Đỗ nghèo khỉ 💸';
 
   @override
-  String get budgetLifestyleDinner => 'Một bữa tối lãng mạn nhẹ 🥂';
+  String get budgetLifestyleMedium => 'Chi tiêu rón rén 🥂';
 
   @override
-  String get budgetLifestyleRich => 'Sống chuẩn \'Rich Kid\' rồi đấy! 👑';
+  String get budgetLifestyleHigh => 'Đời sống vương giả 👑';
 
   @override
   String get budgetLifestyleActive => 'Tận hưởng cuộc sống năng động! ✨';
@@ -1675,4 +1675,35 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get stickerDeleteDrop => 'Buông tay để xóa liền 🔥';
+
+  @override
+  String get mySpendingSafeZone => 'Vùng chi tiêu an toàn';
+
+  @override
+  String get budgetStatusTitle => 'TÌNH TRẠNG HẠN MỨC';
+
+  @override
+  String get budgetStatusTitleNotSet => 'Tình trạng hạn mức';
+
+  @override
+  String get budgetAdviceExceeded =>
+      'Bạn đã dùng hết hoặc vượt quá giới hạn ngân sách tháng này! 😰';
+
+  @override
+  String budgetAdviceSafeDaily(int days, String amount) {
+    return 'Còn $days ngày hết tháng. Bạn nên chi tiêu trung bình tối đa $amount/ngày để giữ an toàn ngân sách.';
+  }
+
+  @override
+  String budgetBarLeft(String amount) {
+    return 'Còn lại: $amount';
+  }
+
+  @override
+  String get budgetBarLeftNotSet => 'Còn lại: --';
+
+  @override
+  String budgetBarLimit(String amount) {
+    return 'Hạn mức: $amount';
+  }
 }

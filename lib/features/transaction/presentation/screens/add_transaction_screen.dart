@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:moment_u_payment/core/utils/category_helper.dart';
 import 'package:moment_u_payment/features/camera/screens/custom_camera_screen.dart';
 import 'package:moment_u_payment/features/camera/screens/edit_photo_screen.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
@@ -443,14 +444,7 @@ class _CategorySelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
-
-    final List<Map<String, dynamic>> categories = [
-      {'id': 'Food', 'name': l10n.catFood, 'emoji': '🍰'},
-      {'id': 'Shopping', 'name': l10n.catShopping, 'emoji': '🛍️'},
-      {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🛵'},
-      {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🍿'},
-      {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '✨'},
-    ];
+    final categories = CategoryHelper.getTransactionCategories(l10n);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

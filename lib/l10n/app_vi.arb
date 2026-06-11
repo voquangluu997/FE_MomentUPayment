@@ -82,7 +82,7 @@
     }
   },
 
-  "budgetTitle": "Ví Ngoan Đặt Mục Tiêu 🎯",
+  "budgetTitle": "Đặt ngưỡng chi tiêu 🎯",
   "budgetSectionTitle": "HẠN MỨC CHI TIÊU THÁNG NÀY 🌟",
   "budgetHint": "Ví dụ: 5.000.000",
   "budgetSaveButton": "Chốt Ngưỡng Chi Tiêu Thôi! 🚀",
@@ -651,7 +651,7 @@
 "errorGoogleLinked": "Tài khoản này đang dùng Google rồi, đăng nhập bằng Google cho nhanh nè! 🚀",
 "errorEmailNotFound": "Email này chưa được đăng ký tài khoản rùi! 😢",
 
-"analyticsTitle": "Thống kê",
+"analyticsTitle": "Thống kê chi tiêu",
   "analyticsSwitchPeriod": "Giai đoạn",
   "analyticsSwitchMonthly": "Từng tháng",
   
@@ -717,7 +717,7 @@
 "survivalStateGodModePunchline": "Tốc độ tiêu đang rất lý tưởng. Cứ giữ phong độ tuyệt vời này nhé!",
 
 "survivalStateDangerBadge": "BÁO ĐỘNG VÀNG",
-"survivalStateDangerHeading": "Giới hạn {amount}/ngày",
+"survivalStateDangerHeading": "Chi tiêu {amount}/ngày",
 "@survivalStateDangerHeading": {
   "placeholders": { "amount": { "type": "String" } }
 },
@@ -745,19 +745,19 @@
   "budgetCardCosmicMessage": "Thông điệp vũ trụ:",
   "budgetCardTapToView": "Nhấn để xem lời nhắc...",
   "budgetHeaderSubtitle": "Thiết lập tấm khiên bảo vệ hầu bao thông minh của bạn.",
-  "budgetDailySafeLimitTitle": "Hạn mức tiêu mỗi ngày",
+  "budgetDailySafeLimitTitle": "Hạn mức mỗi ngày",
   "budgetRemainingLabel": "Đánh giá trạng thái",
   "budgetStatusSafe": "An toàn lý tưởng✨",
   "budgetStatusWarning": "Vùng nguy hiểm!🚨",
   "invalidAmountMessage": "Vui lòng nhập số tiền hợp lệ nha! 💸",
   "categoryOther": "Khác",
 
-  "budgetLifestyleTitle": "Lối sống ngày",
+  "budgetLifestyleTitle": "Level chi tiêu ",
   "budgetLifestyleStart": "Bắt đầu kế hoạch thôi! 🎯",
-  "budgetLifestyleBread": "Cỡ 1 ổ bánh mì thịt 🥖",
-  "budgetLifestyleMilkTea": "Bằng 1 ly trà sữa Full Topping 🧋",
-  "budgetLifestyleDinner": "Một bữa tối lãng mạn nhẹ 🥂",
-  "budgetLifestyleRich": "Sống chuẩn 'Rich Kid' rồi đấy! 👑",
+  "blessingMessage": "Chúa phù hộ bạn 🫨",
+  "budgetLifestyleLow": "Đỗ nghèo khỉ 💸",
+  "budgetLifestyleMedium": "Chi tiêu rón rén 🥂",
+  "budgetLifestyleHigh": "Đời sống vương giả 👑",
   "budgetLifestyleActive": "Tận hưởng cuộc sống năng động! ✨",
   "chooseCurrencyTitle": "Chọn đơn vị tiền tệ",
   "currencyVND": "Việt Nam Đồng",
@@ -818,5 +818,16 @@
   "cropRotate90": "XOAY 90°",
   "cropReset": "KHÔI PHỤC",
   "stickerDeleteDrag": "Kéo vào đây để xóa 🗑️",
-  "stickerDeleteDrop": "Buông tay để xóa liền 🔥"
+  "stickerDeleteDrop": "Buông tay để xóa liền 🔥",
+
+
+  "mySpendingSafeZone": "Vùng chi tiêu an toàn",
+
+  "budgetStatusTitle": "TÌNH TRẠNG HẠN MỨC",
+  "budgetStatusTitleNotSet": "Tình trạng hạn mức",
+  "budgetAdviceExceeded": "Bạn đã dùng hết hoặc vượt quá giới hạn ngân sách tháng này! 😰",
+  "budgetAdviceSafeDaily": "Còn {days} ngày hết tháng. Bạn nên chi tiêu trung bình tối đa {amount}/ngày để giữ an toàn ngân sách.",
+  "budgetBarLeft": "Còn lại: {amount}",
+  "budgetBarLeftNotSet": "Còn lại: --",
+  "budgetBarLimit": "Hạn mức: {amount}"
 }

@@ -1071,7 +1071,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Analytics'**
+  /// **'Spending Analytics'**
   String get analyticsTitle;
 
   /// No description provided for @spendingTrend.
@@ -2631,7 +2631,7 @@ abstract class AppLocalizations {
   /// No description provided for @survivalStateDangerHeading.
   ///
   /// In en, this message translates to:
-  /// **'Limit {amount}/day'**
+  /// **'Spending {amount}/day'**
   String survivalStateDangerHeading(String amount);
 
   /// No description provided for @survivalStateDangerPunchline.
@@ -2736,29 +2736,29 @@ abstract class AppLocalizations {
   /// **'Let\'s start planning! 🎯'**
   String get budgetLifestyleStart;
 
-  /// No description provided for @budgetLifestyleBread.
+  /// No description provided for @blessingMessage.
   ///
   /// In en, this message translates to:
-  /// **'About a sandwich 🥖'**
-  String get budgetLifestyleBread;
+  /// **'God bless you 🫨'**
+  String get blessingMessage;
 
-  /// No description provided for @budgetLifestyleMilkTea.
+  /// No description provided for @budgetLifestyleLow.
   ///
   /// In en, this message translates to:
-  /// **'Equals a full-topping boba 🧋'**
-  String get budgetLifestyleMilkTea;
+  /// **'Broke \'n\' Poor 💸'**
+  String get budgetLifestyleLow;
 
-  /// No description provided for @budgetLifestyleDinner.
+  /// No description provided for @budgetLifestyleMedium.
   ///
   /// In en, this message translates to:
-  /// **'A light romantic dinner 🥂'**
-  String get budgetLifestyleDinner;
+  /// **'Living on a budget 🥂'**
+  String get budgetLifestyleMedium;
 
-  /// No description provided for @budgetLifestyleRich.
+  /// No description provided for @budgetLifestyleHigh.
   ///
   /// In en, this message translates to:
-  /// **'Living that \'Rich Kid\' life! 👑'**
-  String get budgetLifestyleRich;
+  /// **'Living like royalty 👑'**
+  String get budgetLifestyleHigh;
 
   /// No description provided for @budgetLifestyleActive.
   ///
@@ -3077,6 +3077,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Release to delete 🔥'**
   String get stickerDeleteDrop;
+
+  /// No description provided for @mySpendingSafeZone.
+  ///
+  /// In en, this message translates to:
+  /// **'My spending safe-zone'**
+  String get mySpendingSafeZone;
+
+  /// Title for the budget status section
+  ///
+  /// In en, this message translates to:
+  /// **'BUDGET STATUS'**
+  String get budgetStatusTitle;
+
+  /// Title for the budget status section when not set
+  ///
+  /// In en, this message translates to:
+  /// **'Budget status'**
+  String get budgetStatusTitleNotSet;
+
+  /// Advice shown when budget is zero or negative
+  ///
+  /// In en, this message translates to:
+  /// **'You have exhausted or exceeded your budget limit for this month! 😰'**
+  String get budgetAdviceExceeded;
+
+  /// Advice for daily safe spending limit
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left in the month. You should spend an average of max {amount}/day to keep your budget safe.'**
+  String budgetAdviceSafeDaily(int days, String amount);
+
+  /// Label for remaining amount on the progress bar
+  ///
+  /// In en, this message translates to:
+  /// **'Left: {amount}'**
+  String budgetBarLeft(String amount);
+
+  /// Label for remaining amount when budget is not set
+  ///
+  /// In en, this message translates to:
+  /// **'Left: --'**
+  String get budgetBarLeftNotSet;
+
+  /// Label for total limit on the progress bar
+  ///
+  /// In en, this message translates to:
+  /// **'Limit: {amount}'**
+  String budgetBarLimit(String amount);
 }
 
 class _AppLocalizationsDelegate

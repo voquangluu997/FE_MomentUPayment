@@ -138,3 +138,4 @@ final transactionProvider =
     StateNotifierProvider<TransactionNotifier, TransactionState>((ref) {
       return TransactionNotifier(ref);
     });
+    

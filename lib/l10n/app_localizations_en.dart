@@ -555,7 +555,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your password has been changed successfully! Please log in.';
 
   @override
-  String get analyticsTitle => 'Analytics';
+  String get analyticsTitle => 'Spending Analytics';
 
   @override
   String get spendingTrend => 'Trend';
@@ -1429,7 +1429,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String survivalStateDangerHeading(String amount) {
-    return 'Limit $amount/day';
+    return 'Spending $amount/day';
   }
 
   @override
@@ -1492,16 +1492,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetLifestyleStart => 'Let\'s start planning! 🎯';
 
   @override
-  String get budgetLifestyleBread => 'About a sandwich 🥖';
+  String get blessingMessage => 'God bless you 🫨';
 
   @override
-  String get budgetLifestyleMilkTea => 'Equals a full-topping boba 🧋';
+  String get budgetLifestyleLow => 'Broke \'n\' Poor 💸';
 
   @override
-  String get budgetLifestyleDinner => 'A light romantic dinner 🥂';
+  String get budgetLifestyleMedium => 'Living on a budget 🥂';
 
   @override
-  String get budgetLifestyleRich => 'Living that \'Rich Kid\' life! 👑';
+  String get budgetLifestyleHigh => 'Living like royalty 👑';
 
   @override
   String get budgetLifestyleActive => 'Enjoy your active life! ✨';
@@ -1663,4 +1663,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stickerDeleteDrop => 'Release to delete 🔥';
+
+  @override
+  String get mySpendingSafeZone => 'My spending safe-zone';
+
+  @override
+  String get budgetStatusTitle => 'BUDGET STATUS';
+
+  @override
+  String get budgetStatusTitleNotSet => 'Budget status';
+
+  @override
+  String get budgetAdviceExceeded =>
+      'You have exhausted or exceeded your budget limit for this month! 😰';
+
+  @override
+  String budgetAdviceSafeDaily(int days, String amount) {
+    return '$days days left in the month. You should spend an average of max $amount/day to keep your budget safe.';
+  }
+
+  @override
+  String budgetBarLeft(String amount) {
+    return 'Left: $amount';
+  }
+
+  @override
+  String get budgetBarLeftNotSet => 'Left: --';
+
+  @override
+  String budgetBarLimit(String amount) {
+    return 'Limit: $amount';
+  }
 }

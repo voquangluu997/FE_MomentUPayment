@@ -24,6 +24,7 @@ class CurrencyPickerUtil {
     required ValueChanged<String> onCurrencyChanged,
   }) {
     HapticFeedback.mediumImpact();
+    final textTheme = Theme.of(context).textTheme; // Lấy bộ font hệ thống
     final List<Map<String, String>> currencyList = [
       {'symbol': '₫', 'name': 'Việt Nam Đồng (VND)'},
       {'symbol': '\$', 'name': 'Đô la Mỹ (USD)'},
@@ -58,7 +59,7 @@ class CurrencyPickerUtil {
                 const SizedBox(height: 18),
                 Text(
                   "Đơn vị tiền tệ".toUpperCase(),
-                  style: TextStyle(
+                  style: textTheme.bodyMedium?.copyWith(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: appColors.primaryDark.withOpacity(0.6),
@@ -107,24 +108,22 @@ class CurrencyPickerUtil {
                               alignment: Alignment.center,
                               child: Text(
                                 currency['symbol']!,
-                                style: TextStyle(
+                                style: textTheme.titleMedium?.copyWith(
                                   color: isSelected
                                       ? Colors.white
                                       : appColors.primary,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 14),
                             Text(
                               currency['name']!,
-                              style: TextStyle(
+                              style: textTheme.bodyLarge?.copyWith(
                                 color: appColors.text,
                                 fontWeight: isSelected
                                     ? FontWeight.w700
                                     : FontWeight.w500,
-                                fontSize: 14,
                               ),
                             ),
                             const Spacer(),
@@ -239,16 +238,17 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
   ) {
     if (daily <= 0) return l10n.budgetLifestyleStart;
     if (symbol == '₫' || symbol == 'đ') {
-      if (daily < 30000) return l10n.budgetLifestyleBread;
-      if (daily < 60000) return l10n.budgetLifestyleMilkTea;
-      if (daily < 200000) return l10n.budgetLifestyleDinner;
-      return l10n.budgetLifestyleRich;
+      if (daily < 50000) return l10n.blessingMessage;
+      if (daily < 80000) return l10n.budgetLifestyleLow;
+      if (daily < 200000) return l10n.budgetLifestyleMedium;
+      return l10n.budgetLifestyleHigh;
     }
     return l10n.budgetLifestyleActive;
   }
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme; // Lấy bộ font hệ thống
     final appColors = ref.watch(appColorsProvider);
     final budgetState = ref.watch(budgetProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -258,14 +258,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     final bool isBudgetLow = _currentAmount > 0 && _currentAmount < totalSpent;
 
     ref.listen<BudgetState>(budgetProvider, (previous, next) {
-      if (next == BudgetState.success) { // Trạng thái thành công
-        // 1. Ép Riverpod làm mới lại provider của HomeScreen
-        ref.invalidate(homeBudgetProvider); 
-        
-        // 2. Hiện Toast thông báo mượt mà
+      if (next == BudgetState.success) {
+        ref.invalidate(homeBudgetProvider);
         AppToast.showSuccess(context, l10n.budgetUpdateSuccess, appColors);
-        
-        // 3. Đóng màn hình hiện tại để quay về Home
         if (context.mounted) {
           Navigator.pop(context);
         }
@@ -275,9 +270,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     });
 
     return GestureDetector(
-      onTap: () => FocusScope.of(
-        context,
-      ).unfocus(), // 🚀 GIÚP ĐÓNG BÀN PHÍM KHI CHẠM NGOÀI MÀN HÌNH
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: appColors.background,
         body: Stack(
@@ -312,10 +305,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                     centerTitle: true,
                     title: Text(
                       l10n.budgetTitle,
-                      style: TextStyle(
+                      style: textTheme.titleLarge?.copyWith(
                         color: appColors.text,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
@@ -331,17 +323,19 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                         Text(
                           l10n.budgetHeaderSubtitle,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: textTheme.bodyLarge?.copyWith(
                             color: appColors.textMuted,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
 
                         const SizedBox(height: 32),
 
-                        // Ô NHẬP LIỆU CHÍNH ĐÃ ĐƯỢC THAY ĐỔI THEO CHUẨN MỚI
-                        _buildMainInput(currencySymbol, appColors, isBudgetLow),
+                        _buildMainInput(
+                          currencySymbol,
+                          appColors,
+                          isBudgetLow,
+                          textTheme,
+                        ),
 
                         const SizedBox(height: 24),
 
@@ -357,6 +351,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                                         ? appColors.error
                                         : appColors.success,
                                     appColors,
+                                    textTheme,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -370,6 +365,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                                     ),
                                     appColors.primary,
                                     appColors,
+                                    textTheme,
                                   ),
                                 ),
                               ],
@@ -383,6 +379,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                             appColors,
                             isBudgetLow,
                             l10n,
+                            textTheme,
                           ),
                         ],
 
@@ -392,19 +389,23 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                           alignment: Alignment.centerLeft,
                           child: Text(
                             l10n.quickSuggestions,
-                            style: TextStyle(
-                              fontSize: 16,
+                            style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w900,
                               color: appColors.text,
                             ),
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildQuickChips(currencySymbol, appColors),
+                        _buildQuickChips(currencySymbol, appColors, textTheme),
 
                         const SizedBox(height: 40),
 
-                        _buildBigSaveButton(budgetState, appColors, l10n),
+                        _buildBigSaveButton(
+                          budgetState,
+                          appColors,
+                          l10n,
+                          textTheme,
+                        ),
                         const SizedBox(height: 100),
                       ],
                     ),
@@ -452,21 +453,30 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     );
   }
 
-  // 🚀 NÂNG CẤP TOÀN DIỆN Ô INPUT THEO CHUẨN ADD_TRANSACTION_SCREEN
-  Widget _buildMainInput(String symbol, AppColorTheme appColors, bool isLow) {
+  Widget _buildMainInput(
+    String symbol,
+    AppColorTheme appColors,
+    bool isLow,
+    TextTheme textTheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Thanh phím tắt .000 ở góc trên bên phải thanh tiêu đề đầu vào dữ liệu ngân sách
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            _buildShortcutButton('.000', () => _appendZeros('000'), appColors),
+            _buildShortcutButton(
+              '.000',
+              () => _appendZeros('000'),
+              appColors,
+              textTheme,
+            ),
             const SizedBox(width: 6),
             _buildShortcutButton(
               '.000.000',
               () => _appendZeros('000000'),
               appColors,
+              textTheme,
             ),
           ],
         ),
@@ -499,13 +509,16 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                   controller: _budgetController,
                   keyboardType: TextInputType.number,
                   onChanged: _onBudgetChanged,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
+                  style: textTheme.headlineLarge?.copyWith(
+                    fontSize: 24,
                     color: isLow ? appColors.error : appColors.primaryDark,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '0',
+                    hintStyle: textTheme.headlineLarge?.copyWith(
+                      fontSize: 28,
+                      color: appColors.textMuted.withOpacity(0.3),
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
@@ -513,7 +526,6 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                 ),
               ),
 
-              // 🚀 DẤU X ĐÃ ĐƯỢC ĐƯA VÀO NẰM NGANG HÀNG ĐỒNG NHẤT VỚI Ô TEXTFIELD
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _budgetController,
                 builder: (context, value, child) {
@@ -536,7 +548,6 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                 },
               ),
 
-              // NÚT CHỌN ĐƠN VỊ TIỀN TỆ ĐỒNG BỘ PHONG CÁCH MỚI MƯỢT MÀ
               InkWell(
                 onTap: () => CurrencyPickerUtil.showCurrencyBottomSheet(
                   context: context,
@@ -564,7 +575,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                     children: [
                       Text(
                         symbol,
-                        style: const TextStyle(
+                        style: textTheme.bodyLarge?.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -587,11 +598,11 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     );
   }
 
-  // 🚀 ĐỒNG BỘ THIẾT KẾ PHÍM TẮT MÀU HỒNG MỜ (PRIMARY TRANSLUCENT)
   Widget _buildShortcutButton(
     String label,
     VoidCallback onTap,
     AppColorTheme appColors,
+    TextTheme textTheme,
   ) {
     return Material(
       color: appColors.primary.withOpacity(0.08),
@@ -603,7 +614,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           child: Text(
             label,
-            style: TextStyle(
+            style: textTheme.bodyLarge?.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: appColors.primary,
@@ -619,6 +630,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     String value,
     Color accent,
     AppColorTheme appColors,
+    TextTheme textTheme,
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -632,7 +644,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
         children: [
           Text(
             label.toUpperCase(),
-            style: TextStyle(
+            style: textTheme.bodyMedium?.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w800,
               color: appColors.textMuted,
@@ -643,8 +655,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
           Flexible(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: 16,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: accent,
               ),
@@ -662,6 +673,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     AppColorTheme appColors,
     bool isLow,
     AppLocalizations l10n,
+    TextTheme textTheme,
   ) {
     double progress = (spent / limit).clamp(0.0, 1.0);
     return Column(
@@ -671,15 +683,14 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
           children: [
             Text(
               "${l10n.spentLabel}: ${_formatNumber(spent.toStringAsFixed(0))} $symbol",
-              style: TextStyle(
+              style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: appColors.textMuted,
                 fontSize: 12,
               ),
             ),
             Text(
               "${(progress * 100).toInt()}%",
-              style: TextStyle(
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: isLow ? appColors.error : appColors.primary,
               ),
@@ -720,7 +731,11 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     );
   }
 
-  Widget _buildQuickChips(String symbol, AppColorTheme appColors) {
+  Widget _buildQuickChips(
+    String symbol,
+    AppColorTheme appColors,
+    TextTheme textTheme,
+  ) {
     final suggestions = symbol == '₫'
         ? ["1000000", "3000000", "5000000", "10000000"]
         : ["100", "500", "1000", "2000"];
@@ -755,7 +770,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
             ),
             child: Text(
               labels[index],
-              style: TextStyle(
+              style: textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: _currentAmount.toStringAsFixed(0) == suggestions[index]
                     ? Colors.white
@@ -772,6 +787,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     BudgetState state,
     AppColorTheme appColors,
     AppLocalizations l10n,
+    TextTheme textTheme,
   ) {
     bool isEnabled = _currentAmount > 0 && state != BudgetState.loading;
     return CupertinoButton(
@@ -811,10 +827,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
             ? const CupertinoActivityIndicator(color: Colors.white)
             : Text(
                 l10n.budgetSaveButton.toUpperCase(),
-                style: const TextStyle(
+                style: textTheme.titleMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
-                  fontSize: 16,
                   letterSpacing: 2,
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,7 +58,6 @@ class HomeBudgetCard extends ConsumerWidget {
   }
 }
 
-// --- 🌟 STATEFUL WIDGET ĐỂ QUẢN LÝ TRẠNG THÁI MỞ/THU GỌN THẺ ---
 class _HomeBudgetCardContent extends ConsumerStatefulWidget {
   final dynamic summary;
   const _HomeBudgetCardContent({required this.summary});
@@ -68,55 +67,23 @@ class _HomeBudgetCardContent extends ConsumerStatefulWidget {
       _HomeBudgetCardContentState();
 }
 
-class _HomeBudgetCardContentState
-    extends ConsumerState<_HomeBudgetCardContent> {
-  // Trạng thái mở rộng toàn bộ thẻ
-  bool _isCardExpanded = true;
-  // Trạng thái mở rộng thông điệp phụ (Punchline)
-  bool _isMessageExpanded = true;
-
-  Timer? _hideTimer;
+class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
+    with SingleTickerProviderStateMixin {
+  // 🌟 Controller tạo chuyển động đi bộ cho chú cún
+  late AnimationController _walkController;
 
   @override
   void initState() {
     super.initState();
-    _startAutoCollapseTimer();
-  }
-
-  void _startAutoCollapseTimer() {
-    _hideTimer?.cancel();
-    // Tự động thu gọn thẻ sau 30 giây
-    _hideTimer = Timer(const Duration(seconds: 30), () {
-      if (mounted && _isCardExpanded) {
-        setState(() {
-          _isCardExpanded = false;
-        });
-      }
-    });
-  }
-
-  void _toggleCard() {
-    setState(() {
-      _isCardExpanded = !_isCardExpanded;
-      if (_isCardExpanded) {
-        // Nếu vừa mở thẻ ra, bắt đầu đếm 30s để tự động thu nhỏ
-        _startAutoCollapseTimer();
-      } else {
-        // Nếu chủ động thu nhỏ thì hủy hẹn giờ
-        _hideTimer?.cancel();
-      }
-    });
-  }
-
-  void _toggleMessage() {
-    setState(() {
-      _isMessageExpanded = !_isMessageExpanded;
-    });
+    _walkController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _hideTimer?.cancel();
+    _walkController.dispose();
     super.dispose();
   }
 
@@ -193,14 +160,31 @@ class _HomeBudgetCardContentState
     final double spentPercentage = isNotSet ? 0.0 : (spent / limit);
     final double clampedPercentage = spentPercentage.clamp(0.0, 1.0);
 
-    final String spentStr = CurrencyHelper.formatCompactAmount(
-      spent,
+    final String leftStr = CurrencyHelper.formatCompactAmount(
+      remaining > 0 ? remaining : 0,
       symbol: currentCurrency,
     );
     final String limitStr = CurrencyHelper.formatCompactAmount(
       limit,
       symbol: currentCurrency,
     );
+    final String spentStr = CurrencyHelper.formatCompactAmount(
+      spent,
+      symbol: currentCurrency,
+    );
+
+    // Chuỗi văn bản gợi ý chi tiêu và đếm ngược ngày
+    String adviceText;
+    if (isNotSet) {
+      adviceText = l10n.survivalStateNotSetHeading;
+    } else if (remaining <= 0) {
+      adviceText = l10n.budgetAdviceExceeded;
+    } else {
+      adviceText = l10n.budgetAdviceSafeDaily(
+        remainingDaysInMonth,
+        safeDailySpendStr,
+      );
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -208,8 +192,7 @@ class _HomeBudgetCardContentState
         borderRadius: BorderRadius.circular(32),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
+          child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -236,7 +219,6 @@ class _HomeBudgetCardContentState
             ),
             child: Stack(
               children: [
-                // Icon chìm kích thước lớn (Background)
                 Positioned(
                   right: -24,
                   top: -10,
@@ -252,417 +234,305 @@ class _HomeBudgetCardContentState
                     ),
                   ),
                 ),
-                // Lớp Material chứa nội dung CrossFade
-                Material(
-                  color: Colors.transparent,
-                  child: AnimatedCrossFade(
-                    crossFadeState: _isCardExpanded
-                        ? CrossFadeState.showFirst
-                        : CrossFadeState.showSecond,
-                    duration: const Duration(milliseconds: 400),
-                    sizeCurve: Curves.easeOutQuart,
-                    // View khi mở rộng
-                    firstChild: _buildExpandedView(
-                      config,
-                      isNotSet,
-                      spentStr,
-                      limitStr,
-                      clampedPercentage,
-                      l10n,
-                    ),
-                    // View khi thu gọn (Cập nhật giao diện mới)
-                    secondChild: _buildCollapsedView(
-                      config,
-                      isNotSet,
-                      spentStr,
-                      limitStr,
-                      remainingDaysInMonth,
-                      l10n,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // --- GIAO DIỆN KHI MỞ RỘNG TOÀN BỘ THẺ ---
-  Widget _buildExpandedView(
-    _CardDesignConfig config,
-    bool isNotSet,
-    String spentStr,
-    String limitStr,
-    double clampedPercentage,
-    AppLocalizations l10n,
-  ) {
-    return InkWell(
-      onTap: () => Navigator.of(context).push(
-        CupertinoPageRoute(
-          builder: (_) =>
-              isNotSet ? const SetBudgetScreen() : const AnalyticsScreen(),
-        ),
-      ),
-      highlightColor: config.shadowColor.withOpacity(0.05),
-      splashColor: config.shadowColor.withOpacity(0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: config.textColor.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: config.shadowColor.withOpacity(0.2),
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _PulseIndicator(
-                        color: config.accentColors.last,
-                        isPulsing: config.shouldPulse,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        config.badgeText.toUpperCase(),
-                        style: TextStyle(
-                          color: config.textColor.withOpacity(0.9),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Nút thu phóng thẻ được đưa lên góc trên bên phải
                 InkWell(
-                  onTap: _toggleCard,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: config.textColor.withOpacity(0.05),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: config.textColor.withOpacity(0.1),
-                      ),
-                    ),
-                    child: Icon(
-                      CupertinoIcons.chevron_up,
-                      size: 16,
-                      color: config.textColor.withOpacity(0.8),
+                  onTap: () => Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (_) => isNotSet
+                          ? const SetBudgetScreen()
+                          : const AnalyticsScreen(),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            Text(
-              config.mainDisplayHeading,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: config.textColor.withOpacity(0.95),
-                letterSpacing: -0.5,
-                height: 1.2,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 10),
-
-            // KHI NHẤN VÀO TOÀN BỘ KHU VỰC NÀY SẼ CHUYỂN QUA SET BUDGET LIMIT
-            InkWell(
-              onTap: () => Navigator.of(context).push(
-                CupertinoPageRoute(builder: (_) => const SetBudgetScreen()),
-              ),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: config.textColor.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: config.textColor.withOpacity(0.08)),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment
-                      .start, // Đẩy icon lên trên nếu text rớt dòng
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
-                      child: Icon(
-                        isNotSet
-                            ? CupertinoIcons.compass
-                            : CupertinoIcons.chart_pie_fill,
-                        size: 16,
-                        color: config.accentColors.last,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      // SỬ DỤNG TEXT.RICH ĐỂ ICON BÁM SÁT THEO CHỮ VÀ TỰ ĐỘNG XUỐNG DÒNG
-                      child: Text.rich(
-                        TextSpan(
+                  highlightColor: config.shadowColor.withOpacity(0.05),
+                  splashColor: config.shadowColor.withOpacity(0.1),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // --- PHẦN 1: HEADER TAG PHÁT SÁNG ---
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            TextSpan(
-                              text: isNotSet
-                                  ? l10n.setupRadarNow
-                                  : l10n.budgetSpentStatus(spentStr, limitStr),
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: config.textColor.withOpacity(0.8),
-                                height: 1.4, // Tạo khoảng thở giữa các dòng
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: config.textColor.withOpacity(0.06),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: config.shadowColor.withOpacity(0.15),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _PulseIndicator(
+                                    color: config.accentColors.last,
+                                    isPulsing: config.shouldPulse,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    isNotSet
+                                        ? l10n.setupRadarNow.toUpperCase()
+                                        : l10n.mySpendingSafeZone.toUpperCase(),
+                                    style: TextStyle(
+                                      color: config.textColor.withOpacity(0.9),
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 6.0),
+                            // Nút chuyển hướng chỉnh sửa nhanh ngân sách
+                            InkWell(
+                              onTap: () => Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (_) => const SetBudgetScreen(),
+                                ),
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: config.accentColors.last.withOpacity(
+                                    0.15,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: config.accentColors.last.withOpacity(
+                                      0.3,
+                                    ),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 child: Icon(
-                                  CupertinoIcons
-                                      .pencil, // Icon chỉnh sửa bám theo chữ
-                                  size: 16,
-                                  color: config.textColor.withOpacity(0.7),
+                                  CupertinoIcons.pencil,
+                                  size: 12,
+                                  color: config.accentColors.last,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
+                        const SizedBox(height: 14),
 
-            SizedBox(
-              height: 8,
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: config.textColor.withOpacity(0.06),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                  FractionallySizedBox(
-                    widthFactor: clampedPercentage,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.easeOutQuart,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: config.accentColors),
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          BoxShadow(
-                            color: config.shadowColor.withOpacity(0.6),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // THÔNG ĐIỆP VŨ TRỤ (CHỈ CÓ THỂ THU PHÓNG RIÊNG BIỆT)
-            GestureDetector(
-              onTap: _toggleMessage,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      config.textColor.withOpacity(0.03),
-                      config.textColor.withOpacity(0.01),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: config.textColor.withOpacity(0.05)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          config.bottomIcon,
-                          size: 14,
-                          color: config.shadowColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.budgetCardCosmicMessage,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: config.textColor.withOpacity(0.7),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Icon(
-                          _isMessageExpanded
-                              ? CupertinoIcons.chevron_up
-                              : CupertinoIcons.chevron_down,
-                          size: 14,
-                          color: config.textColor.withOpacity(0.4),
-                        ),
-                      ],
-                    ),
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: !_isMessageExpanded
-                          ? const SizedBox.shrink()
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 8, left: 22),
-                              child: Text(
-                                config.punchline,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: config.textColor.withOpacity(0.9),
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --- GIAO DIỆN KHI THU GỌN THẺ (BỐ CỤC HOÀN TOÀN MỚI) ---
-  Widget _buildCollapsedView(
-    _CardDesignConfig config,
-    bool isNotSet,
-    String spentStr,
-    String limitStr,
-    int remainingDays,
-    AppLocalizations l10n,
-  ) {
-    return InkWell(
-      onTap: _toggleCard, // Hành động mở rộng thẻ
-      highlightColor: config.shadowColor.withOpacity(0.05),
-      splashColor: config.shadowColor.withOpacity(0.1),
-      // CHUYỂN TỪ ROW SANG STACK ĐỂ NÚT MŨI TÊN KHÔNG CHIẾM DIỆN TÍCH NGANG
-      child: Stack(
-        children: [
-          Padding(
-            // Tăng padding bottom lên một chút để chữ không đè vào icon mũi tên
-            padding: const EdgeInsets.only(
-              left: 20,
-              top: 16,
-              right: 16,
-              bottom: 22,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: config.textColor.withOpacity(0.05),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: config.shadowColor.withOpacity(0.2),
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Icon(
-                    config.icon,
-                    size: 24,
-                    color: config.accentColors.last,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (_) => const SetBudgetScreen(),
-                      ),
-                    ),
-                    behavior: HitTestBehavior.opaque,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: isNotSet
-                                    ? l10n.setupRadarNow
-                                    : l10n.budgetSpentStatus(
-                                        spentStr,
-                                        limitStr,
-                                      ),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: config.textColor.withOpacity(0.95),
-                                  height: 1.3,
-                                ),
-                              ),
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 6.0),
-                                  child: Icon(
-                                    CupertinoIcons.pencil,
-                                    size: 14,
-                                    color: config.textColor.withOpacity(0.7),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        // 🌍 ĐÃ ÁP DỤNG ĐA NGÔN NGỮ Ở ĐÂY
+                        // --- PHẦN 2: TÌNH TRẠNG HẠN MỨC & GỢI Ý CHI TIÊU ---
                         Text(
-                          l10n.budgetRemainingDays(remainingDays),
+                          isNotSet
+                              ? l10n.budgetStatusTitleNotSet
+                              : l10n.budgetStatusTitle,
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: config.textColor.withOpacity(0.6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: config.textColor.withOpacity(0.45),
+                            letterSpacing: 0.8,
                           ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          adviceText,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: config.textColor.withOpacity(0.95),
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // --- PHẦN 3: THANH PROGRESS BAR ĐỘC QUYỀN (CHÚ CÚN BIẾT ĐI) ---
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            const double dogBoxWidth = 60.0;
+                            final double trackWidth = constraints.maxWidth;
+                            final double usableTrackWidth =
+                                trackWidth - dogBoxWidth;
+                            final double dogLeftOffset =
+                                usableTrackWidth * clampedPercentage;
+
+                            return SizedBox(
+                              height:
+                                  85, // Không gian chứa số tiền đã tiêu, cún và số tiền bên dưới
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  // Nền thanh tiến trình chìm phía dưới
+                                  Positioned(
+                                    top: 42,
+                                    left: dogBoxWidth / 2,
+                                    right: dogBoxWidth / 2,
+                                    child: Container(
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: config.textColor.withOpacity(
+                                          0.08,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Thanh tiến trình đã nạp đầy màu sắc gradient sinh động
+                                  Positioned(
+                                    top: 42,
+                                    left: dogBoxWidth / 2,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 600,
+                                      ),
+                                      curve: Curves.easeOutQuart,
+                                      height: 6,
+                                      width: dogLeftOffset,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: config.accentColors,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Đầu thanh tiến trình: Số tiền CÒN LẠI
+                                  Positioned(
+                                    top: 64,
+                                    left: 4,
+                                    child: Text(
+                                      isNotSet
+                                          ? l10n.budgetBarLeftNotSet
+                                          : l10n.budgetBarLeft(leftStr),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        color: remaining > 0
+                                            ? (isDark
+                                                  ? const Color(0xFF34D399)
+                                                  : const Color(0xFF059669))
+                                            : config.textColor.withOpacity(0.4),
+                                      ),
+                                    ),
+                                  ),
+                                  // Cuối thanh tiến trình: Số tiền HẠN MỨC
+                                  Positioned(
+                                    top: 64,
+                                    right: 4,
+                                    child: Text(
+                                      l10n.budgetBarLimit(limitStr),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        color: config.textColor.withOpacity(
+                                          0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Widget chú cún chuyển động kết hợp số tiền ĐÃ TIÊU ở trên đầu
+                                  AnimatedPositioned(
+                                    duration: const Duration(milliseconds: 600),
+                                    curve: Curves.easeOutQuart,
+                                    left: dogLeftOffset,
+                                    top: 0,
+                                    child: SizedBox(
+                                      width: dogBoxWidth,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Bong bóng số tiền ĐÃ TIÊU nổi phía trên
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 3,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: config.accentColors.last,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: config
+                                                        .accentColors
+                                                        .last
+                                                        .withOpacity(0.25),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Text(
+                                                spentStr,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          // Chú cún di chuyển sinh động bước đi bộ (Wobble & Bounce)
+                                          AnimatedBuilder(
+                                            animation: _walkController,
+                                            builder: (context, child) {
+                                              // Không nhảy lắc lắc nếu chưa thiết lập ví hoặc đã dùng hết ví
+                                              final double bounce =
+                                                  (isNotSet || remaining <= 0)
+                                                  ? 0
+                                                  : math.sin(
+                                                          _walkController
+                                                                  .value *
+                                                              math.pi,
+                                                        ) *
+                                                        -3.5;
+                                              final double wobble =
+                                                  (isNotSet || remaining <= 0)
+                                                  ? 0
+                                                  : math.cos(
+                                                          _walkController
+                                                                  .value *
+                                                              math.pi,
+                                                        ) *
+                                                        0.08;
+
+                                              return Transform.translate(
+                                                offset: Offset(0, bounce),
+                                                child: Transform.rotate(
+                                                  angle: wobble,
+                                                  child: Transform(
+                                                    alignment: Alignment.center,
+                                                    transform:
+                                                        Matrix4.identity()
+                                                          ..rotateY(math.pi),
+                                                    child: Text(
+                                                      remaining <= 0
+                                                          ? '😵'
+                                                          : '🐕',
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -671,23 +541,12 @@ class _HomeBudgetCardContentState
               ],
             ),
           ),
-
-          // 📍 ĐỊNH VỊ NÚT CHEVRON Ở GÓC DƯỚI CÙNG BÊN PHẢI (TRONG ĐỘC LẬP)
-          Positioned(
-            bottom: 12,
-            right: 16,
-            child: Icon(
-              CupertinoIcons.chevron_down,
-              size: 16,
-              color: config.textColor.withOpacity(0.4),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  // --- BỘ MÀU TỪ APP COLORS ---
+  // --- BỘ CẤU HÌNH THEO TRẠNG THÁI TÀI CHÍNH ---
   _CardDesignConfig _getCardConfig(
     _SurvivalState state,
     String safeDailySpendStr,
@@ -700,12 +559,10 @@ class _HomeBudgetCardContentState
         return _CardDesignConfig(
           badgeText: l10n.survivalStateNotSetBadge,
           mainDisplayHeading: l10n.survivalStateNotSetHeading,
-          punchline: l10n.survivalStateNotSetPunchline,
           accentColors: [appColors.primary.withOpacity(0.5), appColors.primary],
           shadowColor: appColors.primary,
           textColor: appColors.textPrimary,
           icon: CupertinoIcons.sparkles,
-          bottomIcon: Icons.auto_awesome,
         );
       case _SurvivalState.godMode:
         return _CardDesignConfig(
@@ -713,12 +570,10 @@ class _HomeBudgetCardContentState
           mainDisplayHeading: l10n.survivalStateGodModeHeading(
             safeDailySpendStr,
           ),
-          punchline: l10n.survivalStateGodModePunchline,
           accentColors: [const Color(0xFF34D399), const Color(0xFF059669)],
           shadowColor: const Color(0xFF10B981),
           textColor: appColors.textPrimary,
           icon: CupertinoIcons.leaf_arrow_circlepath,
-          bottomIcon: Icons.celebration_rounded,
         );
       case _SurvivalState.danger:
         return _CardDesignConfig(
@@ -726,12 +581,10 @@ class _HomeBudgetCardContentState
           mainDisplayHeading: l10n.survivalStateDangerHeading(
             safeDailySpendStr,
           ),
-          punchline: l10n.survivalStateDangerPunchline,
           accentColors: [const Color(0xFFFBBF24), const Color(0xFFD97706)],
           shadowColor: const Color(0xFFF59E0B),
           textColor: appColors.textPrimary,
           icon: CupertinoIcons.speedometer,
-          bottomIcon: Icons.warning_amber_rounded,
         );
       case _SurvivalState.apocalypse:
         return _CardDesignConfig(
@@ -739,7 +592,6 @@ class _HomeBudgetCardContentState
           mainDisplayHeading: l10n.survivalStateApocalypseHeading(
             safeDailySpendStr,
           ),
-          punchline: l10n.survivalStateApocalypsePunchline,
           accentColors: [const Color(0xFFF87171), const Color(0xFFDC2626)],
           shadowColor: const Color(0xFFEF4444),
           textColor: isDark ? const Color(0xFFFEE2E2) : const Color(0xFF7F1D1D),
@@ -747,14 +599,12 @@ class _HomeBudgetCardContentState
               ? const Color(0xFF3B1212)
               : const Color(0xFFFEF2F2),
           icon: CupertinoIcons.exclamationmark_triangle_fill,
-          bottomIcon: Icons.sos_rounded,
           shouldPulse: true,
         );
       case _SurvivalState.wasted:
         return _CardDesignConfig(
           badgeText: l10n.survivalStateWastedBadge,
           mainDisplayHeading: l10n.survivalStateWastedHeading,
-          punchline: l10n.survivalStateWastedPunchline,
           accentColors: [const Color(0xFF94A3B8), const Color(0xFF475569)],
           shadowColor: const Color(0xFF64748B),
           textColor: isDark ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A),
@@ -762,7 +612,6 @@ class _HomeBudgetCardContentState
               ? const Color(0xFF0F172A)
               : const Color(0xFFF8FAFC),
           icon: CupertinoIcons.burn,
-          bottomIcon: Icons.money_off_csred_rounded,
         );
     }
   }
@@ -774,30 +623,26 @@ enum _SurvivalState { notSet, godMode, danger, apocalypse, wasted }
 class _CardDesignConfig {
   final String badgeText;
   final String mainDisplayHeading;
-  final String punchline;
   final List<Color> accentColors;
   final Color shadowColor;
   final Color textColor;
   final Color? backgroundColor;
   final IconData icon;
-  final IconData bottomIcon;
   final bool shouldPulse;
 
   _CardDesignConfig({
     required this.badgeText,
     required this.mainDisplayHeading,
-    required this.punchline,
     required this.accentColors,
     required this.shadowColor,
     required this.textColor,
     this.backgroundColor,
     required this.icon,
-    required this.bottomIcon,
     this.shouldPulse = false,
   });
 }
 
-// --- WIDGET HIỆU ỨNG NHẤP NHÁY BÁO ĐỘNG SINH TỒN ---
+// --- WIDGET HIỆU ỨNG NHẤP NHÁY ---
 class _PulseIndicator extends StatefulWidget {
   final Color color;
   final bool isPulsing;

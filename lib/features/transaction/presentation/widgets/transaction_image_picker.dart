@@ -196,7 +196,7 @@ class _TransactionImagePickerState
                   ),
                   child: const Icon(
                     CupertinoIcons
-                        .slider_horizontal_3, // Hoặc CupertinoIcons.wand_stars nếu bạn thích phong cách lấp lánh
+                        .slider_horizontal_3,
                     color: Colors.white,
                     size: 18, // Icon nhỏ gọn không chắn tầm nhìn
                   ),

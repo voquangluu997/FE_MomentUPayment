@@ -644,7 +644,7 @@
 "errorInvalidCredentials": "Incorrect email or password. Give it another try! 🐾",
 "errorGoogleLinked": "This account is linked with Google. Just sign in with Google! 🚀",
 "errorEmailNotFound": "This email isn't registered yet! 😢",
-"analyticsTitle": "Analytics",
+"analyticsTitle": "Spending Analytics",
   "analyticsSwitchPeriod": "Period",
   "analyticsSwitchMonthly": "Monthly",
   
@@ -711,7 +711,7 @@
 "survivalStateGodModePunchline": "Your spending pace is perfect. Keep up this great form!",
 
 "survivalStateDangerBadge": "YELLOW ALERT",
-"survivalStateDangerHeading": "Limit {amount}/day",
+"survivalStateDangerHeading": "Spending {amount}/day",
 "@survivalStateDangerHeading": {
   "placeholders": { "amount": { "type": "String" } }
 },
@@ -747,10 +747,10 @@
 
   "budgetLifestyleTitle": "Daily Lifestyle",
   "budgetLifestyleStart": "Let's start planning! 🎯",
-  "budgetLifestyleBread": "About a sandwich 🥖",
-  "budgetLifestyleMilkTea": "Equals a full-topping boba 🧋",
-  "budgetLifestyleDinner": "A light romantic dinner 🥂",
-  "budgetLifestyleRich": "Living that 'Rich Kid' life! 👑",
+  "blessingMessage": "God bless you 🫨",
+  "budgetLifestyleLow": "Broke 'n' Poor 💸",
+  "budgetLifestyleMedium": "Living on a budget 🥂",
+  "budgetLifestyleHigh": "Living like royalty 👑",
   "budgetLifestyleActive": "Enjoy your active life! ✨",
   "chooseCurrencyTitle": "Select Currency",
   "currencyVND": "Vietnam Dong (VND)",
@@ -836,6 +836,64 @@
   "stickerDeleteDrop": "Release to delete 🔥",
   "@stickerDeleteDrop": {
     "description": "Text showing instructions when a sticker is hovering right over the delete zone"
+  },
+
+  "mySpendingSafeZone": "My spending safe-zone",
+  "budgetStatusTitle": "BUDGET STATUS",
+  "@budgetStatusTitle": {
+    "description": "Title for the budget status section"
+  },
+
+  "budgetStatusTitleNotSet": "Budget status",
+  "@budgetStatusTitleNotSet": {
+    "description": "Title for the budget status section when not set"
+  },
+
+  "budgetAdviceExceeded": "You have exhausted or exceeded your budget limit for this month! 😰",
+  "@budgetAdviceExceeded": {
+    "description": "Advice shown when budget is zero or negative"
+  },
+
+  "budgetAdviceSafeDaily": "{days} days left in the month. You should spend an average of max {amount}/day to keep your budget safe.",
+  "@budgetAdviceSafeDaily": {
+    "description": "Advice for daily safe spending limit",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "15"
+      },
+      "amount": {
+        "type": "String",
+        "example": "50,000 ₫"
+      }
+    }
+  },
+
+  "budgetBarLeft": "Left: {amount}",
+  "@budgetBarLeft": {
+    "description": "Label for remaining amount on the progress bar",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "100,000 ₫"
+      }
+    }
+  },
+
+  "budgetBarLeftNotSet": "Left: --",
+  "@budgetBarLeftNotSet": {
+    "description": "Label for remaining amount when budget is not set"
+  },
+
+  "budgetBarLimit": "Limit: {amount}",
+  "@budgetBarLimit": {
+    "description": "Label for total limit on the progress bar",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "500,000 ₫"
+      }
+    }
   }
 
 }

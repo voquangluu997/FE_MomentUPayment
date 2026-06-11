@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/features/camera/screens/full_screen_image_viewer.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
@@ -13,11 +12,14 @@ import 'package:moment_u_payment/features/notification/notification_provider.dar
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
-import '../../../../core/services/media_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
-// 🚀 Thêm import DateTimeHelper
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+
+// Đồng bộ danh mục và màn hình camera/edit từ hệ thống
+import 'package:moment_u_payment/core/utils/category_helper.dart';
+import 'package:moment_u_payment/features/camera/screens/custom_camera_screen.dart';
+import 'package:moment_u_payment/features/camera/screens/edit_photo_screen.dart';
 
 class MomentDetailsDialog extends ConsumerStatefulWidget {
   final Map<String, dynamic> moment;
@@ -41,16 +43,12 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   late TextEditingController _customCategoryController;
   DateTime _selectedDate = DateTime.now();
 
-  final _mediaService = MediaService();
-  final ImagePicker _picker = ImagePicker();
-
   late String _selectedCategory;
   String _selectedEmoji = '📝';
   String? _localImagePath;
   late String _currentImageUrl;
   bool _isCustomCategory = false;
 
-  // ✨ STATE TỐI ƯU UPLOAD
   bool _isImageUploading = false;
   String? _tempUploadedUrl;
   bool _isSaved = false;
@@ -68,14 +66,15 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     );
     _noteController = TextEditingController(text: widget.moment['note'] ?? '');
 
-    final standardCategories = [
-      'Food',
-      'Shopping',
-      'Transport',
-      'Entertainment',
-    ];
+    // Lấy danh sách ID danh mục chuẩn từ CategoryHelper để kiểm tra custom category
+    final defaultCats = CategoryHelper.getTransactionCategories(widget.l10n);
+    final standardCategoryIds = defaultCats
+        .map((c) => c['id'].toString())
+        .where((id) => id != 'Custom')
+        .toList();
+
     if (originalCategory.isNotEmpty &&
-        !standardCategories.contains(originalCategory)) {
+        !standardCategoryIds.contains(originalCategory)) {
       _isCustomCategory = true;
       _selectedCategory = 'Custom';
       _customCategoryController = TextEditingController(text: originalCategory);
@@ -164,31 +163,55 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     _onAmountChanged(text + zeros);
   }
 
-  Future<void> _changePhoto(ImageSource source) async {
+  // Mở Custom Camera (nút chọn gallery đã tích hợp bên trong CustomCameraScreen)
+  Future<void> _changePhoto() async {
     try {
-      final photo = source == ImageSource.camera
-          ? await _mediaService.takePhoto()
-          : await _picker.pickImage(
-              source: ImageSource.gallery,
-              imageQuality: 70,
-              maxWidth: 800,
-            );
+      final imagePath = await Navigator.push<String?>(
+        context,
+        MaterialPageRoute(builder: (_) => const CustomCameraScreen()),
+      );
 
-      if (photo != null) {
+      // Khi chụp xong, quay thẳng lại màn hình detail chứ không tự mở màn hình edit ảnh
+      if (imagePath != null && mounted) {
         if (_tempUploadedUrl != null) {
           _cleanupUnsavedImage();
           _tempUploadedUrl = null;
         }
 
         setState(() {
-          _localImagePath = photo.path;
+          _localImagePath = imagePath;
           _isImageUploading = true;
         });
 
-        _uploadImageBackground(File(photo.path));
+        // Tiến hành upload bản gốc lên luôn (mặc định không edit)
+        _uploadImageBackground(File(imagePath));
       }
     } catch (e) {
-      debugPrint("Lỗi chọn ảnh: $e");
+      debugPrint("Lỗi xử lý camera: $e");
+    }
+  }
+
+  // Hàm xử lý khi người dùng chủ động nhấn nút Edit ở góc của ảnh
+  Future<void> _editCurrentPhoto() async {
+    if (_localImagePath == null) return;
+    try {
+      final String? editedPath = await Navigator.push<String?>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EditPhotoScreen(imagePath: _localImagePath!),
+        ),
+      );
+
+      if (editedPath != null && mounted) {
+        setState(() {
+          _localImagePath = editedPath;
+          _isImageUploading = true;
+        });
+        // Upload đè bản ảnh mới đã qua chỉnh sửa lên hệ thống
+        _uploadImageBackground(File(editedPath));
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi chỉnh sửa ảnh: $e");
     }
   }
 
@@ -249,7 +272,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     if (_isImageUploading) {
       AppToast.showError(
         context,
-        "Đang xử lý ảnh mượt mà, chờ chút xíu nhé!",
+        "Đang tải ảnh lên, vui lòng đợi trong giây lát!",
         appColors,
       );
       return;
@@ -276,7 +299,6 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     }
 
     try {
-      // 🚀 TỐI ƯU: Sử dụng DateTimeHelper để đồng bộ logic với toàn App
       final spentAtWithCurrentTime =
           DateTimeHelper.combineDateWithCurrentTimeUtc(_selectedDate);
 
@@ -349,8 +371,8 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                 emoji: _selectedEmoji,
                 isImageUploading: _isImageUploading,
                 moment: widget.moment,
-                onCameraTap: () => _changePhoto(ImageSource.camera),
-                onGalleryTap: () => _changePhoto(ImageSource.gallery),
+                onCameraTap: _changePhoto,
+                onEditPhotoTap: _editCurrentPhoto,
                 onToggleEdit: _toggleEditMode,
                 onCloseTap: () {
                   if (_isImageUploading) {
@@ -410,7 +432,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 }
 
 // =============================================================================
-// HEADER TÍCH HỢP LOADING UPLOAD
+// HEADER TÍCH HỢP CAMERA HOẶC NÚT EDIT TẠI GÓC ẢNH
 // =============================================================================
 class _ImageHeader extends ConsumerWidget {
   final bool isEditing;
@@ -419,11 +441,10 @@ class _ImageHeader extends ConsumerWidget {
   final String emoji;
   final bool isImageUploading;
   final VoidCallback onCameraTap;
-  final VoidCallback onGalleryTap;
+  final VoidCallback onEditPhotoTap;
   final VoidCallback onToggleEdit;
   final VoidCallback onCloseTap;
-  final Map<String, dynamic>
-  moment; // Bắt buộc truyền moment vào để lấy ID cho Hero tag
+  final Map<String, dynamic> moment;
 
   const _ImageHeader({
     required this.isEditing,
@@ -432,7 +453,7 @@ class _ImageHeader extends ConsumerWidget {
     required this.emoji,
     this.isImageUploading = false,
     required this.onCameraTap,
-    required this.onGalleryTap,
+    required this.onEditPhotoTap,
     required this.onToggleEdit,
     required this.onCloseTap,
     required this.moment,
@@ -453,12 +474,10 @@ class _ImageHeader extends ConsumerWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // NỀN
           if (hasImage)
             localImagePath != null
                 ? Image.file(File(localImagePath!), fit: BoxFit.cover)
                 : GestureDetector(
-                    // Vô hiệu hóa phóng to nếu đang ở chế độ chỉnh sửa ảnh
                     onTap: isEditing
                         ? null
                         : () {
@@ -532,7 +551,6 @@ class _ImageHeader extends ConsumerWidget {
               ),
             ),
 
-          // LỚP PHỦ MỜ DẦN
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
@@ -553,7 +571,7 @@ class _ImageHeader extends ConsumerWidget {
             ),
           ),
 
-          // ✨ HIỂN THỊ LOADING NGAY TRÊN ẢNH
+          // Trạng thái Loading khi đang tải ảnh lên hệ thống background
           if (isImageUploading)
             Positioned(
               right: 16,
@@ -592,36 +610,31 @@ class _ImageHeader extends ConsumerWidget {
               ),
             ),
 
-          // CỤM NÚT ĐỔI ẢNH KHI EDITING
-          if (isEditing)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _buildEditBtn(
-                      icon: CupertinoIcons.camera,
-                      label: l10n.cameraPickActionShort,
-                      onTap: isImageUploading ? () {} : onCameraTap,
-                      appColors: appColors,
-                      isDisabled: isImageUploading,
-                    ),
-                    _buildEditBtn(
-                      icon: CupertinoIcons.photo_on_rectangle,
-                      label: l10n.galleryChangeActionShort,
-                      onTap: isImageUploading ? () {} : onGalleryTap,
-                      appColors: appColors,
-                      isDisabled: isImageUploading,
-                    ),
-                  ],
-                ),
+          // Nút Chỉnh sửa ảnh xuất hiện ở góc dưới bên trái của ảnh để user chủ động chọn
+          if (isEditing && localImagePath != null)
+            Positioned(
+              left: 16,
+              bottom: 16,
+              child: _buildGlassButtonWithLabel(
+                icon: CupertinoIcons.wand_stars,
+                label: "Chỉnh sửa ảnh",
+                onPressed: isImageUploading ? () {} : onEditPhotoTap,
+                appColors: appColors,
               ),
             ),
 
-          // NÚT ĐÓNG VÀ EDIT
+          // Nút chụp ảnh hoặc thay đổi ảnh chính giữa (Đã bỏ gallery rời rạc)
+          if (isEditing)
+            Center(
+              child: _buildEditBtn(
+                icon: CupertinoIcons.camera_fill,
+                label: hasImage ? "Thay đổi ảnh" : l10n.cameraPickActionShort,
+                onTap: isImageUploading ? () {} : onCameraTap,
+                appColors: appColors,
+                isDisabled: isImageUploading,
+              ),
+            ),
+
           Positioned(
             top: 16,
             left: 16,
@@ -672,6 +685,50 @@ class _ImageHeader extends ConsumerWidget {
               ),
             ),
             child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassButtonWithLabel({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    required AppColorTheme appColors,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: Colors.white, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -857,7 +914,7 @@ class _ViewModeContent extends ConsumerWidget {
 }
 
 // =============================================================================
-// GIAO DIỆN EDIT (Giữ nguyên)
+// GIAO DIỆN EDIT (Đồng bộ danh mục từ CategoryHelper)
 // =============================================================================
 class _EditModeContent extends ConsumerWidget {
   final String selectedCategory;
@@ -895,13 +952,9 @@ class _EditModeContent extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencyProvider);
 
-    final List<Map<String, dynamic>> categories = [
-      {'id': 'Food', 'name': l10n.catFood, 'emoji': '🍰'},
-      {'id': 'Shopping', 'name': l10n.catShopping, 'emoji': '🛍️'},
-      {'id': 'Transport', 'name': l10n.catTransport, 'emoji': '🚗'},
-      {'id': 'Entertainment', 'name': l10n.catEntertainment, 'emoji': '🎮'},
-      {'id': 'Custom', 'name': l10n.catCustom, 'emoji': '📝'},
-    ];
+    // Đồng bộ danh mục sử dụng CategoryHelper chuẩn của hệ thống giống AddTransactionScreen
+    final List<Map<String, dynamic>> categories =
+        CategoryHelper.getTransactionCategories(l10n);
 
     return Column(
       key: const ValueKey('EditMode'),
@@ -914,15 +967,15 @@ class _EditModeContent extends ConsumerWidget {
           physics: const BouncingScrollPhysics(),
           child: Row(
             children: categories.map((cat) {
-              final isSelected = selectedCategory == cat['id'];
+              final id = cat['id']?.toString() ?? '';
+              final name = cat['name']?.toString() ?? '';
+              final emoji = cat['emoji']?.toString() ?? '📝';
+              final isSelected = selectedCategory == id;
+
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: InkWell(
-                  onTap: () => onCategorySelect(
-                    cat['id']!,
-                    cat['emoji']!,
-                    cat['id'] == 'Custom',
-                  ),
+                  onTap: () => onCategorySelect(id, emoji, id == 'Custom'),
                   borderRadius: BorderRadius.circular(12),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -943,13 +996,10 @@ class _EditModeContent extends ConsumerWidget {
                     ),
                     child: Row(
                       children: [
-                        Text(
-                          cat['emoji'],
-                          style: const TextStyle(fontSize: 14),
-                        ),
+                        Text(emoji, style: const TextStyle(fontSize: 14)),
                         const SizedBox(width: 6),
                         Text(
-                          cat['name'],
+                          name,
                           style: TextStyle(
                             color: isSelected
                                 ? Colors.white

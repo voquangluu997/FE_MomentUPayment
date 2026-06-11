@@ -56,6 +56,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     final appColors = ref.watch(appColorsProvider);
     final currentBadge = ref.watch(currentMonthBadgeProvider);
 
+    // 🌟 KÉO FONT CHỮ CHUẨN (PLUS JAKARTA SANS) TỪ THEME TOÀN CỤC VỀ
+    final textTheme = Theme.of(context).textTheme;
+
     return AppBar(
       backgroundColor: appColors.background,
       elevation: 0,
@@ -65,7 +68,13 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         onTap: () {
           HapticFeedback.lightImpact();
           if (currentBadge != null) {
-            _showCongratsDialog(context, currentBadge, appColors, l10n);
+            _showCongratsDialog(
+              context,
+              currentBadge,
+              appColors,
+              l10n,
+              textTheme,
+            );
           } else {
             Navigator.of(context).push(
               CupertinoPageRoute(builder: (_) => const BadgeGalleryPage()),
@@ -74,35 +83,39 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         },
         child: Row(
           children: [
+            // Container Icon Vẫy Tay bo tròn mượt mà hơn
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: appColors.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: appColors.primary.withOpacity(0.15),
+                  width: 1,
+                ),
               ),
               child: const Text('👋', style: TextStyle(fontSize: 18)),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 🌟 HÀNG 1: TÊN NGƯỜI DÙNG (Đã xóa các icon huy hiệu cũ ở đây)
+                  // 🌟 TÊN NGƯỜI DÙNG: Đồng bộ font TextTheme
                   Text(
                     '${l10n.hello} $userName',
-                    style: TextStyle(
+                    style: textTheme.titleLarge?.copyWith(
                       color: appColors.primaryDark,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
 
-                  // 🌟 HÀNG 2: LỜI CHÀO VÀ HIỆU ỨNG CHUYỂN ĐỔI THÔNG BÁO HUY HIỆU
+                  // 🌟 LỜI CHÀO & HUY HIỆU: Đồng bộ font TextTheme
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 600),
                     transitionBuilder: (child, anim) => FadeTransition(
@@ -115,7 +128,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         child: child,
                       ),
                     ),
-                    // Đưa Icon Huy hiệu vào chung hàng chữ khi đang trong 30s đếm ngược
                     child: (currentBadge != null && _showBadgeName)
                         ? Row(
                             key: const ValueKey('badge_greeting'),
@@ -124,10 +136,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                               Flexible(
                                 child: Text(
                                   "🏆 ${l10n.badgeUnlocked}: ${currentBadge.getLocalizedTitle(l10n)}",
-                                  style: TextStyle(
+                                  style: textTheme.labelLarge?.copyWith(
                                     color: currentBadge.color,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -144,9 +155,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         : Text(
                             l10n.homeSubGreeting,
                             key: const ValueKey('normal_greeting'),
-                            style: TextStyle(
-                              color: appColors.primaryDark.withOpacity(0.4),
-                              fontSize: 11,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: appColors.textMuted,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
@@ -181,34 +192,44 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       hasUnread
                           ? CupertinoIcons.bell_fill
                           : CupertinoIcons.bell,
-                      color: appColors.primaryDark.withOpacity(0.7),
+                      color: hasUnread
+                          ? appColors.primary
+                          : appColors.primaryDark.withOpacity(0.6),
                     ),
                   ),
                   if (hasUnread)
                     Positioned(
-                      right: 10,
-                      top: 10,
+                      right: 8,
+                      top: 8,
                       child: Container(
-                        padding: const EdgeInsets.all(3),
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: appColors.errorAccent,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: appColors.background,
-                            width: 1.5,
+                            width: 2,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: appColors.errorAccent.withOpacity(0.4),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
                         constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
+                          minWidth: 18,
+                          minHeight: 18,
                         ),
                         child: Center(
                           child: Text(
                             unreadCount > 99 ? '99+' : unreadCount.toString(),
-                            style: const TextStyle(
+                            // Đồng bộ font số đếm
+                            style: textTheme.labelSmall?.copyWith(
                               color: Colors.white,
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                         ),
@@ -224,31 +245,34 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         IconButton(
           icon: Icon(
             CupertinoIcons.ellipsis_vertical,
-            color: appColors.primaryDark.withOpacity(0.7),
-            size: 20,
+            color: appColors.primaryDark.withOpacity(0.6),
+            size: 22,
           ),
           onPressed: () {
             HapticFeedback.lightImpact();
             SettingsBottomSheet.show(context);
           },
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
       ],
     );
   }
 
-  // 🚀 DIALOG CHÚC MỪNG TỪ APP BAR - ĐỒNG BỘ UI PREMIUM NEON
+  // 🚀 DIALOG CHÚC MỪNG - ĐÃ UPGRADE KÍNH MỜ & ĐỒNG BỘ TEXT
   void _showCongratsDialog(
     BuildContext context,
     UserBadge badge,
     AppColorTheme appColors,
     AppLocalizations l10n,
+    TextTheme textTheme, // Nhận textTheme từ hàm build
   ) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withOpacity(
+        0.7,
+      ), // Giảm độ tối một chút để thấy mờ mờ background
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
@@ -264,31 +288,36 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
               elevation: 0,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground,
-                  borderRadius: BorderRadius.circular(28),
+                  color: appColors.cardBackground.withOpacity(
+                    0.95,
+                  ), // Lớp kính mờ xịn xò
+                  borderRadius: BorderRadius.circular(
+                    32,
+                  ), // Bo tròn mềm mại hơn
                   border: Border.all(
-                    color: badge.color.withOpacity(0.4),
-                    width: 2,
+                    color: badge.color.withOpacity(0.3),
+                    width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: badge.color.withOpacity(0.2),
-                      blurRadius: 30,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 10),
+                      color: badge.color.withOpacity(0.15),
+                      blurRadius: 40,
+                      spreadRadius: 5,
+                      offset: const Offset(0, 15),
                     ),
                   ],
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Icon Badge phát sáng
                     Container(
-                      width: 140,
-                      height: 100,
+                      width: 130,
+                      height: 130, // Chuyển thành hình vuông bo góc cao cấp
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(26),
+                        borderRadius: BorderRadius.circular(32),
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -296,49 +325,68 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: badge.color.withOpacity(0.5),
-                            blurRadius: 40,
-                            spreadRadius: 4,
+                            color: badge.color.withOpacity(0.4),
+                            blurRadius: 30,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 10),
                           ),
                         ],
-                        border: Border.all(color: Colors.white54, width: 2.0),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.5),
+                          width: 1.5,
+                        ),
                       ),
                       child: Center(
-                        child: Icon(badge.icon, size: 52, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    Text(
-                      l10n.congratsTitle,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: appColors.primaryDark,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.badgeOwnedMessage(badge.getLocalizedTitle(l10n)),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: appColors.textMuted,
-                        height: 1.6,
-                        fontWeight: FontWeight.w500,
+                        child: Icon(badge.icon, size: 60, color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 32),
-                    SizedBox(
+
+                    // Tiêu đề đồng bộ font
+                    Text(
+                      l10n.congratsTitle,
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: appColors.primaryDark,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Lời nhắn đồng bộ font
+                    Text(
+                      l10n.badgeOwnedMessage(badge.getLocalizedTitle(l10n)),
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: appColors.textMuted,
+                        height: 1.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+
+                    // Nút bấm Gradient
+                    Container(
                       width: double.infinity,
-                      height: 52,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        gradient: LinearGradient(colors: badge.gradientColors),
+                        boxShadow: [
+                          BoxShadow(
+                            color: badge.color.withOpacity(0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: badge.color,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                          elevation: 0,
                         ),
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -350,8 +398,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         },
                         child: Text(
                           l10n.exploreCollection,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             letterSpacing: 0.5,
@@ -359,15 +406,18 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
+
+                    // Nút Later
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(
+                        foregroundColor: appColors.textMuted,
+                      ),
                       child: Text(
                         l10n.later,
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: appColors.textMuted.withOpacity(0.7),
                         ),
                       ),
                     ),
