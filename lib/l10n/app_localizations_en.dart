@@ -1742,4 +1742,11 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$percent% of your budget went into \'$category1\' & \'$category2\' on $time! Your happiest moments (🥰) were spent at $location.';
   }
+
+  @override
+  String get allSplurgesTitle => 'Hall of Fame 🏆';
+
+  @override
+  String get allSplurgesSubtitle =>
+      'A look back at your deepest splurges. Don\'t regret the experience! ✨';
 }

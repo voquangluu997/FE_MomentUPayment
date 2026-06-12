@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/cloudinary_helper.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 
 class PhotoCalendarCell extends ConsumerStatefulWidget {
   final DateTime date;
@@ -99,9 +100,11 @@ class _PhotoCalendarCellState extends ConsumerState<PhotoCalendarCell>
               // 1. LỚP NỀN (ẢNH HOẶC MÀU)
               if (hasImage)
                 Positioned.fill(
-                  child: Image.network(
-                    CloudinaryHelper.getThumbnailUrl(imageUrl),
+                  child: AppNetworkImage(
+                    imageUrl: CloudinaryHelper.getThumbnailUrl(imageUrl),
                     fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
                 ),
 

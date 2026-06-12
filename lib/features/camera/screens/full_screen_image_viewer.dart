@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gal/gal.dart';
 
@@ -145,11 +146,12 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         children: [
           // Nền ảnh mờ phía sau để tạo chiều sâu
           Positioned.fill(
-            child: Image.network(
-              widget.imageUrl,
+            child: AppNetworkImage(
+              imageUrl: widget.imageUrl,
               fit: BoxFit.cover,
-              color: Colors.black45,
-              colorBlendMode: BlendMode.darken,
+              color: Colors.black45, // Giữ nguyên hiệu ứng làm tối ảnh nền
+              colorBlendMode:
+                  BlendMode.darken, // Giữ nguyên blend mode giúp nổi bật chữ
             ),
           ),
           Positioned.fill(
@@ -166,7 +168,17 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               maxScale: 4.0,
               child: Hero(
                 tag: widget.heroTag,
-                child: Image.network(widget.imageUrl, fit: BoxFit.contain),
+                child: AppNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fit: BoxFit.contain,
+                  customErrorWidget: const Center(
+                    child: Icon(
+                      Icons.broken_image_rounded,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

@@ -13,6 +13,9 @@ class TransactionAnalyticsController
   // 🔑 Khởi tạo ngày kết thúc đến 23:59:59 (UTC) của hôm nay
   DateTime _endDate = DateTimeHelper.getEndOfDayUtc(DateTime.now());
 
+  DateTime get currentStartDate => _startDate;
+  DateTime get currentEndDate => _endDate;
+
   TransactionRepository get _repository =>
       ref.read(transactionRepositoryProvider);
 

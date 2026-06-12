@@ -3197,6 +3197,18 @@ abstract class AppLocalizations {
     String time,
     String location,
   );
+
+  /// No description provided for @allSplurgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hall of Fame 🏆'**
+  String get allSplurgesTitle;
+
+  /// No description provided for @allSplurgesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A look back at your deepest splurges. Don\'t regret the experience! ✨'**
+  String get allSplurgesSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1754,4 +1754,11 @@ class AppLocalizationsVi extends AppLocalizations {
   ) {
     return '$percent% ngân sách của bạn đã chuyển hóa thành \'$category1\' & \'$category2\' vào $time! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại $location.';
   }
+
+  @override
+  String get allSplurgesTitle => 'Hội con nhà giàu 💸';
+
+  @override
+  String get allSplurgesSubtitle =>
+      'Nhìn lại những lần rút hầu bao đậm sâu nhất của bạn! Đừng tiếc nuối vì những trải nghiệm này nhé ✨';
 }

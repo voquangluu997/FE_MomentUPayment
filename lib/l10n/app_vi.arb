@@ -851,5 +851,8 @@
     }
   },
 
-  "diaryInsightDynamicBody": "{percent}% ngân sách của bạn đã chuyển hóa thành '{category1}' & '{category2}' vào {time}! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại {location}."
+  "diaryInsightDynamicBody": "{percent}% ngân sách của bạn đã chuyển hóa thành '{category1}' & '{category2}' vào {time}! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại {location}.",
+
+"allSplurgesTitle": "Hội con nhà giàu 💸",
+"allSplurgesSubtitle": "Nhìn lại những lần rút hầu bao đậm sâu nhất của bạn! Đừng tiếc nuối vì những trải nghiệm này nhé ✨"
 }

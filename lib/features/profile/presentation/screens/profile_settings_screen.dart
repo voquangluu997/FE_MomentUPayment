@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
 import 'package:moment_u_payment/features/transaction/data/transaction_repository.dart';
@@ -333,15 +334,27 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                       )
                     : (user?.avatar != null && user!.avatar!.isNotEmpty)
                     ? ClipOval(
-                        child: Image.network(
-                          user.avatar!,
-                          fit: BoxFit.cover,
+                        child: AppNetworkImage(
+                          imageUrl: user.avatar,
                           width: 110,
                           height: 110,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            userIcon,
-                            size: 50,
-                            color: appColors.primary,
+                          fit: BoxFit.cover,
+                          // 🔥 Đưa logic hiển thị Icon mặc định vào làm customErrorWidget
+                          customErrorWidget: Container(
+                            width: 110,
+                            height: 110,
+                            decoration: BoxDecoration(
+                              color: appColors.primary.withOpacity(
+                                0.1,
+                              ), // Màu nền nhẹ cho avatar lỗi
+                              shape:
+                                  BoxShape.circle, // Giữ hình tròn cho avatar
+                            ),
+                            child: Icon(
+                              userIcon,
+                              size: 50,
+                              color: appColors.primary,
+                            ),
                           ),
                         ),
                       )

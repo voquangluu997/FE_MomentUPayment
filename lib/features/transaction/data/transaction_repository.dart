@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
+import 'package:moment_u_payment/core/widgets/analytics_components.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/utils/app_logger.dart';
 
@@ -204,6 +205,32 @@ class TransactionRepository {
       rethrow;
     }
   }
+
+  // Thêm hàm này vào class TransactionRepository của bạn
+Future<List<SplurgeInfo>> getAllSplurges({
+  required DateTime startDate,
+  required DateTime endDate,
+  int page = 1,
+  int limit = 20,
+}) async {
+  try {
+    // Thay đổi cú pháp tương ứng với HTTP client bạn đang dùng (Dio / http)
+    final response = await _dio.get(
+      '/transactions/splurges',
+      queryParameters: {
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate.toIso8601String(),
+        'page': page,
+        'limit': limit,
+      },
+    );
+
+    final List<dynamic> data = response.data; // Tuỳ cấu trúc response backend trả về
+    return data.map((json) => SplurgeInfo.fromJson(json)).toList();
+  } catch (e) {
+    throw Exception('Lỗi khi tải danh sách splurges: $e');
+  }
+}
 }
 
 // Cung cấp instance của Repository thông qua Riverpod Provider

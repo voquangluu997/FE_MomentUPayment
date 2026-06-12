@@ -7,6 +7,7 @@ import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/category_helper.dart';
 import 'package:moment_u_payment/core/utils/cloudinary_helper.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 
 class MomentListItem extends ConsumerWidget {
@@ -188,39 +189,20 @@ class MomentListItem extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: hasImage
-                                ? Image.network(
-                                    CloudinaryHelper.getOptimizedOriginalUrl(
-                                      imageUrl,
-                                    ),
+                                ? AppNetworkImage(
+                                    imageUrl:
+                                        CloudinaryHelper.getOptimizedOriginalUrl(
+                                          imageUrl,
+                                        ),
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: double.infinity,
-                                    frameBuilder:
-                                        (
-                                          context,
-                                          child,
-                                          frame,
-                                          wasSynchronouslyLoaded,
-                                        ) {
-                                          if (wasSynchronouslyLoaded)
-                                            return child;
-                                          return AnimatedOpacity(
-                                            opacity: frame == null ? 0 : 1,
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            child: child,
-                                          );
-                                        },
-                                    errorBuilder:
-                                        (context, error, stackTrace) => Center(
-                                          child: Text(
-                                            emoji,
-                                            style: const TextStyle(
-                                              fontSize: 28,
-                                            ),
-                                          ),
-                                        ),
+                                    customErrorWidget: Center(
+                                      child: Text(
+                                        emoji,
+                                        style: const TextStyle(fontSize: 28),
+                                      ),
+                                    ),
                                   )
                                 : Center(
                                     child: Text(

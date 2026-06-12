@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:moment_u_payment/features/camera/screens/full_screen_image_viewer.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
@@ -496,11 +497,15 @@ class _ImageHeader extends ConsumerWidget {
                           },
                     child: Hero(
                       tag: heroTag,
-                      child: Image.network(
-                        CloudinaryHelper.getOptimizedOriginalUrl(
+                      child: AppNetworkImage(
+                        imageUrl: CloudinaryHelper.getOptimizedOriginalUrl(
                           currentImageUrl,
                         ),
                         fit: BoxFit.cover,
+                        customErrorWidget: const Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   )

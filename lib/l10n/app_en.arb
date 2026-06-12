@@ -951,6 +951,9 @@
       "time": { "type": "String" },
       "location": { "type": "String" }
     }
-  }
+  },
+
+  "allSplurgesTitle": "Hall of Fame 🏆",
+  "allSplurgesSubtitle": "A look back at your deepest splurges. Don't regret the experience! ✨"
 
 }

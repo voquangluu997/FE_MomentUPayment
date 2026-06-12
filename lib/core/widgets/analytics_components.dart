@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
+import 'package:moment_u_payment/features/transaction/presentation/screens/all_splurges_screen.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -33,7 +35,7 @@ class SplurgeInfo {
           ? DateTime.parse(json['date'].toString())
           : DateTime.now(),
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      emoji: json['emoji']?.toString(), 
+      emoji: json['emoji']?.toString(),
     );
   }
 }
@@ -969,7 +971,18 @@ class MyBiggestSplurgesSection extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  // TODO: Bổ sung hành động khi nhấn "See all" nếu cần
+                  // CHUYỂN HƯỚNG SANG MÀN HÌNH "XEM TẤT CẢ"
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      // Dùng CupertinoPageRoute cho hiệu ứng trượt iOS mượt mà
+                      builder: (context) => AllSplurgesScreen(
+                        appColors: appColors,
+                        l10n: l10n,
+                        currencySymbol: currencySymbol,
+                      ),
+                    ),
+                  );
                 },
                 child: Text(
                   l10n.seeAll ?? "See all",
@@ -1027,12 +1040,14 @@ class MyBiggestSplurgesSection extends StatelessWidget {
                           child:
                               (item.imageUrl != null &&
                                   item.imageUrl!.isNotEmpty)
-                              ? Image.network(
-                                  item.imageUrl!,
+                              ? AppNetworkImage(
+                                  imageUrl: item
+                                      .imageUrl, // 💡 Không cần dấu "!" nữa vì AppNetworkImage đã tự xử lý an toàn giá trị null
                                   width: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      _buildImagePlaceholder(emoji),
+                                  customErrorWidget: _buildImagePlaceholder(
+                                    emoji,
+                                  ),
                                 )
                               : _buildImagePlaceholder(emoji),
                         ),

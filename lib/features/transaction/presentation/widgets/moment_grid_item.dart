@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/cloudinary_helper.dart';
 import '../../../../core/utils/currency_helper.dart';
@@ -160,11 +161,16 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
         // Ảnh nền Full Cover
         Hero(
           tag: heroTag,
-          child: Image.network(
-            optimizedUrl,
+          child: AppNetworkImage(
+            imageUrl: optimizedUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                _buildHighlightGradient(emoji, compactAmount, note, appColors),
+            // Truyền toàn bộ logic UI highlight của bạn vào làm widget lỗi
+            customErrorWidget: _buildHighlightGradient(
+              emoji,
+              compactAmount,
+              note,
+              appColors,
+            ),
           ),
         ),
 
