@@ -8,6 +8,37 @@ import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 
 // ==========================================
+// DATA MODELS CHO UI
+// ==========================================
+class SplurgeInfo {
+  final String id;
+  final String? imageUrl;
+  final DateTime date;
+  final double amount;
+  final String? emoji;
+
+  SplurgeInfo({
+    required this.id,
+    this.imageUrl,
+    required this.date,
+    required this.amount,
+    this.emoji,
+  });
+
+  factory SplurgeInfo.fromJson(Map<String, dynamic> json) {
+    return SplurgeInfo(
+      id: json['id']?.toString() ?? '',
+      imageUrl: json['imageUrl'],
+      date: json['date'] != null
+          ? DateTime.parse(json['date'].toString())
+          : DateTime.now(),
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      emoji: json['emoji']?.toString(), 
+    );
+  }
+}
+
+// ==========================================
 // 1. THANH CHỌN THỜI GIAN NHANH
 // ==========================================
 class QuickPeriodChips extends StatelessWidget {
@@ -26,6 +57,7 @@ class QuickPeriodChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final periods = [
       {'id': '1D', 'label': l10n.todayChip ?? 'Hôm nay ☀️'},
       {'id': '1W', 'label': l10n.pastWeekChip ?? 'Tuần qua 🌷'},
@@ -78,10 +110,9 @@ class QuickPeriodChips extends StatelessWidget {
                   ),
                   child: Text(
                     label,
-                    style: TextStyle(
+                    style: textTheme.labelMedium?.copyWith(
                       color: isSelected ? Colors.white : appColors.textMuted,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -95,7 +126,7 @@ class QuickPeriodChips extends StatelessWidget {
 }
 
 // ==========================================
-// 2A. BỘ CHỌN NGÀY FROM - TO (ĐÃ TRONG TÂM - VÀO GIỮA)
+// 2A. BỘ CHỌN NGÀY FROM - TO
 // ==========================================
 class DateRangeSelectorCard extends StatelessWidget {
   final DateTime startDate;
@@ -117,6 +148,7 @@ class DateRangeSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final int durationInDays = endDate.difference(startDate).inDays;
     final DateFormat df = DateFormat('dd MMM, yyyy', l10n.localeName);
 
@@ -137,7 +169,6 @@ class DateRangeSelectorCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // --- BADGE ĐẾM NGÀY ---
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -163,8 +194,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                       durationInDays == 0
                           ? (l10n.todayOnly)
                           : (l10n.journeyDuration(durationInDays.toString())),
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: appColors.primary,
                       ),
@@ -175,12 +205,9 @@ class DateRangeSelectorCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
-          // --- 2 VÙNG CHỌN NGÀY ---
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Cột trái: TỪ NGÀY
               Expanded(
                 child: InkWell(
                   onTap: () {
@@ -195,8 +222,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                       children: [
                         Text(
                           (l10n.fromDate).toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: appColors.textMuted.withOpacity(0.6),
                             letterSpacing: 0.5,
@@ -206,8 +232,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           df.format(startDate),
-                          style: TextStyle(
-                            fontSize: 15,
+                          style: textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: appColors.text,
                           ),
@@ -218,8 +243,6 @@ class DateRangeSelectorCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Icon Mũi tên ở giữa phân cách
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -232,8 +255,6 @@ class DateRangeSelectorCard extends StatelessWidget {
                   color: appColors.textMuted.withOpacity(0.5),
                 ),
               ),
-
-              // Cột phải: ĐẾN NGÀY
               Expanded(
                 child: InkWell(
                   onTap: () {
@@ -248,8 +269,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                       children: [
                         Text(
                           (l10n.toDate ?? 'Đến ngày').toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: appColors.textMuted.withOpacity(0.6),
                             letterSpacing: 0.5,
@@ -259,8 +279,7 @@ class DateRangeSelectorCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           df.format(endDate),
-                          style: TextStyle(
-                            fontSize: 15,
+                          style: textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: appColors.text,
                           ),
@@ -298,6 +317,7 @@ class MonthSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final DateFormat mf = DateFormat.yMMMM(l10n.localeName);
 
     return Container(
@@ -317,7 +337,6 @@ class MonthSelectorCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // --- BADGE TIÊU ĐỀ KHỐI ---
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -340,9 +359,8 @@ class MonthSelectorCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      l10n.monthlySummaryTab,
-                      style: TextStyle(
-                        fontSize: 12,
+                      l10n.monthlySummaryTab ?? "Tổng kết tháng",
+                      style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: appColors.primary,
                       ),
@@ -353,8 +371,6 @@ class MonthSelectorCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
-          // --- VÙNG CHỌN THÁNG NĂM CHÍNH GIỮA ---
           Row(
             children: [
               Expanded(
@@ -372,8 +388,7 @@ class MonthSelectorCard extends StatelessWidget {
                         Text(
                           (l10n.selectMonthLabel ?? 'Thời gian tổng kết')
                               .toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: appColors.textMuted.withOpacity(0.6),
                             letterSpacing: 0.5,
@@ -387,8 +402,7 @@ class MonthSelectorCard extends StatelessWidget {
                           children: [
                             Text(
                               mf.format(selectedMonth),
-                              style: TextStyle(
-                                fontSize: 15,
+                              style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w900,
                                 color: appColors.text,
                               ),
@@ -423,7 +437,7 @@ class MonthSelectorCard extends StatelessWidget {
 }
 
 // ==========================================
-// 3. THẺ TỔNG QUAN XINH XẮN
+// 3. THỂ TỔNG QUAN XINH XẮN
 // ==========================================
 class CuteOverviewCard extends StatelessWidget {
   final double total;
@@ -443,7 +457,7 @@ class CuteOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🌟 Sử dụng Helper rút gọn số tiền đồng bộ theo Đơn vị tiền tệ động
+    final textTheme = Theme.of(context).textTheme;
     final String formattedTotal = CurrencyHelper.formatFullAmount(
       total,
       symbol: currencySymbol,
@@ -479,9 +493,8 @@ class CuteOverviewCard extends StatelessWidget {
           children: [
             Text(
               (l10n.totalLabel ?? "Tổng chi tiêu").toUpperCase(),
-              style: TextStyle(
+              style: textTheme.labelSmall?.copyWith(
                 color: Colors.white.withOpacity(0.85),
-                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
               ),
@@ -489,9 +502,8 @@ class CuteOverviewCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               formattedTotal,
-              style: const TextStyle(
+              style: textTheme.headlineLarge?.copyWith(
                 color: Colors.white,
-                fontSize: 30,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -508,10 +520,12 @@ class CuteOverviewCard extends StatelessWidget {
                   _buildSubInfo(
                     l10n.avgPerDay ?? "Trung bình/ngày",
                     formattedAvg,
+                    textTheme,
                   ),
                   _buildSubInfo(
                     l10n.repeatCycle ?? "Chu kỳ",
                     "$totalDays ${l10n.days ?? 'ngày'}",
+                    textTheme,
                   ),
                 ],
               ),
@@ -522,20 +536,19 @@ class CuteOverviewCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSubInfo(String title, String value) {
+  Widget _buildSubInfo(String title, String value, TextTheme textTheme) {
     return Column(
       children: [
         Text(
           title,
-          style: const TextStyle(color: Colors.white70, fontSize: 11),
+          style: textTheme.labelSmall?.copyWith(color: Colors.white70),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
+          style: textTheme.titleSmall?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
           ),
         ),
       ],
@@ -544,14 +557,18 @@ class CuteOverviewCard extends StatelessWidget {
 }
 
 // ==========================================
-// 4. KHỐI CHỨA BIỂU ĐỒ TRÒN & DANH SÁCH
+// 4. KHỐI CHỨA BIỂU ĐỒ TRÒN & DANH SÁCH & INSIGHTS
 // ==========================================
 class AnalyticsContentWidget extends StatefulWidget {
-  final List<Map<String, dynamic>> analyticsData;
+  final List<Map<String, dynamic>> analyticsData; // Dữ liệu category
   final double totalSpending;
   final AppColorTheme appColors;
   final AppLocalizations l10n;
   final String currencySymbol;
+
+  // Dữ liệu động truyền từ state tổng
+  final String? diaryInsightText;
+  final List<SplurgeInfo> biggestSplurges;
 
   const AnalyticsContentWidget({
     super.key,
@@ -560,6 +577,8 @@ class AnalyticsContentWidget extends StatefulWidget {
     required this.appColors,
     required this.l10n,
     required this.currencySymbol,
+    this.diaryInsightText,
+    this.biggestSplurges = const [],
   });
 
   @override
@@ -569,7 +588,6 @@ class AnalyticsContentWidget extends StatefulWidget {
 class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
   int touchedIndex = -1;
 
-  // 🌍 Định dạng tiền tệ chi tiết tự động thích ứng theo Đơn vị tiền tệ động
   NumberFormat get currencyFormatter {
     final isVnd =
         widget.currencySymbol == '₫' ||
@@ -583,7 +601,10 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -601,13 +622,12 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
           ),
           child: Column(
             children: [
-              SizedBox(height: 220, child: _buildDonutChart()),
+              SizedBox(height: 220, child: _buildDonutChart(textTheme)),
               const SizedBox(height: 16),
               Text(
-                widget.l10n.spendingStructure,
-                style: TextStyle(
+                widget.l10n.spendingStructure ?? "Cấu trúc chi tiêu",
+                style: textTheme.labelLarge?.copyWith(
                   color: widget.appColors.textMuted,
-                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.3,
                 ),
@@ -628,14 +648,38 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: widget.analyticsData.length,
             separatorBuilder: (context, index) => const SizedBox(height: 4),
-            itemBuilder: (context, index) => _buildCategoryItem(index),
+            itemBuilder: (context, index) =>
+                _buildCategoryItem(index, textTheme),
           ),
         ),
+
+        // 🌟 HIỂN THỊ DIARY INSIGHT CARD NẾU CÓ TEXT
+        if (widget.diaryInsightText != null &&
+            widget.diaryInsightText!.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          DiaryInsightCard(
+            appColors: widget.appColors,
+            l10n: widget.l10n,
+            insightText: widget.diaryInsightText!,
+          ),
+        ],
+
+        // 🌟 HIỂN THỊ MY BIGGEST SPLURGES NẾU CÓ DỮ LIỆU
+        if (widget.biggestSplurges.isNotEmpty) ...[
+          const SizedBox(height: 28),
+          MyBiggestSplurgesSection(
+            appColors: widget.appColors,
+            l10n: widget.l10n,
+            currencySymbol: widget.currencySymbol,
+            splurges: widget.biggestSplurges,
+          ),
+        ],
+        const SizedBox(height: 20),
       ],
     );
   }
 
-  Widget _buildDonutChart() {
+  Widget _buildDonutChart(TextTheme textTheme) {
     final dynamic activeAmount = touchedIndex != -1
         ? widget.analyticsData[touchedIndex]['totalAmount']
         : widget.totalSpending;
@@ -685,10 +729,9 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
             Text(
               touchedIndex != -1
                   ? widget.analyticsData[touchedIndex]['category']
-                  : (widget.l10n.totalLabel),
-              style: TextStyle(
+                  : (widget.l10n.totalLabel ?? "Tổng chi tiêu"),
+              style: textTheme.labelSmall?.copyWith(
                 color: widget.appColors.textMuted,
-                fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -698,9 +741,8 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
                 (activeAmount as num).toDouble(),
                 symbol: widget.currencySymbol,
               ),
-              style: TextStyle(
+              style: textTheme.titleLarge?.copyWith(
                 color: widget.appColors.text,
-                fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -710,7 +752,7 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
     );
   }
 
-  Widget _buildCategoryItem(int index) {
+  Widget _buildCategoryItem(int index, TextTheme textTheme) {
     final item = widget.analyticsData[index];
     final color = AppColors.getCategoryColor(index);
     final double amount = (item['totalAmount'] as num?)?.toDouble() ?? 0.0;
@@ -752,10 +794,9 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
                 children: [
                   Text(
                     item['category'] ?? '',
-                    style: TextStyle(
+                    style: textTheme.bodyLarge?.copyWith(
                       color: widget.appColors.text,
                       fontWeight: FontWeight.w900,
-                      fontSize: 15,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -777,10 +818,9 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
               children: [
                 Text(
                   currencyFormatter.format(amount),
-                  style: TextStyle(
+                  style: textTheme.bodyLarge?.copyWith(
                     color: widget.appColors.text,
                     fontWeight: FontWeight.w900,
-                    fontSize: 15,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -795,9 +835,8 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
                   ),
                   child: Text(
                     '${percentage.toStringAsFixed(1)}%',
-                    style: TextStyle(
+                    style: textTheme.labelSmall?.copyWith(
                       color: widget.appColors.text,
-                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -812,7 +851,277 @@ class _AnalyticsContentWidgetState extends State<AnalyticsContentWidget> {
 }
 
 // ==========================================
-// 5. CÁC TRẠNG THÁI RỖNG / LỖI
+// 5. DIARY INSIGHT COMPONENT
+// ==========================================
+class DiaryInsightCard extends StatelessWidget {
+  final AppColorTheme appColors;
+  final AppLocalizations l10n;
+  final String insightText; // Text động được truyền vào
+
+  const DiaryInsightCard({
+    super.key,
+    required this.appColors,
+    required this.l10n,
+    required this.insightText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: appColors.primary.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: appColors.primary.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: appColors.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                CupertinoIcons.book_solid,
+                size: 20,
+                color: appColors.primary,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.diaryInsightTitle ?? "Diary Insight",
+                    style: textTheme.titleSmall?.copyWith(
+                      color: appColors.text,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    insightText,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: appColors.textMuted,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+// ==========================================
+// 6. MY BIGGEST SPLURGES COMPONENT
+// ==========================================
+// Lưu ý: Đảm bảo bạn đã import SplurgeInfo, CurrencyHelper, AppColorTheme, AppLocalizations
+
+class MyBiggestSplurgesSection extends StatelessWidget {
+  final AppColorTheme appColors;
+  final AppLocalizations l10n;
+  final String currencySymbol;
+  final List<dynamic>
+  splurges; // Đổi thành List<SplurgeInfo> theo model dự án của bạn
+
+  const MyBiggestSplurgesSection({
+    super.key,
+    required this.appColors,
+    required this.l10n,
+    required this.currencySymbol,
+    required this.splurges,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final DateFormat dateFormat = DateFormat('MMM dd', l10n.localeName);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "${l10n.biggestSplurgesTitle ?? 'My Biggest Splurges'} 💖",
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: appColors.text,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  // TODO: Bổ sung hành động khi nhấn "See all" nếu cần
+                },
+                child: Text(
+                  l10n.seeAll ?? "See all",
+                  style: textTheme.labelLarge?.copyWith(
+                    color: appColors.textMuted.withOpacity(0.6),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 240,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: splurges.length,
+            itemBuilder: (context, index) {
+              final item = splurges[index];
+              final String displayPrice = CurrencyHelper.formatFullAmount(
+                item.amount,
+                symbol: currencySymbol,
+              );
+
+              // Lấy emoji từ item (giả sử SplurgeInfo có thuộc tính emoji)
+              // Nếu bạn đang dùng Map thì dùng item['emoji'] ?? '✨'
+              final String emoji = item.emoji ?? '✨';
+
+              return Container(
+                width: 160,
+                margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Phần ảnh của Polaroid
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child:
+                              (item.imageUrl != null &&
+                                  item.imageUrl!.isNotEmpty)
+                              ? Image.network(
+                                  item.imageUrl!,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      _buildImagePlaceholder(emoji),
+                                )
+                              : _buildImagePlaceholder(emoji),
+                        ),
+                      ),
+                    ),
+                    // Phần nhãn ghi chú bên dưới ảnh
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            dateFormat.format(item.date),
+                            style: textTheme.labelSmall?.copyWith(
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            displayPrice,
+                            style: textTheme.titleSmall?.copyWith(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Cập nhật Placeholder thành nền Gradient và Emoji
+  Widget _buildImagePlaceholder(String emoji) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            appColors.primary.withOpacity(0.15),
+            appColors.primary.withOpacity(0.35),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Emoji khổng lồ mờ nhạt làm nền
+          Positioned(
+            right: -20,
+            bottom: -10,
+            child: Opacity(
+              opacity: 0.1,
+              child: Text(emoji, style: const TextStyle(fontSize: 80)),
+            ),
+          ),
+          // Icon Emoji nổi bật ở giữa
+          Center(
+            child: Text(
+              emoji,
+              style: const TextStyle(
+                fontSize: 36,
+                shadows: [
+                  Shadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 7. CÁC TRẠNG THÁI RỖNG / LỖI
 // ==========================================
 class EmptyAnalyticsWidget extends StatelessWidget {
   final AppLocalizations l10n;
@@ -826,6 +1135,8 @@ class EmptyAnalyticsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
       child: Center(
@@ -836,9 +1147,8 @@ class EmptyAnalyticsWidget extends StatelessWidget {
             Text(
               l10n.emptyAnalyticsData,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: textTheme.bodyMedium?.copyWith(
                 color: appColors.textMuted,
-                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 height: 1.4,
               ),
@@ -864,6 +1174,8 @@ class ErrorAnalyticsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Column(
         children: [
@@ -873,10 +1185,9 @@ class ErrorAnalyticsWidget extends StatelessWidget {
           Text(
             l10n.errorLoadData,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: textTheme.bodyMedium?.copyWith(
               color: appColors.errorAccent,
               fontWeight: FontWeight.bold,
-              fontSize: 14,
             ),
           ),
           const SizedBox(height: 20),
@@ -890,8 +1201,8 @@ class ErrorAnalyticsWidget extends StatelessWidget {
             ),
             onPressed: onRetry,
             child: Text(
-              l10n.retryButton,
-              style: TextStyle(
+              l10n.retryButton ?? "Thử lại",
+              style: textTheme.labelLarge?.copyWith(
                 color: appColors.primary,
                 fontWeight: FontWeight.bold,
               ),

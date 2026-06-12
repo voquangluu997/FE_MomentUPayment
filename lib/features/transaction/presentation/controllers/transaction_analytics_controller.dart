@@ -4,7 +4,7 @@ import 'package:moment_u_payment/core/utils/datetime_helper.dart'; // Import Hel
 import '../../data/transaction_repository.dart';
 
 class TransactionAnalyticsController
-    extends AsyncNotifier<List<Map<String, dynamic>>> {
+    extends AsyncNotifier<Map<String, dynamic>> {
   // 🔑 Khởi tạo ngày bắt đầu từ 00:00:00 (UTC) của 30 ngày trước
   DateTime _startDate = DateTimeHelper.getStartOfDayUtc(
     DateTime.now().subtract(const Duration(days: 30)),
@@ -17,11 +17,13 @@ class TransactionAnalyticsController
       ref.read(transactionRepositoryProvider);
 
   @override
-  FutureOr<List<Map<String, dynamic>>> build() async {
+  FutureOr<Map<String, dynamic>> build() async {
     return _fetchAnalyticsData();
   }
 
-  Future<List<Map<String, dynamic>>> _fetchAnalyticsData() async {
+  Future<Map<String, dynamic>> _fetchAnalyticsData() async {
+    // ⚠️ Đảm bảo repository.getTransactionAnalytics() của bạn cũng đã được
+    // update kiểu trả về thành Map<String, dynamic> thay vì List<>
     return await _repository.getTransactionAnalytics(
       startDate: _startDate, // Đã chuẩn UTC
       endDate: _endDate, // Đã chuẩn UTC
@@ -44,7 +46,6 @@ class TransactionAnalyticsController
 }
 
 final transactionAnalyticsProvider =
-    AsyncNotifierProvider<
-      TransactionAnalyticsController,
-      List<Map<String, dynamic>>
-    >(() => TransactionAnalyticsController());
+    AsyncNotifierProvider<TransactionAnalyticsController, Map<String, dynamic>>(
+      () => TransactionAnalyticsController(),
+    );

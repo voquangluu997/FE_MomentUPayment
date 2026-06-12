@@ -778,6 +778,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       builder: (context) {
         final List txList = dayData['transactions'];
+
+        // 🌟 Lấy mã ngôn ngữ hiện tại
+        final String langCode = Localizations.localeOf(context).languageCode;
+
+        // 🌟 Chuẩn bị các thành phần của ngày tháng
+        final String dayStr = DateFormat('dd').format(date); // Lấy "04"
+        final String yearStr = DateFormat('yyyy').format(date); // Lấy "2024"
+
+        // Tiếng Anh dùng tên tháng (June), Tiếng Việt dùng số (06)
+        final String monthStr = langCode == 'vi'
+            ? DateFormat('MM').format(date)
+            : DateFormat('MMMM', 'en').format(date);
+
+        // Chỉ lấy hậu tố (st, nd, rd, th) nếu là tiếng Anh
+        final String suffixStr = langCode == 'en'
+            ? DateTimeHelper.getDaySuffix(date.day)
+            : '';
+
+        // 🌟 Sử dụng key l10n vừa tạo để ghép chuỗi
+        final String displayTitle = l10n.dayDetailsFormat(
+          dayStr,
+          suffixStr,
+          monthStr,
+          yearStr,
+        );
+
         return FractionallySizedBox(
           heightFactor: 0.65,
           child: Column(
@@ -812,7 +838,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${l10n.day} ${date.day} ${l10n.month} ${date.month}",
+                          displayTitle, // 🚀 Chuỗi đã được localize hoàn toàn
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,

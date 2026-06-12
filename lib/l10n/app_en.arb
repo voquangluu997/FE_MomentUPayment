@@ -52,6 +52,11 @@
   "catTransport": "Transport 🚗",
   "catEntertainment": "Entertainment 🎮",
   "categoryOther": "Uncategorized",
+  "food": "Food",
+  "shopping": "Shopping",
+  "transport": "Transport",
+  "entertainment": "Entertainment",
+  "other": "Other",
   "catCustom": "Custom... 📝",
   "customCategoryHint": "Name your secret category... ✨",
 
@@ -433,7 +438,7 @@
 
   "emptyTransactionSubtitle": "Log your first expense now so your wallet stays perfectly in check! ✨",
   "deleteActionLabel": "Delete",
-  "transactionCount": "{count} transactions",
+  "transactionCount": "{count} moments",
   "@transactionCount": {
     "placeholders": {
       "count": { "type": "int" }
@@ -893,6 +898,58 @@
         "type": "String",
         "example": "500,000 ₫"
       }
+    }
+  },
+
+  "dayDetailsFormat": "{day}{suffix} {month}, {year}",
+  "@dayDetailsFormat": {
+    "description": "Date format for the day details bottom sheet",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "04"
+      },
+      "suffix": {
+        "type": "String",
+        "example": "th"
+      },
+      "month": {
+        "type": "String",
+        "example": "June"
+      },
+      "year": {
+        "type": "String",
+        "example": "2024"
+      }
+    }
+  },
+  "analyticsMonthlyHonor": "{month} {year}",
+  "year": "Year",
+
+  "diaryInsightTitle": "Diary Insight",
+  "@diaryInsightTitle": {
+    "description": "Title for the Diary Insight section"
+  },
+  
+  "biggestSplurgesTitle": "My Biggest Splurges",
+  "@biggestSplurgesTitle": {
+    "description": "Title for the biggest splurges section"
+  },
+  
+  "seeAll": "See all",
+  "@seeAll": {
+    "description": "Text for See all button"
+  },
+
+  "diaryInsightDynamicBody": "{percent}% of your budget went into '{category1}' & '{category2}' on {time}! Your happiest moments (🥰) were spent at {location}.",
+  "@diaryInsightDynamicBody": {
+    "description": "Dynamic text for diary insights",
+    "placeholders": {
+      "percent": { "type": "String" },
+      "category1": { "type": "String" },
+      "category2": { "type": "String" },
+      "time": { "type": "String" },
+      "location": { "type": "String" }
     }
   }
 

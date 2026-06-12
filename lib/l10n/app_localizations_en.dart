@@ -148,6 +148,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryOther => 'Other';
 
   @override
+  String get food => 'Food';
+
+  @override
+  String get shopping => 'Shopping';
+
+  @override
+  String get transport => 'Transport';
+
+  @override
+  String get entertainment => 'Entertainment';
+
+  @override
+  String get other => 'Other';
+
+  @override
   String get catCustom => 'Custom... 📝';
 
   @override
@@ -879,7 +894,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String transactionCount(int count) {
-    return '$count transactions';
+    return '$count moments';
   }
 
   @override
@@ -960,8 +975,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyticsSwitchMonthly => 'Monthly';
 
   @override
-  String analyticsMonthlyHonor(String month) {
-    return 'Month $month';
+  String analyticsMonthlyHonor(String month, Object year) {
+    return '$month $year';
   }
 
   @override
@@ -1693,5 +1708,38 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String budgetBarLimit(String amount) {
     return 'Limit: $amount';
+  }
+
+  @override
+  String dayDetailsFormat(
+    String day,
+    String suffix,
+    String month,
+    String year,
+  ) {
+    return '$day$suffix $month, $year';
+  }
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get diaryInsightTitle => 'Diary Insight';
+
+  @override
+  String get biggestSplurgesTitle => 'My Biggest Splurges';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String diaryInsightDynamicBody(
+    String percent,
+    String category1,
+    String category2,
+    String time,
+    String location,
+  ) {
+    return '$percent% of your budget went into \'$category1\' & \'$category2\' on $time! Your happiest moments (🥰) were spent at $location.';
   }
 }

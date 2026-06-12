@@ -53,6 +53,11 @@
   "catEntertainment": "Giải trí 🎮",
   "categoryOther": "Chưa phân loại",
   "catCustom": "Khác nè... 📝",
+  "food": "Ăn uống",
+  "shopping": "Mua sắm",
+  "transport": "Di chuyển",
+  "entertainment": "Giải trí",
+  "other": "Khác",
   "customCategoryHint": "Đặt tên cho danh mục bí mật của bạn nha... ✨",
 
   "deleteDialogTitle": "Xóa khoảnh khắc này?",
@@ -441,7 +446,7 @@
 
   "emptyTransactionSubtitle": "Ghi chép khoản chi đầu tiên ngay đi nè, để ví tiền luôn ngoan ngoãn nằm trong tầm tay bạn nha! ✨",
   "deleteActionLabel": "Xóa",
-  "transactionCount": "{count} giao dịch",
+  "transactionCount": "{count} khoảnh khắc",
   "@transactionCount": {
     "placeholders": {
       "count": { "type": "int" }
@@ -829,5 +834,22 @@
   "budgetAdviceSafeDaily": "Còn {days} ngày hết tháng. Bạn nên chi tiêu trung bình tối đa {amount}/ngày để giữ an toàn ngân sách.",
   "budgetBarLeft": "Còn lại: {amount}",
   "budgetBarLeftNotSet": "Còn lại: --",
-  "budgetBarLimit": "Hạn mức: {amount}"
+  "budgetBarLimit": "Hạn mức: {amount}",
+  "dayDetailsFormat": "Ngày {day} tháng {month}, {year}",
+  "analyticsMonthlyHonor": "Tháng {month}, {year}",
+  "year": "Năm",
+
+  "diaryInsightDynamicBody": "{percent}% of your budget went into '{category1}' & '{category2}' on {time}! Your happiest moments (🥰) were spent at {location}.",
+  "@diaryInsightDynamicBody": {
+    "description": "Dynamic text for diary insights",
+    "placeholders": {
+      "percent": { "type": "String" },
+      "category1": { "type": "String" },
+      "category2": { "type": "String" },
+      "time": { "type": "String" },
+      "location": { "type": "String" }
+    }
+  },
+
+  "diaryInsightDynamicBody": "{percent}% ngân sách của bạn đã chuyển hóa thành '{category1}' & '{category2}' vào {time}! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại {location}."
 }

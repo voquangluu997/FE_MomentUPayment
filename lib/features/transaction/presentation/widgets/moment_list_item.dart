@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/category_helper.dart';
 import 'package:moment_u_payment/core/utils/cloudinary_helper.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
@@ -47,10 +48,8 @@ class MomentListItem extends ConsumerWidget {
       background: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFFFF4B4B), // Đỏ nguyên bản, mạnh mẽ và dứt khoát
-          borderRadius: BorderRadius.circular(
-            28,
-          ), // Bo góc khớp hoàn toàn với Card mới
+          color: const Color(0xFFFF4B4B),
+          borderRadius: BorderRadius.circular(28),
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 28),
@@ -64,7 +63,7 @@ class MomentListItem extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              l10n.deleteActionLabel ?? "Xóa",
+              l10n.deleteActionLabel,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
@@ -83,7 +82,10 @@ class MomentListItem extends ConsumerWidget {
     final String imageUrl = transaction['imageUrl'] ?? '';
     final String note = transaction['note'] ?? '';
     final bool isNoteEmpty = note.isEmpty;
-    final String category = transaction['category'] ?? l10n.categoryOther;
+    final String category = CategoryHelper().getLocalizedCategory(
+      transaction['category'],
+      l10n,
+    );
     final String emoji = transaction['emoji'] ?? '✨';
     final bool hasImage = imageUrl.isNotEmpty;
 
@@ -98,7 +100,7 @@ class MomentListItem extends ConsumerWidget {
       }
     }
 
-    // 💰 XỬ LÝ SỐ TIỀN VÀ ĐẢM BẢO DẤU TRỪ
+    // 💰 Format Số tiền
     final currencySymbol = ref.watch(currencyProvider);
     final String rawAmount = transaction['amount']?.toString() ?? '0';
     String compactAmount = CurrencyHelper.formatCompactAmount(
@@ -111,18 +113,13 @@ class MomentListItem extends ConsumerWidget {
     }
 
     return Container(
-      // Tăng margin để các thẻ có không gian thở (Whitespace), tạo độ sang trọng
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: appColors.cardBackground,
-        borderRadius: BorderRadius.circular(
-          28,
-        ), // Bo góc cực đại tạo nét dễ thương, bồng bềnh
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: appColors.primaryDark.withOpacity(
-              0.04,
-            ), // Bóng đổ siêu mờ và rộng (Diffuse shadow)
+            color: appColors.primaryDark.withOpacity(0.04),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -140,57 +137,149 @@ class MomentListItem extends ConsumerWidget {
           highlightColor: appColors.primary.withOpacity(0.05),
           splashColor: appColors.primary.withOpacity(0.1),
           child: Padding(
-            // Padding bên trong hào phóng hơn
             padding: const EdgeInsets.all(14.0),
             child: Row(
               children: [
-                // 📸 1. BIG VISUAL: AVATAR KHOẢNH KHẮC CỰC LỚN
-                Container(
-                  width: 72, // Phóng to diện tích ảnh đập vào mắt người dùng
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: hasImage
-                        ? null
-                        : appColors.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(
-                      22,
-                    ), // Tỉ lệ bo góc chuẩn Apple
-                    border: hasImage
-                        ? null
-                        : Border.all(
+                // 📸 1. CREATIVE VISUAL: POLAROID + MINI BEAR PUSHPIN
+                SizedBox(
+                  width: 76,
+                  height: 76,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      // 🔹 Lớp 1: Khung nền mờ xoay sang TRÁI
+                      Transform.rotate(
+                        angle: -0.08,
+                        child: Container(
+                          width: 66,
+                          height: 66,
+                          decoration: BoxDecoration(
                             color: appColors.primary.withOpacity(0.15),
-                            width: 1.5,
-                          ),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: hasImage
-                      ? Image.network(
-                          CloudinaryHelper.getOptimizedOriginalUrl(imageUrl),
-                          fit: BoxFit.cover,
-                          // Hiệu ứng Fade-in mượt mà khi load xong ảnh
-                          frameBuilder:
-                              (context, child, frame, wasSynchronouslyLoaded) {
-                                if (wasSynchronouslyLoaded) return child;
-                                return AnimatedOpacity(
-                                  opacity: frame == null ? 0 : 1,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: child,
-                                );
-                              },
-                          errorBuilder: (context, error, stackTrace) => Center(
-                            child: Text(
-                              emoji,
-                              style: const TextStyle(fontSize: 32),
-                            ),
-                          ),
-                        )
-                      : Center(
-                          // Nếu không có ảnh, Emoji phóng to làm điểm nhấn rực rỡ
-                          child: Text(
-                            emoji,
-                            style: const TextStyle(fontSize: 32),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
+                      ),
+
+                      // 🔹 Lớp 2: Khung ảnh Polaroid xoay sang PHẢI
+                      Transform.rotate(
+                        angle: 0.06,
+                        child: Container(
+                          width: 70,
+                          height: 70,
+                          padding: const EdgeInsets.all(3.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: appColors.primaryDark.withOpacity(0.12),
+                                blurRadius: 12,
+                                offset: const Offset(2, 4),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              color: hasImage
+                                  ? appColors.background
+                                  : appColors.primary.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: hasImage
+                                ? Image.network(
+                                    CloudinaryHelper.getOptimizedOriginalUrl(
+                                      imageUrl,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    frameBuilder:
+                                        (
+                                          context,
+                                          child,
+                                          frame,
+                                          wasSynchronouslyLoaded,
+                                        ) {
+                                          if (wasSynchronouslyLoaded)
+                                            return child;
+                                          return AnimatedOpacity(
+                                            opacity: frame == null ? 0 : 1,
+                                            duration: const Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            child: child,
+                                          );
+                                        },
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Center(
+                                          child: Text(
+                                            emoji,
+                                            style: const TextStyle(
+                                              fontSize: 28,
+                                            ),
+                                          ),
+                                        ),
+                                  )
+                                : Center(
+                                    child: Text(
+                                      emoji,
+                                      style: const TextStyle(fontSize: 28),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                      // 🔹 Lớp 3: GHIM HÌNH ĐẦU GẤU (MINI BEAR PUSHPIN) 🐻
+                      Positioned(
+                        top: -6,
+                        right: 5,
+                        child: Transform.rotate(
+                          angle: 0.15, // Xoay cùng góc với khung ảnh
+                          child: SizedBox(
+                            width: 18,
+                            height: 16, // Kích thước tổng thể rất nhỏ gọn
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                // Mặt gấu (Jelly bóng)
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        Colors.white.withOpacity(
+                                          0.8,
+                                        ), // Điểm bắt sáng
+                                        appColors.primary,
+                                        appColors.primaryDark,
+                                      ],
+                                      stops: const [0.0, 0.4, 1.0],
+                                      center: const Alignment(-0.3, -0.4),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 3,
+                                        offset: const Offset(
+                                          1,
+                                          2,
+                                        ), // Đổ bóng nhẹ xuống giấy
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 16),
 
@@ -200,7 +289,6 @@ class MomentListItem extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Caption: Gradient nổi bật
                       isNoteEmpty
                           ? Text(
                               l10n.emptyTransactionNote,
@@ -220,8 +308,7 @@ class MomentListItem extends ConsumerWidget {
                                   LinearGradient(
                                     colors: [
                                       appColors.primaryDark,
-                                      appColors
-                                          .primary, // Chuyển màu từ tối sang sáng mượt mà
+                                      appColors.primary,
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -239,8 +326,7 @@ class MomentListItem extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight
-                                      .w800, // Dùng w800 cho Gradient sẽ rất đẹp
+                                  fontWeight: FontWeight.w800,
                                   height: 1.35,
                                   letterSpacing: -0.3,
                                 ),
@@ -251,7 +337,6 @@ class MomentListItem extends ConsumerWidget {
                       // Metadata: Hashtag Category & Time
                       Row(
                         children: [
-                          // Viên nang Hashtag (Pill)
                           Flexible(
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -324,8 +409,8 @@ class MomentListItem extends ConsumerWidget {
                     Text(
                       compactAmount,
                       style: TextStyle(
-                        fontSize: 18, // Phóng to cực mạnh
-                        fontWeight: FontWeight.w900, // Đậm nhất có thể
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
                         color: appColors.errorAccent,
                         letterSpacing: -0.5,
                       ),

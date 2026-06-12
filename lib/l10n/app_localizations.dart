@@ -362,6 +362,36 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get categoryOther;
 
+  /// No description provided for @food.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get food;
+
+  /// No description provided for @shopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get shopping;
+
+  /// No description provided for @transport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get transport;
+
+  /// No description provided for @entertainment.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get entertainment;
+
+  /// No description provided for @other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
   /// No description provided for @catCustom.
   ///
   /// In en, this message translates to:
@@ -1683,7 +1713,7 @@ abstract class AppLocalizations {
   /// No description provided for @transactionCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} transactions'**
+  /// **'{count} moments'**
   String transactionCount(int count);
 
   /// No description provided for @transactionTime.
@@ -1833,8 +1863,8 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsMonthlyHonor.
   ///
   /// In en, this message translates to:
-  /// **'Month {month}'**
-  String analyticsMonthlyHonor(String month);
+  /// **'{month} {year}'**
+  String analyticsMonthlyHonor(String month, Object year);
 
   /// No description provided for @analyticsLastMonthReview.
   ///
@@ -3125,6 +3155,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit: {amount}'**
   String budgetBarLimit(String amount);
+
+  /// Date format for the day details bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'{day}{suffix} {month}, {year}'**
+  String dayDetailsFormat(String day, String suffix, String month, String year);
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year;
+
+  /// Title for the Diary Insight section
+  ///
+  /// In en, this message translates to:
+  /// **'Diary Insight'**
+  String get diaryInsightTitle;
+
+  /// Title for the biggest splurges section
+  ///
+  /// In en, this message translates to:
+  /// **'My Biggest Splurges'**
+  String get biggestSplurgesTitle;
+
+  /// Text for See all button
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// Dynamic text for diary insights
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of your budget went into \'{category1}\' & \'{category2}\' on {time}! Your happiest moments (🥰) were spent at {location}.'**
+  String diaryInsightDynamicBody(
+    String percent,
+    String category1,
+    String category2,
+    String time,
+    String location,
+  );
 }
 
 class _AppLocalizationsDelegate

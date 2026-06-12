@@ -147,6 +147,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get categoryOther => 'Khác';
 
   @override
+  String get food => 'Ăn uống';
+
+  @override
+  String get shopping => 'Mua sắm';
+
+  @override
+  String get transport => 'Di chuyển';
+
+  @override
+  String get entertainment => 'Giải trí';
+
+  @override
+  String get other => 'Khác';
+
+  @override
   String get catCustom => 'Khác nè... 📝';
 
   @override
@@ -887,7 +902,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String transactionCount(int count) {
-    return '$count giao dịch';
+    return '$count khoảnh khắc';
   }
 
   @override
@@ -967,8 +982,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get analyticsSwitchMonthly => 'Từng tháng';
 
   @override
-  String analyticsMonthlyHonor(String month) {
-    return 'Tháng $month';
+  String analyticsMonthlyHonor(String month, Object year) {
+    return 'Tháng $month, $year';
   }
 
   @override
@@ -1705,5 +1720,38 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String budgetBarLimit(String amount) {
     return 'Hạn mức: $amount';
+  }
+
+  @override
+  String dayDetailsFormat(
+    String day,
+    String suffix,
+    String month,
+    String year,
+  ) {
+    return 'Ngày $day tháng $month, $year';
+  }
+
+  @override
+  String get year => 'Năm';
+
+  @override
+  String get diaryInsightTitle => 'Diary Insight';
+
+  @override
+  String get biggestSplurgesTitle => 'My Biggest Splurges';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String diaryInsightDynamicBody(
+    String percent,
+    String category1,
+    String category2,
+    String time,
+    String location,
+  ) {
+    return '$percent% ngân sách của bạn đã chuyển hóa thành \'$category1\' & \'$category2\' vào $time! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại $location.';
   }
 }

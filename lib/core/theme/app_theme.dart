@@ -26,53 +26,56 @@ class AppTheme {
 
       // 🔤 CẬP NHẬT TOÀN BỘ ĐỘ ĐẬM NHẠT, TONE MÀU CỦA TEXT TẠI ĐÂY
       textTheme: GoogleFonts.plusJakartaSansTextTheme(baseTextTheme).copyWith(
-        // 1. HEADER CỰC ĐẠI (Ví dụ: Số dư tài khoản lớn, số tiền hiển thị bùng nổ)
+        // 1. HEADER CỰC ĐẠI
         headlineLarge: GoogleFonts.plusJakartaSans(
           color: appColors.primaryDark,
           fontSize: 32,
-          fontWeight: FontWeight.w900, // Siêu đậm (Black) tăng độ chất
-          letterSpacing: -1.2, // Khít chữ lại theo đúng Apple style
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5, // Nới lỏng từ -1.2 lên -0.5
         ),
 
-        // 2. HEADER VỪA (Tiêu đề các mục lớn trên màn hình HomeScreen)
+        // 2. HEADER VỪA
         headlineMedium: GoogleFonts.plusJakartaSans(
           color: appColors.primaryDark,
           fontSize: 24,
-          fontWeight: FontWeight.w800, // Rất đậm (Extra Bold)
-          letterSpacing: -0.8,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.2, // Nới lỏng từ -0.8 lên -0.2
         ),
 
-        // 3. TITLE LỚN (Tiêu đề AppBar, Tiêu đề Card chính)
+        // 3. TITLE LỚN
         titleLarge: GoogleFonts.plusJakartaSans(
           color: appColors.primaryDark,
           fontSize: 20,
-          fontWeight: FontWeight.w700, // Đậm (Bold) công nghệ
-          letterSpacing: -0.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.0, // Đưa về 0 để chữ tiêu chuẩn, không dính
         ),
 
-        // 4. TITLE VỪA (Tên các tính năng, tên Card phụ, danh mục chi tiêu)
+        // 4. TITLE VỪA
         titleMedium: GoogleFonts.plusJakartaSans(
           color: appColors.text,
           fontSize: 16,
-          fontWeight: FontWeight.w600, // Đậm vừa (Semi Bold) sắc nét
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.1, // Thêm chút khoảng cách để nét chữ gai góc hơn
         ),
 
-        // 5. TEXT CHÍNH (Nội dung đọc chính, thông tin chi tiết, text nhập vào)
+        // 5. TEXT CHÍNH
         bodyLarge: GoogleFonts.plusJakartaSans(
           color: appColors.text,
           fontSize: 15,
-          fontWeight: FontWeight.w500, // Mức Medium giúp text không bị thô cứng
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.2, // Tăng nhẹ để đoạn văn bản dài dễ đọc hơn
         ),
 
-        // 6. TEXT PHỤ / MUTED (Mô tả nhỏ, ngày tháng, sub-title nhạt)
+        // 6. TEXT PHỤ / MUTED
         bodyMedium: GoogleFonts.plusJakartaSans(
-          color: appColors.textMuted, // Áp dụng chuẩn màu textMuted dịu mắt
+          color: appColors.textMuted,
           fontSize: 13,
-          fontWeight: FontWeight.w400, // Độ dày bình thường (Regular) dễ nhìn
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.2, // Tăng nhẹ để text nhỏ không bị nhòe vào nhau
         ),
       ),
 
-      // 🍏 ĐỒNG BỘ LUÔN CHO TEXT TRÊN APP BAR (THANH TIÊU ĐỀ TRÊN CÙNG)
+      // 🍏 ĐỒNG BỘ LUÔN CHO TEXT TRÊN APP BAR
       appBarTheme: AppBarTheme(
         backgroundColor: appColors.background,
         elevation: 0,
@@ -81,11 +84,11 @@ class AppTheme {
           color: appColors.primaryDark,
           fontSize: 20,
           fontWeight: FontWeight.w800,
-          letterSpacing: -0.5,
+          letterSpacing: 0.0, // Đưa về 0 để không bị dính
         ),
       ),
 
-      // Các cấu hình decoration khác giữ nguyên và map theo bộ màu mới
+      // Các cấu hình decoration khác giữ nguyên
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: appColors.cardBackground,

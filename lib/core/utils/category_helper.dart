@@ -49,4 +49,21 @@ class CategoryHelper {
       idEntertainment,
     ].contains(categoryName);
   }
+
+  String getLocalizedCategory(String? categoryKey, AppLocalizations l10n) {
+    if (categoryKey == null || categoryKey.isEmpty) return l10n.other;
+    switch (categoryKey.toLowerCase()) {
+      case 'food':
+        return l10n.food;
+      case 'transport':
+        return l10n.transport;
+      case 'shopping':
+        return l10n.shopping;
+      case 'entertainment':
+        return l10n.entertainment;
+      // Thêm các case khác tương ứng với file .arb của bạn
+      default:
+        return "${categoryKey[0].toUpperCase()}${categoryKey.substring(1).toLowerCase()}";
+    }
+  }
 }

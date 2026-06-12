@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
-import 'package:moment_u_payment/core/widgets/analytics_components.dart';
+import 'package:moment_u_payment/core/widgets/analytics_components.dart'; // Nơi chứa SplurgeInfo và các Widget
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_analytics_controller.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -28,7 +28,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   late DateTime _endDate;
   late DateTime _currentMonthSummary;
 
-  // 🌟 FIX LỖI TRÀN NGÀY CỦA DART (Vd: 31/03 lùi 1 tháng thành 31/02 -> bị nhảy sang 03/03)
+  // 🌟 FIX LỖI TRÀN NGÀY CỦA DART
   DateTime _subtractMonths(DateTime date, int months) {
     int newYear = date.year;
     int newMonth = date.month - months;
@@ -63,9 +63,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       _activeFilterType = 'Period';
 
       _endDate = DateTimeHelper.getLocalEndOfDay(now);
-      _startDate = DateTimeHelper.getLocalStartOfDay(
-        _subtractMonths(now, 1), // Sử dụng hàm trừ tháng chuẩn
-      );
+      _startDate = DateTimeHelper.getLocalStartOfDay(_subtractMonths(now, 1));
       _currentMonthSummary = DateTime(now.year, now.month);
     }
 
@@ -75,8 +73,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   }
 
   void _fetchData() {
-    // 🌟 Ép kiểu toLocal() một lần nữa trước khi gửi cho Controller
-    // để đề phòng các lỗi parse ngầm định về UTC ở dưới nền.
     ref
         .read(transactionAnalyticsProvider.notifier)
         .updateDateRange(_startDate.toLocal(), _endDate.toLocal());
@@ -128,6 +124,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   ) {
     HapticFeedback.selectionClick();
     DateTime tempDate = isStart ? _startDate : _endDate;
+    final textTheme = Theme.of(context).textTheme;
 
     showModalBottomSheet(
       context: context,
@@ -159,8 +156,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 isStart
                     ? (l10n.selectStartDate ?? "Chọn ngày bắt đầu")
                     : (l10n.selectEndDate ?? "Chọn ngày kết thúc"),
-                style: TextStyle(
-                  fontSize: 18,
+                style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: appColors.text,
                 ),
@@ -232,8 +228,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     },
                     child: Text(
                       l10n.applyButtonTitle ?? "Áp dụng",
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
                       ),
@@ -264,6 +259,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     HapticFeedback.lightImpact();
     final l10n = AppLocalizations.of(context)!;
     final langCode = Localizations.localeOf(context).languageCode;
+    final textTheme = Theme.of(context).textTheme;
 
     showModalBottomSheet(
       context: context,
@@ -306,8 +302,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     const SizedBox(height: 20),
                     Text(
                       l10n.chooseMonthYear ?? "Chọn Tháng & Năm",
-                      style: TextStyle(
-                        fontSize: 19,
+                      style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: appColors.text,
                         letterSpacing: -0.4,
@@ -320,9 +315,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 10),
                         child: Text(
-                          "NĂM",
-                          style: TextStyle(
-                            fontSize: 11,
+                          l10n.year ?? "NĂM",
+                          style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: appColors.textMuted,
                             letterSpacing: 1.0,
@@ -366,8 +360,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               ),
                               child: Text(
                                 year.toString(),
-                                style: TextStyle(
-                                  fontSize: 15,
+                                style: textTheme.titleSmall?.copyWith(
                                   fontWeight: isSelected
                                       ? FontWeight.w800
                                       : FontWeight.w600,
@@ -388,9 +381,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 10),
                         child: Text(
-                          "THÁNG",
-                          style: TextStyle(
-                            fontSize: 11,
+                          l10n.month ?? "THÁNG",
+                          style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: appColors.textMuted,
                             letterSpacing: 1.0,
@@ -450,8 +442,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             ),
                             child: Text(
                               monthLabel,
-                              style: TextStyle(
-                                fontSize: 14,
+                              style: textTheme.labelLarge?.copyWith(
                                 fontWeight: isSelected
                                     ? FontWeight.w800
                                     : FontWeight.w600,
@@ -500,8 +491,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         },
                         child: Text(
                           l10n.applyButtonTitle ?? "Áp dụng",
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: textTheme.titleMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.3,
@@ -524,6 +514,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final appColors = ref.watch(appColorsProvider);
     final analyticsState = ref.watch(transactionAnalyticsProvider);
+    final String langCode = Localizations.localeOf(context).languageCode;
+    final textTheme = Theme.of(context).textTheme;
+
+    final String monthStr = langCode == 'vi'
+        ? DateFormat('MM').format(_currentMonthSummary)
+        : DateFormat('MMMM', 'en').format(_currentMonthSummary);
+    final String yearStr = DateFormat('yyyy').format(_currentMonthSummary);
+
+    final String displayMonthlyTitle = l10n.analyticsMonthlyHonor(
+      monthStr,
+      yearStr,
+    );
 
     ref.listen<TransactionState>(transactionProvider, (previous, next) {
       if (next == TransactionState.success) {
@@ -536,10 +538,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       appBar: AppBar(
         title: Text(
           l10n.analyticsTitle ?? "Thống kê",
-          style: TextStyle(
+          style: textTheme.headlineSmall?.copyWith(
             color: appColors.text,
             fontWeight: FontWeight.w900,
-            fontSize: 22,
             letterSpacing: -0.5,
           ),
         ),
@@ -584,6 +585,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           }
                         },
                         appColors: appColors,
+                        textTheme: textTheme,
                       ),
                       _buildSwitcherTab(
                         title: l10n.analyticsSwitchMonthly ?? "Từng tháng",
@@ -594,6 +596,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           }
                         },
                         appColors: appColors,
+                        textTheme: textTheme,
                       ),
                     ],
                   ),
@@ -641,15 +644,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              l10n.analyticsMonthlyHonor != null
-                                  ? l10n.analyticsMonthlyHonor(
-                                      _currentMonthSummary.month.toString(),
-                                    )
-                                  : "Tháng ${_currentMonthSummary.month}",
-                              style: TextStyle(
+                              displayMonthlyTitle,
+                              style: textTheme.titleLarge?.copyWith(
                                 color: appColors.primaryDark,
                                 fontWeight: FontWeight.w900,
-                                fontSize: 18,
                               ),
                             ),
                             InkWell(
@@ -673,9 +671,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      l10n.analyticsLastMonthReview,
-                                      style: TextStyle(
-                                        fontSize: 13,
+                                      l10n.analyticsLastMonthReview ??
+                                          "Đổi tháng",
+                                      style: textTheme.labelLarge?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: appColors.primary,
                                       ),
@@ -691,6 +689,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               const SizedBox(height: 16),
 
+              // 🌟 XỬ LÝ KHỐI BÓC TÁCH DỮ LIỆU MAP MỚI 🌟
               analyticsState.when(
                 skipLoadingOnRefresh: true,
                 loading: () => const SizedBox(
@@ -704,8 +703,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       .read(transactionAnalyticsProvider.notifier)
                       .refreshAnalytics(),
                 ),
-                data: (analyticsData) {
-                  final double totalSpending = analyticsData.fold(
+                data: (Map<String, dynamic> analyticsData) {
+                  // 1. Tách danh sách danh mục (categories)
+                  final List<Map<String, dynamic>> categories =
+                      List<Map<String, dynamic>>.from(
+                        analyticsData['categories'] ?? [],
+                      );
+
+                  // 2. Tính tổng tiền từ danh mục
+                  final double totalSpending = categories.fold(
                     0.0,
                     (sum, item) =>
                         sum +
@@ -714,11 +720,46 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
                   final currencySymbol = ref.watch(currencyProvider);
 
-                  if (analyticsData.isEmpty) {
+                  if (categories.isEmpty) {
                     return EmptyAnalyticsWidget(
                       l10n: l10n,
                       appColors: appColors,
                     );
+                  }
+
+                  // 3. Tách danh sách chi tiêu lớn (biggestSplurges)
+                  final List<SplurgeInfo> splurges =
+                      (analyticsData['biggestSplurges'] as List<dynamic>?)
+                          ?.map(
+                            (e) => SplurgeInfo.fromJson(
+                              Map<String, dynamic>.from(e),
+                            ),
+                          )
+                          .toList() ??
+                      [];
+
+                  // 4. Khởi tạo câu Insight động (Dựa trên backend trả về)
+                  final insightRaw = analyticsData['diaryInsight'];
+                  String? insightText;
+
+                  if (insightRaw != null) {
+                    final percent = insightRaw['percent']?.toString() ?? '0';
+                    final cat1 = insightRaw['category1']?.toString() ?? '';
+                    final cat2 = insightRaw['category2']?.toString();
+
+                    String joinedCats = cat1;
+                    if (cat2 != null && cat2.isNotEmpty) {
+                      joinedCats += " & $cat2";
+                    }
+
+                    // Tùy chỉnh nhẹ theo ngôn ngữ để câu văn tự nhiên
+                    if (langCode == 'vi') {
+                      insightText =
+                          "$percent% ngân sách kỳ này đã được bạn dành cho '$joinedCats'. Đây quả là một sự đầu tư đáng giá cho cảm xúc của bạn 🥰!";
+                    } else {
+                      insightText =
+                          "$percent% of your budget went into '$joinedCats' this period. A beautiful and worthy investment in your happiness 🥰!";
+                    }
                   }
 
                   return Column(
@@ -733,12 +774,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         l10n: l10n,
                         currencySymbol: currencySymbol,
                       ),
+                      // 5. Truyền toàn bộ tham số mới vào Component
                       AnalyticsContentWidget(
-                        analyticsData: analyticsData,
+                        analyticsData: categories,
                         totalSpending: totalSpending,
                         appColors: appColors,
                         l10n: l10n,
                         currencySymbol: currencySymbol,
+                        diaryInsightText: insightText,
+                        biggestSplurges: splurges,
                       ),
                       const SizedBox(height: 40),
                     ],
@@ -757,6 +801,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     required bool isActive,
     required VoidCallback onTap,
     required AppColorTheme appColors,
+    required TextTheme textTheme,
   }) {
     return Expanded(
       child: GestureDetector(
@@ -782,8 +827,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           alignment: Alignment.center,
           child: Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
+            style: textTheme.labelLarge?.copyWith(
               fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               color: isActive
                   ? appColors.primary

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'photo_calendar_cell.dart';
 
 class TransactionCalendarView extends ConsumerWidget {
@@ -198,6 +200,20 @@ class TransactionCalendarView extends ConsumerWidget {
       ),
       builder: (context) {
         final List txList = dayData['transactions'];
+        // 1. Tạo chuỗi format: "04" + "th" + " June 2024"
+        final String dayString = DateFormat(
+          'dd',
+        ).format(date); // Lấy ngày có số 0 ở đầu (04)
+        final String suffix = DateTimeHelper.getDaySuffix(
+          date.day,
+        ); // Lấy hậu tố (th)
+        final String monthYearString = DateFormat(
+          'MMMM, yyyy',
+          'en_US',
+        ).format(date); // Lấy tháng và năm
+
+        final String formattedDisplayDate =
+            "$dayString$suffix $monthYearString";
 
         return FractionallySizedBox(
           heightFactor: 0.6,
@@ -215,7 +231,7 @@ class TransactionCalendarView extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  "Ngày ${date.day} Tháng ${date.month}",
+                  formattedDisplayDate,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

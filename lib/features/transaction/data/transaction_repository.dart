@@ -169,7 +169,8 @@ class TransactionRepository {
   }
 
   /// 📊 BƯỚC 6: LẤY DỮ LIỆU THỐNG KÊ CHI TIÊU
-  Future<List<Map<String, dynamic>>> getTransactionAnalytics({
+  /// ⚠️ Đã đổi kiểu trả về thành Map<String, dynamic> để đồng bộ với Backend mới
+  Future<Map<String, dynamic>> getTransactionAnalytics({
     required DateTime startDate,
     required DateTime endDate,
   }) async {
@@ -189,8 +190,8 @@ class TransactionRepository {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data.map((item) => Map<String, dynamic>.from(item)).toList();
+        // Backend mới trả về một Object chứa { categories, biggestSplurges, diaryInsight }
+        return response.data as Map<String, dynamic>;
       } else {
         throw Exception("Không thể lấy dữ liệu phân tích từ Server");
       }
