@@ -6,11 +6,19 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:moment_u_payment/core/features/recap/screens/story_recap_screen.dart';
+import 'package:moment_u_payment/core/utils/currency_helper.dart';
+import 'package:moment_u_payment/core/utils/gamification_utils.dart';
+import 'package:moment_u_payment/features/budget/data/models/budget_summary.dart';
+import 'package:moment_u_payment/features/transaction/data/transaction_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/features/badges/badge_service.dart';
 import 'package:moment_u_payment/core/features/badges/widgets/multiple_badge_premium_dialog.dart';
 import 'package:moment_u_payment/core/services/quick_actions_service.dart';
 import 'package:moment_u_payment/core/services/home_widget_service.dart';
+import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/budget/providers/home_budget_provider.dart';
 import 'package:moment_u_payment/features/home/presentation/screens/home_screen.dart';
@@ -21,12 +29,7 @@ import 'package:moment_u_payment/features/transaction/presentation/screens/analy
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/settings/presentation/widgets/settings_bottom_sheet.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
-
-// Đảm bảo import đúng model UserBadge của bạn
 import 'package:moment_u_payment/core/features/badges/badge_model.dart';
-
-// 🚀 NẾU BẠN CÓ TRANSACTION PROVIDER, HÃY IMPORT Ở ĐÂY
-// import 'package:moment_u_payment/features/transaction/providers/transaction_provider.dart';
 
 class MainLayoutScreen extends ConsumerStatefulWidget {
   const MainLayoutScreen({super.key});
@@ -48,11 +51,14 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // 🚀 1. Gọi hàm đồng bộ ngay khi mở app
-      _syncDataWithBackend();
+      await _syncDataWithBackend();
 
-      // 🚀 2. Tự động kiểm tra huy hiệu ngay lần dựng UI đầu tiên (Vừa login xong)
+      // 🚀 2. Kiểm tra và hiển thị Story Recap thông minh (Chạy ngầm sau khi sync data)
+      _checkAndShowMonthlyRecap();
+
+      // 🚀 3. Tự động kiểm tra huy hiệu ngay lần dựng UI đầu tiên
       final initialBadges = ref.read(newlyUnlockedBadgeProvider);
       if (initialBadges.isNotEmpty) {
         Future.delayed(const Duration(milliseconds: 500), () {
@@ -81,31 +87,216 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     });
   }
 
+  // =========================================================================
+  // 🌟 LOGIC: KIỂM TRA & HIỂN THỊ STORY RECAP THÔNG MINH
+  // =========================================================================
+  Future<void> _checkAndShowMonthlyRecap() async {
+    final now = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+    final recapKey = 'recap_shown_${now.year}_${now.month}';
+
+    // Điều kiện hiển thị thực tế
+    // if (now.day > 5) return;
+    // if (prefs.getBool(recapKey) ?? false) return;
+
+    try {
+      final repo = ref.read(transactionRepositoryProvider);
+      final l10n = AppLocalizations.of(context)!;
+      final currencySymbol = ref.read(currencyProvider).toString();
+      final appColors = ref.read(appColorsProvider);
+
+      // ---------------------------------------------------------
+      // 🌟 BƯỚC 1: XÁC ĐỊNH MỐC THỜI GIAN CHUẨN LOCAL TIME M-1 và M-2
+      // ---------------------------------------------------------
+      final DateTime lastMonthStart = DateTime(now.year, now.month - 1, 1);
+      final DateTime lastMonthEnd = DateTime(
+        now.year,
+        now.month,
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+
+      final DateTime monthBeforeStart = DateTime(now.year, now.month - 2, 1);
+      final DateTime monthBeforeEnd = DateTime(
+        now.year,
+        now.month - 1,
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+
+      // 🚀 Kéo toàn bộ dữ liệu đồng thời từ server
+      final results = await Future.wait([
+        repo.getTransactions(
+          page: 1,
+          limit: 1000,
+          startDate: lastMonthStart.toUtc(),
+          endDate: lastMonthEnd.toUtc(),
+        ),
+        repo.getTransactions(
+          page: 1,
+          limit: 1000,
+          startDate: monthBeforeStart.toUtc(),
+          endDate: monthBeforeEnd.toUtc(),
+        ),
+        ref.read(homeBudgetProvider.future).catchError((_) => null),
+      ]);
+
+      final List<Map<String, dynamic>> lastMonthTx =
+          results[0] as List<Map<String, dynamic>>;
+      final List<Map<String, dynamic>> monthBeforeTx =
+          results[1] as List<Map<String, dynamic>>;
+      final budgetSummary = results[2] as BudgetSummary?;
+
+      if (lastMonthTx.isEmpty) {
+        await prefs.setBool(recapKey, true);
+        return;
+      }
+
+      // ---------------------------------------------------------
+      // 🌟 BƯỚC 2: TÍNH TOÁN SỐ LIỆU CHI TIÊU & SO SÁNH TĂNG GIẢM
+      // ---------------------------------------------------------
+      final int swipeCount = lastMonthTx.length;
+      final double spentLastMonth = lastMonthTx.fold(
+        0.0,
+        (sum, tx) => sum + ((tx['amount'] as num?)?.toDouble() ?? 0.0),
+      );
+      final double spentMonthBefore = monthBeforeTx.fold(
+        0.0,
+        (sum, tx) => sum + ((tx['amount'] as num?)?.toDouble() ?? 0.0),
+      );
+
+      final String formattedSpentLastMonth = CurrencyHelper.formatCompactAmount(
+        spentLastMonth,
+        symbol: currencySymbol,
+      );
+
+      // 🔥 Cập nhật yêu cầu: Nếu m-2 không có dữ liệu (=0) thì để chuỗi rỗng không hiển thị dòng so sánh
+      String comparisonText = '';
+      if (spentMonthBefore > 0) {
+        final double difference = (spentLastMonth - spentMonthBefore).abs();
+        final String formattedDifference = CurrencyHelper.formatCompactAmount(
+          difference,
+          symbol: currencySymbol,
+        );
+
+        if (spentLastMonth > spentMonthBefore) {
+          comparisonText = l10n.recapComparisonMore(formattedDifference);
+        } else if (spentLastMonth < spentMonthBefore) {
+          comparisonText = l10n.recapComparisonLess(formattedDifference);
+        } else {
+          comparisonText = l10n.recapComparisonEqual;
+        }
+      }
+
+      // ---------------------------------------------------------
+      // 🌟 BƯỚC 3: KIỂM TRA NGÂN SÁCH & TRÍCH XUẤT DANH SÁCH BADGES M-1
+      // ---------------------------------------------------------
+      final double budgetLimit = budgetSummary?.budgetLimit.toDouble() ?? 0.0;
+      final double budgetDiff = budgetLimit - spentLastMonth;
+
+      String budgetAnalysisText;
+      if (budgetLimit <= 0) {
+        budgetAnalysisText = formattedSpentLastMonth;
+      } else {
+        final String formattedBudgetDiff = CurrencyHelper.formatCompactAmount(
+          budgetDiff.abs(),
+          symbol: currencySymbol,
+        );
+        budgetAnalysisText = budgetDiff >= 0
+            ? l10n.recapUnderBudget(formattedBudgetDiff)
+            : l10n.recapOverBudget(formattedBudgetDiff);
+      }
+
+      final List<BadgeType> earnedTypes = GamificationUtils.calculateBadges(
+        [],
+        lastMonthTx,
+        spentLastMonth,
+      );
+      final List<UserBadge> earnedBadges = earnedTypes
+          .map(
+            (type) =>
+                GamificationUtils.allBadges.firstWhere((b) => b.type == type),
+          )
+          .toList();
+
+      // ---------------------------------------------------------
+      // 🌟 BƯỚC 4: THIẾT LẬP DỮ LIỆU SLIDE MỚI & ĐIỀU HƯỚNG
+      // ---------------------------------------------------------
+      final List<RecapSlideData> recapSlides = [
+        RecapSlideData(
+          title: l10n.recapSwipeCountMain(swipeCount),
+          mainText: formattedSpentLastMonth,
+          subText: comparisonText, // Sẽ hiển thị trống nếu tháng m-2 bằng 0
+          type: RecapSlideType.spending,
+        ),
+        RecapSlideData(
+          title: l10n.recapEarnedBadges,
+          mainText: budgetAnalysisText,
+          subText: l10n.recapBadgeResetNotice,
+          badges: earnedBadges,
+          type: RecapSlideType.badges,
+          shouldCelebrate: earnedBadges.isNotEmpty,
+        ),
+      ];
+
+      await prefs.setBool(recapKey, true);
+
+      if (!mounted) return;
+
+      // Giữ lại context an toàn của MainLayoutScreen
+      final mainLayoutContext = context;
+
+      Navigator.of(mainLayoutContext).push(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => StoryRecapScreen(
+            appColors: appColors,
+            title: l10n.recapTitleMonthly(
+              lastMonthStart.month.toString().padLeft(2, '0'),
+            ),
+            slides: recapSlides,
+            actionLabel: l10n.recapViewAnalytics,
+            onFinish: () {
+              // Thực thi đóng màn hình phủ bằng rootNavigator để chắc chắn biến mất hoàn toàn
+              Navigator.of(mainLayoutContext, rootNavigator: true).pop();
+
+              // Cập nhật tab bằng tham chiếu trực tiếp an toàn
+              if (mainLayoutContext.mounted) {
+                setState(() {
+                  _currentIndex = 1; // Nhảy ngay sang Analytics Screen
+                  _isNavbarVisible = true;
+                });
+                debugPrint("🚀 Đã điều hướng thành công đến tab Analytics");
+              }
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint("Error generating Enhanced Recap Story: $e");
+    }
+  }
+
   // 🚀 HÀM ĐỒNG BỘ DỮ LIỆU TỔNG HỢP
   Future<void> _syncDataWithBackend() async {
     if (!mounted) return;
 
-    // 1. Làm mới danh sách huy hiệu từ API/Local
     ref.read(badgeServiceProvider.notifier).refreshBadges();
-
-    // 2. Làm mới đếm số thông báo
     ref.read(notificationProvider.notifier).fetchUnreadCount();
-
-    // 3. LÀM MỚI DỮ LIỆU GIAO DỊCH & NGÂN SÁCH
-    // Cập nhật dòng thời gian
-    ref.read(transactionTimelineProvider.notifier).refreshTimeline();
-
-    // Cập nhật biểu đồ thống kê
+    await ref.read(transactionTimelineProvider.notifier).refreshTimeline();
     ref.read(transactionAnalyticsProvider.notifier).refreshAnalytics();
-
-    // Ép ví ngoan tính lại tiền ngân sách
     ref.invalidate(homeBudgetProvider);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Gọi hàm đồng bộ khi người dùng mở lại app từ chế độ nền
       _syncDataWithBackend();
     }
   }
@@ -122,7 +313,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
       context,
       CupertinoPageRoute(builder: (_) => const AddTransactionScreen()),
     );
-    // Đồng bộ lại toàn bộ dữ liệu sau khi thêm giao dịch (đóng màn hình Add)
     if (mounted) {
       _syncDataWithBackend();
     }
@@ -183,10 +373,8 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    // 🌟 CHỈ LẮNG NGHE SỰ THAY ĐỔI MỚI TRONG QUÁ TRÌNH DÙNG APP
     ref.listen<List<UserBadge>>(newlyUnlockedBadgeProvider, (previous, next) {
       if (next != null && next.isNotEmpty) {
-        // Delay một chút để tránh xung đột animation khi đang chuyển trang
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             _showCelebrationDialog(context, next, appColors, l10n);
@@ -282,7 +470,6 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
                             builder: (_) => const SetBudgetScreen(),
                           ),
                         );
-                        // Thay thế lệnh refresh cũ bằng hàm _syncData tổng
                         if (mounted) _syncDataWithBackend();
                       },
                     ),

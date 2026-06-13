@@ -134,11 +134,24 @@ class TransactionRepository {
   Future<List<Map<String, dynamic>>> getTransactions({
     required int page,
     required int limit,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     try {
+      // Chuẩn bị tham số truy vấn
+      final Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
+
+      // Chỉ thêm bộ lọc thời gian nếu có truyền vào
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
       final response = await _dio.get(
         '/transactions',
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: queryParams,
       );
 
       if (response.statusCode == 200) {
@@ -207,30 +220,31 @@ class TransactionRepository {
   }
 
   // Thêm hàm này vào class TransactionRepository của bạn
-Future<List<SplurgeInfo>> getAllSplurges({
-  required DateTime startDate,
-  required DateTime endDate,
-  int page = 1,
-  int limit = 20,
-}) async {
-  try {
-    // Thay đổi cú pháp tương ứng với HTTP client bạn đang dùng (Dio / http)
-    final response = await _dio.get(
-      '/transactions/splurges',
-      queryParameters: {
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
-        'page': page,
-        'limit': limit,
-      },
-    );
+  Future<List<SplurgeInfo>> getAllSplurges({
+    required DateTime startDate,
+    required DateTime endDate,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      // Thay đổi cú pháp tương ứng với HTTP client bạn đang dùng (Dio / http)
+      final response = await _dio.get(
+        '/transactions/splurges',
+        queryParameters: {
+          'startDate': startDate.toIso8601String(),
+          'endDate': endDate.toIso8601String(),
+          'page': page,
+          'limit': limit,
+        },
+      );
 
-    final List<dynamic> data = response.data; // Tuỳ cấu trúc response backend trả về
-    return data.map((json) => SplurgeInfo.fromJson(json)).toList();
-  } catch (e) {
-    throw Exception('Lỗi khi tải danh sách splurges: $e');
+      final List<dynamic> data =
+          response.data; // Tuỳ cấu trúc response backend trả về
+      return data.map((json) => SplurgeInfo.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách splurges: $e');
+    }
   }
-}
 }
 
 // Cung cấp instance của Repository thông qua Riverpod Provider

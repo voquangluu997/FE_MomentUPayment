@@ -43,7 +43,6 @@
   "homeSubGreeting": "Hôm nay tình hình chi tiêu thế nào?",
   "spendingMomentsTitle": "Khoảnh khắc chi tiêu nè",
   "loadingData": "Đang tải danh sách khoảnh khắc...",
-  "errorLoadData": "Không thể tải dữ liệu. Vui lòng thử lại!",
   "retryButton": "Thử lại",
   "emptyTransactionList": "Chưa có khoảnh khắc chi tiêu nào trong tháng này. Ấn + để thêm nhé! 🌸",
 
@@ -297,7 +296,6 @@
   "totalLabel": "Tổng chi tiêu",
   "avgPerDay": "Trung bình/Ngày",
   "timeFrame": "Số ngày",
-  "errorLoadData": "Không thể tải dữ liệu. Vui lòng kiểm tra lại!",
   "retryButton": "Thử lại",
 
   "analyticsTitle": "Soi Ví 🔍",
@@ -386,7 +384,6 @@
   "fillPasswordFieldsError": "Vui lòng nhập đầy đủ thông tin mật khẩu.",
   "samePasswordError": "Mật khẩu mới không được trùng mật khẩu cũ.",
 
-  "errorLoadData": "Lỗi khi tải dữ liệu",
   "emptyFilterTransaction": "Không có khoảnh khắc nào trong khoảng thời gian này",
   "emptyTransactionList": "Chưa có khoảnh khắc nào được ghi lại",
   "addSuccessMessage": "Thêm khoảnh khắc mới thành công rùi! ✨",
@@ -692,7 +689,6 @@
   
 "spendingStructure": "Cơ cấu 'bay màu' của ví 🥧",
 "emptyAnalyticsData": "Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥",
-"errorLoadData": "Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺",
 "retryButton": "Lấy đà thử lại nghen 🚀",
 "filterActiveTitle": "Bộ lọc thời gian",
 "selectMonthLabel": "Thời gian tổng kết",
@@ -839,6 +835,12 @@
   "analyticsMonthlyHonor": "Tháng {month}, {year}",
   "year": "Năm",
 
+  "diaryInsightTitle": "Sổ Tay Phân Tích",
+  "biggestSplurgesTitle": "Chi Tiêu Khủng Nhất",
+  "seeAll": "Xem tất cả",
+  "retryButton": "Thử lại",
+  "emptyAnalyticsData": "Chưa có dữ liệu phân tích nào trong khoảng thời gian này.",
+
   "diaryInsightDynamicBody": "{percent}% of your budget went into '{category1}' & '{category2}' on {time}! Your happiest moments (🥰) were spent at {location}.",
   "@diaryInsightDynamicBody": {
     "description": "Dynamic text for diary insights",
@@ -853,6 +855,56 @@
 
   "diaryInsightDynamicBody": "{percent}% ngân sách của bạn đã chuyển hóa thành '{category1}' & '{category2}' vào {time}! Khoảnh khắc hạnh phúc nhất (🥰) được ghi nhận tại {location}.",
 
-"allSplurgesTitle": "Hội con nhà giàu 💸",
-"allSplurgesSubtitle": "Nhìn lại những lần rút hầu bao đậm sâu nhất của bạn! Đừng tiếc nuối vì những trải nghiệm này nhé ✨"
+"allSplurgesTitle": "Chi tiêu khủng nhất 💸",
+"allSplurgesSubtitle": "Nhìn lại những lần rút hầu bao đậm sâu nhất của bạn! Đừng tiếc nuối vì những trải nghiệm này nhé ✨",
+
+"errorOccurred": "Đã xảy ra lỗi! Vui lòng thủ lại",
+"noSplurgesYet": "Chưa có khoản chi tiêu khủng nào ✨",
+
+"dashboardTotalSpent": "Tổng đã chi",
+"dashboardHighestSpent": "Đắt nhất",
+"dashboardQuantity": "Số lượng",
+"filterAll": "Tất cả",
+"filterMonth": "Tháng này",
+"filterWeek": "7 ngày qua",
+"displayCountItem": "món",
+
+  "recapTitleMonthly": "NHÌN LẠI THÁNG • {month}",
+  "@recapTitleMonthly": {
+    "placeholders": {
+      "month": { "type": "String" }
+    }
+  },
+  "recapTitleYearly": "NHÌN LẠI NĂM • {year}",
+  "@recapTitleYearly": {
+    "placeholders": {
+      "year": { "type": "String" }
+    }
+  },
+  "recapIntroMain": "Tháng này,\nbạn rất rực rỡ!",
+  "recapIntroSub": "Moment U đã ghi lại hành trình quản lý tài chính của bạn.",
+  "recapSwipeCountMain": "Bạn đã ghi lại \n{count} khoảnh khắc chi tiêu",
+  "@recapSwipeCountMain": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recapSwipeCountSub": "Hoạt động cực kỳ năng nổ để tối ưu hóa dòng tiền cá nhân!",
+  "recapSavingsMain": "Tiết kiệm được\n{amount}",
+  "@recapSavingsMain": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "recapSavingsSub": "Bạn đã xuất sắc cắt giảm chi tiêu và quản lý dòng tiền rất khéo!",
+  "recapShareMessage": "Nhìn lại hành trình tài chính tháng này của tôi cùng Moments U Payment! 🎉",
+
+"recapComparisonMore": "Tiêu nhiều hơn {amount} so với tháng trước nữa",
+"recapComparisonLess": "Tiết kiệm hơn {amount} so với tháng trước nữa",
+"recapComparisonEqual": "Chi tiêu ổn định như tháng trước nữa",
+"recapOverBudget": "Bị vượt ngân sách {amount} 🤯",
+"recapUnderBudget": "Tiết kiệm được {amount} so với ngân sách ✨",
+"recapBadgeResetNotice": "Các huy hiệu tháng sẽ được làm mới ở tháng này để sẵn sàng cho thử thách tiếp theo!",
+"recapViewAnalytics": "Xem thống kê chi tiết",
+"recapEarnedBadges": "Thành tựu bạn đã gặt hái"
 }

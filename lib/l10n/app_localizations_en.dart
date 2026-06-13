@@ -124,10 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingData => 'Loading payment moments...';
 
   @override
-  String get errorLoadData => 'Oops, the data tripped on a rock, so unlucky 🥺';
-
-  @override
-  String get retryButton => 'Take a run and try again 🚀';
+  String get retryButton => 'Retry';
 
   @override
   String get emptyTransactionList => 'No moments yet';
@@ -619,7 +616,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyAnalyticsData =>
-      'Piggy bank is empty~ Haven\'t spent a single dime yet 🐥';
+      'No analytics data available for this period.';
 
   @override
   String get buyDevCoffeeTitle => 'Buy the Dev a Coffee ☕';
@@ -1401,6 +1398,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sixMonthsChip => 'Half a year 🐢';
 
   @override
+  String get errorLoadData => 'Oops, the data tripped on a rock, so unlucky 🥺';
+
+  @override
   String get filterActiveTitle => 'Time Filter';
 
   @override
@@ -1749,4 +1749,104 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get allSplurgesSubtitle =>
       'A look back at your deepest splurges. Don\'t regret the experience! ✨';
+
+  @override
+  String get errorOccurred => 'An error occurred! Please try again.';
+
+  @override
+  String get noSplurgesYet => 'No massive splurges yet ✨';
+
+  @override
+  String get dashboardTotalSpent => 'Total Spent';
+
+  @override
+  String get dashboardHighestSpent => 'Highest';
+
+  @override
+  String get dashboardQuantity => 'Quantity';
+
+  @override
+  String get filterAll => 'All Time';
+
+  @override
+  String get filterMonth => 'This Month';
+
+  @override
+  String get filterWeek => 'Last 7 Days';
+
+  @override
+  String get displayCountItem => 'items';
+
+  @override
+  String recapTitleMonthly(String month) {
+    return 'MONTHLY RECAP • $month';
+  }
+
+  @override
+  String recapTitleYearly(String year) {
+    return 'YEARLY RECAP • $year';
+  }
+
+  @override
+  String get recapIntroMain => 'This month,\nyou were brilliant!';
+
+  @override
+  String get recapIntroSub =>
+      'Moment U has captured your personal financial journey.';
+
+  @override
+  String recapSwipeCountMain(int count) {
+    return 'You\'ve recorded \n$count spending moments';
+  }
+
+  @override
+  String get recapSwipeCountSub =>
+      'Extremely active in optimizing your personal cash flow!';
+
+  @override
+  String recapSavingsMain(String amount) {
+    return 'Saved\n$amount';
+  }
+
+  @override
+  String get recapSavingsSub =>
+      'Outstanding job cutting back expenses and managing money wisely!';
+
+  @override
+  String get recapShareMessage =>
+      'Looking back at my financial journey this month with Moments U Payment! 🎉';
+
+  @override
+  String recapComparisonMore(String amount) {
+    return 'Spent $amount more than the month before';
+  }
+
+  @override
+  String recapComparisonLess(String amount) {
+    return 'Saved $amount compared to the month before';
+  }
+
+  @override
+  String get recapComparisonEqual =>
+      'Spending remained stable compared to the month before';
+
+  @override
+  String recapOverBudget(String amount) {
+    return 'Over budget by $amount 🤯';
+  }
+
+  @override
+  String recapUnderBudget(String amount) {
+    return 'Saved $amount from your budget ✨';
+  }
+
+  @override
+  String get recapBadgeResetNotice =>
+      'Monthly badges will be reset this month, ready for your next challenge!';
+
+  @override
+  String get recapViewAnalytics => 'Explore in-depth analytics';
+
+  @override
+  String get recapEarnedBadges => 'Achievements you\'ve earned';
 }

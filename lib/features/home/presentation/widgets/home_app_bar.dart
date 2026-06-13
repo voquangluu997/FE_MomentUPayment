@@ -9,11 +9,16 @@ import 'package:moment_u_payment/core/features/badges/screens/badge_gallery_page
 import 'package:moment_u_payment/core/features/badges/badge_model.dart';
 import 'package:moment_u_payment/core/features/badges/badge_service.dart';
 import 'package:moment_u_payment/core/widgets/animated_ringing_bell.dart';
+import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:moment_u_payment/features/auth/presentation/auth_provider.dart';
+import 'package:moment_u_payment/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:moment_u_payment/features/settings/presentation/widgets/settings_bottom_sheet.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
 import 'package:moment_u_payment/features/notification/presentation/screens/notification_screen.dart';
+
+// 📝 Hãy import màn hình Profile Setting của bạn ở đây, ví dụ:
+// import 'package:moment_u_payment/features/profile/presentation/screens/profile_settings_screen.dart';
 
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -48,11 +53,17 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     super.dispose();
   }
 
+  // 🌟 Hàm trả về icon vẫy tay mặc định
+  Widget _buildDefaultGreeting() {
+    return const Center(child: Text('👋', style: TextStyle(fontSize: 18)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final userInfo = ref.watch(userInfoProvider);
     final String userName = userInfo?.name ?? (l10n.defaultUser ?? 'User');
+    final String? avatarUrl = userInfo?.avatar; // Lấy link avatar
     final appColors = ref.watch(appColorsProvider);
     final currentBadge = ref.watch(currentMonthBadgeProvider);
 
@@ -64,28 +75,22 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       elevation: 0,
       centerTitle: false,
       titleSpacing: 16,
-      title: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          if (currentBadge != null) {
-            _showCongratsDialog(
-              context,
-              currentBadge,
-              appColors,
-              l10n,
-              textTheme,
-            );
-          } else {
-            Navigator.of(context).push(
-              CupertinoPageRoute(builder: (_) => const BadgeGalleryPage()),
-            );
-          }
-        },
-        child: Row(
-          children: [
-            // Container Icon Vẫy Tay bo tròn mượt mà hơn
-            Container(
-              padding: const EdgeInsets.all(10),
+      title: Row(
+        children: [
+          // 👑 VÙNG 1: NHẤN VÀO AVATAR (HOẶC VẪY TAY) ĐỂ ĐI ĐẾN PROFILE SETTING
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              // 🚀 Điều hướng sang màn hình Profile Setting của bạn
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (_) => const ProfileSettingsScreen(),
+                ),
+              );
+            },
+            child: Container(
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 color: appColors.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(14),
@@ -94,15 +99,50 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                   width: 1,
                 ),
               ),
-              child: const Text('👋', style: TextStyle(fontSize: 18)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(13),
+                child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+                    ? AppNetworkImage(
+                        imageUrl: avatarUrl,
+                        width: 42,
+                        height: 42,
+                        fit: BoxFit.cover,
+                        customErrorWidget: _buildDefaultGreeting(),
+                      )
+                    // Nếu không có URL -> Trả về vẫy tay
+                    : _buildDefaultGreeting(),
+              ),
             ),
-            const SizedBox(width: 14),
-            Expanded(
+          ),
+          const SizedBox(width: 14),
+
+          // 🏅 VÙNG 2: NHẤN VÀO TÊN / HUY HIỆU ĐỂ XEM DIALOG HOẶC GALLERY HUY HIỆU
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                HapticFeedback.lightImpact();
+                if (currentBadge != null) {
+                  _showCongratsDialog(
+                    context,
+                    currentBadge,
+                    appColors,
+                    l10n,
+                    textTheme,
+                  );
+                } else {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (_) => const BadgeGalleryPage(),
+                    ),
+                  );
+                }
+              },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 🌟 TÊN NGƯỜI DÙNG: Đồng bộ font TextTheme
+                  // 🌟 TÊN NGƯỜI DÙNG
                   Text(
                     '${l10n.hello} $userName',
                     style: textTheme.titleLarge?.copyWith(
@@ -115,7 +155,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                   ),
                   const SizedBox(height: 2),
 
-                  // 🌟 LỜI CHÀO & HUY HIỆU: Đồng bộ font TextTheme
+                  // 🌟 LỜI CHÀO & HUY HIỆU
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 600),
                     transitionBuilder: (child, anim) => FadeTransition(
@@ -167,8 +207,8 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       actions: [
         // Nút Thông Báo
@@ -225,7 +265,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         child: Center(
                           child: Text(
                             unreadCount > 99 ? '99+' : unreadCount.toString(),
-                            // Đồng bộ font số đếm
                             style: textTheme.labelSmall?.copyWith(
                               color: Colors.white,
                               fontSize: 9,
@@ -258,21 +297,19 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
     );
   }
 
-  // 🚀 DIALOG CHÚC MỪNG - ĐÃ UPGRADE KÍNH MỜ & ĐỒNG BỘ TEXT
+  // 🚀 DIALOG CHÚC MỪNG
   void _showCongratsDialog(
     BuildContext context,
     UserBadge badge,
     AppColorTheme appColors,
     AppLocalizations l10n,
-    TextTheme textTheme, // Nhận textTheme từ hàm build
+    TextTheme textTheme,
   ) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(
-        0.7,
-      ), // Giảm độ tối một chút để thấy mờ mờ background
+      barrierColor: Colors.black.withOpacity(0.7),
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
@@ -290,12 +327,8 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(
-                    0.95,
-                  ), // Lớp kính mờ xịn xò
-                  borderRadius: BorderRadius.circular(
-                    32,
-                  ), // Bo tròn mềm mại hơn
+                  color: appColors.cardBackground.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(32),
                   border: Border.all(
                     color: badge.color.withOpacity(0.3),
                     width: 1.5,
@@ -312,10 +345,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Icon Badge phát sáng
                     Container(
                       width: 130,
-                      height: 130, // Chuyển thành hình vuông bo góc cao cấp
+                      height: 130,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(32),
                         gradient: LinearGradient(
@@ -341,8 +373,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Tiêu đề đồng bộ font
                     Text(
                       l10n.congratsTitle,
                       style: textTheme.headlineMedium?.copyWith(
@@ -352,8 +382,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-
-                    // Lời nhắn đồng bộ font
                     Text(
                       l10n.badgeOwnedMessage(badge.getLocalizedTitle(l10n)),
                       textAlign: TextAlign.center,
@@ -364,8 +392,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       ),
                     ),
                     const SizedBox(height: 36),
-
-                    // Nút bấm Gradient
                     Container(
                       width: double.infinity,
                       height: 56,
@@ -407,8 +433,6 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Nút Later
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(

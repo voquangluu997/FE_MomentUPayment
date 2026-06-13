@@ -18,6 +18,7 @@ class SplurgeInfo {
   final DateTime date;
   final double amount;
   final String? emoji;
+  final String? note;
 
   SplurgeInfo({
     required this.id,
@@ -25,6 +26,7 @@ class SplurgeInfo {
     required this.date,
     required this.amount,
     this.emoji,
+    this.note,
   });
 
   factory SplurgeInfo.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class SplurgeInfo {
           : DateTime.now(),
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       emoji: json['emoji']?.toString(),
+      note: json['note']?.toString(),
     );
   }
 }
@@ -928,17 +931,15 @@ class DiaryInsightCard extends StatelessWidget {
     );
   }
 }
+
 // ==========================================
 // 6. MY BIGGEST SPLURGES COMPONENT
 // ==========================================
-// Lưu ý: Đảm bảo bạn đã import SplurgeInfo, CurrencyHelper, AppColorTheme, AppLocalizations
-
 class MyBiggestSplurgesSection extends StatelessWidget {
   final AppColorTheme appColors;
   final AppLocalizations l10n;
   final String currencySymbol;
-  final List<dynamic>
-  splurges; // Đổi thành List<SplurgeInfo> theo model dự án của bạn
+  final List<dynamic> splurges; // Khuyến khích đổi thành List<SplurgeInfo>
 
   const MyBiggestSplurgesSection({
     super.key,
@@ -971,11 +972,9 @@ class MyBiggestSplurgesSection extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  // CHUYỂN HƯỚNG SANG MÀN HÌNH "XEM TẤT CẢ"
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      // Dùng CupertinoPageRoute cho hiệu ứng trượt iOS mượt mà
                       builder: (context) => AllSplurgesScreen(
                         appColors: appColors,
                         l10n: l10n,
@@ -1009,9 +1008,6 @@ class MyBiggestSplurgesSection extends StatelessWidget {
                 item.amount,
                 symbol: currencySymbol,
               );
-
-              // Lấy emoji từ item (giả sử SplurgeInfo có thuộc tính emoji)
-              // Nếu bạn đang dùng Map thì dùng item['emoji'] ?? '✨'
               final String emoji = item.emoji ?? '✨';
 
               return Container(
@@ -1031,29 +1027,21 @@ class MyBiggestSplurgesSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Phần ảnh của Polaroid
+                    // 🚀 ĐÃ FIX: Bỏ Dead Code if-else check imageUrl, giao toàn quyền cho AppNetworkImage
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child:
-                              (item.imageUrl != null &&
-                                  item.imageUrl!.isNotEmpty)
-                              ? AppNetworkImage(
-                                  imageUrl: item
-                                      .imageUrl, // 💡 Không cần dấu "!" nữa vì AppNetworkImage đã tự xử lý an toàn giá trị null
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  customErrorWidget: _buildImagePlaceholder(
-                                    emoji,
-                                  ),
-                                )
-                              : _buildImagePlaceholder(emoji),
+                          child: AppNetworkImage(
+                            imageUrl: item.imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            customErrorWidget: _buildImagePlaceholder(emoji),
+                          ),
                         ),
                       ),
                     ),
-                    // Phần nhãn ghi chú bên dưới ảnh
                     Padding(
                       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                       child: Column(
@@ -1089,7 +1077,6 @@ class MyBiggestSplurgesSection extends StatelessWidget {
     );
   }
 
-  // Cập nhật Placeholder thành nền Gradient và Emoji
   Widget _buildImagePlaceholder(String emoji) {
     return Container(
       decoration: BoxDecoration(
@@ -1104,7 +1091,6 @@ class MyBiggestSplurgesSection extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Emoji khổng lồ mờ nhạt làm nền
           Positioned(
             right: -20,
             bottom: -10,
@@ -1113,7 +1099,6 @@ class MyBiggestSplurgesSection extends StatelessWidget {
               child: Text(emoji, style: const TextStyle(fontSize: 80)),
             ),
           ),
-          // Icon Emoji nổi bật ở giữa
           Center(
             child: Text(
               emoji,
@@ -1160,7 +1145,7 @@ class EmptyAnalyticsWidget extends StatelessWidget {
             const Text("🐥✨☁️", style: TextStyle(fontSize: 36)),
             const SizedBox(height: 16),
             Text(
-              l10n.emptyAnalyticsData,
+              l10n.emptyAnalyticsData ?? "Chưa có dữ liệu phân tích",
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: appColors.textMuted,
@@ -1198,7 +1183,7 @@ class ErrorAnalyticsWidget extends StatelessWidget {
           const Text("🥺🔧", style: TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(
-            l10n.errorLoadData,
+            l10n.errorLoadData ?? "Không thể tải dữ liệu",
             textAlign: TextAlign.center,
             style: textTheme.bodyMedium?.copyWith(
               color: appColors.errorAccent,

@@ -123,10 +123,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loadingData => 'Đang tải danh sách khoảnh khắc...';
 
   @override
-  String get errorLoadData => 'Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺';
-
-  @override
-  String get retryButton => 'Lấy đà thử lại nghen 🚀';
+  String get retryButton => 'Thử lại';
 
   @override
   String get emptyTransactionList => 'Chưa có khoảnh khắc nào được ghi lại';
@@ -621,7 +618,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get emptyAnalyticsData =>
-      'Hộp tiết kiệm đang trống trơn nè~ Chưa tiêu đồng nào luôn á 🐥';
+      'Chưa có dữ liệu phân tích nào trong khoảng thời gian này.';
 
   @override
   String get buyDevCoffeeTitle => 'Tiếp thêm cafein cho dev ☕';
@@ -1413,6 +1410,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get sixMonthsChip => 'Nửa năm 🐢';
 
   @override
+  String get errorLoadData => 'Úi, dữ liệu bị vấp cục đá ngã rồi, xu ghê 🥺';
+
+  @override
   String get filterActiveTitle => 'Bộ lọc thời gian';
 
   @override
@@ -1736,13 +1736,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get year => 'Năm';
 
   @override
-  String get diaryInsightTitle => 'Diary Insight';
+  String get diaryInsightTitle => 'Sổ Tay Phân Tích';
 
   @override
-  String get biggestSplurgesTitle => 'My Biggest Splurges';
+  String get biggestSplurgesTitle => 'Chi Tiêu Khủng Nhất';
 
   @override
-  String get seeAll => 'See all';
+  String get seeAll => 'Xem tất cả';
 
   @override
   String diaryInsightDynamicBody(
@@ -1756,9 +1756,108 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get allSplurgesTitle => 'Hội con nhà giàu 💸';
+  String get allSplurgesTitle => 'Chi tiêu khủng nhất 💸';
 
   @override
   String get allSplurgesSubtitle =>
       'Nhìn lại những lần rút hầu bao đậm sâu nhất của bạn! Đừng tiếc nuối vì những trải nghiệm này nhé ✨';
+
+  @override
+  String get errorOccurred => 'Đã xảy ra lỗi! Vui lòng thủ lại';
+
+  @override
+  String get noSplurgesYet => 'Chưa có khoản chi tiêu khủng nào ✨';
+
+  @override
+  String get dashboardTotalSpent => 'Tổng đã chi';
+
+  @override
+  String get dashboardHighestSpent => 'Đắt nhất';
+
+  @override
+  String get dashboardQuantity => 'Số lượng';
+
+  @override
+  String get filterAll => 'Tất cả';
+
+  @override
+  String get filterMonth => 'Tháng này';
+
+  @override
+  String get filterWeek => '7 ngày qua';
+
+  @override
+  String get displayCountItem => 'món';
+
+  @override
+  String recapTitleMonthly(String month) {
+    return 'NHÌN LẠI THÁNG • $month';
+  }
+
+  @override
+  String recapTitleYearly(String year) {
+    return 'NHÌN LẠI NĂM • $year';
+  }
+
+  @override
+  String get recapIntroMain => 'Tháng này,\nbạn rất rực rỡ!';
+
+  @override
+  String get recapIntroSub =>
+      'Moment U đã ghi lại hành trình quản lý tài chính của bạn.';
+
+  @override
+  String recapSwipeCountMain(int count) {
+    return 'Bạn đã ghi lại \n$count khoảnh khắc chi tiêu';
+  }
+
+  @override
+  String get recapSwipeCountSub =>
+      'Hoạt động cực kỳ năng nổ để tối ưu hóa dòng tiền cá nhân!';
+
+  @override
+  String recapSavingsMain(String amount) {
+    return 'Tiết kiệm được\n$amount';
+  }
+
+  @override
+  String get recapSavingsSub =>
+      'Bạn đã xuất sắc cắt giảm chi tiêu và quản lý dòng tiền rất khéo!';
+
+  @override
+  String get recapShareMessage =>
+      'Nhìn lại hành trình tài chính tháng này của tôi cùng Moments U Payment! 🎉';
+
+  @override
+  String recapComparisonMore(String amount) {
+    return 'Tiêu nhiều hơn $amount so với tháng trước nữa';
+  }
+
+  @override
+  String recapComparisonLess(String amount) {
+    return 'Tiết kiệm hơn $amount so với tháng trước nữa';
+  }
+
+  @override
+  String get recapComparisonEqual => 'Chi tiêu ổn định như tháng trước nữa';
+
+  @override
+  String recapOverBudget(String amount) {
+    return 'Bị vượt ngân sách $amount 🤯';
+  }
+
+  @override
+  String recapUnderBudget(String amount) {
+    return 'Tiết kiệm được $amount so với ngân sách ✨';
+  }
+
+  @override
+  String get recapBadgeResetNotice =>
+      'Các huy hiệu tháng sẽ được làm mới ở tháng này để sẵn sàng cho thử thách tiếp theo!';
+
+  @override
+  String get recapViewAnalytics => 'Xem thống kê chi tiết';
+
+  @override
+  String get recapEarnedBadges => 'Thành tựu bạn đã gặt hái';
 }

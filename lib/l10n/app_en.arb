@@ -43,7 +43,6 @@
   "homeSubGreeting": "How is your payment status today?",
   "spendingMomentsTitle": "My Lovely Moments",
   "loadingData": "Loading payment moments...",
-  "errorLoadData": "Failed to load data. Please try again!",
   "retryButton": "Retry",
   "emptyTransactionList": "No payment moments this month. Tap + to add one! 🌸",
 
@@ -297,7 +296,6 @@
   "totalLabel": "Total Spending",
   "avgPerDay": "Avg/Day",
   "timeFrame": "Days",
-  "errorLoadData": "Failed to load data. Please check again!",
   "retryButton": "Retry",
 
   "analyticsTitle": "Wallet X-Ray 🔍",
@@ -318,7 +316,6 @@
   "spendingStructure": "Where did my money go? 🥧",
   
   "emptyAnalyticsData": "Nothing here! Your wallet is safely untouched 🐥",
-  "errorLoadData": "Oopsie, the data tripped and fell 🥺",
   "retryButton": "Give it another push 🚀",
 
   "buyDevCoffeeTitle": "Buy the Dev a Coffee ☕",
@@ -385,7 +382,6 @@
   "fillPasswordFieldsError": "Please enter all password fields.",
   "samePasswordError": "New password cannot be the same as old password.",
 
-  "errorLoadData": "Error loading data",
   "emptyFilterTransaction": "No moments found for this period",
   "emptyTransactionList": "No moments yet",
   "addSuccessMessage": "Added successfully! ✨",
@@ -927,14 +923,10 @@
   "year": "Year",
 
   "diaryInsightTitle": "Diary Insight",
-  "@diaryInsightTitle": {
-    "description": "Title for the Diary Insight section"
-  },
-  
   "biggestSplurgesTitle": "My Biggest Splurges",
-  "@biggestSplurgesTitle": {
-    "description": "Title for the biggest splurges section"
-  },
+  "seeAll": "See all",
+  "retryButton": "Retry",
+  "emptyAnalyticsData": "No analytics data available for this period.",
   
   "seeAll": "See all",
   "@seeAll": {
@@ -954,6 +946,83 @@
   },
 
   "allSplurgesTitle": "Hall of Fame 🏆",
-  "allSplurgesSubtitle": "A look back at your deepest splurges. Don't regret the experience! ✨"
+  "allSplurgesSubtitle": "A look back at your deepest splurges. Don't regret the experience! ✨",
+  "errorOccurred": "An error occurred! Please try again.",
+  "noSplurgesYet": "No massive splurges yet ✨",
+
+"dashboardTotalSpent": "Total Spent",
+"dashboardHighestSpent": "Highest",
+"dashboardQuantity": "Quantity",
+"filterAll": "All Time",
+"filterMonth": "This Month",
+"filterWeek": "Last 7 Days",
+"displayCountItem": "items",
+
+  "recapTitleMonthly": "MONTHLY RECAP • {month}",
+  "@recapTitleMonthly": {
+    "placeholders": {
+      "month": { "type": "String" }
+    }
+  },
+  "recapTitleYearly": "YEARLY RECAP • {year}",
+  "@recapTitleYearly": {
+    "placeholders": {
+      "year": { "type": "String" }
+    }
+  },
+  "recapIntroMain": "This month,\nyou were brilliant!",
+  "recapIntroSub": "Moment U has captured your personal financial journey.",
+  "recapSwipeCountMain": "You've recorded \n{count} spending moments",
+  "@recapSwipeCountMain": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recapSwipeCountSub": "Extremely active in optimizing your personal cash flow!",
+  "recapSavingsMain": "Saved\n{amount}",
+  "@recapSavingsMain": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "recapSavingsSub": "Outstanding job cutting back expenses and managing money wisely!",
+  "recapShareMessage": "Looking back at my financial journey this month with Moments U Payment! 🎉",
+
+  "recapComparisonMore": "Spent {amount} more than the month before",
+  "@recapComparisonMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recapComparisonLess": "Saved {amount} compared to the month before",
+  "@recapComparisonLess": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recapComparisonEqual": "Spending remained stable compared to the month before",
+  "recapOverBudget": "Over budget by {amount} \uD83E\uDD2F",
+  "@recapOverBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recapUnderBudget": "Saved {amount} from your budget ✨",
+  "@recapUnderBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recapBadgeResetNotice": "Monthly badges will be reset this month, ready for your next challenge!",
+  "recapViewAnalytics": "Explore in-depth analytics",
+  "recapEarnedBadges": "Achievements you've earned"
 
 }

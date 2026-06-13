@@ -314,16 +314,10 @@ abstract class AppLocalizations {
   /// **'Loading payment moments...'**
   String get loadingData;
 
-  /// No description provided for @errorLoadData.
-  ///
-  /// In en, this message translates to:
-  /// **'Oops, the data tripped on a rock, so unlucky 🥺'**
-  String get errorLoadData;
-
   /// No description provided for @retryButton.
   ///
   /// In en, this message translates to:
-  /// **'Take a run and try again 🚀'**
+  /// **'Retry'**
   String get retryButton;
 
   /// No description provided for @emptyTransactionList.
@@ -1197,7 +1191,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyAnalyticsData.
   ///
   /// In en, this message translates to:
-  /// **'Piggy bank is empty~ Haven\'t spent a single dime yet 🐥'**
+  /// **'No analytics data available for this period.'**
   String get emptyAnalyticsData;
 
   /// No description provided for @buyDevCoffeeTitle.
@@ -2586,6 +2580,12 @@ abstract class AppLocalizations {
   /// **'Half a year 🐢'**
   String get sixMonthsChip;
 
+  /// No description provided for @errorLoadData.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops, the data tripped on a rock, so unlucky 🥺'**
+  String get errorLoadData;
+
   /// No description provided for @filterActiveTitle.
   ///
   /// In en, this message translates to:
@@ -3168,13 +3168,13 @@ abstract class AppLocalizations {
   /// **'Year'**
   String get year;
 
-  /// Title for the Diary Insight section
+  /// No description provided for @diaryInsightTitle.
   ///
   /// In en, this message translates to:
   /// **'Diary Insight'**
   String get diaryInsightTitle;
 
-  /// Title for the biggest splurges section
+  /// No description provided for @biggestSplurgesTitle.
   ///
   /// In en, this message translates to:
   /// **'My Biggest Splurges'**
@@ -3209,6 +3209,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A look back at your deepest splurges. Don\'t regret the experience! ✨'**
   String get allSplurgesSubtitle;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred! Please try again.'**
+  String get errorOccurred;
+
+  /// No description provided for @noSplurgesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No massive splurges yet ✨'**
+  String get noSplurgesYet;
+
+  /// No description provided for @dashboardTotalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get dashboardTotalSpent;
+
+  /// No description provided for @dashboardHighestSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest'**
+  String get dashboardHighestSpent;
+
+  /// No description provided for @dashboardQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get dashboardQuantity;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get filterAll;
+
+  /// No description provided for @filterMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get filterMonth;
+
+  /// No description provided for @filterWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get filterWeek;
+
+  /// No description provided for @displayCountItem.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get displayCountItem;
+
+  /// No description provided for @recapTitleMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'MONTHLY RECAP • {month}'**
+  String recapTitleMonthly(String month);
+
+  /// No description provided for @recapTitleYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'YEARLY RECAP • {year}'**
+  String recapTitleYearly(String year);
+
+  /// No description provided for @recapIntroMain.
+  ///
+  /// In en, this message translates to:
+  /// **'This month,\nyou were brilliant!'**
+  String get recapIntroMain;
+
+  /// No description provided for @recapIntroSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Moment U has captured your personal financial journey.'**
+  String get recapIntroSub;
+
+  /// No description provided for @recapSwipeCountMain.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve recorded \n{count} spending moments'**
+  String recapSwipeCountMain(int count);
+
+  /// No description provided for @recapSwipeCountSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Extremely active in optimizing your personal cash flow!'**
+  String get recapSwipeCountSub;
+
+  /// No description provided for @recapSavingsMain.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved\n{amount}'**
+  String recapSavingsMain(String amount);
+
+  /// No description provided for @recapSavingsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding job cutting back expenses and managing money wisely!'**
+  String get recapSavingsSub;
+
+  /// No description provided for @recapShareMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking back at my financial journey this month with Moments U Payment! 🎉'**
+  String get recapShareMessage;
+
+  /// No description provided for @recapComparisonMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent {amount} more than the month before'**
+  String recapComparisonMore(String amount);
+
+  /// No description provided for @recapComparisonLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {amount} compared to the month before'**
+  String recapComparisonLess(String amount);
+
+  /// No description provided for @recapComparisonEqual.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending remained stable compared to the month before'**
+  String get recapComparisonEqual;
+
+  /// No description provided for @recapOverBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget by {amount} 🤯'**
+  String recapOverBudget(String amount);
+
+  /// No description provided for @recapUnderBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {amount} from your budget ✨'**
+  String recapUnderBudget(String amount);
+
+  /// No description provided for @recapBadgeResetNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly badges will be reset this month, ready for your next challenge!'**
+  String get recapBadgeResetNotice;
+
+  /// No description provided for @recapViewAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore in-depth analytics'**
+  String get recapViewAnalytics;
+
+  /// No description provided for @recapEarnedBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements you\'ve earned'**
+  String get recapEarnedBadges;
 }
 
 class _AppLocalizationsDelegate

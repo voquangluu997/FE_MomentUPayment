@@ -60,8 +60,14 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
 
     final currencySymbol = ref.watch(currencyProvider);
     final appColors = ref.watch(appColorsProvider);
-    final String compactAmount =
-        '-${CurrencyHelper.formatCompactAmount(widget.moment['amount'])}$currencySymbol';
+    String compactAmount = CurrencyHelper.formatCompactAmount(
+      widget.moment['amount'],
+      symbol: currencySymbol,
+    );
+    // Nếu hàm format chưa trả về dấu trừ (cho số dương hiển thị là chi tiêu), ta thêm dấu trừ
+    if (!compactAmount.startsWith('-')) {
+      compactAmount = '-$compactAmount';
+    }
 
     // 🌟 ĐỔI TỶ LỆ: 0.65 tạo dáng dọc chuẩn Story/Highlight cho lưới 3 cột
     return GestureDetector(
