@@ -108,7 +108,7 @@ class _HomeBadgeCarouselState extends ConsumerState<HomeBadgeCarousel> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.withOpacity(0.7),
+                    color: Colors.grey.withValues(alpha: 0.7),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -124,14 +124,14 @@ class _HomeBadgeCarouselState extends ConsumerState<HomeBadgeCarousel> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey.withOpacity(0.5),
+                          color: Colors.grey.withValues(alpha: 0.5),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         CupertinoIcons.xmark_circle_fill,
                         size: 14,
-                        color: Colors.grey.withOpacity(0.5),
+                        color: Colors.grey.withValues(alpha: 0.5),
                       ),
                     ],
                   ),
@@ -232,15 +232,15 @@ class _HomeBadgeCardState extends State<HomeBadgeCard>
                 : appColors.cardBackground,
             border: Border.all(
               color: isLocked
-                  ? lockedColor.withOpacity(0.5)
-                  : widget.badge!.color.withOpacity(0.25),
+                  ? lockedColor.withValues(alpha: 0.5)
+                  : widget.badge!.color.withValues(alpha: 0.25),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
                 color: isLocked
-                    ? lockedColor.withOpacity(0.2)
-                    : widget.badge!.color.withOpacity(0.08),
+                    ? lockedColor.withValues(alpha: 0.2)
+                    : widget.badge!.color.withValues(alpha: 0.08),
                 blurRadius: 12,
                 spreadRadius: 0,
                 offset: const Offset(0, 6),
@@ -296,7 +296,7 @@ class _HomeBadgeCardState extends State<HomeBadgeCard>
                                 fontSize: 15,
                                 fontWeight: FontWeight.w900,
                                 color: isLocked
-                                    ? Colors.white.withOpacity(0.7)
+                                    ? Colors.white.withValues(alpha: 0.7)
                                     : appColors.primaryDark,
                               ),
                             ),
@@ -311,7 +311,9 @@ class _HomeBadgeCardState extends State<HomeBadgeCard>
                                 fontSize: 13,
                                 color: isLocked
                                     ? Colors.white54
-                                    : appColors.textMuted.withOpacity(0.8),
+                                    : appColors.textMuted.withValues(
+                                        alpha: 0.8,
+                                      ),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -336,9 +338,9 @@ class _HomeBadgeCardState extends State<HomeBadgeCard>
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.0),
-                                  Colors.white.withOpacity(0.25),
-                                  Colors.white.withOpacity(0.0),
+                                  Colors.white.withValues(alpha: 0.0),
+                                  Colors.white.withValues(alpha: 0.25),
+                                  Colors.white.withValues(alpha: 0.0),
                                 ],
                               ),
                             ),

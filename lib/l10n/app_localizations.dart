@@ -3365,6 +3365,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Achievements you\'ve earned'**
   String get recapEarnedBadges;
+
+  /// No description provided for @loginAppleButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get loginAppleButtonText;
+
+  /// No description provided for @appleLoginErrorNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple login failed, please try again!'**
+  String get appleLoginErrorNotification;
+
+  /// No description provided for @orContinueWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Or continue with'**
+  String get orContinueWith;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account Permanently'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. All your spending history, badges, and settings will be permanently removed from the system.'**
+  String get deleteAccountWarning;
+
+  /// No description provided for @deleteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Permanently'**
+  String get deleteButton;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred, please try again later.'**
+  String get deleteAccountError;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted!!'**
+  String get accountDeleted;
 }
 
 class _AppLocalizationsDelegate

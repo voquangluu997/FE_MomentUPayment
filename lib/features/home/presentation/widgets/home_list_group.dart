@@ -130,7 +130,7 @@ class _DailyHeaderDelegate extends SliverPersistentHeaderDelegate {
           duration: const Duration(milliseconds: 300),
           // Nền app mờ đi để lộ mờ mờ nội dung cuộn bên dưới
           color: isPinned
-              ? appColors.background.withOpacity(0.65)
+              ? appColors.background.withValues(alpha: 0.65)
               : appColors.background,
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -144,20 +144,20 @@ class _DailyHeaderDelegate extends SliverPersistentHeaderDelegate {
               // - Normal: Dùng màu Primary nhạt (Hồng nhạt/Cyan nhạt trong suốt)
               color: isPinned
                   ? appColors.cardBackground
-                  : appColors.primary.withOpacity(0.1),
+                  : appColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(
                 100,
               ), // Bo tròn thành viên nang (Pill)
               border: Border.all(
                 color: isPinned
-                    ? appColors.primary.withOpacity(0.15)
+                    ? appColors.primary.withValues(alpha: 0.15)
                     : Colors.transparent,
                 width: 1,
               ),
               boxShadow: isPinned
                   ? [
                       BoxShadow(
-                        color: appColors.primaryDark.withOpacity(0.08),
+                        color: appColors.primaryDark.withValues(alpha: 0.08),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -199,7 +199,7 @@ class _DailyHeaderDelegate extends SliverPersistentHeaderDelegate {
                     height: 4,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: appColors.textMuted.withOpacity(0.4),
+                      color: appColors.textMuted.withValues(alpha: 0.4),
                     ),
                   ),
                 ),
@@ -211,8 +211,8 @@ class _DailyHeaderDelegate extends SliverPersistentHeaderDelegate {
                     fontSize: 13,
                     fontWeight: FontWeight.w900, // Đậm hơn để nổi bật số tiền
                     // ErrorAccent giữ nguyên màu nổi bật vì đây là báo cáo trừ tiền
-                    color: appColors.errorAccent.withOpacity(
-                      isPinned ? 1.0 : 0.8,
+                    color: appColors.errorAccent.withValues(
+                      alpha: isPinned ? 1.0 : 0.8,
                     ),
                   ),
                 ),

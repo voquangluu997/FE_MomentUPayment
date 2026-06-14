@@ -27,7 +27,7 @@ class HomeBudgetCard extends ConsumerWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         height: 160,
         decoration: BoxDecoration(
-          color: appColors.cardBackground.withOpacity(0.5),
+          color: appColors.cardBackground.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(32),
         ),
         child: const Center(child: CupertinoActivityIndicator()),
@@ -42,7 +42,7 @@ class HomeBudgetCard extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFF4B4B).withOpacity(0.08),
+        color: const Color(0xFFFF4B4B).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(32),
       ),
       child: Center(
@@ -199,19 +199,21 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                 end: Alignment.bottomRight,
                 colors: [
                   config.backgroundColor ??
-                      appColors.cardBackground.withOpacity(isDark ? 0.6 : 0.8),
+                      appColors.cardBackground.withValues(
+                        alpha: isDark ? 0.6 : 0.8,
+                      ),
                   (config.backgroundColor ?? appColors.cardBackground)
-                      .withOpacity(isDark ? 0.4 : 0.6),
+                      .withValues(alpha: isDark ? 0.4 : 0.6),
                 ],
               ),
               borderRadius: BorderRadius.circular(32),
               border: Border.all(
-                color: Colors.white.withOpacity(isDark ? 0.08 : 0.4),
+                color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.4),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: config.shadowColor.withOpacity(0.15),
+                  color: config.shadowColor.withValues(alpha: 0.15),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -228,8 +230,8 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                       config.icon,
                       key: ValueKey(config.icon),
                       size: 140,
-                      color: config.shadowColor.withOpacity(
-                        isDark ? 0.08 : 0.05,
+                      color: config.shadowColor.withValues(
+                        alpha: isDark ? 0.08 : 0.05,
                       ),
                     ),
                   ),
@@ -242,8 +244,8 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                           : const AnalyticsScreen(),
                     ),
                   ),
-                  highlightColor: config.shadowColor.withOpacity(0.05),
-                  splashColor: config.shadowColor.withOpacity(0.1),
+                  highlightColor: config.shadowColor.withValues(alpha: 0.05),
+                  splashColor: config.shadowColor.withValues(alpha: 0.1),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -259,10 +261,12 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: config.textColor.withOpacity(0.06),
+                                color: config.textColor.withValues(alpha: 0.06),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: config.shadowColor.withOpacity(0.15),
+                                  color: config.shadowColor.withValues(
+                                    alpha: 0.15,
+                                  ),
                                   width: 0.5,
                                 ),
                               ),
@@ -279,7 +283,9 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                         ? l10n.setupRadarNow.toUpperCase()
                                         : l10n.mySpendingSafeZone.toUpperCase(),
                                     style: TextStyle(
-                                      color: config.textColor.withOpacity(0.9),
+                                      color: config.textColor.withValues(
+                                        alpha: 0.9,
+                                      ),
                                       fontSize: 9,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.5,
@@ -299,13 +305,13 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: config.accentColors.last.withOpacity(
-                                    0.15,
+                                  color: config.accentColors.last.withValues(
+                                    alpha: 0.15,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: config.accentColors.last.withOpacity(
-                                      0.3,
+                                    color: config.accentColors.last.withValues(
+                                      alpha: 0.3,
                                     ),
                                     width: 0.5,
                                   ),
@@ -329,7 +335,7 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            color: config.textColor.withOpacity(0.45),
+                            color: config.textColor.withValues(alpha: 0.45),
                             letterSpacing: 0.8,
                           ),
                         ),
@@ -339,7 +345,7 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: config.textColor.withOpacity(0.95),
+                            color: config.textColor.withValues(alpha: 0.95),
                             height: 1.35,
                           ),
                         ),
@@ -369,8 +375,8 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                     child: Container(
                                       height: 6,
                                       decoration: BoxDecoration(
-                                        color: config.textColor.withOpacity(
-                                          0.08,
+                                        color: config.textColor.withValues(
+                                          alpha: 0.08,
                                         ),
                                         borderRadius: BorderRadius.circular(
                                           100,
@@ -414,7 +420,9 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                             ? (isDark
                                                   ? const Color(0xFF34D399)
                                                   : const Color(0xFF059669))
-                                            : config.textColor.withOpacity(0.4),
+                                            : config.textColor.withValues(
+                                                alpha: 0.4,
+                                              ),
                                       ),
                                     ),
                                   ),
@@ -427,8 +435,8 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w800,
-                                        color: config.textColor.withOpacity(
-                                          0.5,
+                                        color: config.textColor.withValues(
+                                          alpha: 0.5,
                                         ),
                                       ),
                                     ),
@@ -462,7 +470,9 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
                                                     color: config
                                                         .accentColors
                                                         .last
-                                                        .withOpacity(0.25),
+                                                        .withValues(
+                                                          alpha: 0.25,
+                                                        ),
                                                     blurRadius: 6,
                                                     offset: const Offset(0, 2),
                                                   ),
@@ -559,7 +569,10 @@ class _HomeBudgetCardContentState extends ConsumerState<_HomeBudgetCardContent>
         return _CardDesignConfig(
           badgeText: l10n.survivalStateNotSetBadge,
           mainDisplayHeading: l10n.survivalStateNotSetHeading,
-          accentColors: [appColors.primary.withOpacity(0.5), appColors.primary],
+          accentColors: [
+            appColors.primary.withValues(alpha: 0.5),
+            appColors.primary,
+          ],
           shadowColor: appColors.primary,
           textColor: appColors.textPrimary,
           icon: CupertinoIcons.sparkles,
@@ -691,7 +704,7 @@ class _PulseIndicatorState extends State<_PulseIndicator>
             color: widget.color,
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(1.0 - _controller.value),
+                color: widget.color.withValues(alpha: 1.0 - _controller.value),
                 blurRadius: 10 * _controller.value,
                 spreadRadius: 4 * _controller.value,
               ),

@@ -180,7 +180,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
-                                      color: appColors.primary.withOpacity(0.3),
+                                      color: appColors.primary.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       blurRadius: 15,
                                       offset: const Offset(0, 8),
                                     ),
@@ -258,14 +260,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         hintText: hint,
         hintStyle: TextStyle(
-          color: appColors.textMuted.withOpacity(0.4),
+          color: appColors.textMuted.withValues(alpha: 0.4),
           fontSize: 14,
         ),
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 8.0),
           child: Icon(
             icon,
-            color: appColors.textMuted.withOpacity(0.6),
+            color: appColors.textMuted.withValues(alpha: 0.6),
             size: 22,
           ),
         ),
@@ -277,7 +279,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     _isPasswordVisible
                         ? Icons.visibility_rounded
                         : Icons.visibility_off_rounded,
-                    color: appColors.textMuted.withOpacity(0.6),
+                    color: appColors.textMuted.withValues(alpha: 0.6),
                     size: 22,
                   ),
                   onPressed: () =>
@@ -286,7 +288,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               )
             : null,
         filled: true,
-        fillColor: appColors.cardBackground.withOpacity(0.5),
+        fillColor: appColors.cardBackground.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 24,
           vertical: 18,
@@ -294,14 +296,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(
-            color: appColors.textMuted.withOpacity(0.15),
+            color: appColors.textMuted.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(
-            color: appColors.textMuted.withOpacity(0.15),
+            color: appColors.textMuted.withValues(alpha: 0.15),
             width: 1,
           ),
         ),

@@ -53,7 +53,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       await Gal.putImage(file.path, album: 'Moment U Payment');
 
       if (mounted) {
-        // AppToast.showSuccess(context, "Đã lưu khoảnh khắc vào thư viện máy! ✨", appColors);
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Đã lưu khoảnh khắc vào thư viện máy! ✨"),
@@ -63,6 +63,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
     } catch (e) {
       if (mounted) {
         // AppToast.showError(context, "Lưu ảnh thất bại, vui lòng thử lại!", appColors);
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Lưu ảnh thất bại, vui lòng thử lại!")),
         );
@@ -77,7 +78,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.92),
+      backgroundColor: Colors.black.withValues(alpha: 0.92),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,

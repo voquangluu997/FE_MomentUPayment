@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/core/widgets/analytics_components.dart'; // Nơi chứa SplurgeInfo và các Widget
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_analytics_controller.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../transaction_provider.dart';
-import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 
 // ==========================================
 // MÀN HÌNH CHÍNH (ANALYTICS SCREEN)
@@ -138,7 +139,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             color: appColors.cardBackground,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+              ),
             ],
           ),
           child: Column(
@@ -147,15 +151,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 width: 48,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: appColors.textMuted.withOpacity(0.2),
+                  color: appColors.textMuted.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
                 isStart
-                    ? (l10n.selectStartDate ?? "Chọn ngày bắt đầu")
-                    : (l10n.selectEndDate ?? "Chọn ngày kết thúc"),
+                    ? (l10n.selectStartDate)
+                    : (l10n.selectEndDate),
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: appColors.text,
@@ -199,7 +203,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       elevation: 4,
-                      shadowColor: appColors.primary.withOpacity(0.4),
+                      shadowColor: appColors.primary.withValues(alpha: 0.4),
                     ),
                     onPressed: () {
                       HapticFeedback.mediumImpact();
@@ -227,7 +231,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       Navigator.pop(context);
                     },
                     child: Text(
-                      l10n.applyButtonTitle ?? "Áp dụng",
+                      l10n.applyButtonTitle,
                       style: textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -281,7 +285,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 24,
                     spreadRadius: 4,
                   ),
@@ -295,13 +299,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       width: 44,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: appColors.textMuted.withOpacity(0.25),
+                        color: appColors.textMuted.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      l10n.chooseMonthYear ?? "Chọn Tháng & Năm",
+                      l10n.chooseMonthYear,
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: appColors.text,
@@ -315,7 +319,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 10),
                         child: Text(
-                          l10n.year ?? "NĂM",
+                          l10n.year,
                           style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: appColors.textMuted,
@@ -349,7 +353,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? appColors.primary
-                                    : appColors.textMuted.withOpacity(0.06),
+                                    : appColors.textMuted.withValues(
+                                        alpha: 0.06,
+                                      ),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isSelected
@@ -366,7 +372,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                       : FontWeight.w600,
                                   color: isSelected
                                       ? Colors.white
-                                      : appColors.text.withOpacity(0.85),
+                                      : appColors.text.withValues(alpha: 0.85),
                                 ),
                               ),
                             ),
@@ -381,7 +387,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 10),
                         child: Text(
-                          l10n.month ?? "THÁNG",
+                          l10n.month,
                           style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             color: appColors.textMuted,
@@ -426,11 +432,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? appColors.primary.withOpacity(0.12)
+                                  ? appColors.primary.withValues(alpha: 0.12)
                                   : (isFutureMonth
-                                        ? appColors.textMuted.withOpacity(0.02)
-                                        : appColors.textMuted.withOpacity(
-                                            0.05,
+                                        ? appColors.textMuted.withValues(
+                                            alpha: 0.02,
+                                          )
+                                        : appColors.textMuted.withValues(
+                                            alpha: 0.05,
                                           )),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
@@ -447,10 +455,14 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                     ? FontWeight.w800
                                     : FontWeight.w600,
                                 color: isFutureMonth
-                                    ? appColors.textMuted.withOpacity(0.25)
+                                    ? appColors.textMuted.withValues(
+                                        alpha: 0.25,
+                                      )
                                     : (isSelected
                                           ? appColors.primary
-                                          : appColors.text.withOpacity(0.85)),
+                                          : appColors.text.withValues(
+                                              alpha: 0.85,
+                                            )),
                               ),
                             ),
                           ),
@@ -469,7 +481,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           elevation: 2,
-                          shadowColor: appColors.primary.withOpacity(0.3),
+                          shadowColor: appColors.primary.withValues(alpha: 0.3),
                         ),
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -490,7 +502,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           Navigator.pop(context);
                         },
                         child: Text(
-                          l10n.applyButtonTitle ?? "Áp dụng",
+                          l10n.applyButtonTitle,
                           style: textTheme.titleMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
@@ -537,7 +549,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       backgroundColor: appColors.background,
       appBar: AppBar(
         title: Text(
-          l10n.analyticsTitle ?? "Thống kê",
+          l10n.analyticsTitle,
           style: textTheme.headlineSmall?.copyWith(
             color: appColors.text,
             fontWeight: FontWeight.w900,
@@ -570,13 +582,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: appColors.textMuted.withOpacity(0.08),
+                    color: appColors.textMuted.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: [
                       _buildSwitcherTab(
-                        title: l10n.analyticsSwitchPeriod ?? "Giai đoạn",
+                        title: l10n.analyticsSwitchPeriod,
                         isActive: _activeFilterType == 'Period',
                         onTap: () {
                           if (_activeFilterType != 'Period') {
@@ -588,7 +600,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         textTheme: textTheme,
                       ),
                       _buildSwitcherTab(
-                        title: l10n.analyticsSwitchMonthly ?? "Từng tháng",
+                        title: l10n.analyticsSwitchMonthly,
                         isActive: _activeFilterType == 'MonthlySummary',
                         onTap: () {
                           if (_activeFilterType != 'MonthlySummary') {
@@ -659,7 +671,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: appColors.primary.withOpacity(0.1),
+                                  color: appColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -671,8 +685,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      l10n.analyticsLastMonthReview ??
-                                          "Đổi tháng",
+                                      l10n.analyticsLastMonthReview,
                                       style: textTheme.labelLarge?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: appColors.primary,
@@ -817,7 +830,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -831,7 +844,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               color: isActive
                   ? appColors.primary
-                  : appColors.text.withOpacity(0.5),
+                  : appColors.text.withValues(alpha: 0.5),
             ),
           ),
         ),

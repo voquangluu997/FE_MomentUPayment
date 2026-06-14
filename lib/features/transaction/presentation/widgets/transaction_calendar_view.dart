@@ -107,8 +107,8 @@ class TransactionCalendarView extends ConsumerWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: isWeekend
-                        ? appColors.errorAccent.withOpacity(0.8)
-                        : appColors.primaryDark.withOpacity(0.5),
+                        ? appColors.errorAccent.withValues(alpha: 0.8)
+                        : appColors.primaryDark.withValues(alpha: 0.5),
                   ),
                 ),
               );
@@ -224,7 +224,7 @@ class TransactionCalendarView extends ConsumerWidget {
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.3),
+                  color: Colors.grey.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -247,7 +247,9 @@ class TransactionCalendarView extends ConsumerWidget {
                     final tx = txList[index];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: appColors.primary.withOpacity(0.1),
+                        backgroundColor: appColors.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         child: Text(tx['emoji'] ?? '✨'),
                       ),
                       title: Text(

@@ -25,7 +25,7 @@ class MediaService {
       );
       return photo;
     } catch (e, st) {
-      AppLogger.e('MediaService', e, st as StackTrace);
+      AppLogger.e('MediaService', e, st);
       return null;
     } finally {
       _isPicking = false;
@@ -52,7 +52,7 @@ class MediaService {
       );
       return image;
     } catch (e, st) {
-      AppLogger.e('MediaService', e, st as StackTrace);
+      AppLogger.e('MediaService', e, st);
       return null;
     } finally {
       _isPicking = false;

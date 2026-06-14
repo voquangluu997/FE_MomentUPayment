@@ -19,7 +19,6 @@ import 'package:moment_u_payment/features/home/presentation/widgets/home_list_gr
 import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_details_dialog.dart';
-import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_grid_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/moment_list_item.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/photo_calendar_cell.dart';
 import 'package:moment_u_payment/l10n/app_localizations.dart';
@@ -143,7 +142,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: appColors.primary.withOpacity(0.08),
+              color: appColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: const Text('📝', style: TextStyle(fontSize: 64)),
@@ -167,7 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: appColors.primaryDark.withOpacity(0.5),
+              color: appColors.primaryDark.withValues(alpha: 0.5),
               height: 1.5,
             ),
           ),
@@ -195,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 120,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(0.6),
+                  color: appColors.cardBackground.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
@@ -221,7 +220,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Container(
                 height: 140,
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(0.5),
+                  color: appColors.cardBackground.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
@@ -231,7 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(0.5),
+                  color: appColors.cardBackground.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
@@ -246,7 +245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         height: 84,
         decoration: BoxDecoration(
-          color: appColors.cardBackground.withOpacity(0.5),
+          color: appColors.cardBackground.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -302,7 +301,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.12),
+                color: appColors.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
             ),
@@ -314,7 +313,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               width: 280,
               height: 280,
               decoration: BoxDecoration(
-                color: appColors.errorAccent.withOpacity(0.08),
+                color: appColors.errorAccent.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
             ),
@@ -530,82 +529,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDateHeaderPill(
-    String dateKey,
-    AppLocalizations l10n,
-    AppColorTheme appColors,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 16, bottom: 12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: appColors.primary.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: appColors.primary.withOpacity(0.1)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(CupertinoIcons.calendar, size: 16, color: appColors.primary),
-            const SizedBox(width: 8),
-            Text(
-              DateTimeHelper.getFriendlyDateLabel(dateKey, l10n),
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: appColors.primary,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMasonryGridGroup(
-    String dateKey,
-    List<Map<String, dynamic>> txList,
-    AppLocalizations l10n,
-    WidgetRef ref,
-    BuildContext context,
-    AppColorTheme appColors,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildDateHeaderPill(dateKey, l10n, appColors),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: txList.length,
-            itemBuilder: (context, gridIdx) => MomentGridItem(
-              moment: txList[gridIdx],
-              l10n: l10n,
-              onLongPress: () => _showDeleteConfirmDialog(
-                context,
-                ref,
-                txList[gridIdx],
-                l10n,
-                appColors,
-              ),
-              onTap: () => _openMomentDetails(txList[gridIdx], l10n),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildMonthlyCalendar(
     DateTime monthKey,
     List<Map<String, dynamic>> monthTx,
@@ -690,8 +613,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ? FontWeight.w800
                             : FontWeight.bold,
                         color: isWeekend
-                            ? appColors.errorAccent.withOpacity(0.9)
-                            : appColors.primaryDark.withOpacity(0.5),
+                            ? appColors.errorAccent.withValues(alpha: 0.9)
+                            : appColors.primaryDark.withValues(alpha: 0.5),
                       ),
                     ),
                   );
@@ -813,7 +736,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 48,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: appColors.primaryDark.withOpacity(0.15),
+                  color: appColors.primaryDark.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -824,7 +747,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: appColors.primary.withOpacity(0.1),
+                        color: appColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -851,7 +774,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: appColors.primaryDark.withOpacity(0.5),
+                            color: appColors.primaryDark.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -902,7 +825,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF4B4B).withOpacity(0.1),
+                color: const Color(0xFFFF4B4B).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -927,7 +850,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           l10n.deleteDialogContent,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: appColors.primaryDark.withOpacity(0.7),
+            color: appColors.primaryDark.withValues(alpha: 0.7),
             fontSize: 15,
             height: 1.4,
           ),
@@ -949,7 +872,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Text(
                     l10n.deleteDialogCancel,
                     style: TextStyle(
-                      color: appColors.primaryDark.withOpacity(0.6),
+                      color: appColors.primaryDark.withValues(alpha: 0.6),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -987,11 +910,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             .deleteTransaction(tx['id'].toString());
 
         if (mounted) {
+          // ignore: use_build_context_synchronously
           AppToast.showSuccess(context, l10n.deleteSuccessMessage, appColors);
         }
       } catch (e) {
         ref.read(transactionTimelineProvider.notifier).refreshTimeline();
         if (mounted) {
+          // ignore: use_build_context_synchronously
           AppToast.showError(context, l10n.deleteErrorMessage, appColors);
         }
       }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 
 class HomeWidgetService {
   // ⚠️ LƯU Ý: Tên App Group này phải khớp 100% trong Xcode (Signing & Capabilities)
@@ -18,7 +19,7 @@ class HomeWidgetService {
         onLaunch();
       }
     } catch (e) {
-      debugPrint('Lỗi checkWidgetLaunch: $e');
+      AppLogger.e("Err", 'Lỗi checkWidgetLaunch: $e');
     }
   }
 
@@ -45,9 +46,9 @@ class HomeWidgetService {
         androidName: _iOSWidgetName,
       );
 
-      debugPrint('Widget đã cập nhật thành công');
+      AppLogger.i("i", 'Widget đã cập nhật thành công');
     } catch (e) {
-      debugPrint('Lỗi updateBudgetWidget: $e');
+      AppLogger.i('i', 'Lỗi updateBudgetWidget: $e');
     }
   }
 }

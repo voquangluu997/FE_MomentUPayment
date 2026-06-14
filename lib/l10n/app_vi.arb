@@ -906,5 +906,17 @@
 "recapUnderBudget": "Tiết kiệm được {amount} so với ngân sách ✨",
 "recapBadgeResetNotice": "Các huy hiệu tháng sẽ được làm mới ở tháng này để sẵn sàng cho thử thách tiếp theo!",
 "recapViewAnalytics": "Xem thống kê chi tiết",
-"recapEarnedBadges": "Thành tựu bạn đã gặt hái"
+"recapEarnedBadges": "Thành tựu bạn đã gặt hái",
+"loginAppleButtonText": "Tiếp tục với Apple",
+"appleLoginErrorNotification": "Đăng nhập Apple thất bại, vui lòng thử lại!",
+
+"orContinueWith": "Hoặc tiếp tục với",
+
+"deleteAccount": "Xóa tài khoản vĩnh viễn",
+  "deleteAccountTitle": "Xóa tài khoản?",
+  "deleteAccountWarning": "Hành động này không thể hoàn tác. Toàn bộ lịch sử chi tiêu, huy hiệu và cài đặt của bạn sẽ bị xóa vĩnh viễn khỏi hệ thống.",
+  "deleteButton": "Xóa vĩnh viễn",
+  "cancel": "Hủy",
+  "deleteAccountError": "Đã xảy ra lỗi, vui lòng thử lại sau.",
+  "accountDeleted": "Tài khoản đã bị xóa!!"
 }

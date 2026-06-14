@@ -80,7 +80,7 @@ class HomeHeaderSection extends ConsumerWidget {
                         : appColors.primary,
                     backgroundColor: isGridView || !isCalendarView
                         ? appColors.primary
-                        : appColors.primary.withOpacity(0.08),
+                        : appColors.primary.withValues(alpha: 0.08),
                     onTap: onToggleView,
                   ),
                   const SizedBox(width: 8),
@@ -89,7 +89,7 @@ class HomeHeaderSection extends ConsumerWidget {
                     color: isCalendarView ? Colors.white : appColors.primary,
                     backgroundColor: isCalendarView
                         ? appColors.primary
-                        : appColors.primary.withOpacity(0.08),
+                        : appColors.primary.withValues(alpha: 0.08),
                     onTap: onCalendarTap,
                   ),
                   const SizedBox(width: 8),
@@ -98,7 +98,7 @@ class HomeHeaderSection extends ConsumerWidget {
                     color: isFiltered ? Colors.white : appColors.primary,
                     backgroundColor: isFiltered
                         ? appColors.primary
-                        : appColors.primary.withOpacity(0.08),
+                        : appColors.primary.withValues(alpha: 0.08),
                     onTap: onFilterTap,
                   ),
                 ],
@@ -119,13 +119,13 @@ class HomeHeaderSection extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.05),
+                    color: appColors.primary.withValues(alpha: 0.05),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
                 ],
                 border: Border.all(
-                  color: appColors.primary.withOpacity(0.12),
+                  color: appColors.primary.withValues(alpha: 0.12),
                   width: 1.5,
                 ),
               ),
@@ -160,7 +160,7 @@ class HomeHeaderSection extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: appColors.errorAccent.withOpacity(0.1),
+                            color: appColors.errorAccent.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -189,7 +189,9 @@ class HomeHeaderSection extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             decoration: BoxDecoration(
-                              color: appColors.background.withOpacity(0.4),
+                              color: appColors.background.withValues(
+                                alpha: 0.4,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -201,7 +203,9 @@ class HomeHeaderSection extends ConsumerWidget {
                                   style: textTheme.bodyMedium?.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: appColors.textMuted.withOpacity(0.6),
+                                    color: appColors.textMuted.withValues(
+                                      alpha: 0.6,
+                                    ),
                                     letterSpacing: 0.5,
                                   ),
                                   textAlign: TextAlign.center,
@@ -229,7 +233,7 @@ class HomeHeaderSection extends ConsumerWidget {
                         child: Icon(
                           CupertinoIcons.arrow_right,
                           size: 14,
-                          color: appColors.textMuted.withOpacity(0.4),
+                          color: appColors.textMuted.withValues(alpha: 0.4),
                         ),
                       ),
 
@@ -244,7 +248,9 @@ class HomeHeaderSection extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             decoration: BoxDecoration(
-                              color: appColors.background.withOpacity(0.4),
+                              color: appColors.background.withValues(
+                                alpha: 0.4,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -256,7 +262,9 @@ class HomeHeaderSection extends ConsumerWidget {
                                   style: textTheme.bodyMedium?.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: appColors.textMuted.withOpacity(0.6),
+                                    color: appColors.textMuted.withValues(
+                                      alpha: 0.6,
+                                    ),
                                     letterSpacing: 0.5,
                                   ),
                                   textAlign: TextAlign.center,

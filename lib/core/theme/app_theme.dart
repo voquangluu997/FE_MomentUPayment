@@ -20,6 +20,7 @@ class AppTheme {
         seedColor: appColors.primary,
         brightness: isDarkMode ? Brightness.dark : Brightness.light,
         primary: appColors.primary,
+        // ignore: deprecated_member_use
         background: appColors.background,
         surface: appColors.cardBackground,
       ),

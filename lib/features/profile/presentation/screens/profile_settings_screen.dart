@@ -313,10 +313,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 height: 110,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: appColors.primary.withOpacity(0.1),
+                  color: appColors.primary.withValues(alpha: 0.1),
                   boxShadow: [
                     BoxShadow(
-                      color: appColors.primary.withOpacity(0.15),
+                      color: appColors.primary.withValues(alpha: 0.15),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -344,8 +344,8 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                             width: 110,
                             height: 110,
                             decoration: BoxDecoration(
-                              color: appColors.primary.withOpacity(
-                                0.1,
+                              color: appColors.primary.withValues(
+                                alpha: 0.1,
                               ), // Màu nền nhẹ cho avatar lỗi
                               shape:
                                   BoxShape.circle, // Giữ hình tròn cho avatar
@@ -368,7 +368,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   border: Border.all(color: appColors.background, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: appColors.primaryDark.withOpacity(0.3),
+                      color: appColors.primaryDark.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -418,7 +418,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -468,20 +468,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-          color: appColors.textMuted.withOpacity(0.8),
+          color: appColors.textMuted.withValues(alpha: 0.8),
           fontWeight: FontWeight.w500,
         ),
         prefixIcon: Icon(
           icon,
           color: enabled
-              ? appColors.primaryDark.withOpacity(0.5)
-              : appColors.textMuted.withOpacity(0.4),
+              ? appColors.primaryDark.withValues(alpha: 0.5)
+              : appColors.textMuted.withValues(alpha: 0.4),
           size: 22,
         ),
         filled: true,
         fillColor: enabled
-            ? appColors.background.withOpacity(0.5)
-            : appColors.background.withOpacity(0.2),
+            ? appColors.background.withValues(alpha: 0.5)
+            : appColors.background.withValues(alpha: 0.2),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 20,
@@ -510,11 +510,11 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: isSecondary
-              ? appColors.primary.withOpacity(0.1)
+              ? appColors.primary.withValues(alpha: 0.1)
               : appColors.primary,
           foregroundColor: isSecondary ? appColors.primary : Colors.white,
           elevation: isSecondary ? 0 : 4,
-          shadowColor: appColors.primary.withOpacity(0.4),
+          shadowColor: appColors.primary.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),

@@ -100,15 +100,18 @@ class AppToast {
             // ✨ THAY ĐỔI: Xóa bo góc tròn (để thành hình chữ nhật phẳng tuyệt đối vuông vức với viền máy)
             borderRadius: BorderRadius.zero,
             border: Border(
-              top: BorderSide(color: accentColor.withOpacity(0.2), width: 1.5),
+              top: BorderSide(
+                color: accentColor.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
               bottom: BorderSide(
-                color: accentColor.withOpacity(0.1),
+                color: accentColor.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: accentColor.withOpacity(0.06),
+                color: accentColor.withValues(alpha: 0.06),
                 blurRadius: 15,
                 offset: const Offset(0, -4), // Đổ bóng nhẹ ngược lên trên
               ),
@@ -138,7 +141,7 @@ class AppToast {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.75),
+                        color: Colors.white.withValues(alpha: 0.75),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),

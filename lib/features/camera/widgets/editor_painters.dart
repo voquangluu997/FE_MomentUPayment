@@ -127,7 +127,7 @@ class CropOverlayPainter extends CustomPainter {
   CropOverlayPainter({required this.cropRect});
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withOpacity(0.8);
+    final paint = Paint()..color = Colors.black.withValues(alpha: 0.8);
     final bgPath = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
     final holePath = Path()..addRect(cropRect);

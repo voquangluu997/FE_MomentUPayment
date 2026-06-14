@@ -36,8 +36,9 @@ class BudgetRepository {
         final statusCode = e.response!.statusCode;
         final serverMessage = e.response!.data?['message'];
 
-        if (statusCode == 401)
+        if (statusCode == 401) {
           throw 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại nhen! 🔑';
+        }
         if (statusCode == 404) throw 'Không tìm thấy tài khoản! 😿';
         if (serverMessage != null) {
           throw serverMessage is List

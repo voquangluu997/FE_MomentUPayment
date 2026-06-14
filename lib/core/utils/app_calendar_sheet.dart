@@ -59,7 +59,7 @@ class _AppCalendarSheetState extends State<AppCalendarSheet> {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -73,7 +73,7 @@ class _AppCalendarSheetState extends State<AppCalendarSheet> {
             width: 40,
             height: 5,
             decoration: BoxDecoration(
-              color: widget.appColors.textMuted.withOpacity(0.3),
+              color: widget.appColors.textMuted.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -106,7 +106,9 @@ class _AppCalendarSheetState extends State<AppCalendarSheet> {
                 ),
 
                 // Decor
-                rangeHighlightColor: widget.appColors.primary.withOpacity(0.2),
+                rangeHighlightColor: widget.appColors.primary.withValues(
+                  alpha: 0.2,
+                ),
                 rangeStartDecoration: BoxDecoration(
                   color: widget.appColors.primary,
                   shape: BoxShape.circle,
@@ -116,7 +118,7 @@ class _AppCalendarSheetState extends State<AppCalendarSheet> {
                   shape: BoxShape.circle,
                 ),
                 todayDecoration: BoxDecoration(
-                  color: widget.appColors.primary.withOpacity(0.1),
+                  color: widget.appColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
               ),

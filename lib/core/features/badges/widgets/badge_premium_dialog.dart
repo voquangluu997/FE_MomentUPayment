@@ -34,7 +34,10 @@ class BadgePremiumDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: appColors.cardBackground,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: badge.color.withOpacity(0.4), width: 2),
+          border: Border.all(
+            color: badge.color.withValues(alpha: 0.4),
+            width: 2,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

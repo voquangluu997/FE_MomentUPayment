@@ -38,10 +38,10 @@ class HomeGridGroup extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: appColors.primary.withOpacity(0.08),
+                    color: appColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: appColors.primary.withOpacity(0.1),
+                      color: appColors.primary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Text(

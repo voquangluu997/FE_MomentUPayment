@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/core/widgets/app_network_image.dart';
 import 'package:moment_u_payment/features/camera/screens/full_screen_image_viewer.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
@@ -103,12 +104,15 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
   Future<void> _cleanupUnsavedImage() async {
     if (!_isSaved && _tempUploadedUrl != null) {
       try {
-        debugPrint("🗑 Dọn rác Cloudinary ảnh không lưu: $_tempUploadedUrl");
+        AppLogger.d(
+          "d",
+          "🗑 Dọn rác Cloudinary ảnh không lưu: $_tempUploadedUrl",
+        );
         await ref
             .read(transactionProvider.notifier)
             .deleteImage(_tempUploadedUrl!);
       } catch (e) {
-        debugPrint("Lỗi dọn rác: $e");
+        AppLogger.d("d", "Lỗi dọn rác: $e");
       }
     }
   }
@@ -188,7 +192,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         _uploadImageBackground(File(imagePath));
       }
     } catch (e) {
-      debugPrint("Lỗi xử lý camera: $e");
+      AppLogger.e("e", "Lỗi xử lý camera: $e");
     }
   }
 
@@ -212,7 +216,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
         _uploadImageBackground(File(editedPath));
       }
     } catch (e) {
-      debugPrint("Lỗi khi chỉnh sửa ảnh: $e");
+      AppLogger.e("e", "Lỗi khi chỉnh sửa ảnh: $e");
     }
   }
 
@@ -286,7 +290,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
     if (_isCustomCategory) {
       finalCategory = _customCategoryController.text.trim().isNotEmpty
           ? _customCategoryController.text.trim()
-          : l10n.categoryOther ?? 'Khác';
+          : l10n.categoryOther;
     }
 
     final String momentId =
@@ -342,13 +346,10 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
 
     return PopScope(
       canPop: !_isImageUploading,
+      // ignore: deprecated_member_use
       onPopInvoked: (didPop) {
         if (!didPop && _isImageUploading) {
-          AppToast.showError(
-            context,
-            "Chờ xíu, ảnh đang được tải lên nhé!",
-            appColors,
-          );
+          AppToast.showError(context, "Uploading!", appColors);
           return;
         }
         if (didPop) _cleanupUnsavedImage();
@@ -377,11 +378,7 @@ class _MomentDetailsDialogState extends ConsumerState<MomentDetailsDialog> {
                 onToggleEdit: _toggleEditMode,
                 onCloseTap: () {
                   if (_isImageUploading) {
-                    AppToast.showError(
-                      context,
-                      "Chờ xíu, ảnh đang được tải lên nhé!",
-                      appColors,
-                    );
+                    AppToast.showError(context, "Uploading!", appColors);
                     return;
                   }
                   _cleanupUnsavedImage();
@@ -517,8 +514,8 @@ class _ImageHeader extends ConsumerWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     appColors.background,
-                    appColors.primary.withOpacity(0.1),
-                    appColors.primary.withOpacity(0.2),
+                    appColors.primary.withValues(alpha: 0.1),
+                    appColors.primary.withValues(alpha: 0.2),
                   ],
                 ),
               ),
@@ -539,11 +536,11 @@ class _ImageHeader extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: appColors.primary.withOpacity(0.15),
+                            color: appColors.primary.withValues(alpha: 0.15),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -564,9 +561,9 @@ class _ImageHeader extends ConsumerWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(isEditing ? 0.4 : 0.05),
+                      Colors.black.withValues(alpha: isEditing ? 0.4 : 0.05),
                       Colors.transparent,
-                      appColors.cardBackground.withOpacity(0.0),
+                      appColors.cardBackground.withValues(alpha: 0.0),
                       appColors.cardBackground,
                     ],
                     stops: const [0.0, 0.3, 0.8, 1.0],
@@ -587,7 +584,7 @@ class _ImageHeader extends ConsumerWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -682,10 +679,10 @@ class _ImageHeader extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
                 width: 0.5,
               ),
             ),
@@ -712,10 +709,10 @@ class _ImageHeader extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 0.5,
               ),
             ),
@@ -758,8 +755,8 @@ class _ImageHeader extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: isDisabled
-                  ? Colors.white.withOpacity(0.5)
-                  : Colors.white.withOpacity(0.85),
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -832,7 +829,7 @@ class _ViewModeContent extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.1),
+                color: appColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -859,7 +856,9 @@ class _ViewModeContent extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: appColors.background,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: appColors.primary.withOpacity(0.1)),
+                border: Border.all(
+                  color: appColors.primary.withValues(alpha: 0.1),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -890,14 +889,16 @@ class _ViewModeContent extends ConsumerWidget {
           decoration: BoxDecoration(
             color: appColors.background,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: appColors.primary.withOpacity(0.05)),
+            border: Border.all(
+              color: appColors.primary.withValues(alpha: 0.05),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
                 CupertinoIcons.quote_bubble_fill,
-                color: appColors.primary.withOpacity(0.2),
+                color: appColors.primary.withValues(alpha: 0.2),
                 size: 20,
               ),
               const SizedBox(height: 8),
@@ -906,7 +907,7 @@ class _ViewModeContent extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: appColors.primaryDark.withOpacity(0.8),
+                  color: appColors.primaryDark.withValues(alpha: 0.8),
                   height: 1.5,
                 ),
               ),
@@ -996,7 +997,7 @@ class _EditModeContent extends ConsumerWidget {
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : appColors.primary.withOpacity(0.1),
+                            : appColors.primary.withValues(alpha: 0.1),
                       ),
                     ),
                     child: Row(
@@ -1033,7 +1034,7 @@ class _EditModeContent extends ConsumerWidget {
             decoration: InputDecoration(
               hintText: l10n.customCategoryHint,
               hintStyle: TextStyle(
-                color: appColors.primaryDark.withOpacity(0.4),
+                color: appColors.primaryDark.withValues(alpha: 0.4),
               ),
               prefixIcon: Icon(
                 CupertinoIcons.tag,
@@ -1085,7 +1086,9 @@ class _EditModeContent extends ConsumerWidget {
           decoration: BoxDecoration(
             color: appColors.background,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: appColors.primary.withOpacity(0.08)),
+            border: Border.all(
+              color: appColors.primary.withValues(alpha: 0.08),
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1120,7 +1123,7 @@ class _EditModeContent extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Icon(
                         CupertinoIcons.clear_circled_solid,
-                        color: appColors.textMuted.withOpacity(0.4),
+                        color: appColors.textMuted.withValues(alpha: 0.4),
                         size: 20,
                       ),
                     ),
@@ -1150,7 +1153,9 @@ class _EditModeContent extends ConsumerWidget {
             decoration: BoxDecoration(
               color: appColors.background,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: appColors.primary.withOpacity(0.08)),
+              border: Border.all(
+                color: appColors.primary.withValues(alpha: 0.08),
+              ),
             ),
             child: Row(
               children: [
@@ -1172,7 +1177,7 @@ class _EditModeContent extends ConsumerWidget {
                 Icon(
                   CupertinoIcons.pencil,
                   size: 16,
-                  color: appColors.textMuted.withOpacity(0.5),
+                  color: appColors.textMuted.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -1193,7 +1198,9 @@ class _EditModeContent extends ConsumerWidget {
           ),
           decoration: InputDecoration(
             hintText: l10n.noteHint,
-            hintStyle: TextStyle(color: appColors.primaryDark.withOpacity(0.4)),
+            hintStyle: TextStyle(
+              color: appColors.primaryDark.withValues(alpha: 0.4),
+            ),
             filled: true,
             fillColor: appColors.background,
             contentPadding: const EdgeInsets.symmetric(
@@ -1218,7 +1225,7 @@ class _EditModeContent extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             elevation: 4,
-            shadowColor: appColors.primary.withOpacity(0.4),
+            shadowColor: appColors.primary.withValues(alpha: 0.4),
           ),
           child: isLoading
               ? const SizedBox(
@@ -1265,7 +1272,7 @@ class _EditModeContent extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: appColors.primary.withOpacity(0.1),
+          color: appColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(

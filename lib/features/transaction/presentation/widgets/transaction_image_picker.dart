@@ -74,7 +74,7 @@ class _TransactionImagePickerState
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -119,7 +119,7 @@ class _TransactionImagePickerState
                 Container(
                   padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                    color: appColors.primary.withOpacity(0.08),
+                    color: appColors.primary.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -130,7 +130,7 @@ class _TransactionImagePickerState
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  l10n.tapToCapture?.toUpperCase() ?? "CHẠM ĐỂ CHỤP ẢNH",
+                  l10n.tapToCapture.toUpperCase(),
                   style: TextStyle(
                     color: appColors.primary,
                     fontSize: 12,
@@ -142,7 +142,7 @@ class _TransactionImagePickerState
                 Text(
                   "Locket & Instagram Aesthetic",
                   style: TextStyle(
-                    color: appColors.textMuted.withOpacity(0.5),
+                    color: appColors.textMuted.withValues(alpha: 0.5),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -185,18 +185,19 @@ class _TransactionImagePickerState
                     10,
                   ), // Kích thước nút được thu nhỏ
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3), // Mờ đen nhẹ nhàng
+                    color: Colors.black.withValues(
+                      alpha: 0.3,
+                    ), // Mờ đen nhẹ nhàng
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withOpacity(
-                        0.2,
+                      color: Colors.white.withValues(
+                        alpha: 0.2,
                       ), // Viền trắng mờ để tách biệt với nền ảnh
                       width: 1.0,
                     ),
                   ),
                   child: const Icon(
-                    CupertinoIcons
-                        .slider_horizontal_3,
+                    CupertinoIcons.slider_horizontal_3,
                     color: Colors.white,
                     size: 18, // Icon nhỏ gọn không chắn tầm nhìn
                   ),

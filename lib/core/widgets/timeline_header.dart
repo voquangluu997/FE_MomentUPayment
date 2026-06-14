@@ -32,7 +32,7 @@ class TimelineHeader extends StatelessWidget {
             height: 2.0, // Độ dày đường kẻ
             width: 40, // Độ dài đường kẻ
             decoration: BoxDecoration(
-              color: appColors.primary.withOpacity(0.5),
+              color: appColors.primary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

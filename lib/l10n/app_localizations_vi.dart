@@ -1860,4 +1860,33 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get recapEarnedBadges => 'Thành tựu bạn đã gặt hái';
+
+  @override
+  String get loginAppleButtonText => 'Tiếp tục với Apple';
+
+  @override
+  String get appleLoginErrorNotification =>
+      'Đăng nhập Apple thất bại, vui lòng thử lại!';
+
+  @override
+  String get orContinueWith => 'Hoặc tiếp tục với';
+
+  @override
+  String get deleteAccount => 'Xóa tài khoản vĩnh viễn';
+
+  @override
+  String get deleteAccountTitle => 'Xóa tài khoản?';
+
+  @override
+  String get deleteAccountWarning =>
+      'Hành động này không thể hoàn tác. Toàn bộ lịch sử chi tiêu, huy hiệu và cài đặt của bạn sẽ bị xóa vĩnh viễn khỏi hệ thống.';
+
+  @override
+  String get deleteButton => 'Xóa vĩnh viễn';
+
+  @override
+  String get deleteAccountError => 'Đã xảy ra lỗi, vui lòng thử lại sau.';
+
+  @override
+  String get accountDeleted => 'Tài khoản đã bị xóa!!';
 }

@@ -51,7 +51,7 @@ class CurrencyPickerUtil {
                     width: 38,
                     height: 4.5,
                     decoration: BoxDecoration(
-                      color: appColors.textMuted.withOpacity(0.2),
+                      color: appColors.textMuted.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -62,7 +62,7 @@ class CurrencyPickerUtil {
                   style: textTheme.bodyMedium?.copyWith(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: appColors.primaryDark.withOpacity(0.6),
+                    color: appColors.primaryDark.withValues(alpha: 0.6),
                     letterSpacing: 0.6,
                   ),
                 ),
@@ -85,12 +85,12 @@ class CurrencyPickerUtil {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? appColors.primary.withOpacity(0.06)
+                              ? appColors.primary.withValues(alpha: 0.06)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
-                                ? appColors.primary.withOpacity(0.15)
+                                ? appColors.primary.withValues(alpha: 0.15)
                                 : Colors.transparent,
                           ),
                         ),
@@ -102,7 +102,7 @@ class CurrencyPickerUtil {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? appColors.primary
-                                    : appColors.primary.withOpacity(0.1),
+                                    : appColors.primary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               alignment: Alignment.center,
@@ -278,12 +278,15 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
             Positioned(
               top: -100,
               right: -50,
-              child: _buildBlurBlob(200, appColors.primary.withOpacity(0.15)),
+              child: _buildBlurBlob(
+                200,
+                appColors.primary.withValues(alpha: 0.15),
+              ),
             ),
             Positioned(
               bottom: 100,
               left: -50,
-              child: _buildBlurBlob(150, Colors.blue.withOpacity(0.1)),
+              child: _buildBlurBlob(150, Colors.blue.withValues(alpha: 0.1)),
             ),
 
             CustomScrollView(
@@ -299,7 +302,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                       size: 32,
                     ),
                     onPressed: () => Navigator.pop(context),
-                    color: appColors.text.withOpacity(0.3),
+                    color: appColors.text.withValues(alpha: 0.3),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
@@ -433,14 +436,17 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
 
   Widget _buildCoachEmoji(bool isLow, double amount) {
     String emoji = "🎯";
-    if (amount <= 0)
+    if (amount <= 0) {
       emoji = "🤔";
-    else if (isLow)
+    } else if (isLow)
+      // ignore: curly_braces_in_flow_control_structures
       emoji = "😰";
     else if (amount > 10000000)
+      // ignore: curly_braces_in_flow_control_structures
       emoji = "👑";
     else
-      emoji = "✨";
+      // ignore: curly_braces_in_flow_control_structures
+      emoji = "🤔";
 
     return AnimatedBuilder(
       animation: _pulseController,
@@ -487,15 +493,16 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
             color: appColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: (isLow ? appColors.error : appColors.primary).withOpacity(
-                0.25,
+              color: (isLow ? appColors.error : appColors.primary).withValues(
+                alpha: 0.25,
               ),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: (isLow ? appColors.error : appColors.primary)
-                    .withOpacity(0.15),
+                color: (isLow ? appColors.error : appColors.primary).withValues(
+                  alpha: 0.15,
+                ),
                 blurRadius: 40,
                 offset: const Offset(0, 15),
               ),
@@ -517,7 +524,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                     hintText: '0',
                     hintStyle: textTheme.headlineLarge?.copyWith(
                       fontSize: 28,
-                      color: appColors.textMuted.withOpacity(0.3),
+                      color: appColors.textMuted.withValues(alpha: 0.3),
                     ),
                     border: InputBorder.none,
                     isDense: true,
@@ -540,7 +547,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Icon(
                         CupertinoIcons.clear_thick_circled,
-                        color: appColors.primary.withOpacity(0.4),
+                        color: appColors.primary.withValues(alpha: 0.4),
                         size: 18,
                       ),
                     ),
@@ -605,7 +612,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     TextTheme textTheme,
   ) {
     return Material(
-      color: appColors.primary.withOpacity(0.08),
+      color: appColors.primary.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onTap,
@@ -635,9 +642,9 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: appColors.cardBackground.withOpacity(0.6),
+        color: appColors.cardBackground.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -702,7 +709,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
           height: 12,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: appColors.textMuted.withOpacity(0.1),
+            color: appColors.textMuted.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Stack(
@@ -714,9 +721,12 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: isLow
-                          ? [appColors.error.withOpacity(0.5), appColors.error]
+                          ? [
+                              appColors.error.withValues(alpha: 0.5),
+                              appColors.error,
+                            ]
                           : [
-                              appColors.primary.withOpacity(0.5),
+                              appColors.primary.withValues(alpha: 0.5),
                               appColors.primary,
                             ],
                     ),
@@ -763,7 +773,7 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
               boxShadow: [
                 if (_currentAmount.toStringAsFixed(0) == suggestions[index])
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.3),
+                    color: appColors.primary.withValues(alpha: 0.3),
                     blurRadius: 10,
                   ),
               ],
@@ -812,11 +822,11 @@ class _SetBudgetScreenState extends ConsumerState<SetBudgetScreen>
                   colors: [appColors.primary, appColors.primaryDark],
                 )
               : null,
-          color: isEnabled ? null : appColors.textMuted.withOpacity(0.1),
+          color: isEnabled ? null : appColors.textMuted.withValues(alpha: 0.1),
           boxShadow: isEnabled
               ? [
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.3),
+                    color: appColors.primary.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),

@@ -1,22 +1,15 @@
-import 'dart:io';
-import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/utils/category_helper.dart';
-import 'package:moment_u_payment/features/camera/screens/custom_camera_screen.dart';
-import 'package:moment_u_payment/features/camera/screens/edit_photo_screen.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/features/transaction/presentation/widgets/transaction_image_picker.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/services/media_service.dart';
 import '../transaction_provider.dart';
 import '../controllers/transaction_timeline_controller.dart';
 import 'package:moment_u_payment/core/utils/app_toast.dart';
@@ -56,7 +49,7 @@ class NumberFormatUtil {
       if (normalizedInput.endsWith(',')) {
         // Nếu người dùng vừa gõ dấu phẩy ở cuối (ví dụ: "1," -> "1.")
         normalizedInput =
-            normalizedInput.substring(0, normalizedInput.length - 1) + '.';
+            '${normalizedInput.substring(0, normalizedInput.length - 1)}.';
       } else if (!normalizedInput.contains('.') &&
           normalizedInput.contains(',')) {
         // Hỗ trợ trường hợp sao chép (paste) hoặc nhập nhanh chuỗi chứa dấu phẩy thập phân (ví dụ: "1,25")
@@ -66,7 +59,7 @@ class NumberFormatUtil {
           String afterComma = normalizedInput.substring(lastComma + 1);
           if (afterComma.length < 3) {
             normalizedInput =
-                normalizedInput.substring(0, lastComma) + '.' + afterComma;
+                '${normalizedInput.substring(0, lastComma)}.$afterComma';
           }
         }
       }
@@ -215,8 +208,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     String text = _amountController.text;
     if (!isVnd) {
       text = text.replaceAll(',', '');
-      if (text.contains('.'))
+      if (text.contains('.')) {
         return; // Nếu đã có phần thập phân thì không append shortcut nghìn tránh lỗi dữ liệu số
+      }
     } else {
       text = text.replaceAll('.', '');
     }
@@ -458,7 +452,7 @@ class _CategorySelector extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
-                color: appColors.primaryDark.withOpacity(0.7),
+                color: appColors.primaryDark.withValues(alpha: 0.7),
                 letterSpacing: 0.5,
               ),
             ),
@@ -496,7 +490,7 @@ class _CategorySelector extends ConsumerWidget {
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : appColors.primary.withOpacity(0.05),
+                            : appColors.primary.withValues(alpha: 0.05),
                       ),
                     ),
                     child: Row(
@@ -564,7 +558,9 @@ class _CustomCategoryInput extends ConsumerWidget {
         isDense: true,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: appColors.primary.withOpacity(0.1)),
+          borderSide: BorderSide(
+            color: appColors.primary.withValues(alpha: 0.1),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -593,14 +589,14 @@ class _DateSelector extends ConsumerWidget {
         decoration: BoxDecoration(
           color: appColors.cardBackground,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: appColors.primary.withOpacity(0.08)),
+          border: Border.all(color: appColors.primary.withValues(alpha: 0.08)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.08),
+                color: appColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
@@ -621,7 +617,7 @@ class _DateSelector extends ConsumerWidget {
             const Spacer(),
             Icon(
               CupertinoIcons.calendar_badge_plus,
-              color: appColors.textMuted.withOpacity(0.4),
+              color: appColors.textMuted.withValues(alpha: 0.4),
               size: 16,
             ),
           ],
@@ -639,7 +635,6 @@ class _AmountInput extends ConsumerWidget {
   onCurrencyChanged; // 🚀 KHẮC PHỤC: Thêm dòng khai báo biến này để hết lỗi compiler
 
   const _AmountInput({
-    super.key,
     required this.controller,
     required this.onChanged,
     required this.onAppendZeros,
@@ -709,7 +704,7 @@ class _AmountInput extends ConsumerWidget {
             color: appColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: appColors.primary.withOpacity(0.25),
+              color: appColors.primary.withValues(alpha: 0.25),
               width: 1.2,
             ),
           ),
@@ -730,7 +725,7 @@ class _AmountInput extends ConsumerWidget {
                   decoration: InputDecoration(
                     hintText: '0',
                     hintStyle: TextStyle(
-                      color: appColors.primary.withOpacity(0.25),
+                      color: appColors.primary.withValues(alpha: 0.25),
                       fontSize: 28,
                     ),
                     border: InputBorder.none,
@@ -753,7 +748,7 @@ class _AmountInput extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Icon(
                         CupertinoIcons.clear_thick_circled,
-                        color: appColors.primary.withOpacity(0.4),
+                        color: appColors.primary.withValues(alpha: 0.4),
                         size: 18,
                       ),
                     ),
@@ -816,7 +811,7 @@ class _AmountInput extends ConsumerWidget {
     AppColorTheme appColors,
   ) {
     return Material(
-      color: appColors.primary.withOpacity(0.08),
+      color: appColors.primary.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onTap,
@@ -859,7 +854,7 @@ class _NoteInput extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
-                color: appColors.primaryDark.withOpacity(0.6),
+                color: appColors.primaryDark.withValues(alpha: 0.6),
                 letterSpacing: 0.5,
               ),
             ),
@@ -934,7 +929,7 @@ class _SaveButton extends ConsumerWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: appColors.primary.withOpacity(0.25),
+              color: appColors.primary.withValues(alpha: 0.25),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

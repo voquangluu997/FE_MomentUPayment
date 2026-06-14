@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -222,9 +223,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
           return widget.l10n.hintGoldfish;
         case BadgeType.balanced:
           return widget.l10n.hintBalanced;
-        default:
-          return widget.l10n.hintDefault;
-      }
+        }
     } catch (e) {
       return widget.l10n.hintSecret;
     }
@@ -242,7 +241,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
             child: Container(
               height: 6,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: FractionallySizedBox(
@@ -253,15 +252,18 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                     borderRadius: BorderRadius.circular(10),
                     gradient: LinearGradient(
                       colors: [
-                        lockedAuraColor.withOpacity(0.4),
+                        lockedAuraColor.withValues(alpha: 0.4),
                         lockedAuraColor,
-                        Colors.white.withOpacity(0.85),
+                        Colors.white.withValues(alpha: 0.85),
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: lockedAuraColor.withOpacity(
-                          (0.4 + 0.4 * _pulseAnimation.value).clamp(0.0, 1.0),
+                        color: lockedAuraColor.withValues(
+                          alpha: (0.4 + 0.4 * _pulseAnimation.value).clamp(
+                            0.0,
+                            1.0,
+                          ),
                         ),
                         blurRadius: 6,
                         spreadRadius: 1,
@@ -278,8 +280,8 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w900,
-              color: lockedAuraColor.withOpacity(
-                (0.7 + 0.3 * _pulseAnimation.value).clamp(0.0, 1.0),
+              color: lockedAuraColor.withValues(
+                alpha: (0.7 + 0.3 * _pulseAnimation.value).clamp(0.0, 1.0),
               ),
             ),
           ),
@@ -315,18 +317,18 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                   : const Color(0xFF161622),
               border: Border.all(
                 color: widget.isUnlocked
-                    ? widget.badge.color.withOpacity(0.25)
-                    : lockedAuraColor.withOpacity(
-                        (0.5 * _pulseAnimation.value).clamp(0.0, 1.0),
+                    ? widget.badge.color.withValues(alpha: 0.25)
+                    : lockedAuraColor.withValues(
+                        alpha: (0.5 * _pulseAnimation.value).clamp(0.0, 1.0),
                       ),
                 width: widget.isUnlocked ? 1.5 : 2.0,
               ),
               boxShadow: [
                 BoxShadow(
                   color: widget.isUnlocked
-                      ? widget.badge.color.withOpacity(0.08)
-                      : lockedAuraColor.withOpacity(
-                          (0.3 * _pulseAnimation.value).clamp(0.0, 1.0),
+                      ? widget.badge.color.withValues(alpha: 0.08)
+                      : lockedAuraColor.withValues(
+                          alpha: (0.3 * _pulseAnimation.value).clamp(0.0, 1.0),
                         ),
                   blurRadius: widget.isUnlocked
                       ? 12
@@ -372,11 +374,9 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                         end: Alignment.bottomRight,
                                         colors: [
                                           Colors.black87,
-                                          lockedAuraColor.withOpacity(
-                                            (0.6 * _pulseAnimation.value).clamp(
-                                              0.0,
-                                              1.0,
-                                            ),
+                                          lockedAuraColor.withValues(
+                                            alpha: (0.6 * _pulseAnimation.value)
+                                                .clamp(0.0, 1.0),
                                           ),
                                         ],
                                       ),
@@ -384,11 +384,9 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                     ? []
                                     : [
                                         BoxShadow(
-                                          color: lockedAuraColor.withOpacity(
-                                            (0.5 * _pulseAnimation.value).clamp(
-                                              0.0,
-                                              1.0,
-                                            ),
+                                          color: lockedAuraColor.withValues(
+                                            alpha: (0.5 * _pulseAnimation.value)
+                                                .clamp(0.0, 1.0),
                                           ),
                                           blurRadius: 15,
                                           spreadRadius: 1,
@@ -408,11 +406,13 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                             (0.15 * _pulseAnimation.value),
                                         child: Icon(
                                           CupertinoIcons.lock_fill,
-                                          color: Colors.white.withOpacity(
-                                            (0.8 +
-                                                    (0.2 *
-                                                        _pulseAnimation.value))
-                                                .clamp(0.0, 1.0),
+                                          color: Colors.white.withValues(
+                                            alpha:
+                                                (0.8 +
+                                                        (0.2 *
+                                                            _pulseAnimation
+                                                                .value))
+                                                    .clamp(0.0, 1.0),
                                           ),
                                           size: 26,
                                         ),
@@ -441,12 +441,13 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                         fontWeight: FontWeight.w900,
                                         color: widget.isUnlocked
                                             ? widget.appColors.primaryDark
-                                            : lockedAuraColor.withOpacity(
-                                                (0.8 +
-                                                        (0.2 *
-                                                            _pulseAnimation
-                                                                .value))
-                                                    .clamp(0.0, 1.0),
+                                            : lockedAuraColor.withValues(
+                                                alpha:
+                                                    (0.8 +
+                                                            (0.2 *
+                                                                _pulseAnimation
+                                                                    .value))
+                                                        .clamp(0.0, 1.0),
                                               ),
                                         letterSpacing: widget.isUnlocked
                                             ? 0
@@ -461,8 +462,12 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                     ),
                                     decoration: BoxDecoration(
                                       color: widget.isUnlocked
-                                          ? widget.badge.color.withOpacity(0.1)
-                                          : lockedAuraColor.withOpacity(0.15),
+                                          ? widget.badge.color.withValues(
+                                              alpha: 0.1,
+                                            )
+                                          : lockedAuraColor.withValues(
+                                              alpha: 0.15,
+                                            ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -494,8 +499,8 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                                       ? FontStyle.normal
                                       : FontStyle.italic,
                                   color: widget.isUnlocked
-                                      ? widget.appColors.textMuted.withOpacity(
-                                          0.8,
+                                      ? widget.appColors.textMuted.withValues(
+                                          alpha: 0.8,
                                         )
                                       : Colors.white70,
                                   fontWeight: FontWeight.w500,
@@ -521,9 +526,9 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.0),
-                                  Colors.white.withOpacity(0.25),
-                                  Colors.white.withOpacity(0.0),
+                                  Colors.white.withValues(alpha: 0.0),
+                                  Colors.white.withValues(alpha: 0.25),
+                                  Colors.white.withValues(alpha: 0.0),
                                 ],
                                 stops: const [0.0, 0.5, 1.0],
                               ),
@@ -568,8 +573,8 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
       context: context,
       barrierDismissible: true,
       barrierLabel: 'SharePreview',
-      barrierColor: Colors.black.withOpacity(0.9),
-      pageBuilder: (context, _, __) =>
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      pageBuilder: (context, _, _) =>
           BadgeSharePreviewDialog(badge: widget.badge, l10n: widget.l10n),
     );
   }
@@ -582,7 +587,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
@@ -603,12 +608,12 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                   color: const Color(0xFF1A1A24),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: lockedDialogAura.withOpacity(0.5),
+                    color: lockedDialogAura.withValues(alpha: 0.5),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: lockedDialogAura.withOpacity(0.4),
+                      color: lockedDialogAura.withValues(alpha: 0.4),
                       blurRadius: 30,
                       spreadRadius: 2,
                       offset: const Offset(0, 10),
@@ -628,12 +633,12 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.black,
-                            lockedDialogAura.withOpacity(0.5),
+                            lockedDialogAura.withValues(alpha: 0.5),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: lockedDialogAura.withOpacity(0.6),
+                            color: lockedDialogAura.withValues(alpha: 0.6),
                             blurRadius: 50,
                             spreadRadius: 5,
                           ),
@@ -643,7 +648,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                       child: Center(
                         child: Icon(
                           CupertinoIcons.lock_circle_fill,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           size: 52,
                         ),
                       ),
@@ -666,7 +671,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: lockedDialogAura.withOpacity(0.15),
+                        color: lockedDialogAura.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -685,7 +690,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.white12),
                       ),
@@ -696,7 +701,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: lockedDialogAura.withOpacity(0.9),
+                              color: lockedDialogAura.withValues(alpha: 0.9),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -725,7 +730,7 @@ class _BadgeRectangularCardState extends State<BadgeRectangularCard>
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 10,
-                          shadowColor: lockedDialogAura.withOpacity(0.5),
+                          shadowColor: lockedDialogAura.withValues(alpha: 0.5),
                         ),
                         onPressed: () => Navigator.pop(context),
                         child: Text(
@@ -798,9 +803,10 @@ class _BadgeSharePreviewDialogState extends State<BadgeSharePreviewDialog> {
 
       // 4. Chia sẻ
       final xFile = XFile(imagePath.path);
+      // ignore: deprecated_member_use
       await Share.shareXFiles([xFile], text: textToShare);
     } catch (e) {
-      debugPrint("Lỗi khi chia sẻ: $e");
+      AppLogger.e("Share", "Lỗi khi chia sẻ: $e");
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
@@ -874,7 +880,7 @@ class _BadgeSharePreviewDialogState extends State<BadgeSharePreviewDialog> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 10,
-                    shadowColor: widget.badge.color.withOpacity(0.5),
+                    shadowColor: widget.badge.color.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -915,10 +921,13 @@ class BadgeStunningExportCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
             color: const Color(0xFF0F0F16), // Nền đen sâu thẳm
-            border: Border.all(color: badge.color.withOpacity(0.3), width: 2),
+            border: Border.all(
+              color: badge.color.withValues(alpha: 0.3),
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: badge.color.withOpacity(0.4),
+                color: badge.color.withValues(alpha: 0.4),
                 blurRadius: 40,
                 spreadRadius: -10,
               ),
@@ -936,7 +945,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                         center: Alignment.center,
                         radius: 0.8,
                         colors: [
-                          badge.color.withOpacity(0.35),
+                          badge.color.withValues(alpha: 0.35),
                           Colors.transparent,
                         ],
                       ),
@@ -963,7 +972,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                             Text(
                               l10n.achievementUnlocked,
                               style: TextStyle(
-                                color: badge.color.withOpacity(0.9),
+                                color: badge.color.withValues(alpha: 0.9),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 3.0,
@@ -985,7 +994,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                                 boxShadow: [
                                   BoxShadow(
                                     color: badge.gradientColors.first
-                                        .withOpacity(0.6),
+                                        .withValues(alpha: 0.6),
                                     blurRadius: 30,
                                     offset: const Offset(0, 10),
                                   ),
@@ -1026,7 +1035,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   height: 1.5,
                                   fontStyle: FontStyle.italic,
                                 ),
@@ -1049,7 +1058,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                     children: [
                       Icon(
                         CupertinoIcons.sparkles,
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         size: 16,
                       ),
                       const SizedBox(width: 8),
@@ -1058,7 +1067,7 @@ class BadgeStunningExportCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           letterSpacing: 1.0,
                         ),
                       ),

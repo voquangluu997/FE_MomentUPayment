@@ -2,7 +2,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:moment_u_payment/core/utils/datetime_helper.dart';
 import 'package:moment_u_payment/core/widgets/analytics_components.dart';
 import '../../../core/network/api_client.dart';
@@ -114,7 +113,7 @@ class TransactionRepository {
           'amount': amount,
           'category': category,
           'note': note,
-          if (imageUrl != null) 'imageUrl': imageUrl,
+          'imageUrl': ?imageUrl,
           'emoji': emoji,
           // ✨ Cập nhật ngày nếu được cung cấp
           if (spentAt != null) 'spentAt': spentAt.toIso8601String(),
@@ -183,7 +182,6 @@ class TransactionRepository {
   }
 
   /// 📊 BƯỚC 6: LẤY DỮ LIỆU THỐNG KÊ CHI TIÊU
-  /// ⚠️ Đã đổi kiểu trả về thành Map<String, dynamic> để đồng bộ với Backend mới
   Future<Map<String, dynamic>> getTransactionAnalytics({
     required DateTime startDate,
     required DateTime endDate,

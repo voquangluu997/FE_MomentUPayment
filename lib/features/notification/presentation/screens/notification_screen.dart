@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:moment_u_payment/core/constants/app_colors.dart';
-import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
-import 'package:moment_u_payment/features/transaction/presentation/screens/add_transaction_screen.dart';
 
 import 'package:moment_u_payment/l10n/app_localizations.dart';
 import 'package:moment_u_payment/features/notification/notification_provider.dart';
@@ -230,25 +228,25 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         // Thông báo chưa đọc sẽ có màu nền nguyên bản, đã đọc sẽ hơi mờ nhẹ đi
         color: isGroupUnread
             ? appColors.cardBackground
-            : appColors.cardBackground.withOpacity(0.65),
+            : appColors.cardBackground.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isGroupUnread
-              ? appColors.primary.withOpacity(0.12)
+              ? appColors.primary.withValues(alpha: 0.12)
               : Colors.transparent,
           width: 1,
         ),
         boxShadow: isGroupUnread
             ? [
                 BoxShadow(
-                  color: appColors.primary.withOpacity(0.06),
+                  color: appColors.primary.withValues(alpha: 0.06),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.015),
+                  color: Colors.black.withValues(alpha: 0.015),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -285,8 +283,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                             ? FontWeight.w500
                             : FontWeight.normal,
                         color: isGroupUnread
-                            ? appColors.primaryDark.withOpacity(0.85)
-                            : appColors.primaryDark.withOpacity(0.45),
+                            ? appColors.primaryDark.withValues(alpha: 0.85)
+                            : appColors.primaryDark.withValues(alpha: 0.45),
                         height: 1.4,
                       ),
                     ),
@@ -322,13 +320,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isUnread
-            ? appColors.primary.withOpacity(0.04)
-            : appColors.cardBackground.withOpacity(0.4),
+            ? appColors.primary.withValues(alpha: 0.04)
+            : appColors.cardBackground.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isUnread
-              ? appColors.primary.withOpacity(0.1)
-              : appColors.primary.withOpacity(0.02),
+              ? appColors.primary.withValues(alpha: 0.1)
+              : appColors.primary.withValues(alpha: 0.02),
         ),
       ),
       child: InkWell(
@@ -362,7 +360,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           : FontWeight.normal,
                       color: isUnread
                           ? appColors.primaryDark
-                          : appColors.primaryDark.withOpacity(0.5),
+                          : appColors.primaryDark.withValues(alpha: 0.5),
                       height: 1.4,
                     ),
                   ),
@@ -371,7 +369,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     intl.DateFormat('HH:mm').format(noti.createdAt),
                     style: TextStyle(
                       fontSize: 9,
-                      color: appColors.primaryDark.withOpacity(0.3),
+                      color: appColors.primaryDark.withValues(alpha: 0.3),
                     ),
                   ),
                 ],
@@ -397,7 +395,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: (content['color'] as Color).withOpacity(0.1),
+              color: (content['color'] as Color).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
@@ -443,7 +441,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               fontSize: 14,
               color: isUnread
                   ? appColors.primaryDark
-                  : appColors.primaryDark.withOpacity(0.6),
+                  : appColors.primaryDark.withValues(alpha: 0.6),
             ),
           ),
         ),
@@ -451,16 +449,17 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           GestureDetector(
             onTap: () {
               setState(() {
-                if (isExpanded)
+                if (isExpanded) {
                   _expandedGroups.remove(index);
-                else
+                } else {
                   _expandedGroups.add(index);
+                }
               });
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.1),
+                color: appColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -491,7 +490,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           intl.DateFormat('HH:mm - dd/MM/yyyy').format(noti.createdAt),
           style: TextStyle(
             fontSize: 10,
-            color: appColors.primaryDark.withOpacity(0.3),
+            color: appColors.primaryDark.withValues(alpha: 0.3),
           ),
         ),
         if (groupLength > 1)
@@ -513,7 +512,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     ? CupertinoIcons.chevron_up
                     : CupertinoIcons.chevron_down,
                 size: 16,
-                color: appColors.primary.withOpacity(0.8),
+                color: appColors.primary.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -526,14 +525,15 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     AppLocalizations l10n,
     dynamic state,
   ) {
-    if (state.isLoading || state.notifications.isEmpty)
+    if (state.isLoading || state.notifications.isEmpty) {
       return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: appColors.primaryDark.withOpacity(0.05),
+          color: appColors.primaryDark.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -578,7 +578,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             style: TextStyle(
               color: isSelected
                   ? appColors.primary
-                  : appColors.primaryDark.withOpacity(0.5),
+                  : appColors.primaryDark.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),
@@ -597,8 +597,7 @@ class _ResizableText extends ConsumerStatefulWidget {
   const _ResizableText({
     required this.text,
     required this.style,
-    this.maxLines = 2,
-  });
+  }) : maxLines = 2;
 
   @override
   ConsumerState<_ResizableText> createState() => _ResizableTextState();

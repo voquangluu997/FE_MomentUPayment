@@ -62,7 +62,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final userInfo = ref.watch(userInfoProvider);
-    final String userName = userInfo?.name ?? (l10n.defaultUser ?? 'User');
+    final String userName = userInfo?.name ?? (l10n.defaultUser);
     final String? avatarUrl = userInfo?.avatar; // Lấy link avatar
     final appColors = ref.watch(appColorsProvider);
     final currentBadge = ref.watch(currentMonthBadgeProvider);
@@ -92,10 +92,10 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.08),
+                color: appColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: appColors.primary.withOpacity(0.15),
+                  color: appColors.primary.withValues(alpha: 0.15),
                   width: 1,
                 ),
               ),
@@ -234,7 +234,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                           : CupertinoIcons.bell,
                       color: hasUnread
                           ? appColors.primary
-                          : appColors.primaryDark.withOpacity(0.6),
+                          : appColors.primaryDark.withValues(alpha: 0.6),
                     ),
                   ),
                   if (hasUnread)
@@ -252,7 +252,9 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: appColors.errorAccent.withOpacity(0.4),
+                              color: appColors.errorAccent.withValues(
+                                alpha: 0.4,
+                              ),
                               blurRadius: 4,
                               spreadRadius: 1,
                             ),
@@ -284,7 +286,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
         IconButton(
           icon: Icon(
             CupertinoIcons.ellipsis_vertical,
-            color: appColors.primaryDark.withOpacity(0.6),
+            color: appColors.primaryDark.withValues(alpha: 0.6),
             size: 22,
           ),
           onPressed: () {
@@ -309,7 +311,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.7),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
@@ -327,15 +329,15 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(0.95),
+                  color: appColors.cardBackground.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(32),
                   border: Border.all(
-                    color: badge.color.withOpacity(0.3),
+                    color: badge.color.withValues(alpha: 0.3),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: badge.color.withOpacity(0.15),
+                      color: badge.color.withValues(alpha: 0.15),
                       blurRadius: 40,
                       spreadRadius: 5,
                       offset: const Offset(0, 15),
@@ -357,14 +359,14 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: badge.color.withOpacity(0.4),
+                            color: badge.color.withValues(alpha: 0.4),
                             blurRadius: 30,
                             spreadRadius: 2,
                             offset: const Offset(0, 10),
                           ),
                         ],
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                       ),
@@ -400,7 +402,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                         gradient: LinearGradient(colors: badge.gradientColors),
                         boxShadow: [
                           BoxShadow(
-                            color: badge.color.withOpacity(0.3),
+                            color: badge.color.withValues(alpha: 0.3),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),

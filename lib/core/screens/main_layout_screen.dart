@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:moment_u_payment/core/features/recap/screens/story_recap_screen.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/core/utils/currency_helper.dart';
 import 'package:moment_u_payment/core/utils/gamification_utils.dart';
 import 'package:moment_u_payment/features/budget/data/models/budget_summary.dart';
@@ -96,11 +97,12 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     final recapKey = 'recap_shown_${now.year}_${now.month}';
 
     // Điều kiện hiển thị thực tế
-    // if (now.day > 5) return;
-    // if (prefs.getBool(recapKey) ?? false) return;
+    if (now.day > 5) return;
+    if (prefs.getBool(recapKey) ?? false) return;
 
     try {
       final repo = ref.read(transactionRepositoryProvider);
+      // ignore: use_build_context_synchronously
       final l10n = AppLocalizations.of(context)!;
       final currencySymbol = ref.read(currencyProvider).toString();
       final appColors = ref.read(appColorsProvider);
@@ -144,6 +146,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
           startDate: monthBeforeStart.toUtc(),
           endDate: monthBeforeEnd.toUtc(),
         ),
+        // ignore: invalid_return_type_for_catch_error
         ref.read(homeBudgetProvider.future).catchError((_) => null),
       ]);
 
@@ -252,6 +255,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
       // Giữ lại context an toàn của MainLayoutScreen
       final mainLayoutContext = context;
 
+      // ignore: use_build_context_synchronously
       Navigator.of(mainLayoutContext).push(
         MaterialPageRoute(
           fullscreenDialog: true,
@@ -263,23 +267,25 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
             slides: recapSlides,
             actionLabel: l10n.recapViewAnalytics,
             onFinish: () {
-              // Thực thi đóng màn hình phủ bằng rootNavigator để chắc chắn biến mất hoàn toàn
               Navigator.of(mainLayoutContext, rootNavigator: true).pop();
 
               // Cập nhật tab bằng tham chiếu trực tiếp an toàn
               if (mainLayoutContext.mounted) {
                 setState(() {
-                  _currentIndex = 1; // Nhảy ngay sang Analytics Screen
+                  _currentIndex = 1;
                   _isNavbarVisible = true;
                 });
-                debugPrint("🚀 Đã điều hướng thành công đến tab Analytics");
+                AppLogger.i(
+                  'i',
+                  "🚀 Đã điều hướng thành công đến tab Analytics",
+                );
               }
             },
           ),
         ),
       );
     } catch (e) {
-      debugPrint("Error generating Enhanced Recap Story: $e");
+      AppLogger.e("err", "Error generating Enhanced Recap Story: $e");
     }
   }
 
@@ -346,7 +352,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
 
     showGeneralDialog(
       context: context,
-      pageBuilder: (context, _, __) => MultipleBadgePremiumDialog(
+      pageBuilder: (context, _, _) => MultipleBadgePremiumDialog(
         badges: sortedBadges,
         title: isMultiple
             ? l10n.congratsMultipleTitle
@@ -374,9 +380,10 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     final l10n = AppLocalizations.of(context)!;
 
     ref.listen<List<UserBadge>>(newlyUnlockedBadgeProvider, (previous, next) {
-      if (next != null && next.isNotEmpty) {
+      if (next.isNotEmpty) {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
+            // ignore: use_build_context_synchronously
             _showCelebrationDialog(context, next, appColors, l10n);
           }
         });
@@ -433,15 +440,15 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
               child: Container(
                 height: 76,
                 decoration: BoxDecoration(
-                  color: appColors.cardBackground.withOpacity(0.82),
+                  color: appColors.cardBackground.withValues(alpha: 0.82),
                   borderRadius: BorderRadius.circular(32),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     width: 1.2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
                     ),
@@ -518,7 +525,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
     bool isMenu = false,
   }) {
     final bool isSelected = (customAction == null) && _currentIndex == index;
-    final Color inactiveColor = appColors.textMuted.withOpacity(0.5);
+    final Color inactiveColor = appColors.textMuted.withValues(alpha: 0.5);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -541,7 +548,7 @@ class _MainLayoutScreenState extends ConsumerState<MainLayoutScreen>
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? appColors.primary.withOpacity(0.1)
+              ? appColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
@@ -650,12 +657,12 @@ class _PremiumAddButtonState extends State<PremiumAddButton>
               end: Alignment.bottomCenter,
             ),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: appColors.primary.withOpacity(0.4),
+                color: appColors.primary.withValues(alpha: 0.4),
                 blurRadius: 16,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -676,7 +683,7 @@ class _PremiumAddButtonState extends State<PremiumAddButton>
                     ),
                     gradient: LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(0.25),
+                        Colors.white.withValues(alpha: 0.25),
                         Colors.transparent,
                       ],
                       begin: Alignment.topCenter,

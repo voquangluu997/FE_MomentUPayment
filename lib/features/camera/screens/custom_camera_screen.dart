@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 
 class CustomCameraScreen extends ConsumerStatefulWidget {
   const CustomCameraScreen({super.key});
@@ -17,6 +18,8 @@ class CustomCameraScreen extends ConsumerStatefulWidget {
 
 class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
     with SingleTickerProviderStateMixin {
+  static const String _logTag = 'CustomCameraScreen';
+
   CameraController? _controller;
   List<CameraDescription> _cameras = [];
   bool _isCameraInitialized = false;
@@ -50,8 +53,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
       if (_cameras.isNotEmpty) {
         _startCamera(_cameras.first);
       }
-    } catch (e) {
-      debugPrint("Lỗi khởi tạo camera: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "Lỗi khởi tạo camera: $e", stackTrace);
     }
   }
 
@@ -74,8 +77,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
           _selectedFocalLength = 24;
         });
       }
-    } catch (e) {
-      debugPrint("Lỗi khi start camera: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "Lỗi khi start camera: $e", stackTrace);
     }
   }
 
@@ -101,8 +104,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
       setState(() {
         _selectedFocalLength = mm;
       });
-    } catch (e) {
-      debugPrint("Không thể chỉnh tiêu cự thật: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "Không thể chỉnh tiêu cự thật: $e", stackTrace);
     }
   }
 
@@ -166,8 +169,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
         // Trả về đường dẫn ảnh ĐÃ ĐƯỢC CẮT ĐÚNG TỶ LỆ khung app
         Navigator.pop(context, croppedFile.path);
       }
-    } catch (e) {
-      debugPrint("Lỗi khi chụp hoặc crop ảnh: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "Lỗi khi chụp hoặc crop ảnh: $e", stackTrace);
     }
   }
 
@@ -181,8 +184,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
       if (image != null && mounted) {
         Navigator.pop(context, image.path);
       }
-    } catch (e) {
-      debugPrint("Lỗi khi mở thư viện: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "Lỗi khi mở thư viện: $e", stackTrace);
     }
   }
 
@@ -222,7 +225,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                   Text(
                     "RAW  •  4:5  •  16-BIT",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.35),
+                      color: Colors.white.withValues(alpha: 0.35),
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 2.5,
@@ -248,7 +251,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                         color: const Color(0xFF18181B),
                         borderRadius: BorderRadius.circular(28),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
+                          color: Colors.white.withValues(alpha: 0.06),
                           width: 1,
                         ),
                       ),
@@ -297,8 +300,8 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                                   fontStyle: FontStyle.italic,
                                   letterSpacing:
                                       4.5, // Giãn khoảng cách tạo cảm giác tối giản kiểu tạp chí thời trang
-                                  color: Colors.white.withOpacity(
-                                    0.3,
+                                  color: Colors.white.withValues(
+                                    alpha: 0.3,
                                   ), // Trong suốt, tiệp vào khung hình
                                 ),
                               ),
@@ -331,7 +334,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                       decoration: BoxDecoration(
                         color: isSelected
                             ? Colors.white
-                            : Colors.white.withOpacity(0.05),
+                            : Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -339,7 +342,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                         style: TextStyle(
                           color: isSelected
                               ? Colors.black
-                              : Colors.white.withOpacity(0.4),
+                              : Colors.white.withValues(alpha: 0.4),
                           fontSize: 11,
                           fontWeight: isSelected
                               ? FontWeight.w700
@@ -378,7 +381,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.4),
+                                color: Colors.white.withValues(alpha: 0.4),
                                 width: 2,
                               ),
                             ),
@@ -414,7 +417,7 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
   Widget _buildFrameCorners() {
     const double cornerSize = 14.0;
     const double strokeWidth = 1.2;
-    final color = Colors.white.withOpacity(0.25);
+    final color = Colors.white.withValues(alpha: 0.25);
 
     return Stack(
       children: [
@@ -487,10 +490,10 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
+          color: Colors.white.withValues(alpha: 0.04),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white.withOpacity(0.7), size: 18),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 18),
       ),
     );
   }
@@ -509,14 +512,18 @@ class _CustomCameraScreenState extends ConsumerState<CustomCameraScreen>
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
+              color: Colors.white.withValues(alpha: 0.06),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
                 width: 1,
               ),
             ),
-            child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+            child: Icon(
+              icon,
+              color: Colors.white.withValues(alpha: 0.8),
+              size: 20,
+            ),
           ),
         ),
       ),

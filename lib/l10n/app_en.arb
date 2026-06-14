@@ -1023,6 +1023,20 @@
   },
   "recapBadgeResetNotice": "Monthly badges will be reset this month, ready for your next challenge!",
   "recapViewAnalytics": "Explore in-depth analytics",
-  "recapEarnedBadges": "Achievements you've earned"
+  "recapEarnedBadges": "Achievements you've earned",
+
+  "loginAppleButtonText": "Continue with Apple",
+"appleLoginErrorNotification": "Apple login failed, please try again!",
+
+"orContinueWith": "Or continue with",
+
+"deleteAccount": "Delete Account Permanently",
+  "deleteAccountTitle": "Delete Account?",
+  "deleteAccountWarning": "This action cannot be undone. All your spending history, badges, and settings will be permanently removed from the system.",
+  "deleteButton": "Delete Permanently",
+  "cancel": "Cancel",
+  "deleteAccountError": "An error occurred, please try again later.",
+    "accountDeleted": "Account deleted!!"
+
 
 }

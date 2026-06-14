@@ -57,18 +57,20 @@ class CategoryFilterBar extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(24),
                       // Màu Pastel dịu mắt, nhấn màu primary khi Active
                       color: isActive
-                          ? appColors.primary.withOpacity(0.85)
+                          ? appColors.primary.withValues(alpha: 0.85)
                           : appColors.cardBackground,
                       border: Border.all(
                         color: isActive
                             ? appColors.primary
-                            : appColors.primaryDark.withOpacity(0.05),
+                            : appColors.primaryDark.withValues(alpha: 0.05),
                         width: 1,
                       ),
                       boxShadow: isActive
                           ? [
                               BoxShadow(
-                                color: appColors.primary.withOpacity(0.25),
+                                color: appColors.primary.withValues(
+                                  alpha: 0.25,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               ),
@@ -92,7 +94,7 @@ class CategoryFilterBar extends ConsumerWidget {
                                 : FontWeight.w600,
                             color: isActive
                                 ? Colors.white
-                                : appColors.primaryDark.withOpacity(0.6),
+                                : appColors.primaryDark.withValues(alpha: 0.6),
                             letterSpacing: 0.2,
                           ),
                         ),

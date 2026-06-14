@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/editor_models.dart';
@@ -178,8 +177,8 @@ class StickerWidget extends StatelessWidget {
             child: Container(
               width: sticker.size.width,
               height: sticker.size.height,
-              color: Colors.black.withOpacity(
-                0.05,
+              color: Colors.black.withValues(
+                alpha: 0.05,
               ), // Tránh lỗi gesture trên bộ lọc mờ
             ),
           ),
@@ -201,8 +200,7 @@ class StickerWidget extends StatelessWidget {
           style: const TextStyle(fontSize: 45, decoration: TextDecoration.none),
         );
       case StickerType.text:
-      default:
-        return Stack(
+      return Stack(
           children: [
             if (sticker.hasBackground)
               Text(
@@ -214,7 +212,7 @@ class StickerWidget extends StatelessWidget {
                   height: 1.2,
                   decoration: TextDecoration.none,
                   background: Paint()
-                    ..color = sticker.backgroundColor.withOpacity(0.6)
+                    ..color = sticker.backgroundColor.withValues(alpha: 0.6)
                     ..strokeWidth = 20
                     ..strokeJoin = StrokeJoin.round
                     ..strokeCap = StrokeCap.round
@@ -245,7 +243,7 @@ class StickerWidget extends StatelessWidget {
         color: Colors.white,
         shape: BoxShape.circle,
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 3),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 3),
         ],
       ),
     );

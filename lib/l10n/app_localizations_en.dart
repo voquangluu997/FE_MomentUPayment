@@ -1849,4 +1849,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recapEarnedBadges => 'Achievements you\'ve earned';
+
+  @override
+  String get loginAppleButtonText => 'Continue with Apple';
+
+  @override
+  String get appleLoginErrorNotification =>
+      'Apple login failed, please try again!';
+
+  @override
+  String get orContinueWith => 'Or continue with';
+
+  @override
+  String get deleteAccount => 'Delete Account Permanently';
+
+  @override
+  String get deleteAccountTitle => 'Delete Account?';
+
+  @override
+  String get deleteAccountWarning =>
+      'This action cannot be undone. All your spending history, badges, and settings will be permanently removed from the system.';
+
+  @override
+  String get deleteButton => 'Delete Permanently';
+
+  @override
+  String get deleteAccountError => 'An error occurred, please try again later.';
+
+  @override
+  String get accountDeleted => 'Account deleted!!';
 }

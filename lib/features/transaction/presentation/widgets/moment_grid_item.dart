@@ -99,14 +99,14 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    appColors.primary.withOpacity(0.8),
-                    appColors.primary.withOpacity(0.2),
-                    appColors.primary.withOpacity(0.6),
+                    appColors.primary.withValues(alpha: 0.8),
+                    appColors.primary.withValues(alpha: 0.2),
+                    appColors.primary.withValues(alpha: 0.6),
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.15),
+                    color: appColors.primary.withValues(alpha: 0.15),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -190,7 +190,7 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
                 colors: [
                   Colors.transparent,
                   Colors.transparent,
-                  Colors.black.withOpacity(0.85), // Đen sâu ở đáy
+                  Colors.black.withValues(alpha: 0.85), // Đen sâu ở đáy
                 ],
                 stops: const [0.0, 0.5, 1.0],
               ),
@@ -209,10 +209,10 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Colors.white.withValues(alpha: 0.4),
                     width: 0.5,
                   ),
                 ),
@@ -255,7 +255,7 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.85),
+                  color: Colors.white.withValues(alpha: 0.85),
                 ),
               ),
             ],
@@ -280,9 +280,9 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            appColors.primary.withOpacity(0.15),
-            appColors.primary.withOpacity(
-              0.35,
+            appColors.primary.withValues(alpha: 0.15),
+            appColors.primary.withValues(
+              alpha: 0.35,
             ), // Màu đậm hơn một chút so với trước
           ],
         ),
@@ -341,7 +341,7 @@ class _MomentGridItemState extends ConsumerState<MomentGridItem>
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: appColors.primaryDark.withOpacity(0.7),
+                    color: appColors.primaryDark.withValues(alpha: 0.7),
                   ),
                 ),
               ],

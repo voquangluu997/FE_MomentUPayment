@@ -28,7 +28,7 @@ class BadgeItem extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: badge.color.withOpacity(0.5),
+                color: badge.color.withValues(alpha: 0.5),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),
@@ -42,9 +42,12 @@ class BadgeItem extends StatelessWidget {
           width: 90,
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           decoration: BoxDecoration(
-            color: badge.color.withOpacity(0.12),
+            color: badge.color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: badge.color.withOpacity(0.2), width: 0.5),
+            border: Border.all(
+              color: badge.color.withValues(alpha: 0.2),
+              width: 0.5,
+            ),
           ),
           child: Text(
             badge.getLocalizedTitle(AppLocalizations.of(context)!),
@@ -99,12 +102,12 @@ class MultipleBadgePremiumDialog extends StatelessWidget {
           color: appColors.cardBackground,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: appColors.primary.withOpacity(0.4),
+            color: appColors.primary.withValues(alpha: 0.4),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: appColors.primary.withOpacity(0.15),
+              color: appColors.primary.withValues(alpha: 0.15),
               blurRadius: 30,
               spreadRadius: 2,
               offset: const Offset(0, 10),
@@ -206,7 +209,7 @@ class MultipleBadgePremiumDialog extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: appColors.textMuted.withOpacity(0.7),
+                  color: appColors.textMuted.withValues(alpha: 0.7),
                 ),
               ),
             ),

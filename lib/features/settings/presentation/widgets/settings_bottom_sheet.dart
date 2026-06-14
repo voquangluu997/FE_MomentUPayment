@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart'; // 🍏 Đã thêm import Cupertino để đồng bộ thiết kế iOS
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart'; // 💡 THÊM IMPORT ĐỂ DÙNG TÍNH NĂNG CHIA SẺ
+import 'package:moment_u_payment/core/utils/app_logger.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
 import 'package:moment_u_payment/core/features/badges/screens/badge_gallery_page.dart';
 import 'package:moment_u_payment/core/providers/currency_provider.dart';
@@ -28,9 +29,7 @@ class SettingsBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 💡 LẮNG NGHE themeModeProvider để cập nhật UI ngay khi gạt switch đổi theme
     final themeMode = ref.watch(themeModeProvider);
-
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
@@ -60,7 +59,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: appColors.textMuted.withOpacity(0.3),
+                  color: appColors.textMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -94,7 +93,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                   child: Column(
                     children: [
                       // ==========================================
-                      // PHÂN NHÓM 1: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG (ĐƯA LÊN ĐẦU)
+                      // PHÂN NHÓM 1: CẤU HÌNH ỨNG DỤNG & HỆ THỐNG
                       // ==========================================
                       _buildSettingItem(
                         icon: CupertinoIcons.rosette,
@@ -103,7 +102,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         appColors: appColors,
                         onTap: () {
                           HapticFeedback.lightImpact();
-                          Navigator.of(context).pop(); // Đóng BottomSheet
+                          Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
                               builder: (_) => const BadgeGalleryPage(),
@@ -119,15 +118,14 @@ class SettingsBottomSheet extends ConsumerWidget {
                         appColors: appColors,
                         trailing: Switch(
                           value: isDark,
-                          activeColor: appColors.primary,
-                          // 💡 Cấu hình màu sắc khi tắt để Switch nhìn sinh động hơn ở Light Mode
+                          activeThumbColor: appColors.primary,
                           onChanged: (val) {
-                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
+                            HapticFeedback.lightImpact();
                             ref.read(themeModeProvider.notifier).toggleTheme();
                           },
                         ),
                         onTap: () {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn vào row
+                          HapticFeedback.lightImpact();
                           ref.read(themeModeProvider.notifier).toggleTheme();
                         },
                       ),
@@ -141,9 +139,9 @@ class SettingsBottomSheet extends ConsumerWidget {
                         appColors: appColors,
                         trailing: Switch(
                           value: currentLocale.languageCode == 'en',
-                          activeColor: appColors.primary,
+                          activeThumbColor: appColors.primary,
                           onChanged: (_) {
-                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi gạt switch
+                            HapticFeedback.lightImpact();
                             ref.read(localeProvider.notifier).toggleLocale();
                           },
                         ),
@@ -167,7 +165,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           color: appColors.cardBackground,
                           elevation: 3,
                           onSelected: (newValue) {
-                            HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chọn tiền tệ mới
+                            HapticFeedback.lightImpact();
                             ref
                                 .read(currencyProvider.notifier)
                                 .setCurrency(newValue);
@@ -201,7 +199,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: appColors.primary.withOpacity(0.1),
+                              color: appColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -231,7 +229,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Divider(
                           thickness: 0.5,
-                          color: appColors.textMuted.withOpacity(0.15),
+                          color: appColors.textMuted.withValues(alpha: 0.15),
                         ),
                       ),
 
@@ -244,13 +242,12 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.helpCenterSubtitle,
                         appColors: appColors,
                         onTap: () {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
+                          HapticFeedback.lightImpact();
                           Navigator.of(context).pop();
                           _showHelpCenterDialog(context, appColors, l10n);
                         },
                       ),
 
-                      // 💡 THÊM LỰA CHỌN CHIA SẺ VÀO ĐÂY (Tham khảo từ badge_gallery_page)
                       _buildSettingItem(
                         icon: CupertinoIcons.share,
                         title: l10n.shareNow,
@@ -258,10 +255,10 @@ class SettingsBottomSheet extends ConsumerWidget {
                         appColors: appColors,
                         onTap: () {
                           HapticFeedback.lightImpact();
-                          // Gọi chuỗi tin nhắn quảng bá ứng dụng tương tự trang Badge Gallery
                           final String textToShare = l10n.shareAppPromoMessage(
                             "Moments U Payment",
                           );
+                          // ignore: deprecated_member_use
                           Share.share(textToShare);
                         },
                       ),
@@ -270,12 +267,12 @@ class SettingsBottomSheet extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Divider(
                           thickness: 0.5,
-                          color: appColors.textMuted.withOpacity(0.15),
+                          color: appColors.textMuted.withValues(alpha: 0.15),
                         ),
                       ),
 
                       // ==========================================
-                      // PHÂN NHÓM 3: QUẢN LÝ CÁ NHÂN & THÔNG BÁO (ĐƯA XUỐNG DƯỚI GẦN LOGOUT)
+                      // PHÂN NHÓM 3: QUẢN LÝ CÁ NHÂN & THÔNG BÁO
                       // ==========================================
                       _buildSettingItem(
                         icon: CupertinoIcons.person,
@@ -283,7 +280,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.accountSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
+                          HapticFeedback.lightImpact();
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
@@ -298,7 +295,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         subtitle: l10n.notificationSettingsSubtitle,
                         appColors: appColors,
                         onTap: () {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi chạm
+                          HapticFeedback.lightImpact();
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
@@ -313,24 +310,26 @@ class SettingsBottomSheet extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Divider(
                           thickness: 0.5,
-                          color: appColors.textMuted.withOpacity(0.2),
+                          color: appColors.textMuted.withValues(alpha: 0.2),
                         ),
                       ),
 
                       // ==========================================
-                      // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (LOGOUT)
+                      // PHÂN NHÓM 4: THAO TÁC TÀI KHOẢN (LOGOUT & DELETE)
                       // ==========================================
+
+                      // NÚT ĐĂNG XUẤT
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.redAccent.withOpacity(0.12),
+                            color: Colors.orange.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             CupertinoIcons.square_arrow_right,
-                            color: Colors.redAccent,
+                            color: Colors.orange,
                             size: 22,
                           ),
                         ),
@@ -338,7 +337,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                           l10n.logout,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.redAccent,
+                            color: Colors.orange,
                             fontSize: 15,
                           ),
                         ),
@@ -350,13 +349,48 @@ class SettingsBottomSheet extends ConsumerWidget {
                           ),
                         ),
                         onTap: () async {
-                          HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn đăng xuất
+                          HapticFeedback.lightImpact();
                           Navigator.of(context).pop();
                           await ref.read(authProvider.notifier).logout();
                           if (!context.mounted) return;
                           Navigator.of(
                             context,
                           ).pushNamedAndRemoveUntil('/login', (route) => false);
+                        },
+                      ),
+
+                      // NÚT XÓA TÀI KHOẢN
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            CupertinoIcons.trash,
+                            color: Colors.red,
+                            size: 22,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.deleteAccount,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                            fontSize: 15,
+                          ),
+                        ),
+                        onTap: () {
+                          HapticFeedback.heavyImpact(); // Rung mạnh cảnh báo
+                          Navigator.of(context).pop(); // Đóng BottomSheet
+                          _showDeleteAccountDialog(
+                            context,
+                            ref,
+                            appColors,
+                            l10n,
+                          );
                         },
                       ),
                     ],
@@ -397,7 +431,7 @@ class SettingsBottomSheet extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: appColors.primary.withOpacity(0.1),
+          color: appColors.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: appColors.primary, size: 22),
@@ -432,7 +466,7 @@ class SettingsBottomSheet extends ConsumerWidget {
   ) {
     return InkWell(
       onTap: () {
-        HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi mở dialog ủng hộ
+        HapticFeedback.lightImpact();
         _showDonationDialog(context, appColors, l10n);
       },
       borderRadius: BorderRadius.circular(20),
@@ -441,15 +475,15 @@ class SettingsBottomSheet extends ConsumerWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              appColors.primary.withOpacity(0.15),
-              appColors.primary.withOpacity(0.05),
+              appColors.primary.withValues(alpha: 0.15),
+              appColors.primary.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: appColors.primary.withOpacity(0.2),
+            color: appColors.primary.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -462,7 +496,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: appColors.primary.withOpacity(0.3),
+                    color: appColors.primary.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -511,10 +545,10 @@ class SettingsBottomSheet extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFB800).withOpacity(0.08),
+        color: const Color(0xFFFFB800).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFFFB800).withOpacity(0.3),
+          color: const Color(0xFFFFB800).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -527,7 +561,7 @@ class SettingsBottomSheet extends ConsumerWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFB800).withOpacity(0.3),
+                  color: const Color(0xFFFFB800).withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -561,7 +595,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFB800).withOpacity(0.2),
+                        color: const Color(0xFFFFB800).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -577,7 +611,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                   l10n.premiumGroupMomentsSubtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: appColors.primaryDark.withOpacity(0.6),
+                    color: appColors.primaryDark.withValues(alpha: 0.6),
                     height: 1.3,
                   ),
                 ),
@@ -606,7 +640,7 @@ class SettingsBottomSheet extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFA50064).withOpacity(0.1),
+                color: const Color(0xFFA50064).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -643,7 +677,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -660,7 +694,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                     return Container(
                       width: 180,
                       height: 180,
-                      color: appColors.primary.withOpacity(0.1),
+                      color: appColors.primary.withValues(alpha: 0.1),
                       alignment: Alignment.center,
                       child: Text(
                         l10n.missingQrMessage,
@@ -688,7 +722,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 elevation: 0,
               ),
               onPressed: () {
-                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi đóng
+                HapticFeedback.lightImpact();
                 Navigator.of(context).pop();
               },
               child: Text(
@@ -722,7 +756,7 @@ class SettingsBottomSheet extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: appColors.primary.withOpacity(0.1),
+                color: appColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -754,7 +788,7 @@ class SettingsBottomSheet extends ConsumerWidget {
             const SizedBox(height: 24),
             InkWell(
               onTap: () async {
-                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi nhấn sao chép email
+                HapticFeedback.lightImpact();
                 await Clipboard.setData(ClipboardData(text: l10n.contactEmail));
                 if (context.mounted) {
                   AppToast.showSuccess(
@@ -773,7 +807,9 @@ class SettingsBottomSheet extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: appColors.cardBackground,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: appColors.primary.withOpacity(0.2)),
+                  border: Border.all(
+                    color: appColors.primary.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -829,7 +865,7 @@ class SettingsBottomSheet extends ConsumerWidget {
                 elevation: 0,
               ),
               onPressed: () {
-                HapticFeedback.lightImpact(); // 📳 Rung nhẹ khi đóng
+                HapticFeedback.lightImpact();
                 Navigator.of(context).pop();
               },
               child: Text(
@@ -841,6 +877,158 @@ class SettingsBottomSheet extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // 💡 HÀM MỚI: HIỂN THỊ DIALOG XÁC NHẬN XÓA TÀI KHOẢN
+  void _showDeleteAccountDialog(
+    BuildContext context,
+    WidgetRef ref, // ref cũ này ta sẽ không dùng cho các tác vụ async nữa
+    AppColorTheme appColors,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Ngăn người dùng bấm ra ngoài khi đang xử lý
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: appColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.all(24),
+        content: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  CupertinoIcons.exclamationmark_triangle_fill,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.deleteAccountTitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: appColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.deleteAccountWarning,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: appColors.textMuted,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: appColors.textMuted,
+                        side: BorderSide(
+                          color: appColors.textMuted.withValues(alpha: 0.3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 8,
+                        ),
+                      ),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.of(
+                          dialogContext,
+                        ).pop(); // Sử dụng đúng context của dialog
+                      },
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          l10n.cancel,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    // 🚀 GIẢI PHÁP: Sử dụng Consumer để tạo ra một 'ref' mới tinh,
+                    // thuộc về Dialog chứ không liên quan đến BottomSheet đã bị đóng.
+                    child: Consumer(
+                      builder: (context, dialogRef, child) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 8,
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () async {
+                            HapticFeedback.heavyImpact();
+                            try {
+                              // 🚀 SỬ DỤNG dialogRef thay vì ref cũ
+                              await dialogRef
+                                  .read(authProvider.notifier)
+                                  .deleteAccount();
+                              AppToast.showSuccess(
+                                context,
+                                l10n.accountDeleted,
+                                appColors,
+                              );
+                              if (!context.mounted) return;
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login',
+                                (route) => false,
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              Navigator.of(context).pop(); // Đóng dialog
+                              AppToast.showError(
+                                context,
+                                l10n.deleteAccountError,
+                                appColors,
+                              );
+                            }
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              l10n.deleteButton,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

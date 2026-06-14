@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 
 class UserProvider extends ChangeNotifier {
   final String _baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8001';
@@ -47,7 +48,7 @@ class UserProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('❌ Lỗi khi đồng bộ trạng thái Email: $e');
+      AppLogger.e('e', '❌ Lỗi khi đồng bộ trạng thái Email: $e');
     }
   }
 

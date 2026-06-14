@@ -86,7 +86,7 @@ class CurrencyPickerUtil {
                     width: 38,
                     height: 4.5,
                     decoration: BoxDecoration(
-                      color: appColors.textMuted.withOpacity(0.2),
+                      color: appColors.textMuted.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -97,7 +97,7 @@ class CurrencyPickerUtil {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: appColors.primaryDark.withOpacity(0.6),
+                    color: appColors.primaryDark.withValues(alpha: 0.6),
                     letterSpacing: 0.6,
                   ),
                 ),
@@ -120,12 +120,12 @@ class CurrencyPickerUtil {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? appColors.primary.withOpacity(0.06)
+                              ? appColors.primary.withValues(alpha: 0.06)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
-                                ? appColors.primary.withOpacity(0.15)
+                                ? appColors.primary.withValues(alpha: 0.15)
                                 : Colors.transparent,
                           ),
                         ),
@@ -137,7 +137,7 @@ class CurrencyPickerUtil {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? appColors.primary
-                                    : appColors.primary.withOpacity(0.1),
+                                    : appColors.primary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               alignment: Alignment.center,

@@ -15,14 +15,13 @@ class BadgeVisual extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         gradient: LinearGradient(
-          colors:
-              badge.gradientColors,
+          colors: badge.gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: badge.color.withOpacity(0.5),
+            color: badge.color.withValues(alpha: 0.5),
             blurRadius: 40,
             spreadRadius: 2,
           ),

@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/network/api_client.dart'; // Thay bằng đg dẫn ApiClient của bạn
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'models/in_app_notification.dart';
 
 class NotificationState {
@@ -30,6 +30,8 @@ class NotificationState {
 class NotificationNotifier extends StateNotifier<NotificationState> {
   NotificationNotifier() : super(NotificationState());
 
+  static const String _logTag = 'NotificationNotifier';
+
   /// 📥 Lấy số lượng chưa đọc chính xác từ Server
   Future<void> fetchUnreadCount() async {
     try {
@@ -38,8 +40,8 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         final data = response.data;
         state = state.copyWith(unreadCount: data['count'] ?? 0);
       }
-    } catch (e) {
-      debugPrint("❌ Lỗi fetchUnreadCount: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "❌ Lỗi fetchUnreadCount: $e", stackTrace);
     }
   }
 
@@ -63,9 +65,9 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         // Gọi sync lại số lượng chuẩn từ server
         await fetchUnreadCount();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(isLoading: false);
-      debugPrint("❌ Lỗi fetchNotifications: $e");
+      AppLogger.e(_logTag, "❌ Lỗi fetchNotifications: $e", stackTrace);
     }
   }
 
@@ -93,8 +95,8 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 
     try {
       await dioClient.patch('/notifications/$id/read');
-    } catch (e) {
-      debugPrint("❌ Lỗi markAsRead: $e");
+    } catch (e, stackTrace) {
+      AppLogger.e(_logTag, "❌ Lỗi markAsRead: $e", stackTrace);
       // Nếu lỗi thì fetch lại để sync với DB
       fetchNotifications();
     }
@@ -122,8 +124,12 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
     // 2. Gọi API chạy ngầm dữ liệu xuống DB
     try {
       await dioClient.patch('/notifications/read-all');
-    } catch (e) {
-      debugPrint("❌ Lỗi markAllAsRead API: $e. Kiểm tra lại route backend!");
+    } catch (e, stackTrace) {
+      AppLogger.e(
+        _logTag,
+        "❌ Lỗi markAllAsRead API: $e. Kiểm tra lại route backend!",
+        stackTrace,
+      );
       // Nếu API lỗi (ví dụ 404), fetch lại để giao diện hiển thị đúng thực tế DB
       fetchNotifications();
     }

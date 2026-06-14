@@ -27,9 +27,8 @@ class TransactionTimelineController
     try {
       final budgetSummary = await ref
           .read(homeBudgetProvider.future)
+          // ignore: invalid_return_type_for_catch_error
           .catchError((_) => null);
-
-      if (budgetSummary == null) return;
 
       final totalBudget = budgetSummary.budgetLimit.toDouble();
       final totalSpent = budgetSummary.totalSpent.toDouble();
@@ -56,8 +55,9 @@ class TransactionTimelineController
       // 1. Lấy tổng tiền đã chi trong tháng từ provider ngân sách
       final budgetSummary = await ref
           .read(homeBudgetProvider.future)
+          // ignore: invalid_return_type_for_catch_error
           .catchError((_) => null);
-      final thisMonthTotal = budgetSummary?.totalSpent.toDouble() ?? 0.0;
+      final thisMonthTotal = budgetSummary.totalSpent.toDouble();
 
       // 2. Lọc ra các giao dịch của tháng này từ danh sách timeline
       final now = DateTime.now();

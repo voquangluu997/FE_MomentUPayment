@@ -49,11 +49,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await prefs.setBool('has_seen_onboarding', true);
 
     if (mounted) {
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 1000),
-          pageBuilder: (_, __, ___) => const LoginScreen(),
-          transitionsBuilder: (_, animation, __, child) {
+          pageBuilder: (_, _, _) => const LoginScreen(),
+          transitionsBuilder: (_, animation, _, child) {
             var scaleTween = Tween<double>(begin: 0.95, end: 1.0).animate(
               CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
             );
@@ -70,7 +71,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Color _getAmbientTint() {
     if (_currentPage < 0) return Colors.transparent;
     if (_currentPage >= _pageColors.length - 1) {
-      return _pageColors.last.withOpacity(0.08);
+      return _pageColors.last.withValues(alpha: 0.08);
     }
 
     int lowerIndex = _currentPage.floor();
@@ -80,7 +81,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     Color startColor = _pageColors[lowerIndex];
     Color endColor = _pageColors[upperIndex];
 
-    return Color.lerp(startColor, endColor, t)?.withOpacity(0.08) ??
+    return Color.lerp(startColor, endColor, t)?.withValues(alpha: 0.08) ??
         Colors.transparent;
   }
 
@@ -89,7 +90,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    final List<Map<String, dynamic>> _pagesData = [
+    final List<Map<String, dynamic>> pagesData = [
       {
         'icon': CupertinoIcons.camera_fill,
         'title': l10n.obTitle1,
@@ -129,11 +130,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       child: PageView.builder(
                         controller: _controller,
                         physics: const BouncingScrollPhysics(),
-                        itemCount: _pagesData.length,
+                        itemCount: pagesData.length,
                         onPageChanged: (index) {
                           HapticFeedback.lightImpact();
                           setState(
-                            () => _isLastPage = index == _pagesData.length - 1,
+                            () => _isLastPage = index == pagesData.length - 1,
                           );
                         },
                         itemBuilder: (context, index) {
@@ -153,7 +154,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               scale: scale,
                               child: _buildMomentPage(
                                 appColors: appColors,
-                                data: _pagesData[index],
+                                data: pagesData[index],
                                 parallaxOffset: diff,
                               ),
                             ),
@@ -180,7 +181,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           _completeOnboarding(context);
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: appColors.text.withOpacity(0.5),
+                          foregroundColor: appColors.text.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                         child: Text(
                           l10n.obSkip,
@@ -226,13 +229,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 boxShadow: [
                   // Đổ bóng mịn màng và có màu sắc nhẹ ăn rơ với tone màu của trang hiện tại
                   BoxShadow(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     blurRadius: 40,
                     spreadRadius: -5,
                     offset: const Offset(0, 20),
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -250,11 +253,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       // Hạ opacity xuống khoảng 0.55 để lớp màu nền ambient lọt qua mờ ảo cực đẹp
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                       borderRadius: BorderRadius.circular(24),
                       // Viền bán trong suốt giả lập ánh sáng phản chiếu cạnh kính
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.65),
+                        color: Colors.white.withValues(alpha: 0.65),
                         width: 2,
                       ),
                     ),
@@ -272,8 +275,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        color.withOpacity(0.25),
-                                        color.withOpacity(0.75),
+                                        color.withValues(alpha: 0.25),
+                                        color.withValues(alpha: 0.75),
                                       ],
                                     ),
                                   ),
@@ -286,7 +289,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     height: 150,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.white.withOpacity(0.18),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.18,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -309,7 +314,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           height: 5,
                           width: 48,
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.35),
+                            color: color.withValues(alpha: 0.35),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -340,7 +345,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: appColors.text.withOpacity(0.6),
+              color: appColors.text.withValues(alpha: 0.6),
               height: 1.5,
             ),
           ),
@@ -361,7 +366,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             count: 3,
             effect: ExpandingDotsEffect(
               spacing: 8,
-              dotColor: appColors.primary.withOpacity(0.15),
+              dotColor: appColors.primary.withValues(alpha: 0.15),
               activeDotColor: appColors.primary,
               dotHeight: 8,
               dotWidth: 8,
@@ -378,7 +383,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 backgroundColor: appColors.primary,
                 padding: EdgeInsets.zero,
                 elevation: _isLastPage ? 8 : 2,
-                shadowColor: appColors.primary.withOpacity(0.4),
+                shadowColor: appColors.primary.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
                 ),

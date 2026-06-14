@@ -53,7 +53,6 @@ class DateTimeHelper {
   // NHÓM HÀM CŨ ĐÃ ĐƯỢC BẠN TỐI ƯU
   // =========================================================
 
-  /// 📦 Nhóm danh sách phẳng thành Map<String, List> dựa trên ngày (yyyy-MM-dd) local
   static Map<String, List<Map<String, dynamic>>> groupTransactionsByDate(
     List<Map<String, dynamic>> transactions,
   ) {

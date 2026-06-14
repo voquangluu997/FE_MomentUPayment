@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/features/camera/models/editor_models.dart';
 import 'package:moment_u_payment/features/camera/widgets/editor_painters.dart';
 import 'package:moment_u_payment/features/camera/widgets/sticker_widget.dart';
@@ -227,8 +227,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
   void _onPanUpdate(DragUpdateDetails details) {
     if (_currentTab != 4 ||
         _currentDrawingMode == PaintingMode.none ||
-        _drawStartPoint == null)
+        _drawStartPoint == null) {
       return;
+    }
     final RenderBox renderBox =
         _paintKey.currentContext!.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.globalPosition);
@@ -288,10 +289,12 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
             } else {
               final rect = Rect.fromPoints(A, B);
               StickerType type = StickerType.rect;
-              if (_currentDrawingMode == PaintingMode.circle)
+              if (_currentDrawingMode == PaintingMode.circle) {
                 type = StickerType.circle;
-              if (_currentDrawingMode == PaintingMode.blur)
+              }
+              if (_currentDrawingMode == PaintingMode.blur) {
                 type = StickerType.blur;
+              }
 
               _stickers.add(
                 StickerModel(
@@ -348,8 +351,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        if (_selectedStickerId != null && !_isEditingText)
+        if (_selectedStickerId != null && !_isEditingText) {
           setState(() => _selectedStickerId = null);
+        }
       },
       child: Scaffold(
         backgroundColor: studioBg,
@@ -443,7 +447,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white12),
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
@@ -574,7 +578,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Icon(icon, color: color.withOpacity(0.8), size: 24),
+        child: Icon(icon, color: color.withValues(alpha: 0.8), size: 24),
       ),
     );
   }
@@ -593,7 +597,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white12),
       ),
@@ -656,7 +660,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                         boxShadow: isSel
                             ? [
                                 BoxShadow(
-                                  color: color.withOpacity(0.5),
+                                  color: color.withValues(alpha: 0.5),
                                   blurRadius: 5,
                                 ),
                               ]
@@ -677,7 +681,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
 
   Widget _buildPremiumHeader(AppLocalizations l10n, Color accent) {
     return Container(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -752,8 +756,8 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: _isOverDeleteArea
-              ? Colors.redAccent.withOpacity(0.95)
-              : Colors.black.withOpacity(0.85),
+              ? Colors.redAccent.withValues(alpha: 0.95)
+              : Colors.black.withValues(alpha: 0.85),
           border: Border(
             bottom: BorderSide(
               color: _isOverDeleteArea ? Colors.white : Colors.white12,
@@ -887,14 +891,16 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                                         _initialStickerOffset +
                                         (details.focalPoint -
                                             _initialFocalPoint);
-                                    if (details.scale != 1.0)
+                                    if (details.scale != 1.0) {
                                       stk.scale =
                                           (_initialStickerScale * details.scale)
                                               .clamp(0.3, 5.0);
-                                    if (details.rotation != 0.0)
+                                    }
+                                    if (details.rotation != 0.0) {
                                       stk.rotation =
                                           _initialStickerRotation +
                                           details.rotation;
+                                    }
                                   });
                                   final topPadding = MediaQuery.of(
                                     context,
@@ -1474,7 +1480,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.04),
+              color: Colors.white.withValues(alpha: 0.04),
             ),
             child: Icon(icon, color: Colors.white, size: 18),
           ),
@@ -1525,7 +1531,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
               data: SliderThemeData(
                 trackHeight: 1.5,
                 activeTrackColor: accent,
-                inactiveTrackColor: Colors.white.withOpacity(0.03),
+                inactiveTrackColor: Colors.white.withValues(alpha: 0.03),
                 thumbColor: Colors.white,
                 thumbShape: const RoundSliderThumbShape(
                   enabledThumbRadius: 6.0,
@@ -1571,8 +1577,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       _isEditingText = false;
       String text = _textStickerController.text.trim();
       if (text.isEmpty) {
-        if (_editingStickerId != null)
+        if (_editingStickerId != null) {
           _stickers.removeWhere((s) => s.id == _editingStickerId);
+        }
       } else {
         if (_editingStickerId != null) {
           final idx = _stickers.indexWhere((s) => s.id == _editingStickerId);
@@ -1680,7 +1687,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
                           height: 1.2,
                           background: _currentTextHasBg
                               ? (Paint()
-                                  ..color = _currentTextBgColor.withOpacity(0.6)
+                                  ..color = _currentTextBgColor.withValues(
+                                    alpha: 0.6,
+                                  )
                                   ..strokeWidth = 20
                                   ..strokeJoin = StrokeJoin.round
                                   ..strokeCap = StrokeCap.round
@@ -1776,10 +1785,12 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
               setState(() {
                 double newLeft = _cropLeft + details.delta.dx;
                 double newTop = _cropTop + details.delta.dy;
-                if (newLeft >= 0 && newLeft + _cropWidth <= maxWidth)
+                if (newLeft >= 0 && newLeft + _cropWidth <= maxWidth) {
                   _cropLeft = newLeft;
-                if (newTop >= 0 && newTop + _cropHeight <= maxHeight)
+                }
+                if (newTop >= 0 && newTop + _cropHeight <= maxHeight) {
                   _cropTop = newTop;
+                }
               });
             },
             child: Container(
@@ -1829,8 +1840,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
             double newT = _cropTop + d.dy;
             double newW = _cropWidth + d.dx;
             double newH = _cropHeight - d.dy;
-            if (newW >= _minCropSize && _cropLeft + newW <= maxWidth)
+            if (newW >= _minCropSize && _cropLeft + newW <= maxWidth) {
               _cropWidth = newW;
+            }
             if (newH >= _minCropSize && newT >= 0) {
               _cropTop = newT;
               _cropHeight = newH;
@@ -1849,8 +1861,9 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
               _cropLeft = newL;
               _cropWidth = newW;
             }
-            if (newH >= _minCropSize && _cropTop + newH <= maxHeight)
+            if (newH >= _minCropSize && _cropTop + newH <= maxHeight) {
               _cropHeight = newH;
+            }
           },
         ),
         _buildCropCorner(
@@ -1860,10 +1873,12 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
           (d) {
             double newW = _cropWidth + d.dx;
             double newH = _cropHeight + d.dy;
-            if (newW >= _minCropSize && _cropLeft + newW <= maxWidth)
+            if (newW >= _minCropSize && _cropLeft + newW <= maxWidth) {
               _cropWidth = newW;
-            if (newH >= _minCropSize && _cropTop + newH <= maxHeight)
+            }
+            if (newH >= _minCropSize && _cropTop + newH <= maxHeight) {
               _cropHeight = newH;
+            }
           },
         ),
       ],
@@ -1953,7 +1968,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       _saveStateToHistory();
     } catch (e) {
       setState(() => _isCapturingRaw = false);
-      debugPrint("Crop error: $e");
+      AppLogger.e('e', "Crop error: $e");
     }
   }
 
@@ -1982,7 +1997,7 @@ class _EditPhotoScreenState extends State<EditPhotoScreen> {
       if (mounted) Navigator.pop(context, file.path);
     } catch (e) {
       setState(() => _isCapturingRaw = false);
-      debugPrint("Save error: $e");
+      AppLogger.e('e', "Save error: $e");
     }
   }
 

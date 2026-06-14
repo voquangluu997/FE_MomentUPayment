@@ -126,13 +126,15 @@ class GamificationUtils {
 
       // Check Night & Weekend
       if (time.hour >= 0 && time.hour < 4) hasNightTx = true;
-      if (time.weekday == DateTime.saturday || time.weekday == DateTime.sunday)
+      if (time.weekday == DateTime.saturday || time.weekday == DateTime.sunday) {
         hasWeekendTx = true;
+      }
 
       // Đếm số liệu
       if (category.toLowerCase().contains('food') ||
-          category.toLowerCase().contains('ăn uống'))
+          category.toLowerCase().contains('ăn uống')) {
         foodCount++;
+      }
       if (amount < (isVND ? 10000 : 0.5)) smallTxCount++;
       if (isBackdated) backdateCount++;
     }

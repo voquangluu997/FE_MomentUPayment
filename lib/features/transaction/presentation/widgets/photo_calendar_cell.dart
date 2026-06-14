@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moment_u_payment/core/constants/app_colors.dart';
@@ -73,7 +72,7 @@ class _PhotoCalendarCellState extends ConsumerState<PhotoCalendarCell>
             color: hasData
                 ? (hasImage
                       ? Colors.transparent
-                      : appColors.primary.withOpacity(0.12))
+                      : appColors.primary.withValues(alpha: 0.12))
                 : appColors.background,
             borderRadius: BorderRadius.circular(14),
             border: isToday
@@ -81,13 +80,13 @@ class _PhotoCalendarCellState extends ConsumerState<PhotoCalendarCell>
                 : (hasData
                       ? null
                       : Border.all(
-                          color: appColors.primaryDark.withOpacity(0.05),
+                          color: appColors.primaryDark.withValues(alpha: 0.05),
                           width: 1,
                         )),
             boxShadow: hasData
                 ? [
                     BoxShadow(
-                      color: appColors.primary.withOpacity(0.1),
+                      color: appColors.primary.withValues(alpha: 0.1),
                       blurRadius: 6,
                       offset: const Offset(0, 3),
                     ),
@@ -116,9 +115,9 @@ class _PhotoCalendarCellState extends ConsumerState<PhotoCalendarCell>
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.35),
+                          Colors.black.withValues(alpha: 0.35),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.1),
+                          Colors.black.withValues(alpha: 0.1),
                         ],
                       ),
                     ),
@@ -151,7 +150,7 @@ class _PhotoCalendarCellState extends ConsumerState<PhotoCalendarCell>
                         ? Colors.white
                         : (isToday
                               ? appColors.primary
-                              : appColors.primaryDark.withOpacity(0.5)),
+                              : appColors.primaryDark.withValues(alpha: 0.5)),
                   ),
                 ),
               ),

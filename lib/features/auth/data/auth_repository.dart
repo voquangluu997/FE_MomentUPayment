@@ -35,7 +35,7 @@ class AuthRepository {
     try {
       return await _dio.post(
         '/auth/update-profile',
-        data: {'name': name, if (avatarUrl != null) 'avatar': avatarUrl},
+        data: {'name': name, 'avatar': ?avatarUrl},
       );
     } catch (e) {
       rethrow;

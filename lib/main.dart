@@ -9,6 +9,7 @@ import 'package:moment_u_payment/core/providers/currency_provider.dart';
 import 'package:moment_u_payment/core/screens/main_layout_screen.dart';
 import 'package:moment_u_payment/core/services/notification_service.dart';
 import 'package:moment_u_payment/core/theme/app_theme.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/features/auth/auth_checker.dart';
 import 'package:moment_u_payment/features/budget/presentation/screens/set_budget_screen.dart';
 import 'package:moment_u_payment/features/splash/presentation/screens/splash_screen.dart';
@@ -38,7 +39,7 @@ void main() async {
   try {
     await dotenv.load(fileName: '.env');
   } catch (e) {
-    debugPrint('⚠️ Không tìm thấy hoặc lỗi load file .env: $e');
+    AppLogger.i('i', '⚠️ Không tìm thấy hoặc lỗi load file .env: $e');
   }
 
   // 4. Khởi tạo Firebase an toàn
@@ -47,14 +48,14 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint('⚠️ Firebase initialization error: $e');
+    AppLogger.e('e', '⚠️ Firebase initialization error: $e');
   }
 
   // 5. Khởi tạo dịch vụ thông báo
   try {
     await NotificationService.initNotifications();
   } catch (e) {
-    debugPrint('⚠️ Notification init error: $e');
+    AppLogger.e('e', '⚠️ Notification init error: $e');
   }
 
   // 6. Khởi tạo SharedPreferences cho Riverpod

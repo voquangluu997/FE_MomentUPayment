@@ -120,7 +120,7 @@ class MomentListItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: appColors.primaryDark.withOpacity(0.04),
+            color: appColors.primaryDark.withValues(alpha: 0.04),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -135,8 +135,8 @@ class MomentListItem extends ConsumerWidget {
             HapticFeedback.lightImpact();
             onTap();
           },
-          highlightColor: appColors.primary.withOpacity(0.05),
-          splashColor: appColors.primary.withOpacity(0.1),
+          highlightColor: appColors.primary.withValues(alpha: 0.05),
+          splashColor: appColors.primary.withValues(alpha: 0.1),
           child: Padding(
             padding: const EdgeInsets.all(14.0),
             child: Row(
@@ -156,7 +156,7 @@ class MomentListItem extends ConsumerWidget {
                           width: 66,
                           height: 66,
                           decoration: BoxDecoration(
-                            color: appColors.primary.withOpacity(0.15),
+                            color: appColors.primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
@@ -174,7 +174,9 @@ class MomentListItem extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: appColors.primaryDark.withOpacity(0.12),
+                                color: appColors.primaryDark.withValues(
+                                  alpha: 0.12,
+                                ),
                                 blurRadius: 12,
                                 offset: const Offset(2, 4),
                               ),
@@ -185,7 +187,7 @@ class MomentListItem extends ConsumerWidget {
                             decoration: BoxDecoration(
                               color: hasImage
                                   ? appColors.background
-                                  : appColors.primary.withOpacity(0.12),
+                                  : appColors.primary.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: hasImage
@@ -234,8 +236,8 @@ class MomentListItem extends ConsumerWidget {
                                     shape: BoxShape.circle,
                                     gradient: RadialGradient(
                                       colors: [
-                                        Colors.white.withOpacity(
-                                          0.8,
+                                        Colors.white.withValues(
+                                          alpha: 0.8,
                                         ), // Điểm bắt sáng
                                         appColors.primary,
                                         appColors.primaryDark,
@@ -245,7 +247,9 @@ class MomentListItem extends ConsumerWidget {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         blurRadius: 3,
                                         offset: const Offset(
                                           1,
@@ -279,7 +283,9 @@ class MomentListItem extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: appColors.textMuted.withOpacity(0.5),
+                                color: appColors.textMuted.withValues(
+                                  alpha: 0.5,
+                                ),
                                 height: 1.35,
                                 letterSpacing: -0.2,
                               ),
@@ -326,7 +332,7 @@ class MomentListItem extends ConsumerWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: appColors.primary.withOpacity(0.1),
+                                color: appColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
@@ -335,7 +341,9 @@ class MomentListItem extends ConsumerWidget {
                                   Icon(
                                     CupertinoIcons.tag_fill,
                                     size: 10,
-                                    color: appColors.primary.withOpacity(0.8),
+                                    color: appColors.primary.withValues(
+                                      alpha: 0.8,
+                                    ),
                                   ),
                                   const SizedBox(width: 4),
                                   Flexible(
@@ -362,7 +370,9 @@ class MomentListItem extends ConsumerWidget {
                               child: Text(
                                 '•',
                                 style: TextStyle(
-                                  color: appColors.textMuted.withOpacity(0.3),
+                                  color: appColors.textMuted.withValues(
+                                    alpha: 0.3,
+                                  ),
                                   fontSize: 14,
                                 ),
                               ),
@@ -372,7 +382,9 @@ class MomentListItem extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: appColors.textMuted.withOpacity(0.6),
+                                color: appColors.textMuted.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
                             ),
                           ],

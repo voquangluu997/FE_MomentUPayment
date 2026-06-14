@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:moment_u_payment/core/features/badges/badge_model.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/core/utils/gamification_utils.dart';
 
 // ============================================================================
@@ -86,7 +87,8 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
             final type = BadgeType.values.firstWhere((e) => e.name == name);
             fetchedBadges.add(type);
           } catch (e) {
-            print(
+            AppLogger.e(
+              'e',
               "⚠️ [Badge] Bỏ qua huy hiệu không xác định từ Backend: $name",
             );
           }
@@ -96,11 +98,11 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
         state = state.copyWith(unlockedBadges: uniqueBadges, isLoading: false);
       } else {
         state = state.copyWith(isLoading: false);
-        print("💥 [Badge] API trả về lỗi: ${response.statusCode}");
+        AppLogger.e('e', "💥 [Badge] API trả về lỗi: ${response.statusCode}");
       }
     } catch (e) {
       state = state.copyWith(isLoading: false);
-      print("💥 Lỗi đồng bộ danh sách huy hiệu từ Backend: $e");
+      AppLogger.e('e', "💥 Lỗi đồng bộ danh sách huy hiệu từ Backend: $e");
     }
   }
 
@@ -158,14 +160,18 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("🚀 [Badge] Đã đồng bộ Backend thành công: $badgeNames");
+        AppLogger.i(
+          'i',
+          "🚀 [Badge] Đã đồng bộ Backend thành công: $badgeNames",
+        );
       } else {
-        print(
+        AppLogger.e(
+          'e',
           "💥 [Badge] Lỗi lưu Backend (Code: ${response.statusCode}): ${response.body}",
         );
       }
     } catch (e) {
-      print("💥 [Badge] Lỗi kết nối khi lưu Backend: $e");
+      AppLogger.e('i', "💥 [Badge] Lỗi kết nối khi lưu Backend: $e");
     }
   }
 

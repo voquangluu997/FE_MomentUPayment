@@ -231,7 +231,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: ui.FontWeight.w600,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -274,7 +274,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         height: 1.5,
                         fontWeight: FontWeight.w500,
                       ),
@@ -305,7 +305,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
             ),
             boxShadow: [
               BoxShadow(
-                color: badge.color.withOpacity(0.5),
+                color: badge.color.withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: 1,
               ),
@@ -332,7 +332,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
           backgroundColor: widget.appColors.primary,
           foregroundColor: Colors.white,
           elevation: 8,
-          shadowColor: widget.appColors.primary.withOpacity(0.5),
+          shadowColor: widget.appColors.primary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -360,7 +360,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
             height: 350,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: widget.appColors.primary.withOpacity(0.4),
+              color: widget.appColors.primary.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -372,13 +372,13 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
             height: 400,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFF3366).withOpacity(0.35),
+              color: const Color(0xFFFF3366).withValues(alpha: 0.35),
             ),
           ),
         ),
         BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-          child: Container(color: Colors.black.withOpacity(0.2)),
+          child: Container(color: Colors.black.withValues(alpha: 0.2)),
         ),
       ],
     );
@@ -398,7 +398,7 @@ class _StoryRecapScreenState extends State<StoryRecapScreen>
                     : (index == _currentIndex
                           ? _progressController.value
                           : 0.0),
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 minHeight: 3,
               ),

@@ -62,7 +62,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
     final splurgesAsync = ref.watch(allSplurgesProvider);
     final notifier = ref.watch(allSplurgesProvider.notifier);
     final appColors = ref.watch(appColorsProvider);
-    final l10n = AppLocalizations.of(context);
+    AppLocalizations.of(context);
 
     ref.listen<AsyncValue>(allSplurgesProvider, (previous, next) {
       if (next.hasError && !next.isLoading) {
@@ -83,7 +83,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
               Icon(
                 CupertinoIcons.exclamationmark_triangle_fill,
                 size: 48,
-                color: widget.appColors.errorAccent.withOpacity(0.8),
+                color: widget.appColors.errorAccent.withValues(alpha: 0.8),
               ),
               const SizedBox(height: 16),
               Text(
@@ -104,7 +104,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
 
           final List<dynamic> filteredSplurges = splurges.where((item) {
             // Đảm bảo đưa item.date (thường là UTC) về múi giờ thiết bị trước khi so sánh
-            final DateTime localDate = (item.date as DateTime).toLocal();
+            final DateTime localDate = (item.date).toLocal();
 
             if (_currentFilter == SplurgeFilter.month) {
               return localDate.year == now.year && localDate.month == now.month;
@@ -161,7 +161,9 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
                         ),
                       ),
                       background: Container(
-                        color: widget.appColors.background.withOpacity(0.6),
+                        color: widget.appColors.background.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ),
@@ -256,7 +258,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
       child: SizedBox(
         width: double.infinity,
         child: CupertinoSlidingSegmentedControl<SplurgeFilter>(
-          backgroundColor: widget.appColors.primary.withOpacity(0.08),
+          backgroundColor: widget.appColors.primary.withValues(alpha: 0.08),
           thumbColor: widget.appColors.cardBackground,
           groupValue: _currentFilter,
           children: {
@@ -324,12 +326,14 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            widget.appColors.primary.withOpacity(0.08),
-            widget.appColors.primaryDark.withOpacity(0.03),
+            widget.appColors.primary.withValues(alpha: 0.08),
+            widget.appColors.primaryDark.withValues(alpha: 0.03),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: widget.appColors.primary.withOpacity(0.12)),
+        border: Border.all(
+          color: widget.appColors.primary.withValues(alpha: 0.12),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -343,7 +347,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
           Container(
             width: 1,
             height: 32,
-            color: widget.appColors.textMuted.withOpacity(0.15),
+            color: widget.appColors.textMuted.withValues(alpha: 0.15),
           ),
           _buildStatItem(
             l10n.dashboardHighestSpent,
@@ -354,7 +358,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
           Container(
             width: 1,
             height: 32,
-            color: widget.appColors.textMuted.withOpacity(0.15),
+            color: widget.appColors.textMuted.withValues(alpha: 0.15),
           ),
           _buildStatItem(
             l10n.dashboardQuantity,
@@ -431,12 +435,12 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
         color: widget.appColors.cardBackground,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: widget.appColors.textMuted.withOpacity(0.06),
+          color: widget.appColors.textMuted.withValues(alpha: 0.06),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: widget.appColors.primaryDark.withOpacity(0.04),
+            color: widget.appColors.primaryDark.withValues(alpha: 0.04),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -473,7 +477,7 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
                             horizontal: 10,
                             vertical: 6,
                           ),
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withValues(alpha: 0.25),
                           child: Text(
                             emoji,
                             style: const TextStyle(fontSize: 16),
@@ -503,7 +507,9 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: widget.appColors.primary.withOpacity(0.08),
+                          color: widget.appColors.primary.withValues(
+                            alpha: 0.08,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text.rich(
@@ -529,8 +535,8 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
                                   child: Icon(
                                     CupertinoIcons.clock_fill,
                                     size: 11,
-                                    color: widget.appColors.primary.withOpacity(
-                                      0.7,
+                                    color: widget.appColors.primary.withValues(
+                                      alpha: 0.7,
                                     ),
                                   ),
                                 ),
@@ -557,8 +563,8 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
                               widget.l10n.emptyTransactionNote,
                               style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: widget.appColors.textMuted.withOpacity(
-                                  0.5,
+                                color: widget.appColors.textMuted.withValues(
+                                  alpha: 0.5,
                                 ),
                                 height: 1.25,
                               ),
@@ -622,8 +628,8 @@ class _AllSplurgesScreenState extends ConsumerState<AllSplurgesScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            widget.appColors.primary.withOpacity(0.2),
-            widget.appColors.primary.withOpacity(0.5),
+            widget.appColors.primary.withValues(alpha: 0.2),
+            widget.appColors.primary.withValues(alpha: 0.5),
           ],
         ),
       ),

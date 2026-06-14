@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:moment_u_payment/core/network/api_client.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -87,13 +88,14 @@ class NotificationService {
     await _localNotifications.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        print(
+        AppLogger.d(
+          'd',
           "DEBUG: Đã nhận phản hồi từ Notification! ActionID: ${response.actionId}",
         );
         if (response.actionId == 'promise_action') {
-          print(_getLocaleString('log_promise'));
+          AppLogger.i('i', _getLocaleString('log_promise'));
         } else if (response.actionId == 'ignore_action') {
-          print(_getLocaleString('log_ignore'));
+          AppLogger.i('i', _getLocaleString('log_ignore'));
         }
       },
     );
@@ -137,7 +139,7 @@ class NotificationService {
   }
 
   static Future<void> _sendTokenToBackend(String token) async {
-    print("🎯 FCM Token chuẩn bị gửi lên NestJS: $token");
+    AppLogger.i('i', "🎯 FCM Token chuẩn bị gửi lên NestJS: $token");
     try {
       final response = await dioClient.patch(
         '/users/fcm-token',
@@ -147,10 +149,13 @@ class NotificationService {
         },
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("✅ Moments u Payment: Đồng bộ FCM Token và Ngôn ngữ thành công!");
+        AppLogger.i(
+          'i',
+          "✅ Moments u Payment: Đồng bộ FCM Token và Ngôn ngữ thành công!",
+        );
       }
     } catch (e) {
-      print("❌ Lỗi gửi token lên backend: $e");
+      AppLogger.e('e', "❌ Lỗi gửi token lên backend: $e");
     }
   }
 }

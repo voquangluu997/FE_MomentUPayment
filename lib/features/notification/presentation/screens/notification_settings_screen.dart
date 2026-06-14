@@ -99,7 +99,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: appColors.primaryDark.withOpacity(0.02),
+            color: appColors.primaryDark.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -120,7 +120,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
           secondary: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 22),
@@ -138,17 +138,17 @@ class NotificationSettingsScreen extends ConsumerWidget {
             child: Text(
               subtitle,
               style: TextStyle(
-                color: appColors.primaryDark.withOpacity(0.55),
+                color: appColors.primaryDark.withValues(alpha: 0.55),
                 fontSize: 12,
                 height: 1.4,
               ),
             ),
           ),
           value: value,
-          activeColor: Colors.white,
+          activeThumbColor: Colors.white,
           activeTrackColor: appColors.primary,
           inactiveThumbColor: Colors.white,
-          inactiveTrackColor: appColors.primaryDark.withOpacity(0.15),
+          inactiveTrackColor: appColors.primaryDark.withValues(alpha: 0.15),
           onChanged: onChanged,
         ),
       ),

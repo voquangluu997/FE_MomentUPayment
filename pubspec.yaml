@@ -63,6 +63,7 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   confetti: ^0.8.0
   screenshot: ^3.0.0
+  sign_in_with_apple: ^8.1.0
 
 dev_dependencies:
   flutter_test:

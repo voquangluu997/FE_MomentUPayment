@@ -1,12 +1,13 @@
 import 'dart:convert';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moment_u_payment/core/utils/app_logger.dart';
 import 'package:moment_u_payment/features/auth/data/auth_repository.dart';
-import 'package:moment_u_payment/features/transaction/presentation/controllers/transaction_timeline_controller.dart';
-import 'package:moment_u_payment/features/transaction/presentation/transaction_provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum AuthState {
   initial,
@@ -19,6 +20,7 @@ enum AuthState {
   emailAlreadyExists,
   registerError,
   googleLoginError,
+  appleLoginError,
 }
 
 class UserInfoState {
@@ -77,11 +79,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState.authenticated;
   }
 
-  /// ✨ ĐÃ SỬA: Tối ưu hóa tốc độ load app, vào thẳng Main Layout chạy ngầm API
   Future<void> checkAuthStatus() async {
     state = AuthState.loading;
     try {
-      // 1. Đọc nhanh token từ bộ nhớ thiết bị (mất ~5-10ms)
       String? token = await _secureStorage.read(key: 'access_token');
 
       if (token == null) {
@@ -89,10 +89,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      // 2. LẬP TỨC cho phép người dùng vào màn hình chính (Không bắt UI chờ mạng)
       state = AuthState.authenticated;
 
-      // 3. Gọi API lấy thông tin Profile dưới nền (Background)
       final response = await http
           .get(
             Uri.parse('$_baseUrl/auth/me'),
@@ -101,9 +99,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(
-            const Duration(seconds: 8),
-          ); // Giới hạn thời gian chờ tránh treo ngầm
+          .timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -120,14 +116,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
               );
         }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        // Nếu Server báo Token sai/hết hạn thực sự, lúc này mới đẩy ra Login
         await _secureStorage.delete(key: 'access_token');
         ref.read(userInfoProvider.notifier).clearUserInfo();
         state = AuthState.unauthenticated;
       }
-      // Các trường hợp lỗi mạng khác (Mất mạng, lỗi 500) giữ nguyên trạng thái authenticated để dùng offline
     } catch (_) {
-      // Nếu có lỗi kết nối lúc khởi động nhưng máy vẫn giữ token cũ -> Cho giữ trạng thái đăng nhập để trải nghiệm không gián đoạn
       String? token = await _secureStorage.read(key: 'access_token');
       if (token == null) {
         state = AuthState.unauthenticated;
@@ -140,18 +133,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     state = AuthState.loading;
     try {
-      print(
-        "====== [DEBUG LOGIN] Đang gọi API tới: $_baseUrl/auth/login ======",
-      );
-
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
-      );
-
-      print(
-        "====== [DEBUG LOGIN] Mã phản hồi từ Server: ${response.statusCode} ======",
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -175,14 +160,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }
         state = AuthState.loginSuccess;
       } else {
-        print(
-          "====== [DEBUG LOGIN] Đăng nhập thất bại: ${response.body} ======",
-        );
         state = AuthState.loginError;
       }
-    } catch (e, stack) {
-      print("====== [DEBUG LOGIN] LỖI KẾT NỐI MẠNG: $e ======");
-      print(stack);
+    } catch (e) {
       state = AuthState.loginError;
     }
   }
@@ -240,6 +220,66 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
     } catch (e) {
       state = AuthState.googleLoginError;
+    }
+  }
+
+  Future<void> loginWithApple() async {
+    state = AuthState.loading;
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      if (credential.identityToken == null) {
+        state = AuthState.appleLoginError;
+        return;
+      }
+
+      final Map<String, dynamic> body = {
+        'identityToken': credential.identityToken,
+      };
+      if (credential.givenName != null || credential.familyName != null) {
+        body['name'] = {
+          'firstName': credential.givenName ?? '',
+          'lastName': credential.familyName ?? '',
+        };
+      }
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/apple-login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        await _secureStorage.write(
+          key: 'access_token',
+          value: data['backend_jwt_token'],
+        );
+
+        final user = data['user'];
+
+        if (user != null) {
+          ref
+              .read(userInfoProvider.notifier)
+              .updateUserInfo(
+                user['name']?.toString() ?? '',
+                user['email']?.toString() ?? '',
+                user['isEmailVerified'] as bool? ?? true,
+                user['avatar'] as String?,
+              );
+        }
+        state = AuthState.loginSuccess;
+      } else {
+        state = AuthState.appleLoginError;
+      }
+    } catch (e) {
+      AppLogger.d('d', "====== [DEBUG APPLE LOGIN] ERROR: $e ======");
+      state = AuthState.appleLoginError;
     }
   }
 
@@ -319,6 +359,50 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState.unauthenticated;
   }
 
+  /// 🚀 HÀM MỚI ĐƯỢC THÊM VÀO: Xóa vĩnh viễn tài khoản người dùng khỏi hệ thống
+  Future<void> deleteAccount() async {
+    state = AuthState.loading;
+    try {
+      String? token = await _secureStorage.read(key: 'access_token');
+      if (token == null) {
+        state = AuthState.unauthenticated;
+        throw Exception("Không tìm thấy mã xác thực (Token not found)");
+      }
+
+      // Gọi API DELETE tới backend NestJS
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/auth/delete-account'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // 1. Xóa JWT Token lưu cục bộ
+        await _secureStorage.delete(key: 'access_token');
+
+        // 2. Hủy phiên đăng nhập Google nếu có
+        try {
+          final GoogleSignIn googleSignIn = GoogleSignIn();
+          await googleSignIn.signOut();
+        } catch (_) {}
+
+        // 3. Xóa thông tin User Info State và chuyển trạng thái về chưa đăng nhập
+        ref.read(userInfoProvider.notifier).clearUserInfo();
+        state = AuthState.unauthenticated;
+      } else {
+        // Hoàn tác lại trạng thái đã xác thực nếu API báo lỗi
+        state = AuthState.authenticated;
+        throw Exception("Xóa tài khoản không thành công từ phía máy chủ");
+      }
+    } catch (e) {
+      // Hoàn tác trạng thái nếu xảy ra lỗi kết nối hoặc lỗi bất định
+      state = AuthState.authenticated;
+      rethrow; // Ném tiếp lỗi ra ngoài để khối try-catch trong SettingsBottomSheet nhận diện
+    }
+  }
+
   Future<String?> forgotPassword(String email) async {
     state = AuthState.loading;
     try {
@@ -330,9 +414,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState.initial;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return null; // Thành công
+        return null;
       } else {
-        // Lấy thông báo lỗi từ NestJS gửi về (ví dụ: "Email này chưa được đăng ký...")
         final data = jsonDecode(response.body);
         return data['message'] ?? "Lỗi gửi yêu cầu";
       }
@@ -342,7 +425,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  // 💡 SỬA ĐỔI: Trả về String? (null nếu thành công, chuỗi thông báo nếu có lỗi)
   Future<String?> resetPasswordWithOtp(
     String email,
     String otp,
@@ -356,14 +438,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         body: jsonEncode({
           'email': email,
           'otp': otp,
-          'newPassword':
-              newPassword, // 💡 Đảm bảo biến này trùng khớp với DTO bên NestJS
+          'newPassword': newPassword,
         }),
       );
       state = AuthState.initial;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return null; // Thành công
+        return null;
       } else {
         final data = jsonDecode(response.body);
         return data['message'] ?? "Mã OTP không hợp lệ";
