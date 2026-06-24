@@ -22,8 +22,8 @@
   "loginCreateAccountSub": "Tham gia vào thế giới quản lý chi tiêu đáng yêu",
   "loginErrorNotification": "Tài khoản hoặc mật khẩu không chính xác bạn ơi! 😢",
   "googleLoginErrorNotification": "Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸",
-  "loginButtonText": "Đi vào thuiii ✨",
-  "loginGGButtonText": "Vào bằng google nè 🚀",
+  "loginButtonText": "Đăng nhập",
+  "loginGGButtonText": "Đăng nhập bằng google",
   "emailNotVerifiedAlert": "Nhớ xác thực email {email} bạn nhé! 🔑",
   "@emailNotVerifiedAlert": {
     "placeholders": {
@@ -462,15 +462,14 @@
   "markAllAsRead": "Đánh dấu tất cả đã đọc",
   "allReadSuccess": "Đã đánh dấu tất cả thông báo!",
 
-  "obTitle1": "Lưu giữ khoảnh khắc thanh toán.",
-  "obDesc1": "Ghi nhận mọi khoản chi bằng hình ảnh. Tinh giản, nhanh chóng, không lưu luyến văn bản!",
-  "obTitle2": "Nhìn thấu ví tiền.",
-  "obDesc2": "Báo cáo đẹp mắt, dễ hiểu. Biết ngay tiền 'bốc hơi' vì đâu.",
-  "obTitle3": "Két sắt an toàn",
-  "obDesc3": "Bảo mật tuyệt đối, chỉ mình bạn biết bí mật chi tiêu.",
+  "obTitle1": "Lưu giữ khoảnh khắc chi tiêu",
+  "obDesc1": "Lưu giữ từng khoảnh khắc chi tiêu của bạn thành một mảnh ghép ký ức. Mỗi lần nhìn lại, bạn sẽ thấy cả một bức tranh chi tiêu sống động của chính mình theo một cách rất riêng.",
+  "obTitle2": "Thống kê chi tiêu, cân bằng cuộc sống",
+  "obDesc2": "Những báo cáo thông minh theo ngày, tháng, năm sẽ giúp bạn thấu hiểu thói quen mua sắm chỉ trong một cái nhìn. Nhẹ nhàng nhận ra đâu là đam mê, đâu là nhu cầu, để bạn luôn chủ động và thoải mái với dòng tiền của mình.",
+  "obTitle3": "Bình yên trong không gian của riêng bạn",
+  "obDesc3": "Mọi dữ liệu và kỷ niệm thân thương đều được bảo vệ an toàn tuyệt đối. Chỉ một chạm tay để mở khóa, bạn hoàn toàn an tâm rằng đây là thế giới riêng tư – nơi chỉ mình bạn được phép ghé thăm.",
   "obSkip": "Bỏ qua",
-  "obNext": "Tiếp tục",
-  "obStart": "Bắt đầu ngay",
+  "obStart": "Khám phá ngay",
 
   "dayLabel": "ngày",
   "spentLabel": "Đã tiêu",

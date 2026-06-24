@@ -21,10 +21,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   double _currentPage = 0.0;
   bool _isLastPage = false;
 
-  final List<Color> _pageColors = [
-    const Color(0xFF9D84B7),
-    const Color(0xFFF2A6A6),
-    const Color(0xFF83BCA9),
+  // Bảng màu gradient mới phù hợp với concept "Moment", "Insight" và "Cloud"
+  final List<List<Color>> _pageGradients = [
+    [
+      const Color(0xFFFC466B),
+      const Color(0xFF3F5EFB),
+    ], // Moments: Cảm xúc, Kỷ niệm (Hồng/Tím)
+    [
+      const Color(0xFFFF8008),
+      const Color(0xFFFFC837),
+    ], // Insights & Splurges: Phân tích (Cam/Vàng)
+    [
+      const Color(0xFF11998E),
+      const Color(0xFF2575FC),
+    ], // Cloud Security: An tâm, Bảo mật (Ngọc/Xanh lam)
   ];
 
   @override
@@ -49,18 +59,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await prefs.setBool('has_seen_onboarding', true);
 
     if (mounted) {
-      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 1000),
+          transitionDuration: const Duration(milliseconds: 800),
           pageBuilder: (_, _, _) => const LoginScreen(),
           transitionsBuilder: (_, animation, _, child) {
-            var scaleTween = Tween<double>(begin: 0.95, end: 1.0).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            var fadeTween = Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
             );
+            var slideTween =
+                Tween<Offset>(
+                  begin: const Offset(0, 0.05),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                );
             return FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(scale: scaleTween, child: child),
+              opacity: fadeTween,
+              child: SlideTransition(position: slideTween, child: child),
             );
           },
         ),
@@ -70,18 +89,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Color _getAmbientTint() {
     if (_currentPage < 0) return Colors.transparent;
-    if (_currentPage >= _pageColors.length - 1) {
-      return _pageColors.last.withValues(alpha: 0.08);
-    }
-
     int lowerIndex = _currentPage.floor();
+    if (lowerIndex >= _pageGradients.length - 1) {
+      return _pageGradients.last[0].withValues(alpha: 0.05);
+    }
     int upperIndex = lowerIndex + 1;
     double t = _currentPage - lowerIndex;
 
-    Color startColor = _pageColors[lowerIndex];
-    Color endColor = _pageColors[upperIndex];
+    Color startColor = _pageGradients[lowerIndex][0];
+    Color endColor = _pageGradients[upperIndex][0];
 
-    return Color.lerp(startColor, endColor, t)?.withValues(alpha: 0.08) ??
+    return Color.lerp(startColor, endColor, t)?.withValues(alpha: 0.05) ??
         Colors.transparent;
   }
 
@@ -90,27 +108,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final appColors = ref.watch(appColorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
+    // Dữ liệu được cập nhật icon theo concept mới
     final List<Map<String, dynamic>> pagesData = [
       {
-        'icon': CupertinoIcons.camera_fill,
+        'mainIcon': CupertinoIcons.camera_fill,
+        'subIcon': CupertinoIcons.heart_fill,
         'title': l10n.obTitle1,
         'description': l10n.obDesc1,
-        'color': _pageColors[0],
-        'rotation': -0.05,
+        'gradient': _pageGradients[0],
       },
       {
-        'icon': CupertinoIcons.chart_pie_fill,
+        'mainIcon': CupertinoIcons.chart_pie_fill,
+        'subIcon': CupertinoIcons
+            .sparkles, // Icon tia lửa đại diện cho "Biggest Splurges" & Insight
         'title': l10n.obTitle2,
         'description': l10n.obDesc2,
-        'color': _pageColors[1],
-        'rotation': 0.05,
+        'gradient': _pageGradients[1],
       },
       {
-        'icon': CupertinoIcons.lock_shield_fill,
+        'mainIcon': CupertinoIcons.cloud_fill,
+        'subIcon': CupertinoIcons.lock_shield_fill,
         'title': l10n.obTitle3,
         'description': l10n.obDesc3,
-        'color': _pageColors[2],
-        'rotation': -0.02,
+        'gradient': _pageGradients[2],
       },
     ];
 
@@ -118,85 +138,80 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       backgroundColor: appColors.background,
       body: Stack(
         children: [
-          // Lớp phủ màu Ambient Gradient mượt mà
-          Positioned.fill(child: Container(color: _getAmbientTint())),
-
+          Positioned.fill(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              color: _getAmbientTint(),
+            ),
+          ),
           SafeArea(
-            child: Stack(
+            child: Column(
               children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: PageView.builder(
-                        controller: _controller,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: pagesData.length,
-                        onPageChanged: (index) {
-                          HapticFeedback.lightImpact();
-                          setState(
-                            () => _isLastPage = index == pagesData.length - 1,
-                          );
-                        },
-                        itemBuilder: (context, index) {
-                          double diff = (_currentPage - index);
-                          double scale = (1 - (diff.abs() * 0.2)).clamp(
-                            0.8,
-                            1.0,
-                          );
-                          double opacity = (1 - (diff.abs() * 0.5)).clamp(
-                            0.0,
-                            1.0,
-                          );
-
-                          return Opacity(
-                            opacity: opacity,
-                            child: Transform.scale(
-                              scale: scale,
-                              child: _buildMomentPage(
-                                appColors: appColors,
-                                data: pagesData[index],
-                                parallaxOffset: diff,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    _buildBottomControls(appColors, l10n),
-                  ],
-                ),
-
-                Positioned(
-                  top: 16.0,
-                  right: 24.0,
-                  child: AnimatedOpacity(
-                    opacity: _isLastPage ? 0.0 : 1.0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                    child: IgnorePointer(
-                      ignoring: _isLastPage,
-                      child: TextButton(
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          _completeOnboarding(context);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: appColors.text.withValues(
-                            alpha: 0.5,
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0, right: 24.0),
+                    child: AnimatedOpacity(
+                      opacity: _isLastPage ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: IgnorePointer(
+                        ignoring: _isLastPage,
+                        child: TextButton(
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            _controller.animateToPage(
+                              pagesData.length - 1,
+                              duration: const Duration(milliseconds: 600),
+                              curve: Curves.easeInOutCubic,
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: appColors.textMuted,
                           ),
-                        ),
-                        child: Text(
-                          l10n.obSkip,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            letterSpacing: 0.5,
+                          child: Text(
+                            l10n.obSkip,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _controller,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: pagesData.length,
+                    onPageChanged: (index) {
+                      HapticFeedback.lightImpact();
+                      setState(
+                        () => _isLastPage = index == pagesData.length - 1,
+                      );
+                    },
+                    itemBuilder: (context, index) {
+                      double diff = (_currentPage - index);
+
+                      double scale = (1 - (diff.abs() * 0.15)).clamp(0.85, 1.0);
+                      double opacity = (1 - (diff.abs() * 0.8)).clamp(0.0, 1.0);
+
+                      return Opacity(
+                        opacity: opacity,
+                        child: Transform.scale(
+                          scale: scale,
+                          child: _buildFeaturePage(
+                            appColors: appColors,
+                            data: pagesData[index],
+                            parallaxOffset: diff,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                _buildBottomControls(appColors, l10n),
               ],
             ),
           ),
@@ -205,159 +220,179 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget _buildMomentPage({
+  Widget _buildFeaturePage({
     required AppColorTheme appColors,
     required Map<String, dynamic> data,
     required double parallaxOffset,
   }) {
-    final Color color = data['color'];
-    final double baseRotation = data['rotation'];
-    final double iconTranslateX = parallaxOffset * 60;
+    final List<Color> gradientColors = data['gradient'];
+    final IconData mainIcon = data['mainIcon'];
+    final IconData subIcon = data['subIcon'];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Transform.rotate(
-            angle: baseRotation + (parallaxOffset * 0.1),
-            child: Container(
-              height: 300,
-              width: 240,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  // Đổ bóng mịn màng và có màu sắc nhẹ ăn rơ với tone màu của trang hiện tại
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.15),
-                    blurRadius: 40,
-                    spreadRadius: -5,
-                    offset: const Offset(0, 20),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+    final double fastTranslate = parallaxOffset * 100;
+    final double slowTranslate = parallaxOffset * 40;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints
+                  .maxHeight, // Đảm bảo luôn giãn đầy chiều cao để căn giữa
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32.0,
+                vertical: 24.0,
               ),
-              // 🚀 CẬP NHẬT: Thực hiện hiệu ứng Glassmorphic bằng BackdropFilter
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 16,
-                    sigmaY: 16,
-                  ), // Độ nhòe kính mờ cao cấp
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      // Hạ opacity xuống khoảng 0.55 để lớp màu nền ambient lọt qua mờ ảo cực đẹp
-                      color: Colors.white.withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(24),
-                      // Viền bán trong suốt giả lập ánh sáng phản chiếu cạnh kính
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.65),
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        color.withValues(alpha: 0.25),
-                                        color.withValues(alpha: 0.75),
-                                      ],
-                                    ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 🚀 Dùng FittedBox để đồ họa 3D tự động co lại nếu màn hình ngang (bị lùn)
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      height: 340,
+                      width:
+                          340, // Chiều rộng cố định để FittedBox giữ đúng khung tỷ lệ
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: gradientColors[0].withValues(
+                                    alpha: 0.3,
                                   ),
-                                ),
-                                Positioned(
-                                  top: -50,
-                                  left: -50,
-                                  child: Container(
-                                    width: 150,
-                                    height: 150,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.18,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Center(
-                                  child: Transform.translate(
-                                    offset: Offset(iconTranslateX, 0),
-                                    child: Icon(
-                                      data['icon'],
-                                      size: 88,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  blurRadius: 80,
+                                  spreadRadius: 20,
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          height: 5,
-                          width: 48,
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(10),
+                          Transform.translate(
+                            offset: Offset(slowTranslate, 0),
+                            child: Container(
+                              width: 220,
+                              height: 260,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(32),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: gradientColors,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: gradientColors[1].withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: -30,
+                                    right: -30,
+                                    child: Icon(
+                                      CupertinoIcons.circle_fill,
+                                      size: 140,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Icon(
+                                      mainIcon,
+                                      size: 100,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
+                          Positioned(
+                            bottom: 30,
+                            right: 20,
+                            child: Transform.translate(
+                              offset: Offset(fastTranslate, 0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: appColors.surface,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  subIcon,
+                                  size: 36,
+                                  color: gradientColors[0],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+
+                  const SizedBox(height: 32),
+
+                  Text(
+                    data['title'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: appColors.text,
+                      letterSpacing: -0.5,
+                      height: 1.2,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    data['description'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: appColors.textMuted,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 64),
-          Text(
-            data['title'],
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              color: appColors.text,
-              letterSpacing: -0.5,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            data['description'],
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: appColors.text.withValues(alpha: 0.6),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildBottomControls(AppColorTheme appColors, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+    // 🚀 Giảm padding bottom từ 48 xuống 24 để màn hình ngang có thêm không gian thở
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -366,61 +401,83 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             count: 3,
             effect: ExpandingDotsEffect(
               spacing: 8,
-              dotColor: appColors.primary.withValues(alpha: 0.15),
-              activeDotColor: appColors.primary,
+              dotColor: appColors.primary.withValues(alpha: 0.2),
+              activeDotColor:
+                  _pageGradients[_currentPage.round().clamp(0, 2)][0],
               dotHeight: 8,
               dotWidth: 8,
-              expansionFactor: 3,
+              expansionFactor: 4,
             ),
           ),
           AnimatedContainer(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeOutBack,
-            width: _isLastPage ? 160 : 64,
+            width: _isLastPage ? 150 : 64,
             height: 64,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: appColors.primary,
-                padding: EdgeInsets.zero,
-                elevation: _isLastPage ? 8 : 2,
-                shadowColor: appColors.primary.withValues(alpha: 0.4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              gradient: LinearGradient(
+                colors: _isLastPage
+                    ? _pageGradients[2]
+                    : [appColors.primary, appColors.primary],
               ),
-              onPressed: () {
-                HapticFeedback.selectionClick();
-                if (_isLastPage) {
-                  _completeOnboarding(context);
-                } else {
-                  _controller.nextPage(
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.fastOutSlowIn,
-                  );
-                }
-              },
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(scale: animation, child: child);
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      (_isLastPage ? _pageGradients[2][0] : appColors.primary)
+                          .withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(32),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  if (_isLastPage) {
+                    _completeOnboarding(context);
+                  } else {
+                    _controller.nextPage(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.fastOutSlowIn,
+                    );
+                  }
                 },
-                child: _isLastPage
-                    ? Text(
-                        l10n.obStart,
-                        key: const ValueKey('start_text'),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 17,
-                          letterSpacing: 0.5,
-                        ),
-                      )
-                    : const Icon(
-                        CupertinoIcons.arrow_right,
-                        key: ValueKey('arrow_icon'),
-                        color: Colors.white,
-                        size: 28,
-                      ),
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            ),
+                          );
+                        },
+                    child: _isLastPage
+                        ? Text(
+                            l10n.obStart,
+                            key: const ValueKey('start_text'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18,
+                              letterSpacing: 0.5,
+                            ),
+                          )
+                        : const Icon(
+                            CupertinoIcons.arrow_right,
+                            key: ValueKey('arrow_icon'),
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                  ),
+                ),
               ),
             ),
           ),

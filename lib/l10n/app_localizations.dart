@@ -227,13 +227,13 @@ abstract class AppLocalizations {
   /// No description provided for @loginButtonText.
   ///
   /// In en, this message translates to:
-  /// **'Let\'s Go Inside ✨'**
+  /// **'Join now'**
   String get loginButtonText;
 
   /// No description provided for @loginGGButtonText.
   ///
   /// In en, this message translates to:
-  /// **'Let\'s Go By Google 🚀'**
+  /// **'Login By Google'**
   String get loginGGButtonText;
 
   /// No description provided for @emailNotVerifiedAlert.
@@ -1773,37 +1773,37 @@ abstract class AppLocalizations {
   /// No description provided for @obTitle1.
   ///
   /// In en, this message translates to:
-  /// **'Capture your spending moments.'**
+  /// **'Every spend, a story'**
   String get obTitle1;
 
   /// No description provided for @obDesc1.
   ///
   /// In en, this message translates to:
-  /// **'Log every expense through photos. Streamlined, fast, and delightfully text-free!'**
+  /// **'Don\'t let your hard-earned money fade into dull numbers. Capture the feeling behind every payment – attach a photo, jot down a note, and turn your transaction log into a visual diary of your life.'**
   String get obDesc1;
 
   /// No description provided for @obTitle2.
   ///
   /// In en, this message translates to:
-  /// **'See through your wallet.'**
+  /// **'Insights that inspire balance'**
   String get obTitle2;
 
   /// No description provided for @obDesc2.
   ///
   /// In en, this message translates to:
-  /// **'Beautiful and intuitive reports. Instantly know where your cash vanished.'**
+  /// **'Get beautifully simple, personalized reports by day, month, or year. Spot your true needs, track your passions, and effortlessly keep your budget in check – without the stress.'**
   String get obDesc2;
 
   /// No description provided for @obTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Your secure vault.'**
+  /// **'Peace of mind, locked in'**
   String get obTitle3;
 
   /// No description provided for @obDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Absolute privacy. Your spending secrets are for your eyes only.'**
+  /// **'Every memory and financial detail you treasure is protected with a secure lock that only you can open. This is your private sanctuary – safe, sound, and completely yours.'**
   String get obDesc3;
 
   /// No description provided for @obSkip.
@@ -1811,12 +1811,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get obSkip;
-
-  /// No description provided for @obNext.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get obNext;
 
   /// No description provided for @obStart.
   ///

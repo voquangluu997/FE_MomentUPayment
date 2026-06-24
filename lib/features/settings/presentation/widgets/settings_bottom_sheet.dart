@@ -882,10 +882,10 @@ class SettingsBottomSheet extends ConsumerWidget {
     );
   }
 
-  // 💡 HÀM MỚI: HIỂN THỊ DIALOG XÁC NHẬN XÓA TÀI KHOẢN
+  // 💡 HIỂN THỊ DIALOG XÁC NHẬN XÓA TÀI KHOẢN
   void _showDeleteAccountDialog(
     BuildContext context,
-    WidgetRef ref, // ref cũ này ta sẽ không dùng cho các tác vụ async nữa
+    WidgetRef ref,
     AppColorTheme appColors,
     AppLocalizations l10n,
   ) {
@@ -968,8 +968,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    // 🚀 GIẢI PHÁP: Sử dụng Consumer để tạo ra một 'ref' mới tinh,
-                    // thuộc về Dialog chứ không liên quan đến BottomSheet đã bị đóng.
                     child: Consumer(
                       builder: (context, dialogRef, child) {
                         return ElevatedButton(
@@ -988,7 +986,6 @@ class SettingsBottomSheet extends ConsumerWidget {
                           onPressed: () async {
                             HapticFeedback.heavyImpact();
                             try {
-                              // 🚀 SỬ DỤNG dialogRef thay vì ref cũ
                               await dialogRef
                                   .read(authProvider.notifier)
                                   .deleteAccount();

@@ -75,10 +75,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Google sign-in failed! Please try again 🌸';
 
   @override
-  String get loginButtonText => 'Let\'s Go Inside ✨';
+  String get loginButtonText => 'Join now';
 
   @override
-  String get loginGGButtonText => 'Let\'s Go By Google 🚀';
+  String get loginGGButtonText => 'Login By Google';
 
   @override
   String emailNotVerifiedAlert(String email) {
@@ -925,31 +925,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allReadSuccess => 'All notifications marked as read!';
 
   @override
-  String get obTitle1 => 'Capture your spending moments.';
+  String get obTitle1 => 'Every spend, a story';
 
   @override
   String get obDesc1 =>
-      'Log every expense through photos. Streamlined, fast, and delightfully text-free!';
+      'Don\'t let your hard-earned money fade into dull numbers. Capture the feeling behind every payment – attach a photo, jot down a note, and turn your transaction log into a visual diary of your life.';
 
   @override
-  String get obTitle2 => 'See through your wallet.';
+  String get obTitle2 => 'Insights that inspire balance';
 
   @override
   String get obDesc2 =>
-      'Beautiful and intuitive reports. Instantly know where your cash vanished.';
+      'Get beautifully simple, personalized reports by day, month, or year. Spot your true needs, track your passions, and effortlessly keep your budget in check – without the stress.';
 
   @override
-  String get obTitle3 => 'Your secure vault.';
+  String get obTitle3 => 'Peace of mind, locked in';
 
   @override
   String get obDesc3 =>
-      'Absolute privacy. Your spending secrets are for your eyes only.';
+      'Every memory and financial detail you treasure is protected with a secure lock that only you can open. This is your private sanctuary – safe, sound, and completely yours.';
 
   @override
   String get obSkip => 'Skip';
-
-  @override
-  String get obNext => 'Next';
 
   @override
   String get obStart => 'Get Started';

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moment_u_payment/features/auth/presentation/widgets/aurora_background.dart';
+import 'package:moment_u_payment/features/auth/presentation/widgets/unified_text_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../auth_provider.dart';
@@ -16,9 +19,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  // ✨ Trạng thái ẩn/hiện mật khẩu
-  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -50,32 +50,38 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
     final appColors = ref.watch(appColorsProvider);
+    final textTheme = Theme.of(context).textTheme;
 
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next == AuthState.registerSuccess) {
-        AppToast.showSuccess(context, l10n.registerSuccessMsg, appColors);
-        ref.read(authProvider.notifier).resetState();
-        Navigator.of(context).pop();
+        Future.microtask(() {
+          AppToast.showSuccess(context, l10n.registerSuccessMsg, appColors);
+          ref.read(authProvider.notifier).resetState();
+          Navigator.of(context).pop();
+        });
       } else if (next == AuthState.emailAlreadyExists) {
-        AppToast.showError(context, l10n.emailExistsError, appColors);
-        ref.read(authProvider.notifier).resetState();
+        Future.microtask(() {
+          AppToast.showError(context, l10n.emailExistsError, appColors);
+          ref.read(authProvider.notifier).resetState();
+        });
       } else if (next == AuthState.registerError) {
-        AppToast.showError(context, l10n.registerFailedError, appColors);
-        ref.read(authProvider.notifier).resetState();
+        Future.microtask(() {
+          AppToast.showError(context, l10n.registerFailedError, appColors);
+          ref.read(authProvider.notifier).resetState();
+        });
       }
     });
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: appColors.background,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              Icons
-                  .arrow_back_ios_new_rounded, // Đổi sang icon bo tròn tinh tế hơn
+              Icons.arrow_back_ios_new_rounded,
               color: appColors.text,
               size: 22,
             ),
@@ -85,7 +91,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             },
           ),
         ),
-        body: SafeArea(
+
+        // 🚀 SỬ DỤNG AURORA BACKGROUND ĐÃ TÁCH
+        body: AuroraBackground(
+          primaryColor: appColors.primary,
+          backgroundColor: appColors.background,
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
@@ -102,72 +112,106 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // 🌟 TYPOGRAPHY MỀM MẠI (Đồng bộ với Login)
-                        Center(
-                          child: Text(
-                            l10n.loginCreateAccountTitle,
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w500,
-                              color: appColors.primary,
-                              letterSpacing: 0.5,
-                            ),
-                            textAlign: TextAlign.center,
+                        const SizedBox(height: 10),
+
+                        // 🌟 TITLE
+                        Text(
+                          l10n.loginCreateAccountTitle,
+                          textAlign: TextAlign.center,
+                          style: textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 32,
+                            letterSpacing: -1.0,
+                            color: appColors.text,
+                            height: 1.1,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Center(
-                          child: Text(
-                            l10n.loginCreateAccountSub,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: appColors.textMuted,
-                              letterSpacing: 0.2,
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
+
+                        const SizedBox(height: 12),
+
+                        // 🌟 SUBTITLE (Đã bổ sung đầy đủ)
+                        Text(
+                          l10n.loginCreateAccountSub,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: appColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            height: 1.5,
                           ),
                         ),
-                        const SizedBox(height: 50),
 
-                        // 🌟 TEXTFIELDS BO TRÒN (PILL-SHAPE)
-                        _buildCustomTextField(
-                          controller: _nameController,
-                          label: l10n.name,
-                          hint: l10n.nameHint,
-                          icon: Icons.person_outline_rounded,
-                          textInputAction: TextInputAction.next,
-                          appColors: appColors,
+                        const SizedBox(height: 48),
+
+                        // 🌟 UNIFIED INPUT CARD THỜI THƯỢNG
+                        Container(
+                          decoration: BoxDecoration(
+                            color: appColors.cardBackground.withValues(
+                              alpha: 0.45,
+                            ),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: appColors.textMuted.withValues(
+                                alpha: 0.12,
+                              ),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              // 🚀 SỬ DỤNG TEXTFIELD ĐÃ TÁCH
+                              UnifiedTextField(
+                                controller: _nameController,
+                                label: l10n.name,
+                                hint: l10n.nameHint,
+                                icon: CupertinoIcons.person,
+                                textInputAction: TextInputAction.next,
+                                appColors: appColors,
+                              ),
+                              Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: appColors.textMuted.withValues(
+                                  alpha: 0.12,
+                                ),
+                                indent: 48,
+                                endIndent: 16,
+                              ),
+                              UnifiedTextField(
+                                controller: _emailController,
+                                label: l10n.email,
+                                hint: l10n.emailHint,
+                                icon: CupertinoIcons.mail,
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                appColors: appColors,
+                              ),
+                              Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: appColors.textMuted.withValues(
+                                  alpha: 0.12,
+                                ),
+                                indent: 48,
+                                endIndent: 16,
+                              ),
+                              UnifiedTextField(
+                                controller: _passwordController,
+                                label: l10n.password,
+                                hint: l10n.passwordHint,
+                                icon: CupertinoIcons.lock,
+                                isPassword: true,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _handleRegister(),
+                                appColors: appColors,
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 20),
 
-                        _buildCustomTextField(
-                          controller: _emailController,
-                          label: l10n.email,
-                          hint: l10n.emailHint,
-                          icon: Icons.alternate_email_rounded,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          appColors: appColors,
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 48),
 
-                        _buildCustomTextField(
-                          controller: _passwordController,
-                          label: l10n.password,
-                          hint: l10n.passwordHint,
-                          icon: Icons.lock_outline_rounded,
-                          isPassword: true,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => _handleRegister(),
-                          appColors: appColors,
-                        ),
-
-                        const SizedBox(height: 50),
-
-                        // 🌟 NÚT ĐĂNG KÝ (THÊM BÓNG ĐỔ SANG TRỌNG)
+                        // 🌟 NÚT ĐĂNG KÝ
                         authState == AuthState.loading
                             ? Center(
                                 child: CircularProgressIndicator(
@@ -181,9 +225,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   boxShadow: [
                                     BoxShadow(
                                       color: appColors.primary.withValues(
-                                        alpha: 0.3,
+                                        alpha: 0.35,
                                       ),
-                                      blurRadius: 15,
+                                      blurRadius: 18,
                                       offset: const Offset(0, 8),
                                     ),
                                   ],
@@ -193,15 +237,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: appColors.primary,
                                     foregroundColor: appColors.background,
-                                    elevation: 0, // Tắt elevation mặc định
+                                    elevation: 0,
                                     minimumSize: const Size(
                                       double.infinity,
                                       56,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        30,
-                                      ), // Bo tròn tuyệt đối
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                   child: Text(
@@ -215,7 +257,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                               ),
 
-                        const Spacer(), // Đẩy phần nội dung lên trên, tạo khoảng trống thanh lịch phía dưới
+                        const Spacer(),
                         const SizedBox(height: 24),
                       ],
                     ),
@@ -224,92 +266,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               );
             },
           ),
-        ),
-      ),
-    );
-  }
-
-  // 💡 HELPER: Hàm tạo TextField bo tròn tinh tế (Đồng bộ chuẩn 100% với LoginScreen)
-  Widget _buildCustomTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required dynamic appColors,
-    bool isPassword = false,
-    TextInputType keyboardType = TextInputType.text,
-    TextInputAction textInputAction = TextInputAction.done,
-    void Function(String)? onSubmitted,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: isPassword && !_isPasswordVisible,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      onFieldSubmitted: onSubmitted,
-      style: TextStyle(
-        color: appColors.text,
-        fontWeight: FontWeight.w500,
-        fontSize: 15,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-          color: appColors.textMuted,
-          fontWeight: FontWeight.w400,
-        ),
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: appColors.textMuted.withValues(alpha: 0.4),
-          fontSize: 14,
-        ),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-          child: Icon(
-            icon,
-            color: appColors.textMuted.withValues(alpha: 0.6),
-            size: 22,
-          ),
-        ),
-        suffixIcon: isPassword
-            ? Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded,
-                    color: appColors.textMuted.withValues(alpha: 0.6),
-                    size: 22,
-                  ),
-                  onPressed: () =>
-                      setState(() => _isPasswordVisible = !_isPasswordVisible),
-                ),
-              )
-            : null,
-        filled: true,
-        fillColor: appColors.cardBackground.withValues(alpha: 0.5),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-            color: appColors.textMuted.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-            color: appColors.textMuted.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: appColors.primary, width: 1.5),
         ),
       ),
     );

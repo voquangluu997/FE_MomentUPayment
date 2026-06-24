@@ -85,12 +85,13 @@ class AppColors {
   }
 }
 
-// --- ⚙️ LỚP CHỨA BỘ MÀU ĐƯỢC PHÂN PHÁT CHO TOÀN APP (Giữ nguyên cấu trúc) ---
+// --- ⚙️ LỚP CHỨA BỘ MÀU ĐƯỢC PHÂN PHÁT CHO TOÀN APP ---
 class AppColorTheme {
   final Color primary;
   final Color primaryDark;
   final Color background;
   final Color cardBackground;
+  final Color surface; // 👈 ĐÃ THÊM THUỘC TÍNH NÀY
 
   final Color text;
   final Color textPrimary;
@@ -108,6 +109,7 @@ class AppColorTheme {
     required this.primaryDark,
     required this.background,
     required this.cardBackground,
+    required this.surface, // 👈 ĐÃ THÊM YÊU CẦU NÀY
     required this.text,
     required this.textPrimary,
     required this.textMuted,
@@ -120,7 +122,7 @@ class AppColorTheme {
   });
 }
 
-// --- ⚡ PROVIDER TỰ ĐỘNG ĐỔI MÀU THÔNG MINH THEO THEME MODE (Giữ nguyên logic) ---
+// --- ⚡ PROVIDER TỰ ĐỘNG ĐỔI MÀU THÔNG MINH THEO THEME MODE ---
 final appColorsProvider = Provider<AppColorTheme>((ref) {
   final themeMode = ref.watch(themeModeProvider);
   final isDark = themeMode == ThemeMode.dark;
@@ -132,6 +134,9 @@ final appColorsProvider = Provider<AppColorTheme>((ref) {
     cardBackground: isDark
         ? AppColors.darkCardBackground
         : AppColors.cardBackground,
+
+    // 👈 GÁN SURFACE BẰNG CARD BACKGROUND (Chuẩn Material Design)
+    surface: isDark ? AppColors.darkCardBackground : AppColors.cardBackground,
 
     text: isDark ? AppColors.darkText : AppColors.text,
     textPrimary: isDark ? AppColors.darkText : AppColors.text,

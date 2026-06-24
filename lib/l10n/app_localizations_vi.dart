@@ -75,10 +75,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Đăng nhập bằng Google thất bại mất rồi! Thử lại nha 🌸';
 
   @override
-  String get loginButtonText => 'Đi vào thuiii ✨';
+  String get loginButtonText => 'Đăng nhập';
 
   @override
-  String get loginGGButtonText => 'Vào bằng google nè 🚀';
+  String get loginGGButtonText => 'Đăng nhập bằng google';
 
   @override
   String emailNotVerifiedAlert(String email) {
@@ -933,33 +933,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get allReadSuccess => 'Đã đánh dấu tất cả thông báo!';
 
   @override
-  String get obTitle1 => 'Lưu giữ khoảnh khắc thanh toán.';
+  String get obTitle1 => 'Lưu giữ khoảnh khắc chi tiêu';
 
   @override
   String get obDesc1 =>
-      'Ghi nhận mọi khoản chi bằng hình ảnh. Tinh giản, nhanh chóng, không lưu luyến văn bản!';
+      'Lưu giữ từng khoảnh khắc chi tiêu của bạn thành một mảnh ghép ký ức. Mỗi lần nhìn lại, bạn sẽ thấy cả một bức tranh chi tiêu sống động của chính mình theo một cách rất riêng.';
 
   @override
-  String get obTitle2 => 'Nhìn thấu ví tiền.';
+  String get obTitle2 => 'Thống kê chi tiêu, cân bằng cuộc sống';
 
   @override
   String get obDesc2 =>
-      'Báo cáo đẹp mắt, dễ hiểu. Biết ngay tiền \'bốc hơi\' vì đâu.';
+      'Những báo cáo thông minh theo ngày, tháng, năm sẽ giúp bạn thấu hiểu thói quen mua sắm chỉ trong một cái nhìn. Nhẹ nhàng nhận ra đâu là đam mê, đâu là nhu cầu, để bạn luôn chủ động và thoải mái với dòng tiền của mình.';
 
   @override
-  String get obTitle3 => 'Két sắt an toàn';
+  String get obTitle3 => 'Bình yên trong không gian của riêng bạn';
 
   @override
-  String get obDesc3 => 'Bảo mật tuyệt đối, chỉ mình bạn biết bí mật chi tiêu.';
+  String get obDesc3 =>
+      'Mọi dữ liệu và kỷ niệm thân thương đều được bảo vệ an toàn tuyệt đối. Chỉ một chạm tay để mở khóa, bạn hoàn toàn an tâm rằng đây là thế giới riêng tư – nơi chỉ mình bạn được phép ghé thăm.';
 
   @override
   String get obSkip => 'Bỏ qua';
 
   @override
-  String get obNext => 'Tiếp tục';
-
-  @override
-  String get obStart => 'Bắt đầu ngay';
+  String get obStart => 'Khám phá ngay';
 
   @override
   String get dayLabel => 'ngày';

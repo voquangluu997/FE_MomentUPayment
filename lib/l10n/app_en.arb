@@ -22,8 +22,8 @@
   "loginCreateAccountSub": "Join the lovely expense management world",
   "loginErrorNotification": "Incorrect email or password, please try again! 😢",
   "googleLoginErrorNotification": "Google sign-in failed! Please try again 🌸",
-  "loginButtonText": "Let's Go Inside ✨",
-  "loginGGButtonText": "Let's Go By Google 🚀",
+  "loginButtonText": "Join now",
+  "loginGGButtonText": "Login By Google",
   "emailNotVerifiedAlert": "Email {email} is not verified yet! 🔑",
   "@emailNotVerifiedAlert": {
     "placeholders": {
@@ -454,14 +454,13 @@
   "markAllAsRead": "Mark all as read",
   "allReadSuccess": "All notifications marked as read!",
 
-  "obTitle1": "Capture your spending moments.",
-  "obDesc1": "Log every expense through photos. Streamlined, fast, and delightfully text-free!",
-  "obTitle2": "See through your wallet.",
-  "obDesc2": "Beautiful and intuitive reports. Instantly know where your cash vanished.",
-  "obTitle3": "Your secure vault.",
-  "obDesc3": "Absolute privacy. Your spending secrets are for your eyes only.",
+  "obTitle1": "Every spend, a story",
+  "obDesc1": "Don't let your hard-earned money fade into dull numbers. Capture the feeling behind every payment – attach a photo, jot down a note, and turn your transaction log into a visual diary of your life.",
+  "obTitle2": "Insights that inspire balance",
+  "obDesc2": "Get beautifully simple, personalized reports by day, month, or year. Spot your true needs, track your passions, and effortlessly keep your budget in check – without the stress.",
+  "obTitle3": "Peace of mind, locked in",
+  "obDesc3": "Every memory and financial detail you treasure is protected with a secure lock that only you can open. This is your private sanctuary – safe, sound, and completely yours.",
   "obSkip": "Skip",
-  "obNext": "Next",
   "obStart": "Get Started",
 
   "dayLabel": "day",
