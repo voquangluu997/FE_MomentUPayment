@@ -62,8 +62,8 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
 
   // 👇 Đọc trạng thái xem user đã xem Onboarding chưa
-  // final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-  final hasSeenOnboarding = false;
+  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+  // final hasSeenOnboarding = false;
 
   // 7. Chạy ứng dụng
   runApp(
